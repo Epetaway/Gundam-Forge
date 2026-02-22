@@ -26,7 +26,9 @@ export interface DeckValidationResult {
   metrics: DeckValidationMetrics;
 }
 
-const DEFAULT_MAX_COPIES_WARNING = 4;
+const DEFAULT_MAX_COPIES_PER_CARD = 3; // Official rule: max 3 copies per card
+const EXACT_DECK_SIZE = 60; // Official rule: exactly 60 cards
+const MAX_COLORS = 2; // Official rule: max 2 colors (excluding Colorless)
 
 export const validateDeck = (
   deck: DeckCardEntry[],
@@ -72,29 +74,41 @@ export const validateDeck = (
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  if (totalCards !== 60) {
-    errors.push(`Deck must contain exactly 60 cards (currently ${totalCards}).`);
+  // Rule 1: Exactly 60 cards
+  if (totalCards !== EXACT_DECK_SIZE) {
+    errors.push(`Deck must contain exactly ${EXACT_DECK_SIZE} cards (currently ${totalCards}).`);
   }
 
+  // Rule 2: Maximum 2 colors (excluding Colorless)
   const colorsUsed = [...colors].sort();
-  if (colorsUsed.length > 2) {
-    errors.push(`Deck can contain at most 2 colors (currently ${colorsUsed.join(', ')}).`);
+  const nonColorlessColors = colorsUsed.filter(c => c !== 'Colorless');
+  if (nonColorlessColors.length > MAX_COLORS) {
+    errors.push(`Deck can contain at most ${MAX_COLORS} colors excluding Colorless (currently ${nonColorlessColors.join(', ')}).`);
   }
 
+  // Rule 3: Unknown card IDs
   if (unknownCardIds.size > 0) {
     errors.push(`Unknown card IDs found: ${[...unknownCardIds].sort().join(', ')}.`);
   }
 
-  const maxCopiesPerCard = options.maxCopiesPerCard;
+  // Rule 4: Maximum copies per card (default 3)
+  const maxCopiesPerCard = options.maxCopiesPerCard ?? DEFAULT_MAX_COPIES_PER_CARD;
 
   for (const [cardId, qty] of Object.entries(cardCopies)) {
-    if (typeof maxCopiesPerCard === 'number') {
-      if (qty > maxCopiesPerCard) {
-        errors.push(`Card ${cardId} exceeds max copies (${qty}/${maxCopiesPerCard}).`);
-      }
-    } else if (qty > DEFAULT_MAX_COPIES_WARNING) {
-      warnings.push(`Card ${cardId} has ${qty} copies (soft warning over ${DEFAULT_MAX_COPIES_WARNING}).`);
+    if (qty > maxCopiesPerCard) {
+      errors.push(`Card ${cardId} exceeds max copies (${qty}/${maxCopiesPerCard}).`);
     }
+  }
+
+  // Warning: Deck composition recommendations
+  if (typeCounts.Unit < 15) {
+    warnings.push(`Consider adding more Unit cards (currently ${typeCounts.Unit}, recommend at least 15).`);
+  }
+
+  const avgCost = Object.entries(costCurve).reduce((sum, [cost, count]) => 
+    sum + (parseInt(cost) * count), 0) / totalCards;
+  if (avgCost > 4.5) {
+    warnings.push(`Average card cost is high (${avgCost.toFixed(1)}). Consider adding lower-cost cards.`);
   }
 
   return {

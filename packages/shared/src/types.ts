@@ -10,5 +10,6 @@ export interface CardDefinition {
   type: CardType;
   set: string;
   text?: string;
+  power?: number;
   placeholderArt?: string;
 }
