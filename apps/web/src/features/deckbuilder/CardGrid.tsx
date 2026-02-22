@@ -30,6 +30,8 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
         const qty = qtyByCardId.get(card.id) ?? 0;
         const isSelected = selectedCardId === card.id;
         const isHovered = hoveredCardId === card.id;
+        // Use imageUrl if available, otherwise fall back to placeholderArt
+        const imageSrc = card.imageUrl || card.placeholderArt;
 
         return (
           <div
@@ -50,7 +52,7 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
               {/* Image */}
               <div className="relative w-full pb-[140%] bg-gray-100">
                 <img
-                  src={card.placeholderArt}
+                  src={imageSrc}
                   alt={card.name}
                   className="absolute inset-0 h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
                   loading="lazy"
@@ -69,6 +71,13 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
                 {card.power !== undefined && card.power  !== null && card.power > 0 && (
                   <div className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gcg-border text-xs font-bold text-gcg-text shadow-sm">
                     {card.power}
+                  </div>
+                )}
+
+                {/* Price Badge (if exists) */}
+                {card.price?.market !== undefined && (
+                  <div className="absolute top-2 right-2 flex items-center justify-center rounded-full bg-green-500 border border-green-600 text-white shadow-sm px-2 py-1 text-xs font-bold">
+                    ${card.price.market.toFixed(2)}
                   </div>
                 )}
 

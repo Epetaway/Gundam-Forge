@@ -4,3 +4,4 @@ export * from './validation';
 export * from './game-engine';
 export * from './card-schema';
 export * from './card-sources';
+export * from './price-api';

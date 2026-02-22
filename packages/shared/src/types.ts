@@ -2,6 +2,14 @@ export type CardColor = 'Blue' | 'Green' | 'Red' | 'White' | 'Black' | 'Colorles
 
 export type CardType = 'Unit' | 'Pilot' | 'Command' | 'Base';
 
+export interface CardPrice {
+  market?: number;
+  low?: number;
+  mid?: number;
+  high?: number;
+  foil?: number;
+}
+
 export interface CardDefinition {
   id: string;
   name: string;
@@ -12,4 +20,6 @@ export interface CardDefinition {
   text?: string;
   power?: number;
   placeholderArt?: string;
+  imageUrl?: string;
+  price?: CardPrice;
 }
