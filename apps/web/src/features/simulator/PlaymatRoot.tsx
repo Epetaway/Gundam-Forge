@@ -38,6 +38,7 @@ const CardStack = ({
   <div className={className}>
     {cards.slice(Math.max(0, cards.length - MAX_VISIBLE_STACK)).map((card, index) => {
       const def = cardsById.get(card.cardId);
+      const imageSrc = def?.imageUrl || def?.placeholderArt;
       return (
         <div
           key={card.instanceId}
@@ -47,7 +48,7 @@ const CardStack = ({
             event.dataTransfer.effectAllowed = 'move';
           }}
           onDoubleClick={() => onToggleTapped(card.instanceId)}
-          className="absolute h-24 w-16 cursor-grab rounded border border-slate-700 bg-slate-900 p-1 text-[10px] shadow"
+          className="absolute h-20 w-14 cursor-grab rounded-lg border border-white/40 shadow-md overflow-hidden"
           style={{
             transform: `translate(${index * STACK_OFFSET}px, 0px) rotate(${card.tapped ? 90 : 0}deg)`,
             transformOrigin: 'center center',
@@ -55,9 +56,16 @@ const CardStack = ({
           }}
           title={def?.name ?? card.cardId}
         >
-          <div className="flex h-full flex-col justify-between overflow-hidden rounded bg-slate-950 p-1">
-            <p className="line-clamp-2 text-[10px] font-medium leading-tight">{def?.name ?? card.cardId}</p>
-            <p className="text-[9px] text-slate-400">{def?.id ?? card.cardId}</p>
+          {imageSrc ? (
+            <img src={imageSrc} alt={def?.name} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full flex-col justify-between bg-gf-dark p-1">
+              <p className="line-clamp-2 text-[8px] font-medium text-white leading-tight">{def?.name ?? card.cardId}</p>
+              <p className="text-[7px] text-gray-400">{def?.id ?? card.cardId}</p>
+            </div>
+          )}
+          <div className="absolute top-0.5 left-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gf-blue text-[7px] font-bold text-white">
+            {def?.cost}
           </div>
         </div>
       );
@@ -75,17 +83,15 @@ export function PlaymatRoot({
   onToggleTapped
 }: PlaymatRootProps) {
   return (
-    <section className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-      <h2 className="mb-3 text-lg font-semibold">Playmat</h2>
-
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md border border-slate-700 bg-slate-950">
+    <section className="rounded-xl overflow-hidden">
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-gradient-to-br from-playmat-surface to-playmat-felt border border-white/10">
         {OFFICIAL_PLAYMAT_ZONE_TEMPLATE.map((zone) => {
           const zoneCards = zone.id === 'deck' ? deckPile : (zones[zone.id] ?? []);
 
           return (
             <div
               key={zone.id}
-              className="absolute rounded border border-sky-700/60 bg-sky-900/10"
+              className="absolute rounded-lg border border-white/20 bg-white/5 backdrop-blur-sm transition-colors hover:bg-white/10"
               style={{
                 left: `${zone.xPercent}%`,
                 top: `${zone.yPercent}%`,
@@ -103,7 +109,7 @@ export function PlaymatRoot({
                 onDropToZone(instanceId, zone.id);
               }}
             >
-              <p className="pointer-events-none absolute left-1 top-1 text-[10px] uppercase tracking-wide text-sky-300">
+              <p className="pointer-events-none absolute left-1.5 top-1 text-[10px] font-medium uppercase tracking-wide text-white/50">
                 {zone.label}
               </p>
               <CardStack
@@ -115,25 +121,6 @@ export function PlaymatRoot({
             </div>
           );
         })}
-      </div>
-
-      <div
-        className="mt-3 rounded border border-slate-700 bg-slate-950 p-3"
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'move';
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          const instanceId = readDragCardId(event);
-          if (!instanceId) return;
-          onDropToHand(instanceId);
-        }}
-      >
-        <p className="mb-2 text-xs uppercase tracking-wide text-slate-400">Hand</p>
-        <div className="relative min-h-28">
-          <CardStack cards={hand} cardsById={cardsById} onToggleTapped={onToggleTapped} className="relative h-24" />
-        </div>
       </div>
     </section>
   );

@@ -5,13 +5,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Official Gundam GCG Brand Colors
-        'gcg-primary': '#E60012',     // Official Bandai Red
-        'gcg-dark': '#1A1A1A',        // Dark background
-        'gcg-light': '#F5F5F5',       // Light background
-        'gcg-text': '#333333',        // Primary text
-        'gcg-border': '#E0E0E0',      // Border color
-        'gcg-hover': '#CC0010',       // Hover state
+        // Gundam Forge Brand Colors
+        'gf-blue': '#1A5CFF',         // Primary brand blue
+        'gf-blue-dark': '#0D47D1',    // Darker blue for hover
+        'gf-blue-light': '#E8F0FE',   // Light blue background
+        'gf-red': '#E60012',          // Bandai Red accent
+        'gf-red-dark': '#CC0010',     // Darker red for hover
+        'gf-orange': '#F59E0B',       // Warning/accent orange
+        'gf-dark': '#1A1A2E',         // Dark background
+        'gf-light': '#F8F9FC',        // Light page background
+        'gf-white': '#FFFFFF',        // Card/panel background
+        'gf-text': '#1F2937',         // Primary text
+        'gf-text-secondary': '#6B7280', // Secondary text
+        'gf-border': '#E5E7EB',       // Border color
+        'gf-border-dark': '#D1D5DB',  // Darker border
         // Card Colors (from official game)
         'card-white': '#FFFFFF',
         'card-blue': '#0066CC',
@@ -19,14 +26,17 @@ const config: Config = {
         'card-green': '#00AA44',
         'card-yellow': '#FFCC00',
         'card-black': '#333333',
+        // Playmat
+        'playmat-felt': '#1E3A5F',
+        'playmat-surface': '#2A4A6B',
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'heading': ['Roboto', 'sans-serif'],
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in',
-        'slide-up': 'slideUp 0.3s ease-out',
+        'fade-in': 'fadeIn 0.2s ease-in',
+        'slide-up': 'slideUp 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
