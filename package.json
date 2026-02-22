@@ -1,0 +1,14 @@
+{
+  "name": "gundam-forge",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "npm run --workspaces --if-present lint",
+    "qa": "npm run lint && npm run build",
+    "build": "npm run --workspaces --if-present build",
+    "dev:web": "npm --workspace @gundam-forge/web run dev"
+  }
+}
