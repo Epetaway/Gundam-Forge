@@ -7,10 +7,44 @@ export interface PlaymatZoneAnchor {
   heightPercent: number;
 }
 
+/**
+ * Official Gundam Card Game playmat zone layout.
+ *
+ * Layout follows the official game zones (Rule 4):
+ * - Top row (opponent side): Opponent's battle area + shield area
+ * - Bottom row (player side): Player's battle area + shield area
+ * - Left side: Deck, Resource Deck, Trash
+ * - Right side: Shield Area (shields + base)
+ * - Center: Battle Areas
+ *
+ * This is a simplified single-player view (your side only):
+ *
+ *  ┌─────────┬───────────────────────────────────┬──────────┐
+ *  │ Res Deck│         Battle Area               │ Shields  │
+ *  │         │  [Unit] [Unit] [Unit]              │ [Shield] │
+ *  │         │  [Unit] [Unit] [Unit]              │ [Base]   │
+ *  ├─────────┤                                    ├──────────┤
+ *  │  Deck   │                                    │  Trash   │
+ *  │         │         Resource Area              │          │
+ *  └─────────┴───────────────────────────────────┴──────────┘
+ */
 export const OFFICIAL_PLAYMAT_ZONE_TEMPLATE: PlaymatZoneAnchor[] = [
-  { id: 'deck', label: 'Deck', xPercent: 4, yPercent: 64, widthPercent: 12, heightPercent: 28 },
-  { id: 'discard', label: 'Discard', xPercent: 18, yPercent: 64, widthPercent: 12, heightPercent: 28 },
-  { id: 'resource', label: 'Resource', xPercent: 34, yPercent: 64, widthPercent: 12, heightPercent: 28 },
-  { id: 'battle-left', label: 'Battle Left', xPercent: 52, yPercent: 20, widthPercent: 14, heightPercent: 30 },
-  { id: 'battle-right', label: 'Battle Right', xPercent: 70, yPercent: 20, widthPercent: 14, heightPercent: 30 }
+  // Left column
+  { id: 'resource-deck', label: 'Res. Deck', xPercent: 1.5, yPercent: 3,   widthPercent: 11, heightPercent: 42 },
+  { id: 'deck',          label: 'Deck',      xPercent: 1.5, yPercent: 53,  widthPercent: 11, heightPercent: 42 },
+
+  // Center - Battle Area (top)
+  { id: 'battle',        label: 'Battle Area', xPercent: 14.5, yPercent: 3, widthPercent: 56, heightPercent: 42 },
+
+  // Center - Resource Area (bottom)
+  { id: 'resource',      label: 'Resources',   xPercent: 14.5, yPercent: 53, widthPercent: 56, heightPercent: 42 },
+
+  // Right column
+  { id: 'shields',       label: 'Shields',   xPercent: 72.5, yPercent: 3,  widthPercent: 13, heightPercent: 56 },
+  { id: 'base',          label: 'Base',      xPercent: 72.5, yPercent: 62, widthPercent: 13, heightPercent: 33 },
+  { id: 'trash',         label: 'Trash',     xPercent: 87.5, yPercent: 3,  widthPercent: 11, heightPercent: 42 },
+  { id: 'removal',       label: 'Removed',   xPercent: 87.5, yPercent: 53, widthPercent: 11, heightPercent: 42 },
 ];
+
+/** Zone IDs used in the game */
+export const ZONE_IDS = OFFICIAL_PLAYMAT_ZONE_TEMPLATE.map(z => z.id);

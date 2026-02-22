@@ -6,15 +6,14 @@
     "cost": 4,
     "type": "Unit",
     "set": "GD01 - Operation V",
-    "text": "Haste. When this enters, draw 1 card. While you control a Pilot, this gains +1 power.",
+    "text": "【Deploy】Draw 1 card. 【During Pair】This Unit gains AP+1.",
+    "ap": 5,
+    "hp": 5,
     "power": 5,
+    "linkCondition": "Amuro Ray",
+    "traits": ["Mobile Suit", "Gundam", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=RX-78-2+Gundam&font=roboto",
-    "price": {
-      "market": 2.21,
-      "low": 1.55,
-      "mid": 1.99,
-      "high": 2.87
-    },
+    "price": { "market": 2.21, "low": 1.55, "mid": 1.99, "high": 2.87 },
     "imageUrl": "/card_art/GD01-001.webp"
   },
   {
@@ -24,15 +23,14 @@
     "cost": 3,
     "type": "Unit",
     "set": "GD01 - Operation V",
-    "text": "Haste. When this attacks, destroy target Unit with power 3 or less.",
+    "text": "【Attack】Choose 1 enemy Unit with AP 3 or less and destroy it.",
+    "ap": 4,
+    "hp": 3,
     "power": 4,
+    "linkCondition": "Char Aznable",
+    "traits": ["Mobile Suit", "Zaku", "Zeon"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=MS-06S+Zaku+II&font=roboto",
-    "price": {
-      "market": 0.83,
-      "low": 0.58,
-      "mid": 0.75,
-      "high": 1.08
-    },
+    "price": { "market": 0.83, "low": 0.58, "mid": 0.75, "high": 1.08 },
     "imageUrl": "/card_art/GD01-002.webp"
   },
   {
@@ -42,15 +40,15 @@
     "cost": 2,
     "type": "Pilot",
     "set": "GD01 - Operation V",
-    "text": "Attach to a Unit. That Unit gains +2 power and First Strike.",
+    "text": "【Burst】Draw 1 card.\n<First Strike>. AP+2, HP+2.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 2,
     "power": 0,
+    "traits": ["Newtype", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Amuro+Ray&font=roboto",
-    "price": {
-      "market": 1.94,
-      "low": 1.36,
-      "mid": 1.75,
-      "high": 2.52
-    },
+    "price": { "market": 1.94, "low": 1.36, "mid": 1.75, "high": 2.52 },
     "imageUrl": "/card_art/GD01-003.webp"
   },
   {
@@ -60,15 +58,12 @@
     "cost": 1,
     "type": "Command",
     "set": "GD01 - Operation V",
-    "text": "Prevent the next 3 damage that would be dealt to target Unit or player this turn. Draw 1 card.",
+    "text": "【Action】Choose 1 friendly Unit. It recovers 3 HP. Draw 1 card.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Beam+Shield&font=roboto",
-    "price": {
-      "market": 0.68,
-      "low": 0.48,
-      "mid": 0.61,
-      "high": 0.88
-    },
+    "price": { "market": 0.68, "low": 0.48, "mid": 0.61, "high": 0.88 },
     "imageUrl": "/card_art/GD01-004.webp"
   },
   {
@@ -78,15 +73,13 @@
     "cost": 3,
     "type": "Base",
     "set": "GD01 - Operation V",
-    "text": "Generate 2 Blue resources at start of your turn. Your Units cost 1 less to play.",
+    "text": "Your Units cost 1 less to play (minimum 1).",
+    "ap": 0,
+    "hp": 4,
     "power": 4,
+    "traits": ["Colony", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=Side+7+Colony&font=roboto",
-    "price": {
-      "market": 1.58,
-      "low": 1.11,
-      "mid": 1.42,
-      "high": 2.05
-    },
+    "price": { "market": 1.58, "low": 1.11, "mid": 1.42, "high": 2.05 },
     "imageUrl": "/card_art/GD01-005.webp"
   },
   {
@@ -96,33 +89,29 @@
     "cost": 2,
     "type": "Unit",
     "set": "GD01 - Operation V",
-    "text": "When you play another Unit, this gains +1 power until end of turn.",
+    "text": "【Deploy】When you play another Unit this turn, this Unit gains AP+1 during this turn.",
+    "ap": 2,
+    "hp": 3,
     "power": 2,
+    "traits": ["Mobile Suit", "GM", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=RGM-79+GM&font=roboto",
-    "price": {
-      "market": 2.51,
-      "low": 1.76,
-      "mid": 2.26,
-      "high": 3.26
-    },
+    "price": { "market": 2.51, "low": 1.76, "mid": 2.26, "high": 3.26 },
     "imageUrl": "/card_art/GD01-006.webp"
   },
   {
     "id": "GD02-007",
     "name": "PMX-003 The-O",
-    "color": "Black",
+    "color": "Purple",
     "cost": 6,
     "type": "Unit",
     "set": "GD02 - Titans Rising",
-    "text": "Unblockable. Costs 1 less for each Pilot you control.",
+    "text": "<High-Maneuver>. Cost is reduced by 1 for each Pilot you control.",
+    "ap": 7,
+    "hp": 6,
     "power": 7,
-    "placeholderArt": "https://placehold.co/600x840/333333/FFFFFF?text=PMX-003+The-O&font=roboto",
-    "price": {
-      "market": 2.96,
-      "low": 2.07,
-      "mid": 2.66,
-      "high": 3.85
-    },
+    "traits": ["Mobile Suit", "Titans"],
+    "placeholderArt": "https://placehold.co/600x840/8B5CF6/FFFFFF?text=PMX-003+The-O&font=roboto",
+    "price": { "market": 2.96, "low": 2.07, "mid": 2.66, "high": 3.85 },
     "imageUrl": "/card_art/GD02-007.webp"
   },
   {
@@ -132,15 +121,15 @@
     "cost": 3,
     "type": "Pilot",
     "set": "GD02 - Titans Rising",
-    "text": "Attach to a Unit. That Unit gains Haste and +2 power. When attached Unit attacks, draw 1 card.",
+    "text": "【When Paired】Draw 1 card.\nAP+2, HP+1. 【Attack】Draw 1 card.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 1,
     "power": 0,
+    "traits": ["Newtype", "Zeon"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=Char+Aznable&font=roboto",
-    "price": {
-      "market": 0.95,
-      "low": 0.66,
-      "mid": 0.85,
-      "high": 1.23
-    },
+    "price": { "market": 0.95, "low": 0.66, "mid": 0.85, "high": 1.23 },
     "imageUrl": "/card_art/GD02-008.webp"
   },
   {
@@ -150,15 +139,12 @@
     "cost": 2,
     "type": "Command",
     "set": "GD02 - Titans Rising",
-    "text": "Deal 3 damage to target Unit. If that Unit has Flying, deal 5 damage instead.",
+    "text": "【Main】Deal 3 damage to 1 enemy Unit.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Beam+Rifle&font=roboto",
-    "price": {
-      "market": 0.59,
-      "low": 0.41,
-      "mid": 0.53,
-      "high": 0.77
-    },
+    "price": { "market": 0.59, "low": 0.41, "mid": 0.53, "high": 0.77 },
     "imageUrl": "/card_art/GD02-009.webp"
   },
   {
@@ -168,15 +154,13 @@
     "cost": 5,
     "type": "Unit",
     "set": "GD02 - Titans Rising",
-    "text": "Flying. When this attacks, deal 1 damage to all enemy Units without Flying.",
+    "text": "【Attack】Deal 1 damage to all enemy Units.",
+    "ap": 6,
+    "hp": 5,
     "power": 6,
+    "traits": ["Mobile Armor", "Zeon"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=Zeon+Armor&font=roboto",
-    "price": {
-      "market": 3.17,
-      "low": 2.22,
-      "mid": 2.85,
-      "high": 4.12
-    },
+    "price": { "market": 3.17, "low": 2.22, "mid": 2.85, "high": 4.12 },
     "imageUrl": "/card_art/GD02-010.webp"
   },
   {
@@ -186,15 +170,14 @@
     "cost": 4,
     "type": "Unit",
     "set": "ST07 - Celestial Drive",
-    "text": "When this enters, search your deck for a Pilot card and add it to your hand.",
+    "text": "【Deploy】Search your deck for 1 Pilot card and add it to your hand. Shuffle your deck.",
+    "ap": 5,
+    "hp": 4,
     "power": 5,
+    "linkCondition": "Kira Yamato",
+    "traits": ["Mobile Suit", "Gundam", "OMNI"],
     "placeholderArt": "https://placehold.co/600x840/00AA44/FFFFFF?text=Strike+Gundam&font=roboto",
-    "price": {
-      "market": 2.33,
-      "low": 1.63,
-      "mid": 2.1,
-      "high": 3.03
-    },
+    "price": { "market": 2.33, "low": 1.63, "mid": 2.1, "high": 3.03 },
     "imageUrl": "/card_art/ST07-001.webp"
   },
   {
@@ -204,15 +187,15 @@
     "cost": 3,
     "type": "Pilot",
     "set": "ST07 - Celestial Drive",
-    "text": "Attach to a Unit. Generate 1 additional resource each turn. Attached Unit gains +2 power.",
+    "text": "【Burst】Place 1 resource from your resource deck.\nAP+2, HP+2.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 2,
     "power": 0,
+    "traits": ["Coordinator", "OMNI"],
     "placeholderArt": "https://placehold.co/600x840/00AA44/FFFFFF?text=Kira+Yamato&font=roboto",
-    "price": {
-      "market": 1.76,
-      "low": 1.23,
-      "mid": 1.58,
-      "high": 2.29
-    },
+    "price": { "market": 1.76, "low": 1.23, "mid": 1.58, "high": 2.29 },
     "imageUrl": "/card_art/ST07-002.webp"
   },
   {
@@ -222,15 +205,13 @@
     "cost": 2,
     "type": "Unit",
     "set": "ST07 - Celestial Drive",
-    "text": "This costs 1 less for each other GINN you control.",
+    "text": "Cost is reduced by 1 for each other GINN you control (minimum 1).",
+    "ap": 3,
+    "hp": 2,
     "power": 3,
+    "traits": ["Mobile Suit", "GINN", "ZAFT"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=GINN&font=roboto",
-    "price": {
-      "market": 3.08,
-      "low": 2.16,
-      "mid": 2.77,
-      "high": 4
-    },
+    "price": { "market": 3.08, "low": 2.16, "mid": 2.77, "high": 4 },
     "imageUrl": "/card_art/ST07-003.webp"
   },
   {
@@ -240,15 +221,15 @@
     "cost": 2,
     "type": "Pilot",
     "set": "ST08 - Flash of Radiance",
-    "text": "When this enters, draw 2 cards. Attached Unit has protection from Commands.",
+    "text": "【When Paired】Draw 2 cards.\nAP+0, HP+2.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 0,
+    "hpModifier": 2,
     "power": 0,
+    "traits": ["Coordinator", "PLANT"],
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Lacus+Clyne&font=roboto",
-    "price": {
-      "market": 1.79,
-      "low": 1.25,
-      "mid": 1.61,
-      "high": 2.33
-    },
+    "price": { "market": 1.79, "low": 1.25, "mid": 1.61, "high": 2.33 },
     "imageUrl": "/card_art/ST08-004.webp"
   },
   {
@@ -258,15 +239,12 @@
     "cost": 2,
     "type": "Command",
     "set": "ST08 - Flash of Radiance",
-    "text": "Target Unit gains Armor 5 until end of turn. (Prevent the first 5 damage dealt to it this turn.)",
+    "text": "【Action】Choose 1 friendly Unit. It recovers 5 HP during this turn.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Phase+Shift&font=roboto",
-    "price": {
-      "market": 3.02,
-      "low": 2.11,
-      "mid": 2.72,
-      "high": 3.93
-    },
+    "price": { "market": 3.02, "low": 2.11, "mid": 2.72, "high": 3.93 },
     "imageUrl": "/card_art/ST08-005.webp"
   },
   {
@@ -276,15 +254,13 @@
     "cost": 4,
     "type": "Base",
     "set": "ST08 - Flash of Radiance",
-    "text": "Generate 2 resources of any color at start of your turn. You may draw an extra card each turn.",
+    "text": "At the start of your turn, draw 1 card.",
+    "ap": 0,
+    "hp": 5,
     "power": 5,
+    "traits": ["Warship", "Earth Alliance"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=Archangel&font=roboto",
-    "price": {
-      "market": 0.53,
-      "low": 0.37,
-      "mid": 0.48,
-      "high": 0.69
-    },
+    "price": { "market": 0.53, "low": 0.37, "mid": 0.48, "high": 0.69 },
     "imageUrl": "/card_art/ST08-006.webp"
   },
   {
@@ -294,15 +270,14 @@
     "cost": 5,
     "type": "Unit",
     "set": "GD03 - Steel Requiem",
-    "text": "Whenever you play a Command, this gains +1 power until end of turn. Can attack twice per turn.",
+    "text": "【Attack】This Unit gains AP+1 during this turn.",
+    "ap": 6,
+    "hp": 5,
     "power": 6,
+    "linkCondition": "Setsuna",
+    "traits": ["Mobile Suit", "Gundam", "Celestial Being"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=Gundam+Exia&font=roboto",
-    "price": {
-      "market": 2.36,
-      "low": 1.65,
-      "mid": 2.12,
-      "high": 3.07
-    },
+    "price": { "market": 2.36, "low": 1.65, "mid": 2.12, "high": 3.07 },
     "imageUrl": "/card_art/GD03-001.webp"
   },
   {
@@ -312,15 +287,15 @@
     "cost": 3,
     "type": "Pilot",
     "set": "GD03 - Steel Requiem",
-    "text": "Attach to a Unit. Attached Unit gains +3 power and 'When this attacks, untap it.'",
+    "text": "【Burst】Choose 1 friendly Unit. Set it to active.\nAP+3, HP+1.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 3,
+    "hpModifier": 1,
     "power": 0,
+    "traits": ["Meister", "Celestial Being"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=Setsuna&font=roboto",
-    "price": {
-      "market": 0.92,
-      "low": 0.64,
-      "mid": 0.83,
-      "high": 1.2
-    },
+    "price": { "market": 0.92, "low": 0.64, "mid": 0.83, "high": 1.2 },
     "imageUrl": "/card_art/GD03-002.webp"
   },
   {
@@ -330,15 +305,15 @@
     "cost": 1,
     "type": "Pilot",
     "set": "GD03 - Steel Requiem",
-    "text": "Attach to a Unit. When attached Unit attacks, you may pay 1: Draw a card.",
+    "text": "【Activate·Main】Rest this Unit: Draw 1 card.\nAP+0, HP+1.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 0,
+    "hpModifier": 1,
     "power": 0,
+    "traits": ["Support"],
     "placeholderArt": "https://placehold.co/600x840/CCCCCC/333333?text=Haro&font=roboto",
-    "price": {
-      "market": 3.32,
-      "low": 2.32,
-      "mid": 2.99,
-      "high": 4.32
-    },
+    "price": { "market": 3.32, "low": 2.32, "mid": 2.99, "high": 4.32 },
     "imageUrl": "/card_art/GD03-003.webp"
   },
   {
@@ -348,15 +323,12 @@
     "cost": 3,
     "type": "Command",
     "set": "GD03 - Steel Requiem",
-    "text": "Search your deck for up to 2 Blue cards and add them to your hand. Shuffle your deck.",
+    "text": "【Main】Search your deck for up to 2 Blue cards and add them to your hand. Shuffle your deck.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=GN+Drive&font=roboto",
-    "price": {
-      "market": 3.11,
-      "low": 2.18,
-      "mid": 2.8,
-      "high": 4.04
-    },
+    "price": { "market": 3.11, "low": 2.18, "mid": 2.8, "high": 4.04 },
     "imageUrl": "/card_art/GD03-004.webp"
   },
   {
@@ -366,15 +338,14 @@
     "cost": 4,
     "type": "Unit",
     "set": "GD04 - Phantom Aria",
-    "text": "Armor 2. This gains +1 power for each other Mobile Suit you control.",
+    "text": "This Unit gains AP+1 for each other Mobile Suit you control.",
+    "ap": 6,
+    "hp": 5,
     "power": 6,
+    "linkCondition": "Mikazuki",
+    "traits": ["Mobile Suit", "Gundam Frame", "Tekkadan"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=Barbatos&font=roboto",
-    "price": {
-      "market": 1.88,
-      "low": 1.32,
-      "mid": 1.69,
-      "high": 2.44
-    }
+    "price": { "market": 1.88, "low": 1.32, "mid": 1.69, "high": 2.44 }
   },
   {
     "id": "GD04-002",
@@ -383,15 +354,15 @@
     "cost": 2,
     "type": "Pilot",
     "set": "GD04 - Phantom Aria",
-    "text": "Attach to a Unit. Attached Unit has 'When this attacks, destroy target Unit with power 3 or less.'",
+    "text": "【Attack】Choose 1 enemy Unit with HP 3 or less and destroy it.\nAP+2, HP+1.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 1,
     "power": 0,
+    "traits": ["Human Debris", "Tekkadan"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=Mikazuki&font=roboto",
-    "price": {
-      "market": 3.08,
-      "low": 2.16,
-      "mid": 2.77,
-      "high": 4
-    }
+    "price": { "market": 3.08, "low": 2.16, "mid": 2.77, "high": 4 }
   },
   {
     "id": "GD04-003",
@@ -400,15 +371,15 @@
     "cost": 2,
     "type": "Pilot",
     "set": "GD04 - Phantom Aria",
-    "text": "Attach to a Unit. Your other Units cost 1 less to play. Draw 1 card when this enters.",
+    "text": "【When Paired】Draw 1 card.\nAP+1, HP+1. Your other Units cost 1 less to play.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 1,
+    "hpModifier": 1,
     "power": 0,
+    "traits": ["Tekkadan"],
     "placeholderArt": "https://placehold.co/600x840/CC0000/FFFFFF?text=Orga+Itsuka&font=roboto",
-    "price": {
-      "market": 2,
-      "low": 1.4,
-      "mid": 1.8,
-      "high": 2.6
-    }
+    "price": { "market": 2, "low": 1.4, "mid": 1.8, "high": 2.6 }
   },
   {
     "id": "GD05-001",
@@ -417,15 +388,14 @@
     "cost": 7,
     "type": "Unit",
     "set": "GD05 - Freedom Ascension",
-    "text": "When this enters, destroy all enemy Units with cost 4 or less. Pay 3: Transform to Destroy Mode (gains +2 power and Beam).",
+    "text": "【Deploy】Destroy all enemy Units with cost 4 or less. <Breach 2>.",
+    "ap": 8,
+    "hp": 7,
     "power": 8,
+    "linkCondition": "Banagher",
+    "traits": ["Mobile Suit", "Gundam", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/00AA44/FFFFFF?text=Unicorn&font=roboto",
-    "price": {
-      "market": 1.37,
-      "low": 0.96,
-      "mid": 1.23,
-      "high": 1.78
-    }
+    "price": { "market": 1.37, "low": 0.96, "mid": 1.23, "high": 1.78 }
   },
   {
     "id": "GD05-002",
@@ -434,15 +404,15 @@
     "cost": 4,
     "type": "Pilot",
     "set": "GD05 - Freedom Ascension",
-    "text": "Attach to a Unit. Pay 3: All your Units gain +4 power until end of turn. Attached Unit has protection from Black.",
+    "text": "【Activate·Main】Rest this Unit: All friendly Units gain AP+2 during this turn.\nAP+2, HP+3.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 3,
     "power": 0,
+    "traits": ["Newtype", "Earth Federation"],
     "placeholderArt": "https://placehold.co/600x840/00AA44/FFFFFF?text=Banagher+Links&font=roboto",
-    "price": {
-      "market": 1.61,
-      "low": 1.13,
-      "mid": 1.45,
-      "high": 2.09
-    }
+    "price": { "market": 1.61, "low": 1.13, "mid": 1.45, "high": 2.09 }
   },
   {
     "id": "GD05-003",
@@ -451,15 +421,12 @@
     "cost": 3,
     "type": "Command",
     "set": "GD05 - Freedom Ascension",
-    "text": "Target Unit gains +3 power and Beam until end of turn. Draw 1 card.",
+    "text": "【Main】Choose 1 friendly Unit. It gains AP+3 during this turn. Draw 1 card.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Full+Armor&font=roboto",
-    "price": {
-      "market": 1.25,
-      "low": 0.88,
-      "mid": 1.13,
-      "high": 1.63
-    }
+    "price": { "market": 1.25, "low": 0.88, "mid": 1.13, "high": 1.63 }
   },
   {
     "id": "ST09-001",
@@ -468,15 +435,14 @@
     "cost": 5,
     "type": "Unit",
     "set": "ST09 - Destiny Ignition",
-    "text": "Flying. Transform: Pay 2 to become Wing Zero (gains +2 power and First Strike).",
+    "text": "<First Strike>. 【Activate·Main】Pay 2: This Unit gains AP+2 during this turn.",
+    "ap": 6,
+    "hp": 5,
     "power": 6,
+    "linkCondition": "Heero Yuy",
+    "traits": ["Mobile Suit", "Gundam", "Colony"],
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Wing+Gundam&font=roboto",
-    "price": {
-      "market": 0.53,
-      "low": 0.37,
-      "mid": 0.48,
-      "high": 0.69
-    }
+    "price": { "market": 0.53, "low": 0.37, "mid": 0.48, "high": 0.69 }
   },
   {
     "id": "ST09-002",
@@ -485,15 +451,15 @@
     "cost": 3,
     "type": "Pilot",
     "set": "ST09 - Destiny Ignition",
-    "text": "Attach to a Unit. Attached Unit gains +2 power, Flying, and 'Cannot be destroyed by Commands.'",
+    "text": "【Burst】Destroy 1 enemy Unit.\nAP+2, HP+2. <First Strike>.",
+    "ap": 0,
+    "hp": 0,
+    "apModifier": 2,
+    "hpModifier": 2,
     "power": 0,
+    "traits": ["Colony"],
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Heero+Yuy&font=roboto",
-    "price": {
-      "market": 2.24,
-      "low": 1.57,
-      "mid": 2.02,
-      "high": 2.91
-    }
+    "price": { "market": 2.24, "low": 1.57, "mid": 2.02, "high": 2.91 }
   },
   {
     "id": "ST09-003",
@@ -502,15 +468,12 @@
     "cost": 4,
     "type": "Command",
     "set": "ST09 - Destiny Ignition",
-    "text": "Destroy target Unit with power 6 or less. Deal 3 damage to opponent.",
+    "text": "【Main】Destroy 1 enemy Unit with HP 6 or less. Deal 3 damage to the first card in the enemy shield area.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/FFFFFF/333333?text=Buster+Rifle&font=roboto",
-    "price": {
-      "market": 2.27,
-      "low": 1.59,
-      "mid": 2.04,
-      "high": 2.95
-    }
+    "price": { "market": 2.27, "low": 1.59, "mid": 2.04, "high": 2.95 }
   },
   {
     "id": "GD06-011",
@@ -519,15 +482,13 @@
     "cost": 5,
     "type": "Unit",
     "set": "GD06 - Ace Pilots",
-    "text": "Flying. Transform: Pay 2 to become Wave Rider mode (gains +1 power and cannot be blocked).",
+    "text": "<High-Maneuver>. 【Activate·Main】Pay 2: This Unit gains AP+1 during this turn.",
+    "ap": 6,
+    "hp": 5,
     "power": 6,
+    "traits": ["Mobile Suit", "Gundam", "AEUG"],
     "placeholderArt": "https://placehold.co/600x840/0066CC/FFFFFF?text=Zeta+Gundam&font=roboto",
-    "price": {
-      "market": 2.93,
-      "low": 2.05,
-      "mid": 2.64,
-      "high": 3.81
-    }
+    "price": { "market": 2.93, "low": 2.05, "mid": 2.64, "high": 3.81 }
   },
   {
     "id": "GD06-001",
@@ -536,15 +497,12 @@
     "cost": 1,
     "type": "Command",
     "set": "GD06 - Ace Pilots",
-    "text": "Add 2 colorless resources to your resource pool. Draw 1 card.",
+    "text": "【Main】Place 2 resources from your resource deck. Draw 1 card.",
+    "ap": 0,
+    "hp": 0,
     "power": 0,
     "placeholderArt": "https://placehold.co/600x840/CCCCCC/333333?text=Resource&font=roboto",
-    "price": {
-      "market": 2.69,
-      "low": 1.88,
-      "mid": 2.42,
-      "high": 3.5
-    }
+    "price": { "market": 2.69, "low": 1.88, "mid": 2.42, "high": 3.5 }
   },
   {
     "id": "GD06-002",
@@ -553,14 +511,12 @@
     "cost": 2,
     "type": "Base",
     "set": "GD06 - Ace Pilots",
-    "text": "Generate 1 resource of any color at start of your turn. Your Units gain +1 power.",
+    "text": "Your Units gain AP+1.",
+    "ap": 0,
+    "hp": 3,
     "power": 3,
+    "traits": ["Facility"],
     "placeholderArt": "https://placehold.co/600x840/CCCCCC/333333?text=Hangar&font=roboto",
-    "price": {
-      "market": 2.84,
-      "low": 1.99,
-      "mid": 2.56,
-      "high": 3.69
-    }
+    "price": { "market": 2.84, "low": 1.99, "mid": 2.56, "high": 3.69 }
   }
 ]

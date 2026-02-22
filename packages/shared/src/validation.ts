@@ -11,10 +11,12 @@ export interface ValidateDeckOptions {
 
 export interface DeckValidationMetrics {
   totalCards: number;
+  mainDeckCards: number;
+  resourceDeckCards: number;
   unknownCardIds: string[];
   colorsUsed: CardColor[];
   colorCounts: Partial<Record<CardColor, number>>;
-  typeCounts: Record<CardType, number>;
+  typeCounts: Record<string, number>;
   costCurve: Record<number, number>;
   cardCopies: Record<string, number>;
 }
@@ -26,9 +28,14 @@ export interface DeckValidationResult {
   metrics: DeckValidationMetrics;
 }
 
-const DEFAULT_MAX_COPIES_PER_CARD = 3; // Official rule: max 3 copies per card
-const EXACT_DECK_SIZE = 60; // Official rule: exactly 60 cards
-const MAX_COLORS = 2; // Official rule: max 2 colors (excluding Colorless)
+/** Official rules: max 4 copies per card number (Rule 2-1-2) */
+const DEFAULT_MAX_COPIES_PER_CARD = 4;
+/** Official rules: main deck is exactly 50 cards (Rule 6-1-1) */
+const MAIN_DECK_SIZE = 50;
+/** Official rules: resource deck is exactly 10 cards (Rule 6-1-1) */
+const RESOURCE_DECK_SIZE = 10;
+/** Official rules: max 2 colors excluding Colorless (Rule 6-1-1-2) */
+const MAX_COLORS = 2;
 
 export const validateDeck = (
   deck: DeckCardEntry[],
@@ -40,11 +47,12 @@ export const validateDeck = (
     .map((entry) => ({ cardId: entry.cardId, qty: Math.max(0, Math.floor(entry.qty)) }))
     .filter((entry) => entry.cardId.trim().length > 0 && entry.qty > 0);
 
-  const typeCounts: Record<CardType, number> = {
+  const typeCounts: Record<string, number> = {
     Unit: 0,
     Pilot: 0,
     Command: 0,
-    Base: 0
+    Base: 0,
+    Resource: 0,
   };
 
   const costCurve: Record<number, number> = {};
@@ -54,6 +62,8 @@ export const validateDeck = (
   const colors = new Set<CardColor>();
 
   let totalCards = 0;
+  let mainDeckCards = 0;
+  let resourceDeckCards = 0;
 
   for (const entry of normalizedDeck) {
     totalCards += entry.qty;
@@ -65,50 +75,67 @@ export const validateDeck = (
       continue;
     }
 
-    colors.add(card.color);
-    colorCounts[card.color] = (colorCounts[card.color] ?? 0) + entry.qty;
-    typeCounts[card.type] += entry.qty;
-    costCurve[card.cost] = (costCurve[card.cost] ?? 0) + entry.qty;
+    // Separate Resource cards from main deck cards
+    if (card.type === 'Resource') {
+      resourceDeckCards += entry.qty;
+    } else {
+      mainDeckCards += entry.qty;
+      colors.add(card.color);
+      colorCounts[card.color] = (colorCounts[card.color] ?? 0) + entry.qty;
+      costCurve[card.cost] = (costCurve[card.cost] ?? 0) + entry.qty;
+    }
+
+    typeCounts[card.type] = (typeCounts[card.type] ?? 0) + entry.qty;
   }
 
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Rule 1: Exactly 60 cards
-  if (totalCards !== EXACT_DECK_SIZE) {
-    errors.push(`Deck must contain exactly ${EXACT_DECK_SIZE} cards (currently ${totalCards}).`);
+  // Rule 1: Main deck = exactly 50 cards (Rule 6-1-1)
+  if (mainDeckCards !== MAIN_DECK_SIZE) {
+    errors.push(`Main deck must contain exactly ${MAIN_DECK_SIZE} cards (currently ${mainDeckCards}).`);
   }
 
-  // Rule 2: Maximum 2 colors (excluding Colorless)
+  // Rule 2: Resource deck = exactly 10 cards (Rule 6-1-1)
+  if (resourceDeckCards > 0 && resourceDeckCards !== RESOURCE_DECK_SIZE) {
+    errors.push(`Resource deck must contain exactly ${RESOURCE_DECK_SIZE} cards (currently ${resourceDeckCards}).`);
+  }
+
+  // Rule 3: Maximum 2 colors excluding Colorless (Rule 6-1-1-2)
   const colorsUsed = [...colors].sort();
   const nonColorlessColors = colorsUsed.filter(c => c !== 'Colorless');
   if (nonColorlessColors.length > MAX_COLORS) {
     errors.push(`Deck can contain at most ${MAX_COLORS} colors excluding Colorless (currently ${nonColorlessColors.join(', ')}).`);
   }
 
-  // Rule 3: Unknown card IDs
+  // Rule 4: Unknown card IDs
   if (unknownCardIds.size > 0) {
     errors.push(`Unknown card IDs found: ${[...unknownCardIds].sort().join(', ')}.`);
   }
 
-  // Rule 4: Maximum copies per card (default 3)
+  // Rule 5: Maximum 4 copies per card (Rule 2-1-2)
   const maxCopiesPerCard = options.maxCopiesPerCard ?? DEFAULT_MAX_COPIES_PER_CARD;
-
   for (const [cardId, qty] of Object.entries(cardCopies)) {
     if (qty > maxCopiesPerCard) {
       errors.push(`Card ${cardId} exceeds max copies (${qty}/${maxCopiesPerCard}).`);
     }
   }
 
-  // Warning: Deck composition recommendations
-  if (typeCounts.Unit < 15) {
+  // Warnings
+  if (mainDeckCards > 0 && typeCounts.Unit < 15) {
     warnings.push(`Consider adding more Unit cards (currently ${typeCounts.Unit}, recommend at least 15).`);
   }
 
-  const avgCost = Object.entries(costCurve).reduce((sum, [cost, count]) => 
-    sum + (parseInt(cost) * count), 0) / totalCards;
-  if (avgCost > 4.5) {
-    warnings.push(`Average card cost is high (${avgCost.toFixed(1)}). Consider adding lower-cost cards.`);
+  if (resourceDeckCards === 0 && mainDeckCards > 0) {
+    warnings.push(`No Resource cards in deck. The simulator will generate placeholder resources.`);
+  }
+
+  if (mainDeckCards > 0) {
+    const avgCost = Object.entries(costCurve).reduce((sum, [cost, count]) =>
+      sum + (parseInt(cost) * count), 0) / mainDeckCards;
+    if (avgCost > 4.5) {
+      warnings.push(`Average card cost is high (${avgCost.toFixed(1)}). Consider adding lower-cost cards.`);
+    }
   }
 
   return {
@@ -117,6 +144,8 @@ export const validateDeck = (
     warnings,
     metrics: {
       totalCards,
+      mainDeckCards,
+      resourceDeckCards,
       unknownCardIds: [...unknownCardIds].sort(),
       colorsUsed,
       colorCounts,
