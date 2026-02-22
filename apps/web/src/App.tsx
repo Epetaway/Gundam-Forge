@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import cardsJson from './data/cards.json';
 import { validateDeck, type CardDefinition } from '@gundam-forge/shared';
@@ -49,11 +49,6 @@ function App() {
   );
 
   const validation = useMemo(() => validateDeck(deckEntries, catalogCards), [deckEntries, catalogCards]);
-
-  const totalCards = useMemo(
-    () => deckEntries.reduce((sum, e) => sum + e.qty, 0),
-    [deckEntries]
-  );
 
   const navItems = [
     { to: '/builder', label: 'Deck Builder' },

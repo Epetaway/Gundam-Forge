@@ -30,86 +30,126 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
   const typeMax = maxValue(typeRows.map((row) => row.count));
   const colorMax = maxValue(colorRows.map((row) => row.count));
 
+  const colorBarColors: Record<string, string> = {
+    White: 'from-gray-300 to-gray-400',
+    Blue: 'from-blue-500 to-blue-600',
+    Red: 'from-red-500 to-red-600',
+    Green: 'from-green-500 to-green-600',
+    Black: 'from-gray-700 to-gray-800',
+    Colorless: 'from-gray-400 to-gray-500',
+  };
+
   return (
-    <section className="space-y-4 rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="relative rounded-lg border border-gcg-border bg-gcg-light p-4">
-        <h2 className="text-xl font-bold tracking-wider text-gcg-dark">Deck Diagnostics</h2>
-        <p className="mt-1 text-xs uppercase tracking-widest text-gray-600">
-          Deck Analysis: {total} cards · {validation.isValid ? <span className="text-green-600">● Valid</span> : <span className="text-red-600">● Invalid</span>}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-heading text-2xl font-bold text-gf-text">Deck Analytics</h2>
+          <p className="text-sm text-gf-text-secondary mt-1">
+            {total} cards ·{' '}
+            {validation.isValid ? (
+              <span className="text-green-600 font-medium">Valid</span>
+            ) : (
+              <span className="text-red-600 font-medium">Invalid</span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {[
+          { label: 'Total Cards', value: total, color: 'text-gf-blue' },
+          { label: 'Unique Cards', value: Object.keys(validation.metrics.costCurve).length, color: 'text-purple-600' },
+          { label: 'Types', value: typeRows.length, color: 'text-green-600' },
+          { label: 'Colors', value: colorRows.length, color: 'text-gf-orange' },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="rounded-xl border border-gf-border bg-white p-5 shadow-sm">
+            <p className="text-sm text-gf-text-secondary">{label}</p>
+            <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
+          </div>
+        ))}
       </div>
 
       {/* Cost Curve */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
-          Cost Curve Distribution
-        </h3>
+      <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-bold text-gf-text">Cost Curve Distribution</h3>
         {costCurveRows.length === 0 ? (
-          <p className="text-xs text-gray-500">No data available</p>
+          <p className="text-sm text-gf-text-secondary">No data available</p>
         ) : (
-          <ul className="space-y-2">
+          <div className="space-y-3">
             {costCurveRows.map((row) => (
-              <li key={row.cost} className="flex items-center gap-3">
-                <span className="w-12 text-sm font-bold text-gray-700">{row.cost}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded border border-gcg-border bg-gcg-light">
-                  <div
-                    className="h-6 bg-gradient-to-r from-gcg-primary to-red-700 transition-all duration-300"
-                    style={{ width: `${(row.count / curveMax) * 100}%` }}
-                  />
+              <div key={row.cost} className="flex items-center gap-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gf-blue text-xs font-bold text-white">
+                  {row.cost}
                 </div>
-                <span className="w-12 text-right text-sm font-bold text-gcg-dark">{row.count}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Type Distribution */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
-          Type Distribution
-        </h3>
-        <ul className="space-y-2">
-          {typeRows.map((row) => (
-            <li key={row.type} className="flex items-center gap-3">
-              <span className="w-20 truncate text-sm font-semibold text-gcg-dark">{row.type}</span>
-              <div className="h-6 flex-1 overflow-hidden rounded border border-gcg-border bg-gcg-light">
-                <div
-                  className="h-6 bg-gradient-to-r from-green-500 to-green-700 transition-all duration-300"
-                  style={{ width: `${(row.count / typeMax) * 100}%` }}
-                />
+                <div className="h-8 flex-1 overflow-hidden rounded-lg bg-gf-light">
+                  <div
+                    className="h-8 rounded-lg bg-gradient-to-r from-gf-blue to-blue-600 transition-all duration-300 flex items-center pl-3"
+                    style={{ width: `${Math.max((row.count / curveMax) * 100, 8)}%` }}
+                  >
+                    <span className="text-xs font-bold text-white">{row.count}</span>
+                  </div>
+                </div>
               </div>
-              <span className="w-12 text-right text-sm font-bold text-gcg-dark">{row.count}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Color Distribution */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
-          Color Distribution
-        </h3>
-        {colorRows.length === 0 ? (
-          <p className="text-xs text-gray-500">No colors yet</p>
-        ) : (
-          <ul className="space-y-2">
-            {colorRows.map((row) => (
-              <li key={row.color} className="flex items-center gap-3">
-                <span className="w-20 truncate text-sm font-semibold text-gcg-dark">{row.color}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded border border-gcg-border bg-gcg-light">
-                  <div
-                    className="h-6 bg-gradient-to-r from-blue-500 to-blue-700 transition-all duration-300"
-                    style={{ width: `${(row.count / colorMax) * 100}%` }}
-                  />
-                </div>
-                <span className="w-12 text-right text-sm font-bold text-gcg-dark">{row.count}</span>
-              </li>
             ))}
-          </ul>
+          </div>
         )}
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Type Distribution */}
+        <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+          <h3 className="mb-4 text-sm font-bold text-gf-text">Type Distribution</h3>
+          <div className="space-y-3">
+            {typeRows.map((row) => {
+              const pct = total > 0 ? ((row.count / total) * 100).toFixed(0) : '0';
+              return (
+                <div key={row.type} className="flex items-center gap-3">
+                  <span className="w-16 text-sm font-medium text-gf-text">{row.type}</span>
+                  <div className="h-7 flex-1 overflow-hidden rounded-lg bg-gf-light">
+                    <div
+                      className="h-7 rounded-lg bg-gradient-to-r from-green-500 to-green-600 transition-all duration-300 flex items-center pl-3"
+                      style={{ width: `${Math.max((row.count / typeMax) * 100, 10)}%` }}
+                    >
+                      <span className="text-xs font-bold text-white">{row.count}</span>
+                    </div>
+                  </div>
+                  <span className="w-10 text-right text-xs text-gf-text-secondary">{pct}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Color Distribution */}
+        <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+          <h3 className="mb-4 text-sm font-bold text-gf-text">Color Distribution</h3>
+          {colorRows.length === 0 ? (
+            <p className="text-sm text-gf-text-secondary">No colors yet</p>
+          ) : (
+            <div className="space-y-3">
+              {colorRows.map((row) => {
+                const pct = total > 0 ? ((row.count / total) * 100).toFixed(0) : '0';
+                return (
+                  <div key={row.color} className="flex items-center gap-3">
+                    <span className="w-16 text-sm font-medium text-gf-text">{row.color}</span>
+                    <div className="h-7 flex-1 overflow-hidden rounded-lg bg-gf-light">
+                      <div
+                        className={`h-7 rounded-lg bg-gradient-to-r ${colorBarColors[row.color] || 'from-blue-500 to-blue-600'} transition-all duration-300 flex items-center pl-3`}
+                        style={{ width: `${Math.max((row.count / colorMax) * 100, 10)}%` }}
+                      >
+                        <span className="text-xs font-bold text-white">{row.count}</span>
+                      </div>
+                    </div>
+                    <span className="w-10 text-right text-xs text-gf-text-secondary">{pct}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
