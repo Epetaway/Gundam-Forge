@@ -9,6 +9,7 @@
     "lint": "npm run --workspaces --if-present lint",
     "qa": "npm run lint && npm run build",
     "build": "npm run --workspaces --if-present build",
-    "dev:web": "npm --workspace @gundam-forge/web run dev"
+    "dev:web": "npm --workspace @gundam-forge/web run dev",
+    "fetch-assets": "tsx scripts/fetchCardAssets.ts"
   }
 }
