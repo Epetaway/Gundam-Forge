@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { Link, Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import cardsJson from './data/cards.json';
 import { validateDeck, type CardDefinition } from '@gundam-forge/shared';
 import { ModernCardCatalog } from './features/deckbuilder/ModernCardCatalog';
@@ -19,6 +19,7 @@ function App() {
   const deckEntries = useDeckStore((state) => state.entries);
   const loadFromStorage = useDeckStore((state) => state.loadFromStorage);
   const hydratedFromStorage = useDeckStore((state) => state.hydratedFromStorage);
+  const location = useLocation();
 
   useEffect(() => {
     hydrateCards(cards);
@@ -49,119 +50,176 @@ function App() {
 
   const validation = useMemo(() => validateDeck(deckEntries, catalogCards), [deckEntries, catalogCards]);
 
+  const totalCards = useMemo(
+    () => deckEntries.reduce((sum, e) => sum + e.qty, 0),
+    [deckEntries]
+  );
+
   const navItems = [
-    { to: '/', label: 'Hangar' },
-    { to: '/builder', label: 'Builder' },
-    { to: '/sim', label: 'Simulator' },
-    { to: '/diagnostics', label: 'Diagnostics' }
+    { to: '/builder', label: 'Deck Builder' },
+    { to: '/catalog', label: 'Card Catalog' },
+    { to: '/sim', label: 'Deck Test' },
+    { to: '/diagnostics', label: 'Analytics' }
   ];
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <main className="relative min-h-screen w-full bg-gcg-light">
-      {/* Header - Official GCG Style */}
-      <header className="bg-white border-b border-gcg-border shadow-sm sticky top-0 z-50">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center justify-between py-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="text-gcg-primary font-heading text-2xl font-bold">
-                GUNDAM CARD GAME
+    <div className="min-h-screen w-full bg-gf-light">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-gf-border bg-white shadow-sm">
+        <div className="flex h-16 items-center justify-between px-6">
+          {/* Left: Logo + Nav */}
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2.5">
+              {/* GF Logo Icon */}
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-gf-blue to-gf-blue-dark">
+                <span className="text-sm font-black text-white tracking-tight">GF</span>
               </div>
+              <span className="font-heading text-xl font-bold text-gf-text">
+                Gundam <span className="text-gf-blue">Forge</span>
+              </span>
             </Link>
-            
-            {/* Navigation - Official Style */}
-            <nav className="flex items-center gap-1">
+
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="px-4 py-2 text-sm font-medium text-gcg-text hover:text-gcg-primary hover:bg-gcg-light rounded transition-colors"
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    isActive(item.to)
+                      ? 'text-gf-blue bg-gf-blue-light'
+                      : 'text-gf-text-secondary hover:text-gf-text hover:bg-gray-50'
+                  }`}
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
           </div>
+
+          {/* Right: Icons */}
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <button className="flex h-9 w-9 items-center justify-center rounded-lg text-gf-text-secondary hover:bg-gray-100 transition-colors">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" strokeLinecap="round" />
+              </svg>
+            </button>
+            {/* Notifications */}
+            <button className="flex h-9 w-9 items-center justify-center rounded-lg text-gf-text-secondary hover:bg-gray-100 transition-colors">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </button>
+            {/* User Avatar */}
+            <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-gf-text-secondary hover:bg-gray-300 transition-colors">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      {/* Main Content */}
       {catalogCards.length === 0 ? (
-        <section className="rounded-lg border border-gcg-border bg-white p-4 text-sm text-gcg-text">
-          No cards loaded. Check `apps/web/src/data/cards.json`.
-        </section>
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <section className="rounded-xl border border-gf-border bg-white p-4 text-sm text-gf-text">
+            No cards loaded. Check `apps/web/src/data/cards.json`.
+          </section>
+        </div>
       ) : (
         <Routes>
-          <Route
-            path="/"
-            element={
-              <section className="text-center py-12">
-                <h2 className="font-heading text-4xl font-bold text-gcg-text mb-4">
-                  Welcome to GUNDAM CARD GAME
-                </h2>
-                <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                  Build your deck, test strategies, and master the game with our comprehensive deck builder and simulator.
-                </p>
-                
-                <div className="flex flex-wrap justify-center gap-4">
-                  <Link 
-                    to="/builder" 
-                    className="inline-block bg-gcg-primary hover:bg-gcg-hover text-white font-medium px-8 py-3 rounded transition-colors"
-                  >
-                    Start Building
-                  </Link>
-                  <Link 
-                    to="/sim" 
-                    className="inline-block bg-white hover:bg-gcg-light border border-gcg-border text-gcg-text font-medium px-8 py-3 rounded transition-colors"
-                  >
-                    Open Simulator
-                  </Link>
-                </div>
-                
-                {/* Stats */}
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                  <div className="bg-white border border-gcg-border rounded-lg p-6">
-                    <div className="text-3xl font-bold text-gcg-primary mb-2">{catalogCards.length}</div>
-                    <div className="text-sm text-gray-600">Cards Available</div>
-                  </div>
-                  <div className="bg-white border border-gcg-border rounded-lg p-6">
-                    <div className="text-3xl font-bold text-gcg-primary mb-2">{deckEntries.length}</div>
-                    <div className="text-sm text-gray-600">Cards in Deck</div>
-                  </div>
-                  <div className="bg-white border border-gcg-border rounded-lg p-6">
-                    <div className="text-3xl font-bold text-gcg-primary mb-2">{validation.isValid ? 'Valid' : 'Invalid'}</div>
-                    <div className="text-sm text-gray-600">Deck Status</div>
-                  </div>
-                </div>
-              </section>
-            }
-          />
+          {/* Home / Redirect to builder */}
+          <Route path="/" element={<Navigate to="/builder" replace />} />
 
+          {/* Deck Builder - 3 Column Layout */}
           <Route
             path="/builder"
             element={
-              <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-                <ModernCardCatalog cards={catalogCards} />
-                <div className="flex flex-col gap-6 xl:col-span-1">
-                  <EnhancedCardPreview card={selectedCard} />
+              <div className="flex h-[calc(100vh-64px)]">
+                {/* Left Sidebar - Card Catalog */}
+                <div className="w-80 flex-shrink-0 border-r border-gf-border bg-white overflow-y-auto custom-scrollbar">
+                  <ModernCardCatalog cards={catalogCards} />
+                </div>
+
+                {/* Center - Deck List */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-gf-light">
                   <DeckBuilderPanel cards={catalogCards} />
+                </div>
+
+                {/* Right - Card Details */}
+                <div className="w-80 flex-shrink-0 border-l border-gf-border bg-white overflow-y-auto custom-scrollbar">
+                  <EnhancedCardPreview card={selectedCard} />
                 </div>
               </div>
             }
           />
 
+          {/* Card Catalog - Full Page */}
+          <Route
+            path="/catalog"
+            element={
+              <div className="flex h-[calc(100vh-64px)]">
+                <div className="w-80 flex-shrink-0 border-r border-gf-border bg-white overflow-y-auto custom-scrollbar">
+                  <ModernCardCatalog cards={catalogCards} />
+                </div>
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                    {catalogCards.map((card) => {
+                      const imageSrc = card.imageUrl || card.placeholderArt;
+                      return (
+                        <div
+                          key={card.id}
+                          className="cursor-pointer group"
+                          onClick={() => useCardsStore.getState().setSelectedCardId(card.id)}
+                        >
+                          <div className="relative overflow-hidden rounded-lg border border-gf-border bg-white transition-all hover:border-gf-blue hover:shadow-md">
+                            <div className="relative w-full pb-[140%] bg-gray-100">
+                              <img
+                                src={imageSrc}
+                                alt={card.name}
+                                className="absolute inset-0 h-full w-full object-cover"
+                                loading="lazy"
+                              />
+                              <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-gf-blue text-xs font-bold text-white shadow">
+                                {card.cost}
+                              </div>
+                            </div>
+                          </div>
+                          <p className="mt-1.5 truncate text-xs font-medium text-gf-text">{card.name}</p>
+                          <p className="text-xs text-gf-text-secondary">{card.id}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            }
+          />
+
+          {/* Simulator */}
           <Route
             path="/sim"
             element={<SimulatorPanel cards={catalogCards} deckEntries={deckEntries} validation={validation} />}
           />
 
-          <Route path="/diagnostics" element={<DiagnosticsPanel validation={validation} />} />
+          {/* Diagnostics / Analytics */}
+          <Route path="/diagnostics" element={
+            <div className="mx-auto max-w-5xl px-6 py-8">
+              <DiagnosticsPanel validation={validation} />
+            </div>
+          } />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/builder" replace />} />
         </Routes>
       )}
-      </div>
-    </main>
+    </div>
   );
 }
 
