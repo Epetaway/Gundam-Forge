@@ -4,8 +4,8 @@ import { filterCatalogCards, useCardsStore } from './cardsStore';
 import { useDeckStore } from './deckStore';
 
 const pageSize = 12;
-const colors: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Black', 'Colorless'];
-const types: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base'];
+const colors: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
+const types: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 
 interface CardCatalogProps {
   cards: CardDefinition[];

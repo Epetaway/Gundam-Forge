@@ -1,10 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
-import { OFFICIAL_PLAYMAT_ZONE_TEMPLATE, type CardDefinition, type DeckValidationResult } from '@gundam-forge/shared';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { CardDefinition, DeckValidationResult } from '@gundam-forge/shared';
 import type { DeckEntry } from '../deckbuilder/deckStore';
-import { buildDeckSignature } from '../deckbuilder/deckSelectors';
 import { PlaymatRoot } from './PlaymatRoot';
-import { useSimStore } from './simStore';
-import { useCardsStore } from '../deckbuilder/cardsStore';
+import {
+  useSimStore,
+  type GameCard,
+  getActivePlayer,
+  getEffectiveAP,
+  getEffectiveHP,
+  getRemainingHP,
+  countActiveResources,
+  countTotalResources,
+  PHASE_LABELS,
+  BATTLE_PHASE_ORDER,
+} from './simStore';
 
 interface SimulatorPanelProps {
   cards: CardDefinition[];
@@ -12,71 +21,84 @@ interface SimulatorPanelProps {
   validation: DeckValidationResult;
 }
 
+const PHASE_GROUPS = [
+  { label: 'Start', phases: ['start-active', 'start-step'] },
+  { label: 'Draw', phases: ['draw'] },
+  { label: 'Resource', phases: ['resource'] },
+  { label: 'Main', phases: ['main'] },
+  { label: 'End', phases: ['end-action', 'end-step', 'end-hand', 'end-cleanup'] },
+] as const;
+
 export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPanelProps) {
-  const deckPile = useSimStore((state) => state.deckPile);
-  const hand = useSimStore((state) => state.hand);
-  const zones = useSimStore((state) => state.zones);
-  const initializeFromDeck = useSimStore((state) => state.initializeFromDeck);
-  const reset = useSimStore((state) => state.reset);
-  const shuffle = useSimStore((state) => state.shuffle);
-  const draw = useSimStore((state) => state.draw);
-  const mulligan = useSimStore((state) => state.mulligan);
-  const moveCard = useSimStore((state) => state.moveCard);
-  const toggleTapped = useSimStore((state) => state.toggleTapped);
+  const gameState = useSimStore((s) => s.gameState);
+  const startGame = useSimStore((s) => s.startGame);
+  const resetGame = useSimStore((s) => s.resetGame);
+  const nextPhase = useSimStore((s) => s.nextPhase);
+  const playCard = useSimStore((s) => s.playCard);
+  const attack = useSimStore((s) => s.attack);
+  const resolveDamageAction = useSimStore((s) => s.resolveDamage);
+  const manualDraw = useSimStore((s) => s.manualDraw);
+  const manualMulligan = useSimStore((s) => s.manualMulligan);
+  const manualToggleActive = useSimStore((s) => s.manualToggleActive);
+  const manualDiscard = useSimStore((s) => s.manualDiscard);
+  const undo = useSimStore((s) => s.undo);
+  const undoStack = useSimStore((s) => s.undoStack);
+  const selectedInstanceId = useSimStore((s) => s.selectedInstanceId);
+  const setSelectedInstanceId = useSimStore((s) => s.setSelectedInstanceId);
 
-  const selectedCardId = useCardsStore((state) => state.selectedCardId);
-  const setSelectedCardId = useCardsStore((state) => state.setSelectedCardId);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [pairingPilotId, setPairingPilotId] = useState<string | null>(null);
+  const logEndRef = useRef<HTMLDivElement>(null);
 
-  const [turnCount, setTurnCount] = useState(0);
-  const [resources, setResources] = useState(0);
-  const [deckName] = useState('RX-78 Strike Force');
-  const [activeZoneTab, setActiveZoneTab] = useState<'units' | 'pilots' | 'commands'>('units');
-
-  const zoneIds = useMemo(() => OFFICIAL_PLAYMAT_ZONE_TEMPLATE.map((zone) => zone.id), []);
-  const deckSignature = useMemo(() => buildDeckSignature(deckEntries), [deckEntries]);
-  const cardsById = useMemo(() => new Map(cards.map((card) => [card.id, card])), [cards]);
-
-  const totalCards = useMemo(
-    () => deckEntries.reduce((sum, e) => sum + e.qty, 0),
-    [deckEntries]
-  );
-
+  // Clear error after delay
   useEffect(() => {
-    initializeFromDeck(deckEntries, zoneIds);
-  }, [deckSignature, deckEntries, initializeFromDeck, zoneIds]);
+    if (!actionError) return;
+    const t = window.setTimeout(() => setActionError(null), 3000);
+    return () => clearTimeout(t);
+  }, [actionError]);
 
-  const handleDraw = (count: number) => {
-    draw(count);
-  };
+  // Auto-scroll log
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [gameState?.log.length]);
 
-  const handleMulligan = () => {
-    mulligan();
-  };
+  const handleStartGame = useCallback(() => {
+    startGame(deckEntries, cards);
+  }, [deckEntries, cards, startGame]);
 
-  const handleShuffle = () => {
-    shuffle();
-  };
+  const handlePlayCard = useCallback((instanceId: string, targetUnitId?: string) => {
+    const err = playCard(instanceId, targetUnitId);
+    if (err) setActionError(err);
+    setPairingPilotId(null);
+  }, [playCard]);
 
-  const handleNextTurn = () => {
-    setTurnCount((prev) => prev + 1);
-    setResources((prev) => prev + 1);
-    handleDraw(1);
-  };
+  const handleAttackPlayer = useCallback((attackerId: string) => {
+    const err = attack(attackerId, { kind: 'player' });
+    if (err) setActionError(err);
+  }, [attack]);
 
-  const handleReset = () => {
-    reset();
-    setTurnCount(0);
-    setResources(0);
-  };
+  const handleCardClick = useCallback((card: GameCard) => {
+    if (pairingPilotId && card.definition.type === 'Unit') {
+      handlePlayCard(pairingPilotId, card.instanceId);
+      return;
+    }
+    setSelectedInstanceId(card.instanceId);
+  }, [pairingPilotId, handlePlayCard, setSelectedInstanceId]);
 
-  const selectedCard = selectedCardId ? cardsById.get(selectedCardId) : undefined;
+  const handleCardDoubleClick = useCallback((card: GameCard) => {
+    manualToggleActive(card.instanceId);
+  }, [manualToggleActive]);
+
+  const handleZoneClick = useCallback((_zoneId: string) => {
+    // Placeholder for zone-specific actions
+  }, []);
 
   if (deckEntries.length === 0) {
     return (
       <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-gf-light">
         <div className="text-center">
           <svg className="mx-auto mb-4 h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L2 22h20L12 2zm0 5l7 13H5l7-13z" strokeWidth="1.5" />
+            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <h2 className="text-lg font-bold text-gf-text">No Deck Loaded</h2>
           <p className="mt-2 text-sm text-gf-text-secondary">Build a deck first to start testing</p>
@@ -85,319 +107,348 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
     );
   }
 
-  if (!validation.isValid) {
+  if (!gameState) {
     return (
       <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-gf-light">
         <div className="text-center">
-          <svg className="mx-auto mb-4 h-16 w-16 text-gf-orange" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
-          </svg>
-          <h2 className="text-lg font-bold text-gf-text">Deck Invalid</h2>
-          <p className="mt-2 text-sm text-gf-text-secondary">Fix validation errors before testing</p>
+          <h2 className="text-xl font-bold text-gf-text">Deck Test - Solo Goldfish</h2>
+          <p className="mt-2 text-sm text-gf-text-secondary">
+            {validation.metrics.mainDeckCards} main deck / {validation.metrics.resourceDeckCards || '10 auto'} resources
+          </p>
+          {validation.errors.length > 0 && (
+            <div className="mt-3 rounded-lg bg-yellow-50 border border-yellow-200 p-3 max-w-md mx-auto">
+              <p className="text-xs text-yellow-800">
+                Deck has validation issues. The simulator will still run.
+              </p>
+            </div>
+          )}
+          <button
+            onClick={handleStartGame}
+            className="mt-6 rounded-lg bg-gf-blue px-8 py-3 text-sm font-bold text-white hover:bg-gf-blue-dark transition-colors shadow-lg"
+          >
+            Start Game
+          </button>
         </div>
       </div>
     );
   }
 
+  const player = gameState.players[0];
+  const opponent = gameState.players[1];
+  const phase = gameState.phase;
+  const isInBattle = BATTLE_PHASE_ORDER.includes(phase);
+  const isMainPhase = phase === 'main';
+  const isGameOver = gameState.gameOver;
+
+  const selectedCard = selectedInstanceId
+    ? [...player.hand, ...player.battleArea, ...player.resourceArea, ...player.trash].find(
+        (c) => c.instanceId === selectedInstanceId
+      ) ?? (player.shieldArea.base?.instanceId === selectedInstanceId ? player.shieldArea.base : null)
+    : null;
+
+  const selectedDef = selectedCard?.definition;
+
   return (
     <div className="flex h-[calc(100vh-64px)]">
-      {/* Left Sidebar - Card Catalog (simplified) */}
-      <div className="w-72 flex-shrink-0 border-r border-gf-border bg-white overflow-y-auto custom-scrollbar">
-        <div className="px-4 py-3 border-b border-gf-border">
-          <h3 className="text-sm font-bold text-gf-text">Card Catalog</h3>
-        </div>
-        <div className="px-3 py-2 border-b border-gf-border space-y-2">
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-gf-text-secondary">Color</span>
-            {['Red', 'Blue', 'Green', 'Yellow', 'Black'].map((c) => (
-              <span key={c} className="inline-block h-3 w-3 rounded-sm" style={{
-                backgroundColor: c === 'Red' ? '#CC0000' : c === 'Blue' ? '#0066CC' : c === 'Green' ? '#00AA44' : c === 'Yellow' ? '#FFCC00' : '#333333',
-              }} />
-            ))}
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gf-text-secondary">
-            <span>Types</span>
-            {['PPE', 'Pils', 'Command', 'Support'].map((t) => (
-              <label key={t} className="flex items-center gap-0.5">
-                <input type="checkbox" className="h-3 w-3" />
-                {t}
-              </label>
-            ))}
-          </div>
-          <input
-            className="w-full rounded border border-gf-border bg-white px-2 py-1 text-xs text-gf-text placeholder-gf-text-secondary outline-none focus:border-gf-blue"
-            placeholder="Search cards..."
-          />
-        </div>
-        <div className="p-3 grid grid-cols-2 gap-2">
-          {cards.slice(0, 12).map((card) => {
-            const imageSrc = card.imageUrl || card.placeholderArt;
-            return (
-              <div
-                key={card.id}
-                className="cursor-pointer group"
-                onClick={() => setSelectedCardId(card.id)}
-              >
-                <div className={`relative overflow-hidden rounded-lg border transition-all ${
-                  selectedCardId === card.id ? 'border-gf-blue ring-1 ring-gf-blue/30' : 'border-gf-border hover:border-gf-blue'
-                }`}>
-                  <div className="relative w-full pb-[140%] bg-gray-100">
-                    <img src={imageSrc} alt={card.name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-                    <div className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-gf-blue text-[9px] font-bold text-white">
-                      {card.cost}
-                    </div>
-                    <div className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gf-blue text-[9px] font-bold text-white">
-                      {card.cost}
-                    </div>
-                  </div>
-                </div>
-                <p className="mt-0.5 truncate text-[10px] font-medium text-gf-text">{card.name}</p>
-                <p className="text-[9px] text-gf-text-secondary">{card.type}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Center - Playmat */}
       <div className="flex-1 flex flex-col bg-playmat-felt overflow-hidden">
-        {/* Player Info Bars */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-gf-blue to-gf-blue-dark px-4 py-2">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-bold text-white">Player</span>
-            <div className="flex items-center gap-4 text-sm text-white/90">
-              <span className="flex items-center gap-1">
-                <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                {turnCount} Site
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="h-4 w-4 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" /></svg>
-                {resources} Energy
-              </span>
-            </div>
+        {/* Phase Indicator */}
+        <div className="flex items-center justify-between bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-2 border-b border-white/10">
+          <div className="flex items-center gap-1">
+            {PHASE_GROUPS.map((group, gi) => {
+              const isActive = group.phases.some((p) => p === phase);
+              const isPast = gi < PHASE_GROUPS.findIndex((g) => g.phases.some((p) => p === phase));
+              return (
+                <div key={group.label} className="flex items-center">
+                  {gi > 0 && <div className={`mx-1 h-px w-4 ${isPast ? 'bg-gf-blue' : 'bg-white/20'}`} />}
+                  <span
+                    className={`rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors ${
+                      isActive
+                        ? 'bg-gf-blue text-white shadow'
+                        : isPast
+                        ? 'bg-gf-blue/20 text-gf-blue'
+                        : 'text-white/40'
+                    }`}
+                  >
+                    {group.label}
+                  </span>
+                </div>
+              );
+            })}
+            {isInBattle && (
+              <div className="ml-2 flex items-center gap-1">
+                <div className="mx-1 h-px w-4 bg-red-500/50" />
+                <span className="rounded-md bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white shadow animate-pulse">
+                  Battle
+                </span>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-4 text-sm text-white/90">
-            <span className="flex items-center gap-1">
-              <svg className="h-4 w-4 text-red-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
-              {deckPile.length} Deck
-            </span>
-            <span className="text-sm font-bold text-white">Opponent</span>
+          <div className="flex items-center gap-3 text-xs text-white/60">
+            <span>Turn {gameState.turnNumber}</span>
+            <span>{PHASE_LABELS[phase]}</span>
           </div>
         </div>
+
+        {/* Player Info Bar */}
+        <div className="flex items-center justify-between bg-gray-900/80 px-4 py-1.5 border-b border-white/5">
+          <div className="flex items-center gap-4 text-xs text-white/80">
+            <span className="font-bold text-white">{player.name}</span>
+            <span>Shields: {player.shieldArea.shields.length}</span>
+            <span>Resources: {countActiveResources(player)}/{countTotalResources(player)}</span>
+            <span>Hand: {player.hand.length}</span>
+            <span>Deck: {player.deck.length}</span>
+            <span>Units: {player.battleArea.length}/6</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-white/50">
+            <span>Opp Shields: {opponent.shieldArea.shields.length}</span>
+            <span>Opp Deck: {opponent.deck.length}</span>
+          </div>
+        </div>
+
+        {/* Banners */}
+        {actionError && (
+          <div className="bg-red-600/90 px-4 py-1.5 text-xs font-medium text-white text-center">
+            {actionError}
+          </div>
+        )}
+        {isGameOver && (
+          <div className="bg-yellow-500/90 px-4 py-3 text-center">
+            <span className="text-sm font-bold text-black">
+              Game Over! {gameState.winner === 0 ? 'You win!' : 'Opponent wins!'}
+            </span>
+            <button
+              onClick={() => { resetGame(); }}
+              className="ml-4 rounded bg-black/20 px-3 py-1 text-xs font-bold text-black hover:bg-black/30"
+            >
+              Play Again
+            </button>
+          </div>
+        )}
+        {pairingPilotId && (
+          <div className="bg-orange-500/90 px-4 py-1.5 text-xs font-medium text-white text-center">
+            Select a Unit in the Battle Area to pair this Pilot with.
+            <button onClick={() => setPairingPilotId(null)} className="ml-2 underline">Cancel</button>
+          </div>
+        )}
 
         {/* Playmat Area */}
         <div className="flex-1 overflow-auto p-4">
           <PlaymatRoot
-            cardsById={cardsById}
-            deckPile={deckPile}
-            hand={hand}
-            zones={zones}
-            onDropToHand={(instanceId) => moveCard(instanceId, { kind: 'hand' })}
-            onDropToZone={(instanceId, zoneId) => moveCard(instanceId, { kind: 'zone', zoneId })}
-            onToggleTapped={toggleTapped}
+            gameState={gameState}
+            onCardClick={handleCardClick}
+            onCardDoubleClick={handleCardDoubleClick}
+            onZoneClick={handleZoneClick}
           />
-        </div>
-
-        {/* Zone Tabs */}
-        <div className="bg-white/10 backdrop-blur-sm border-t border-white/20 px-4">
-          <div className="flex gap-1 py-2">
-            {(['units', 'pilots', 'commands'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveZoneTab(tab)}
-                className={`rounded-md px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
-                  activeZoneTab === tab
-                    ? tab === 'units' ? 'bg-blue-500 text-white' : tab === 'pilots' ? 'bg-orange-500 text-white' : 'bg-red-400 text-white'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Hand Area */}
         <div className="bg-gradient-to-t from-playmat-felt to-playmat-surface border-t border-white/10 px-4 py-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-white">My Hand!</span>
-            <div className="flex items-center gap-2">
-              <select className="rounded bg-white/10 border border-white/20 px-2 py-1 text-xs text-white">
-                <option>OPPONENT</option>
-              </select>
-              <button
-                onClick={() => setResources((prev) => prev + 1)}
-                className="flex items-center gap-1 rounded bg-white/10 border border-white/20 px-2 py-1 text-xs text-white hover:bg-white/20"
-              >
-                <svg className="h-3.5 w-3.5 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                Energy
-              </button>
-            </div>
+            <span className="text-sm font-bold text-white">Hand ({player.hand.length})</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 min-h-[100px]">
-            {hand.map((card) => {
-              const def = cardsById.get(card.cardId);
-              const imageSrc = def?.imageUrl || def?.placeholderArt;
+            {player.hand.map((card) => {
+              const def = card.definition;
+              const imageSrc = def.imageUrl || def.placeholderArt;
+              const isSelected = selectedInstanceId === card.instanceId;
               return (
                 <div
                   key={card.instanceId}
-                  draggable
-                  onDragStart={(event) => {
-                    event.dataTransfer.setData('application/x-gundam-forge-card', card.instanceId);
-                    event.dataTransfer.effectAllowed = 'move';
-                  }}
-                  onClick={() => def && setSelectedCardId(def.id)}
-                  className="flex-shrink-0 w-16 cursor-grab"
+                  className="flex-shrink-0 w-16 cursor-pointer"
+                  onClick={() => setSelectedInstanceId(card.instanceId)}
                 >
-                  <div className="relative overflow-hidden rounded-lg border border-white/30 shadow-lg hover:border-white/60 transition-all hover:-translate-y-1">
+                  <div className={`relative overflow-hidden rounded-lg border-2 shadow-lg transition-all hover:-translate-y-1 ${
+                    isSelected ? 'border-gf-blue ring-2 ring-gf-blue/40' : 'border-white/30 hover:border-white/60'
+                  }`}>
                     <div className="relative w-full pb-[140%] bg-gray-900">
                       {imageSrc ? (
-                        <img src={imageSrc} alt={def?.name} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={imageSrc} alt={def.name} className="absolute inset-0 h-full w-full object-cover" />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-[8px] text-white p-1 text-center">
-                          {def?.name ?? card.cardId}
+                          {def.name}
                         </div>
                       )}
-                      <div className="absolute top-0.5 left-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gf-blue text-[8px] font-bold text-white">
-                        {def?.cost}
+                      <div className="absolute top-0.5 left-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-[8px] font-bold text-white">
+                        {def.cost}
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1 py-0.5">
+                        <span className="text-[7px] font-medium text-white/90">{def.type}</span>
                       </div>
                     </div>
                   </div>
-                  <p className="mt-0.5 truncate text-[9px] font-medium text-white/80">{def?.name ?? card.cardId}</p>
+                  <p className="mt-0.5 truncate text-[9px] font-medium text-white/80">{def.name}</p>
                 </div>
               );
             })}
+            {player.hand.length === 0 && (
+              <div className="flex items-center justify-center w-full text-sm text-white/30">
+                No cards in hand
+              </div>
+            )}
           </div>
         </div>
 
         {/* Bottom Controls */}
         <div className="flex items-center justify-between bg-white border-t border-gf-border px-4 py-2">
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {!isGameOver && (
+              <>
+                <button
+                  onClick={nextPhase}
+                  className="rounded-lg bg-gf-blue px-4 py-2 text-sm font-medium text-white hover:bg-gf-blue-dark transition-colors"
+                >
+                  {isInBattle ? 'Next Battle Step' : 'Next Phase'}
+                </button>
+
+                {isMainPhase && selectedInstanceId && player.hand.some((c) => c.instanceId === selectedInstanceId) && (
+                  <button
+                    onClick={() => {
+                      const card = player.hand.find((c) => c.instanceId === selectedInstanceId);
+                      if (!card) return;
+                      if (card.definition.type === 'Pilot') {
+                        setPairingPilotId(card.instanceId);
+                      } else {
+                        handlePlayCard(card.instanceId);
+                      }
+                    }}
+                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+                  >
+                    Play Card
+                  </button>
+                )}
+
+                {isMainPhase && selectedInstanceId && player.battleArea.some((c) => c.instanceId === selectedInstanceId && c.active && !c.deployedThisTurn) && (
+                  <button
+                    onClick={() => handleAttackPlayer(selectedInstanceId!)}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+                  >
+                    Attack Player
+                  </button>
+                )}
+
+                {phase === 'battle-damage' && (
+                  <button
+                    onClick={() => {
+                      const err = resolveDamageAction();
+                      if (err) setActionError(err);
+                    }}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors animate-pulse"
+                  >
+                    Resolve Damage
+                  </button>
+                )}
+              </>
+            )}
             <button
-              onClick={handleNextTurn}
-              className="rounded-lg bg-gf-blue px-4 py-2 text-sm font-medium text-white hover:bg-gf-blue-dark transition-colors"
-            >
-              Next Turn
-            </button>
-            <button
-              onClick={() => handleDraw(1)}
+              onClick={() => manualDraw(1)}
               className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
             >
               Draw
             </button>
             <button
-              onClick={handleShuffle}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
-            >
-              Shuffle
-            </button>
-            <button
-              onClick={handleMulligan}
+              onClick={manualMulligan}
               className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
             >
               Mulligan
             </button>
+            {selectedInstanceId && player.hand.some((c) => c.instanceId === selectedInstanceId) && (
+              <button
+                onClick={() => manualDiscard(selectedInstanceId!)}
+                className="rounded-lg border border-gf-border bg-white px-3 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
+              >
+                Discard
+              </button>
+            )}
           </div>
           <div className="flex gap-2">
             <button
-              onClick={handleReset}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
+              onClick={undo}
+              disabled={undoStack.length === 0}
+              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors disabled:opacity-30"
             >
-              End Turn
+              Undo
             </button>
             <button
-              onClick={handleReset}
+              onClick={resetGame}
               className="rounded-lg bg-gf-orange px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600 transition-colors"
             >
-              <span className="flex items-center gap-1">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Undo
-              </span>
+              Restart
             </button>
           </div>
         </div>
       </div>
 
-      {/* Right Panel - Card Preview */}
-      <div className="w-72 flex-shrink-0 border-l border-gf-border bg-white overflow-y-auto custom-scrollbar">
-        {selectedCard ? (
-          <div className="p-4">
-            {/* Card Image */}
+      {/* Right Panel - Card Detail + Game Log */}
+      <div className="w-72 flex-shrink-0 border-l border-gf-border bg-white overflow-hidden flex flex-col">
+        {selectedDef ? (
+          <div className="p-4 border-b border-gf-border overflow-y-auto custom-scrollbar">
             <div className="relative overflow-hidden rounded-xl border border-gf-border shadow-sm">
               <img
-                src={selectedCard.imageUrl || selectedCard.placeholderArt}
-                alt={selectedCard.name}
+                src={selectedDef.imageUrl || selectedDef.placeholderArt}
+                alt={selectedDef.name}
                 className="h-auto w-full object-cover"
               />
-              <div className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-gf-blue text-sm font-bold text-white shadow-lg">
-                {selectedCard.cost}
+              <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-xs font-bold text-white shadow-lg">
+                {selectedDef.cost}
               </div>
             </div>
 
-            {/* Card Info */}
-            <h3 className="mt-3 font-heading text-lg font-bold text-gf-text">{selectedCard.name}</h3>
-            <p className="text-sm text-gf-text-secondary">{selectedCard.type} — {selectedCard.color}</p>
+            <h3 className="mt-3 font-heading text-base font-bold text-gf-text">{selectedDef.name}</h3>
+            <p className="text-xs text-gf-text-secondary">{selectedDef.type} - {selectedDef.color}</p>
 
-            {/* Power */}
-            {selectedCard.power !== undefined && selectedCard.power > 0 && (
-              <div className="mt-2 inline-flex items-center gap-3 rounded-full bg-gf-dark px-4 py-1.5">
-                <span className="flex items-center gap-1 text-sm font-bold text-yellow-400">
-                  <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  {selectedCard.power}
+            {(selectedDef.type === 'Unit' || selectedDef.type === 'Base') && selectedCard && (
+              <div className="mt-2 flex items-center gap-3">
+                <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-bold text-yellow-800">
+                  AP {getEffectiveAP(selectedCard)}
                 </span>
-                <span className="text-gray-500">/</span>
-                <span className="text-sm font-bold text-red-400">3000</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-800">
+                  HP {getRemainingHP(selectedCard)}/{getEffectiveHP(selectedCard)}
+                </span>
               </div>
             )}
 
-            {/* Card Text */}
-            {selectedCard.text && (
-              <p className="mt-3 rounded-lg bg-gf-light border border-gf-border p-3 text-sm leading-relaxed text-gf-text">
-                {selectedCard.text}
+            {selectedCard?.pairedPilot && (
+              <p className="mt-1 text-xs text-orange-600 font-medium">
+                Pilot: {selectedCard.pairedPilot.definition.name}
               </p>
             )}
 
-            {/* Price */}
-            {selectedCard.price?.market !== undefined && (
-              <p className="mt-2 text-lg font-bold text-gf-red">${selectedCard.price.market.toFixed(2)}</p>
+            {selectedDef.traits && selectedDef.traits.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {selectedDef.traits.map((trait) => (
+                  <span key={trait} className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                    {trait}
+                  </span>
+                ))}
+              </div>
             )}
 
-            {/* Details */}
-            <div className="mt-3 space-y-1.5 text-xs">
-              <div className="flex justify-between"><span className="text-gf-text-secondary">Market Price</span><span className="font-medium text-gf-text">${selectedCard.price?.market?.toFixed(2) ?? 'N/A'}</span></div>
-              <div className="flex justify-between"><span className="text-gf-text-secondary">Rarity</span><span className="font-bold text-red-600">Super Rare</span></div>
-              <div className="flex justify-between"><span className="text-gf-text-secondary">Set</span><span className="font-medium text-gf-text">{selectedCard.set}</span></div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-4 flex gap-2">
-              <button className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gf-red px-3 py-2.5 text-sm font-medium text-white hover:bg-gf-red-dark transition-colors">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Play
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gf-orange px-3 py-2.5 text-sm font-medium text-white hover:bg-yellow-600 transition-colors">
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z" />
-                </svg>
-                Action
-              </button>
-            </div>
+            {selectedDef.text && (
+              <p className="mt-2 rounded-lg bg-gf-light border border-gf-border p-2 text-xs leading-relaxed text-gf-text">
+                {selectedDef.text}
+              </p>
+            )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full py-16 text-center px-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gf-light mb-4">
-              <svg className="h-8 w-8 text-gf-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M12 8v8M8 12h8" />
-              </svg>
-            </div>
-            <p className="text-sm text-gf-text-secondary">Select a card to view details</p>
+          <div className="p-4 border-b border-gf-border text-center">
+            <p className="text-xs text-gf-text-secondary">Click a card to view details</p>
           </div>
         )}
+
+        {/* Game Log */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="px-4 py-2 border-b border-gf-border">
+            <h4 className="text-xs font-bold text-gf-text uppercase tracking-wider">Game Log</h4>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
+            {gameState.log.map((entry, i) => (
+              <p key={i} className="text-[11px] text-gf-text-secondary leading-relaxed py-0.5 border-b border-gf-border/30 last:border-0">
+                {entry}
+              </p>
+            ))}
+            <div ref={logEndRef} />
+          </div>
+        </div>
       </div>
     </div>
   );
