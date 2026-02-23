@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { CardDefinition } from '@gundam-forge/shared';
+import { resolveCardImage } from '../../utils/resolveCardImage';
+import { useBrokenImageStore } from '../../utils/brokenImageStore';
 import { useDeckStore } from './deckStore';
 
 interface EnhancedCardPreviewProps {
@@ -29,7 +31,9 @@ export function EnhancedCardPreview({ card }: EnhancedCardPreviewProps) {
   }
 
   const qty = deckEntries.find((entry) => entry.cardId === card.id)?.qty ?? 0;
-  const imageSrc = card.imageUrl || card.placeholderArt;
+  const imageSrc = resolveCardImage(card);
+  const markBroken = useBrokenImageStore((state) => state.markBroken);
+  const isBroken = useBrokenImageStore((state) => state.brokenIds)[card.id];
   const marketPrice = card.price?.market;
 
   const rarityLabel = (card as any).rarity || 'Common';
@@ -62,17 +66,26 @@ export function EnhancedCardPreview({ card }: EnhancedCardPreviewProps) {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {/* Card Image */}
-        <div className="relative mx-4 mt-4 overflow-hidden rounded-xl border border-gf-border shadow-sm">
-          <img
-            src={imageSrc}
-            alt={card.name}
-            className="h-auto w-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                `https://via.placeholder.com/600x800/f5f5f5/333333?text=${encodeURIComponent(card.name)}`;
-            }}
-          />
+        <div className="relative mx-4 mt-4 overflow-hidden rounded-xl border border-gf-border shadow-sm bg-gradient-to-b from-gray-200 to-gray-300">
+          {isBroken ? (
+            <div className="flex items-center justify-center h-64 text-gf-text-secondary text-sm">
+              Image unavailable
+            </div>
+          ) : (
+            <img
+              src={imageSrc}
+              alt={card.name}
+              className="h-auto w-full object-cover fade-in"
+              loading="lazy"
+              decoding="async"
+              onError={() => {
+                markBroken(card.id);
+              }}
+              onLoad={(e) => {
+                (e.target as HTMLImageElement).classList.add('fade-in');
+              }}
+            />
+          )}
           {/* Cost overlay */}
           <div className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-gf-blue text-sm font-bold text-white shadow-lg">
             {card.cost}

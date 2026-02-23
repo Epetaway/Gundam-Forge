@@ -77,7 +77,7 @@ async function tryExBurstUrls(cardId: string): Promise<string | null> {
 }
 
 /**
- * Download and save image
+ * Download and save image (preserving quality)
  */
 async function downloadImage(
   imageUrl: string,
@@ -102,8 +102,12 @@ async function downloadImage(
     const dir = path.dirname(outputPath);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(outputPath, Buffer.from(buffer));
+    
+    // Get content type for quality info
+    const contentType = response.headers.get('content-type') || 'unknown';
+    const sizeKB = (buffer.byteLength / 1024).toFixed(1);
     console.log(
-      `    ✓ Downloaded (${(buffer.byteLength / 1024).toFixed(1)}KB)`
+      `    ✓ Downloaded (${sizeKB}KB, ${contentType})`
     );
     return true;
   } catch (error) {
@@ -173,12 +177,26 @@ async function main() {
 
     console.log(`${progress} ${card.id} - ${card.name}`);
 
-    // Try to get image from ExBurst
+    // Try to get image from official gundam-gcg.com first (highest quality)
+    let imageUrl: string | null = null;
+    let source = 'ExBurst';
+    
+    // Check if we have an official imageUrl already (from sync-official-cards)
+    if (card.imageUrl && card.imageUrl.includes('gundam-gcg.com')) {
+      imageUrl = card.imageUrl;
+      source = 'Official (gundam-gcg.com)';
+    }
+    
+    // Fallback to ExBurst if no official image
+    if (!imageUrl) {
+      imageUrl = await tryExBurstUrls(card.id);
+      source = 'ExBurst';
+    }
+    
     try {
-      const imageUrl = await tryExBurstUrls(card.id);
       if (imageUrl) {
-        console.log(`  Downloading image...`);
-        const extension = imageUrl.split('.').pop() || 'webp';
+        console.log(`  Downloading image from ${source}...`);
+        const extension = imageUrl.includes('.webp') ? 'webp' : imageUrl.split('.').pop() || 'webp';
         const outputPath = path.join(cardArtDir, `${card.id}.${extension}`);
 
         const downloaded = await downloadImage(imageUrl, outputPath, card.id);
@@ -187,7 +205,7 @@ async function main() {
           cardsWithImages++;
         }
       } else {
-        console.log(`  ℹ Image not found on ExBurst (using placeholder)`);
+        console.log(`  ℹ Image not found (using placeholder)`);
       }
     } catch (error) {
       console.warn(`  Error fetching image: ${error}`);

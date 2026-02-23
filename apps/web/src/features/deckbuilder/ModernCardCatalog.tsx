@@ -1,5 +1,7 @@
 import { useDeferredValue, useMemo, useState } from 'react';
 import type { CardDefinition, CardColor, CardType } from '@gundam-forge/shared';
+import { resolveCardImage } from '../../utils/resolveCardImage';
+import { useBrokenImageStore } from '../../utils/brokenImageStore';
 import { filterCatalogCards, useCardsStore } from './cardsStore';
 import { useDeckStore } from './deckStore';
 
@@ -29,6 +31,8 @@ export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {
 
   const addCard = useDeckStore((state) => state.addCard);
   const deckEntries = useDeckStore((state) => state.entries);
+  const brokenIds = useBrokenImageStore((state) => state.brokenIds);
+  const markBroken = useBrokenImageStore((state) => state.markBroken);
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -191,9 +195,11 @@ export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-2 gap-2.5">
             {filteredCards.map((card) => {
+              if (brokenIds[card.id]) return null;
+
               const qty = qtyByCardId.get(card.id) ?? 0;
               const isSelected = selectedCardId === card.id;
-              const imageSrc = card.imageUrl || card.placeholderArt;
+              const imageSrc = resolveCardImage(card);
 
               return (
                 <div
@@ -206,15 +212,19 @@ export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {
                       ? 'border-gf-blue shadow-md ring-2 ring-gf-blue/30'
                       : 'border-gf-border hover:border-gf-blue hover:shadow-sm'
                   }`}>
-                    <div className="relative w-full pb-[140%] bg-gray-100">
+                    <div className="relative w-full pb-[140%] bg-gradient-to-b from-gray-200 to-gray-300">
                       <img
                         src={imageSrc}
                         alt={card.name}
                         className="absolute inset-0 h-full w-full object-cover"
                         loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            `https://via.placeholder.com/300x420/f5f5f5/333333?text=${encodeURIComponent(card.name)}`;
+                        decoding="async"
+                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 20vw"
+                        onError={() => {
+                          markBroken(card.id);
+                        }}
+                        onLoad={(e) => {
+                          (e.target as HTMLImageElement).classList.add('fade-in');
                         }}
                       />
                       {/* Cost Badge */}
@@ -246,9 +256,11 @@ export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {
         ) : (
           <div className="space-y-1">
             {filteredCards.map((card) => {
+              if (brokenIds[card.id]) return null;
+
               const qty = qtyByCardId.get(card.id) ?? 0;
               const isSelected = selectedCardId === card.id;
-              const imageSrc = card.imageUrl || card.placeholderArt;
+              const imageSrc = resolveCardImage(card);
 
               return (
                 <div
@@ -265,6 +277,9 @@ export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {
                     alt={card.name}
                     className="h-10 w-7 rounded object-cover"
                     loading="lazy"
+                    onError={() => {
+                      markBroken(card.id);
+                    }}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-sm font-medium text-gf-text">{card.name}</p>

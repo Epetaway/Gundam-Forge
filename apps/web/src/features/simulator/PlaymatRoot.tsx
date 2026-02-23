@@ -1,4 +1,5 @@
 import { OFFICIAL_PLAYMAT_ZONE_TEMPLATE } from '@gundam-forge/shared';
+import { resolveCardImage } from '../../utils/resolveCardImage';
 import {
   type GameCard,
   type GameState,
@@ -40,7 +41,7 @@ function GameCardView({
   small?: boolean;
 }) {
   const def = card.definition;
-  const imageSrc = def.imageUrl || def.placeholderArt;
+  const imageSrc = resolveCardImage(def);
   const colorBorder = COLOR_MAP[def.color] ?? 'border-gray-400';
   const isRested = !card.active;
 

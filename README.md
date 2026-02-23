@@ -16,6 +16,40 @@ npm run dev:web
 
 Open the local URL printed by Vite.
 
+## Official card sync
+
+Syncs cards from the official Gundam Card Game site into `apps/web/src/data/cards.json`.
+
+```bash
+npm run sync-cards
+```
+
+Optional environment variables:
+
+- `GUNDAM_GCG_CARDS_URL` (default: `https://www.gundam-gcg.com/en/cards`)
+- `GUNDAM_GCG_PAGE_LIMIT` (default: `0` = all pages)
+- `GUNDAM_GCG_CARD_DETAIL_TEMPLATE` (optional detail URL template, use `{id}` placeholder)
+- `GUNDAM_GCG_USE_PLAYWRIGHT` (default: `true`, set `false` to skip headless rendering)
+- `GUNDAM_GCG_DETAIL_LIMIT` (optional; limit number of detail pages when scraping)
+
+If Playwright is enabled, install the browser binaries once:
+
+```bash
+npx playwright install
+```
+
+## XLSX card sync
+
+Syncs cards from a local Excel file (default: `~/Downloads/Gundam TCG Cards.xlsx`).
+
+```bash
+npm run sync-cards-xlsx
+```
+
+Optional environment variables:
+
+- `GUNDAM_CARDS_XLSX_PATH` (absolute path to the `.xlsx` file)
+
 ## Routes
 
 - `/` — Hangar

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CardDefinition, DeckValidationResult } from '@gundam-forge/shared';
+import { resolveCardImage } from '../../utils/resolveCardImage';
 import type { DeckEntry } from '../deckbuilder/deckStore';
 import { PlaymatRoot } from './PlaymatRoot';
 import {
@@ -249,7 +250,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
           <div className="flex gap-2 overflow-x-auto pb-1 min-h-[100px]">
             {player.hand.map((card) => {
               const def = card.definition;
-              const imageSrc = def.imageUrl || def.placeholderArt;
+              const imageSrc = resolveCardImage(def);
               const isSelected = selectedInstanceId === card.instanceId;
               return (
                 <div
@@ -384,7 +385,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
           <div className="p-4 border-b border-gf-border overflow-y-auto custom-scrollbar">
             <div className="relative overflow-hidden rounded-xl border border-gf-border shadow-sm">
               <img
-                src={selectedDef.imageUrl || selectedDef.placeholderArt}
+                src={resolveCardImage(selectedDef)}
                 alt={selectedDef.name}
                 className="h-auto w-full object-cover"
               />
