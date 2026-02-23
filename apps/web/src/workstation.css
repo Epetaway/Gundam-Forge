@@ -1,0 +1,580 @@
+/* ============================================================
+   GUNDAM FORGE — "Bandai Workstation" Design System
+   ============================================================
+   Design philosophy: white/light background, elevated whitespace,
+   subtle blueprint grid, soft shadows, thin mechanical dividers,
+   angular corner cuts on panels, refined Gundam blue accent.
+   8pt spacing system. No neon, no cyberpunk, no heavy sci-fi HUD.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   0. Design Tokens (CSS custom properties)
+   ---------------------------------------------------------- */
+:root {
+  /* Brand */
+  --gf-blue: #1A5CFF;
+  --gf-blue-dark: #0D47D1;
+  --gf-blue-light: #E8F0FE;
+  --gf-blue-muted: #94B3F4;
+  --gf-red: #E60012;
+  --gf-red-dark: #CC0010;
+
+  /* Surfaces */
+  --gf-bg: #F8F9FC;
+  --gf-surface: #FFFFFF;
+  --gf-border: #E5E7EB;
+  --gf-border-dark: #D1D5DB;
+
+  /* Text */
+  --gf-text: #1F2937;
+  --gf-text-secondary: #6B7280;
+  --gf-text-muted: #9CA3AF;
+
+  /* Shadows */
+  --gf-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --gf-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --gf-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
+  --gf-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+
+  /* Radii */
+  --gf-radius-sm: 4px;
+  --gf-radius: 8px;
+  --gf-radius-lg: 12px;
+
+  /* Easing */
+  --gf-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --gf-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Timing */
+  --gf-duration-fast: 120ms;
+  --gf-duration: 160ms;
+  --gf-duration-slow: 240ms;
+
+  /* Blueprint grid */
+  --gf-grid-color: rgba(26, 92, 255, 0.02);
+  --gf-grid-size: 24px;
+}
+
+/* ----------------------------------------------------------
+   1. Blueprint Grid Background
+   ---------------------------------------------------------- */
+.gf-blueprint {
+  background-image:
+    linear-gradient(var(--gf-grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gf-grid-color) 1px, transparent 1px);
+  background-size: var(--gf-grid-size) var(--gf-grid-size);
+}
+
+/* ----------------------------------------------------------
+   2. Angular Corner Cuts (clipped panels)
+   ---------------------------------------------------------- */
+.gf-panel {
+  background: var(--gf-surface);
+  border: 1px solid var(--gf-border);
+  box-shadow: var(--gf-shadow);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 6px) 0,
+    100% 6px,
+    100% 100%,
+    6px 100%,
+    0 calc(100% - 6px)
+  );
+}
+
+.gf-panel-sm {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 4px) 0,
+    100% 4px,
+    100% 100%,
+    4px 100%,
+    0 calc(100% - 4px)
+  );
+}
+
+/* ----------------------------------------------------------
+   3. Mechanical Dividers
+   ---------------------------------------------------------- */
+.gf-divider {
+  position: relative;
+  border: none;
+  height: 1px;
+  background: var(--gf-border);
+}
+
+.gf-divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 32px;
+  height: 3px;
+  background: var(--gf-blue);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Thin blue accent line */
+.gf-accent-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--gf-blue), transparent);
+}
+
+/* ----------------------------------------------------------
+   4. Card Tile Micro-interactions
+   ---------------------------------------------------------- */
+.gf-card-tile {
+  position: relative;
+  border-radius: var(--gf-radius);
+  border: 1px solid var(--gf-border);
+  overflow: hidden;
+  transition:
+    transform var(--gf-duration) var(--gf-ease),
+    box-shadow var(--gf-duration) var(--gf-ease),
+    border-color var(--gf-duration) var(--gf-ease);
+  will-change: transform;
+}
+
+/* Hover lift + border highlight */
+.gf-card-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gf-shadow-md);
+  border-color: var(--gf-blue);
+}
+
+/* Press-in on active */
+.gf-card-tile:active {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: var(--gf-shadow-sm);
+  transition-duration: var(--gf-duration-fast);
+}
+
+/* Specular light sweep via ::after */
+.gf-card-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 400ms var(--gf-ease);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gf-card-tile:hover::after {
+  transform: translateX(100%);
+}
+
+/* Selected state */
+.gf-card-tile[data-selected="true"] {
+  border-color: var(--gf-blue);
+  box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.2);
+}
+
+/* ----------------------------------------------------------
+   5. Deck Row Interactions
+   ---------------------------------------------------------- */
+.gf-deck-row {
+  position: relative;
+  transition:
+    background-color var(--gf-duration) var(--gf-ease),
+    box-shadow var(--gf-duration) var(--gf-ease);
+  border-left: 3px solid transparent;
+}
+
+/* Left accent rail on hover */
+.gf-deck-row:hover {
+  background-color: rgba(26, 92, 255, 0.03);
+  border-left-color: var(--gf-blue);
+  box-shadow: var(--gf-shadow-sm);
+}
+
+/* ----------------------------------------------------------
+   6. Quantity Pulse Animation
+   ---------------------------------------------------------- */
+@keyframes gf-qty-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.gf-qty-pulse {
+  animation: gf-qty-pulse 300ms var(--gf-ease-bounce);
+}
+
+/* ----------------------------------------------------------
+   7. Progress Bar
+   ---------------------------------------------------------- */
+.gf-progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #E5E7EB;
+  overflow: hidden;
+}
+
+.gf-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 300ms var(--gf-ease);
+  background: linear-gradient(90deg, var(--gf-blue), var(--gf-blue-dark));
+}
+
+.gf-progress-fill[data-status="complete"] {
+  background: linear-gradient(90deg, #10B981, #059669);
+}
+
+.gf-progress-fill[data-status="warning"] {
+  background: linear-gradient(90deg, #F59E0B, #D97706);
+}
+
+/* ----------------------------------------------------------
+   8. Validation LED
+   ---------------------------------------------------------- */
+.gf-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gf-led[data-status="valid"] {
+  background: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.gf-led[data-status="warning"] {
+  background: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.gf-led[data-status="error"] {
+  background: #EF4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes gf-led-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.gf-led[data-status="warning"],
+.gf-led[data-status="error"] {
+  animation: gf-led-pulse 2s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------
+   9. Autosave Indicator
+   ---------------------------------------------------------- */
+.gf-autosave {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--gf-text-muted);
+  transition: color var(--gf-duration) var(--gf-ease);
+}
+
+.gf-autosave[data-status="saving"] {
+  color: var(--gf-blue);
+}
+
+.gf-autosave[data-status="saved"] {
+  color: #10B981;
+}
+
+@keyframes gf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.gf-autosave-spinner {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--gf-border);
+  border-top-color: var(--gf-blue);
+  border-radius: 50%;
+  animation: gf-spin 700ms linear infinite;
+}
+
+/* ----------------------------------------------------------
+   10. Section Collapse
+   ---------------------------------------------------------- */
+.gf-section-body {
+  overflow: hidden;
+  transition: max-height var(--gf-duration-slow) var(--gf-ease),
+              opacity var(--gf-duration) var(--gf-ease);
+}
+
+.gf-section-body[data-collapsed="true"] {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* ----------------------------------------------------------
+   11. Inspection Modal
+   ---------------------------------------------------------- */
+.gf-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+}
+
+.gf-modal-backdrop[data-state="open"] {
+  animation: gf-backdrop-in 150ms ease-out;
+}
+
+.gf-modal-backdrop[data-state="closed"] {
+  animation: gf-backdrop-out 150ms ease-in;
+}
+
+@keyframes gf-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gf-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.gf-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  width: calc(100vw - 64px);
+  max-width: 900px;
+  max-height: calc(100vh - 64px);
+  background: var(--gf-surface);
+  border-radius: var(--gf-radius-lg);
+  box-shadow: var(--gf-shadow-lg);
+  overflow: hidden;
+  outline: none;
+}
+
+.gf-modal-content[data-state="open"] {
+  animation: gf-modal-in 180ms var(--gf-ease);
+}
+
+.gf-modal-content[data-state="closed"] {
+  animation: gf-modal-out 150ms ease-in;
+}
+
+@keyframes gf-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes gf-modal-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}
+
+/* Inspection mode header */
+.gf-inspection-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--gf-blue);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gf-text-secondary);
+}
+
+.gf-inspection-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gf-blue);
+  box-shadow: 0 0 6px rgba(26, 92, 255, 0.5);
+}
+
+/* ----------------------------------------------------------
+   12. Buttons
+   ---------------------------------------------------------- */
+.gf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--gf-radius);
+  transition:
+    background-color var(--gf-duration) var(--gf-ease),
+    box-shadow var(--gf-duration) var(--gf-ease),
+    transform var(--gf-duration-fast) var(--gf-ease);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.gf-btn:active {
+  transform: scale(0.97);
+}
+
+.gf-btn-primary {
+  background: var(--gf-blue);
+  color: white;
+}
+
+.gf-btn-primary:hover {
+  background: var(--gf-blue-dark);
+  box-shadow: 0 2px 8px rgba(26, 92, 255, 0.25);
+}
+
+.gf-btn-ghost {
+  background: transparent;
+  color: var(--gf-text-secondary);
+}
+
+.gf-btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--gf-text);
+}
+
+.gf-btn-danger {
+  background: transparent;
+  color: var(--gf-red);
+  border: 1.5px solid var(--gf-red);
+}
+
+.gf-btn-danger:hover {
+  background: rgba(230, 0, 18, 0.05);
+}
+
+/* Angular cut variant */
+.gf-btn-cut {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 4px) 0,
+    100% 4px,
+    100% 100%,
+    4px 100%,
+    0 calc(100% - 4px)
+  );
+}
+
+/* ----------------------------------------------------------
+   13. Quick-add Button (on card tiles)
+   ---------------------------------------------------------- */
+.gf-quick-add {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gf-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity var(--gf-duration) var(--gf-ease),
+    transform var(--gf-duration) var(--gf-ease-bounce);
+  cursor: pointer;
+  border: none;
+  z-index: 3;
+  box-shadow: var(--gf-shadow-md);
+}
+
+.gf-card-tile:hover .gf-quick-add {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gf-quick-add:hover {
+  background: var(--gf-blue-dark);
+}
+
+.gf-quick-add:active {
+  transform: scale(0.9);
+}
+
+/* ----------------------------------------------------------
+   14. Custom scrollbar (overrides)
+   ---------------------------------------------------------- */
+.gf-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.gf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gf-scroll::-webkit-scrollbar-thumb {
+  background: var(--gf-border-dark);
+  border-radius: 3px;
+}
+
+.gf-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* ----------------------------------------------------------
+   15. Nav active state underline
+   ---------------------------------------------------------- */
+.gf-nav-link {
+  position: relative;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gf-text-secondary);
+  transition: color var(--gf-duration) var(--gf-ease);
+  border-radius: var(--gf-radius-sm);
+}
+
+.gf-nav-link:hover {
+  color: var(--gf-text);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.gf-nav-link[data-active="true"] {
+  color: var(--gf-blue);
+  background: var(--gf-blue-light);
+}
+
+/* ----------------------------------------------------------
+   16. Focus visible (accessibility)
+   ---------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--gf-blue);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------
+   17. Transitions utility
+   ---------------------------------------------------------- */
+.gf-transition {
+  transition-property: transform, opacity, box-shadow, border-color, background-color;
+  transition-duration: var(--gf-duration);
+  transition-timing-function: var(--gf-ease);
+}
