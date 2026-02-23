@@ -13,10 +13,13 @@
     "sync-cards": "tsx scripts/sync-official-cards.ts",
     "sync-cards-xlsx": "tsx scripts/sync-cards-from-xlsx.ts",
     "fetch-assets": "tsx scripts/fetchCardAssets.ts",
-    "fetch-hq-images": "tsx scripts/fetch-hq-images.ts"
+    "fetch-hq-images": "tsx scripts/fetch-hq-images.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "playwright": "^1.58.2",
+    "vitest": "^4.0.18",
     "xlsx": "^0.18.5"
   }
 }
