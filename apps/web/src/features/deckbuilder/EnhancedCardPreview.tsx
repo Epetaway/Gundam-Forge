@@ -87,26 +87,32 @@ export function EnhancedCardPreview({ card }: EnhancedCardPreviewProps) {
           </p>
         </div>
 
-        {/* Power / Shield */}
-        {card.power !== undefined && card.power > 0 && (
+        {/* AP / HP Stats */}
+        {(card.ap !== undefined || card.hp !== undefined) && (card.ap || card.hp) ? (
           <div className="px-4 pb-3">
             <div className="inline-flex items-center gap-3 rounded-full bg-gf-dark px-4 py-1.5">
-              <span className="flex items-center gap-1 text-sm font-bold text-yellow-400">
-                <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {card.power}
-              </span>
-              <span className="text-gray-500">/</span>
-              <span className="flex items-center gap-1 text-sm font-bold text-red-400">
-                <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                3000
-              </span>
+              {card.ap !== undefined && (
+                <span className="flex items-center gap-1 text-sm font-bold text-yellow-400">
+                  <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {card.ap} AP
+                </span>
+              )}
+              {card.ap !== undefined && card.hp !== undefined && (
+                <span className="text-gray-500">/</span>
+              )}
+              {card.hp !== undefined && (
+                <span className="flex items-center gap-1 text-sm font-bold text-red-400">
+                  <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  {card.hp} HP
+                </span>
+              )}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Card Text */}
         {card.text && (
@@ -132,7 +138,7 @@ export function EnhancedCardPreview({ card }: EnhancedCardPreviewProps) {
         <div className="px-4 pb-3 flex gap-2">
           <button
             onClick={() => addCard(card.id)}
-            disabled={qty >= 3}
+            disabled={qty >= 4}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-gf-blue px-3 py-2.5 text-sm font-medium text-white hover:bg-gf-blue-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -211,10 +217,22 @@ export function EnhancedCardPreview({ card }: EnhancedCardPreviewProps) {
                   <span className="text-xs font-medium text-gf-text">{card.cost}</span>
                 </div>
               </div>
-              {card.power !== undefined && (
+              {card.ap !== undefined && (
                 <div className="flex items-center justify-between py-1.5 border-t border-gf-border">
-                  <span className="text-xs text-gf-text-secondary">Power</span>
-                  <span className="text-xs font-medium text-gf-text">{card.power}</span>
+                  <span className="text-xs text-gf-text-secondary">Attack Points</span>
+                  <span className="text-xs font-medium text-gf-text">{card.ap}</span>
+                </div>
+              )}
+              {card.hp !== undefined && (
+                <div className="flex items-center justify-between py-1.5 border-t border-gf-border">
+                  <span className="text-xs text-gf-text-secondary">Hit Points</span>
+                  <span className="text-xs font-medium text-gf-text">{card.hp}</span>
+                </div>
+              )}
+              {card.traits && card.traits.length > 0 && (
+                <div className="flex items-center justify-between py-1.5 border-t border-gf-border">
+                  <span className="text-xs text-gf-text-secondary">Traits</span>
+                  <span className="text-xs font-medium text-gf-text">{card.traits.join(', ')}</span>
                 </div>
               )}
               <div className="flex items-center justify-between py-1.5 border-t border-gf-border">

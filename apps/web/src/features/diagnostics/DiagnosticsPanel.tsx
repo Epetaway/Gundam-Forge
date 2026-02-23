@@ -35,7 +35,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
     Blue: 'from-blue-500 to-blue-600',
     Red: 'from-red-500 to-red-600',
     Green: 'from-green-500 to-green-600',
-    Black: 'from-gray-700 to-gray-800',
+    Purple: 'from-purple-500 to-purple-600',
     Colorless: 'from-gray-400 to-gray-500',
   };
 

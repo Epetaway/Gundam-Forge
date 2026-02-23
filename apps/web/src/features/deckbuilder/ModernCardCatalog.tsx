@@ -12,10 +12,10 @@ const colorOptions: { color: CardColor; bg: string; border: string; label: strin
   { color: 'Blue', bg: 'bg-card-blue', border: 'border-blue-700', label: 'Blue' },
   { color: 'Green', bg: 'bg-card-green', border: 'border-green-700', label: 'Green' },
   { color: 'White', bg: 'bg-yellow-400', border: 'border-yellow-500', label: 'Yellow' },
-  { color: 'Black', bg: 'bg-card-black', border: 'border-gray-700', label: 'Black' },
+  { color: 'Purple', bg: 'bg-purple-500', border: 'border-purple-700', label: 'Purple' },
 ];
 
-const typeOptions: CardType[] = ['Unit', 'Pilot', 'Command', 'Base'];
+const typeOptions: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 const costOptions = [1, 2, 3, 4, 5];
 
 export function ModernCardCatalog({ cards }: ModernCardCatalogProps) {

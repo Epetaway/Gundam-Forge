@@ -15,11 +15,12 @@ const orderedTypes: { type: CardType; label: string; color: string }[] = [
   { type: 'Base', label: 'Support', color: 'border-l-purple-500' },
 ];
 
-const typeSortRank: Record<CardType, number> = {
+const typeSortRank: Record<string, number> = {
   Unit: 0,
   Pilot: 1,
   Command: 2,
-  Base: 3
+  Base: 3,
+  Resource: 4,
 };
 
 export function buildDeckExport(entries: Array<{ qty: number; name: string; type: CardType; cost: number }>) {
@@ -33,7 +34,7 @@ export function buildDeckExport(entries: Array<{ qty: number; name: string; type
   return [`# Gundam Forge Decklist`, ...lines].join('\n');
 }
 
-const DECK_MAX = 60;
+const DECK_MAX = 50;
 
 export function DeckBuilderPanel({ cards }: DeckBuilderPanelProps) {
   const entries = useDeckStore((state) => state.entries);
@@ -241,9 +242,9 @@ export function DeckBuilderPanel({ cards }: DeckBuilderPanelProps) {
                               <span className="w-6 text-center text-sm font-bold text-gf-text">{entry.qty}</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); addCard(entry.cardId); }}
-                                disabled={entry.qty >= 3}
+                                disabled={entry.qty >= 4}
                                 className={`flex h-7 w-7 items-center justify-center rounded border text-sm font-bold transition-colors ${
-                                  entry.qty >= 3
+                                  entry.qty >= 4
                                     ? 'border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed'
                                     : 'border-gf-border bg-white text-gf-text hover:bg-gray-100'
                                 }`}

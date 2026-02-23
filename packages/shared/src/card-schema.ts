@@ -102,9 +102,9 @@ export const ExtendedCardDefinitionSchema = z.object({
     .max(15)
     .describe('Play cost (0-15)'),
 
-  color: z.enum(['Blue', 'Green', 'Red', 'White', 'Black', 'Colorless']).describe('Primary color'),
+  color: z.enum(['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless']).describe('Primary color'),
 
-  type: z.enum(['Unit', 'Pilot', 'Command', 'Base']).describe('Card type: Unit, Pilot, Command, or Base'),
+  type: z.enum(['Unit', 'Pilot', 'Command', 'Base', 'Resource']).describe('Card type: Unit, Pilot, Command, Base, or Resource'),
 
   text: z
     .string()

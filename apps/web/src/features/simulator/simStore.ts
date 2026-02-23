@@ -1,229 +1,270 @@
 import { create } from 'zustand';
+import type { CardDefinition } from '@gundam-forge/shared';
+import {
+  initializeSoloGame,
+  advancePhase,
+  deployUnit,
+  pairPilot,
+  playCommand,
+  deployBase,
+  declareAttack,
+  declareBlock,
+  resolveBattleDamage,
+  drawCards,
+  mulligan,
+  toggleActive,
+  addDamage,
+  destroyCard,
+  returnToHand,
+  discardFromHand,
+  shuffleDeck,
+  type GameState,
+  type GameCard,
+  type TurnPhase,
+  getEffectiveAP,
+  getEffectiveHP,
+  getRemainingHP,
+  getActivePlayer,
+  countActiveResources,
+  countTotalResources,
+  PHASE_LABELS,
+  BATTLE_PHASE_ORDER,
+} from '@gundam-forge/shared';
 import type { DeckEntry } from '../deckbuilder/deckStore';
 
-export interface SimCardInstance {
-  instanceId: string;
-  cardId: string;
-  tapped: boolean;
-}
-
-export type SimZoneMap = Record<string, SimCardInstance[]>;
+// ── Types ─────────────────────────────────────────────────────────
 
 export interface SimState {
-  sourceDeck: DeckEntry[];
-  deckPile: SimCardInstance[];
-  hand: SimCardInstance[];
-  zones: SimZoneMap;
-  initializeFromDeck: (entries: DeckEntry[], zoneIds: string[]) => void;
-  reset: () => void;
-  shuffle: () => void;
-  draw: (count?: number) => void;
-  mulligan: () => void;
-  moveCard: (instanceId: string, target: { kind: 'hand' } | { kind: 'zone'; zoneId: string }) => void;
-  toggleTapped: (instanceId: string) => void;
+  gameState: GameState | null;
+  undoStack: GameState[];
+  selectedInstanceId: string | null;
+  hoveredZone: string | null;
+
+  // Initialization
+  startGame: (entries: DeckEntry[], cards: CardDefinition[]) => void;
+  resetGame: () => void;
+
+  // Phase control
+  nextPhase: () => void;
+
+  // Card actions
+  playCard: (instanceId: string, targetUnitId?: string) => string | null;
+  attack: (attackerId: string, target: { kind: 'player' } | { kind: 'unit'; unitId: string }) => string | null;
+  block: (blockerId: string) => string | null;
+  resolveDamage: () => string | null;
+
+  // Manual actions (goldfish mode)
+  manualDraw: (count?: number) => void;
+  manualMulligan: () => void;
+  manualToggleActive: (instanceId: string) => void;
+  manualAddDamage: (instanceId: string, amount: number) => void;
+  manualDestroy: (instanceId: string) => void;
+  manualReturnToHand: (instanceId: string) => void;
+  manualDiscard: (instanceId: string) => void;
+  manualShuffleDeck: () => void;
+
+  // UI state
+  setSelectedInstanceId: (id: string | null) => void;
+  setHoveredZone: (zone: string | null) => void;
+
+  // Undo
+  undo: () => void;
 }
 
-export const expandDeckToInstances = (entries: DeckEntry[]): SimCardInstance[] => {
-  const instances: SimCardInstance[] = [];
+// ── Helpers ────────────────────────────────────────────────────────
 
+const buildMainDeck = (entries: DeckEntry[], cards: CardDefinition[]): CardDefinition[] => {
+  const cardsById = new Map(cards.map((c) => [c.id, c]));
+  const result: CardDefinition[] = [];
   for (const entry of entries) {
-    for (let index = 0; index < entry.qty; index += 1) {
-      instances.push({
-        instanceId: `${entry.cardId}#${index + 1}`,
-        cardId: entry.cardId,
-        tapped: false
-      });
+    const card = cardsById.get(entry.cardId);
+    if (!card || card.type === 'Resource') continue;
+    for (let i = 0; i < entry.qty; i++) {
+      result.push(card);
     }
   }
-
-  return instances;
+  return result;
 };
 
-export const shuffleInstances = (
-  instances: SimCardInstance[],
-  randomFn: () => number = Math.random
-): SimCardInstance[] => {
-  const shuffled = [...instances];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(randomFn() * (index + 1));
-    const current = shuffled[index];
-    shuffled[index] = shuffled[randomIndex];
-    shuffled[randomIndex] = current;
-  }
-  return shuffled;
-};
-
-const createEmptyZones = (zoneIds: string[]): SimZoneMap =>
-  Object.fromEntries(zoneIds.map((zoneId) => [zoneId, [] as SimCardInstance[]]));
-
-const removeCardFromStacks = (
-  instanceId: string,
-  deckPile: SimCardInstance[],
-  hand: SimCardInstance[],
-  zones: SimZoneMap
-) => {
-  const fromDeck = deckPile.find((card) => card.instanceId === instanceId);
-  if (fromDeck) {
-    return {
-      card: fromDeck,
-      deckPile: deckPile.filter((card) => card.instanceId !== instanceId),
-      hand,
-      zones
-    };
-  }
-
-  const fromHand = hand.find((card) => card.instanceId === instanceId);
-  if (fromHand) {
-    return {
-      card: fromHand,
-      deckPile,
-      hand: hand.filter((card) => card.instanceId !== instanceId),
-      zones
-    };
-  }
-
-  for (const [zoneId, cards] of Object.entries(zones)) {
-    const fromZone = cards.find((card) => card.instanceId === instanceId);
-    if (fromZone) {
-      return {
-        card: fromZone,
-        deckPile,
-        hand,
-        zones: {
-          ...zones,
-          [zoneId]: cards.filter((card) => card.instanceId !== instanceId)
-        }
-      };
+const buildResourceDeck = (entries: DeckEntry[], cards: CardDefinition[]): CardDefinition[] => {
+  const cardsById = new Map(cards.map((c) => [c.id, c]));
+  const result: CardDefinition[] = [];
+  for (const entry of entries) {
+    const card = cardsById.get(entry.cardId);
+    if (!card || card.type !== 'Resource') continue;
+    for (let i = 0; i < entry.qty; i++) {
+      result.push(card);
     }
   }
-
-  return { card: null, deckPile, hand, zones };
+  return result;
 };
 
-const toggleInStack = (stack: SimCardInstance[], instanceId: string) =>
-  stack.map((card) => (card.instanceId === instanceId ? { ...card, tapped: !card.tapped } : card));
+// ── Store ──────────────────────────────────────────────────────────
 
 export const useSimStore = create<SimState>((set, get) => ({
-  sourceDeck: [],
-  deckPile: [],
-  hand: [],
-  zones: {},
+  gameState: null,
+  undoStack: [],
+  selectedInstanceId: null,
+  hoveredZone: null,
 
-  initializeFromDeck: (entries, zoneIds) => {
-    const normalized = entries
-      .filter((entry) => entry.qty > 0 && entry.cardId.trim().length > 0)
-      .map((entry) => ({ cardId: entry.cardId, qty: Math.floor(entry.qty) }));
-
-    const deckPile = shuffleInstances(expandDeckToInstances(normalized));
-    set(() => ({
-      sourceDeck: normalized,
-      deckPile,
-      hand: [],
-      zones: createEmptyZones(zoneIds)
-    }));
+  startGame: (entries, cards) => {
+    const mainDeck = buildMainDeck(entries, cards);
+    const resourceDeck = buildResourceDeck(entries, cards);
+    const state = initializeSoloGame(
+      mainDeck,
+      resourceDeck.length > 0 ? resourceDeck : undefined,
+      'Player',
+    );
+    set({ gameState: state, undoStack: [], selectedInstanceId: null });
   },
 
-  reset: () => {
-    const state = get();
-    const zoneIds = Object.keys(state.zones);
-    const deckPile = shuffleInstances(expandDeckToInstances(state.sourceDeck));
-    set(() => ({
-      deckPile,
-      hand: [],
-      zones: createEmptyZones(zoneIds)
-    }));
+  resetGame: () => {
+    set({ gameState: null, undoStack: [], selectedInstanceId: null });
   },
 
-  shuffle: () => {
-    const state = get();
-    set(() => ({
-      deckPile: shuffleInstances(state.deckPile)
-    }));
+  nextPhase: () => {
+    const { gameState } = get();
+    if (!gameState || gameState.gameOver) return;
+    const prev = gameState;
+    const next = advancePhase(gameState);
+    set({ gameState: next, undoStack: [...get().undoStack, prev] });
   },
 
-  draw: (count = 1) => {
-    const state = get();
-    if (count <= 0) return;
+  playCard: (instanceId, targetUnitId) => {
+    const { gameState } = get();
+    if (!gameState) return 'No game in progress.';
 
-    const drawCount = Math.min(count, state.deckPile.length);
-    if (drawCount <= 0) return;
+    const player = getActivePlayer(gameState);
+    const card = player.hand.find((c) => c.instanceId === instanceId);
+    if (!card) return 'Card not in hand.';
 
-    const drawn = state.deckPile.slice(-drawCount);
-    const remaining = state.deckPile.slice(0, state.deckPile.length - drawCount);
-
-    set(() => ({
-      deckPile: remaining,
-      hand: [...state.hand, ...drawn]
-    }));
-  },
-
-  mulligan: () => {
-    const state = get();
-    const returned = [...state.deckPile, ...state.hand].map((card) => ({ ...card, tapped: false }));
-    set(() => ({
-      deckPile: shuffleInstances(returned),
-      hand: []
-    }));
-  },
-
-  moveCard: (instanceId, target) => {
-    const state = get();
-    const pulled = removeCardFromStacks(instanceId, state.deckPile, state.hand, state.zones);
-    if (!pulled.card) return;
-
-    if (target.kind === 'hand') {
-      set(() => ({
-        deckPile: pulled.deckPile,
-        hand: [...pulled.hand, pulled.card!],
-        zones: pulled.zones
-      }));
-      return;
+    let result;
+    switch (card.definition.type) {
+      case 'Unit':
+        result = deployUnit(gameState, instanceId);
+        break;
+      case 'Pilot':
+        if (!targetUnitId) return 'Select a unit to pair with this pilot.';
+        result = pairPilot(gameState, instanceId, targetUnitId);
+        break;
+      case 'Command':
+        result = playCommand(gameState, instanceId);
+        break;
+      case 'Base':
+        result = deployBase(gameState, instanceId);
+        break;
+      default:
+        return 'Cannot play this card type.';
     }
 
-    if (target.zoneId === 'deck') {
-      set(() => ({
-        deckPile: [...pulled.deckPile, { ...pulled.card!, tapped: false }],
-        hand: pulled.hand,
-        zones: pulled.zones
-      }));
-      return;
-    }
-
-    if (!(target.zoneId in pulled.zones)) return;
-
-    set(() => ({
-      deckPile: pulled.deckPile,
-      hand: pulled.hand,
-      zones: {
-        ...pulled.zones,
-        [target.zoneId]: [...pulled.zones[target.zoneId], pulled.card!]
-      }
-    }));
+    if (!result.success) return result.error ?? 'Action failed.';
+    set({ gameState: result.state, undoStack: [...get().undoStack, gameState] });
+    return null;
   },
 
-  toggleTapped: (instanceId) => {
-    const state = get();
-    if (state.deckPile.some((card) => card.instanceId === instanceId)) {
-      set(() => ({ deckPile: toggleInStack(state.deckPile, instanceId) }));
-      return;
-    }
+  attack: (attackerId, target) => {
+    const { gameState } = get();
+    if (!gameState) return 'No game in progress.';
+    const result = declareAttack(gameState, attackerId, target);
+    if (!result.success) return result.error ?? 'Attack failed.';
+    set({ gameState: result.state, undoStack: [...get().undoStack, gameState] });
+    return null;
+  },
 
-    if (state.hand.some((card) => card.instanceId === instanceId)) {
-      set(() => ({ hand: toggleInStack(state.hand, instanceId) }));
-      return;
-    }
+  block: (blockerId) => {
+    const { gameState } = get();
+    if (!gameState) return 'No game in progress.';
+    const result = declareBlock(gameState, blockerId);
+    if (!result.success) return result.error ?? 'Block failed.';
+    set({ gameState: result.state, undoStack: [...get().undoStack, gameState] });
+    return null;
+  },
 
-    const nextZones: SimZoneMap = {};
-    let found = false;
-    for (const [zoneId, cards] of Object.entries(state.zones)) {
-      if (cards.some((card) => card.instanceId === instanceId)) {
-        nextZones[zoneId] = toggleInStack(cards, instanceId);
-        found = true;
-      } else {
-        nextZones[zoneId] = cards;
-      }
-    }
+  resolveDamage: () => {
+    const { gameState } = get();
+    if (!gameState) return 'No game in progress.';
+    const result = resolveBattleDamage(gameState);
+    if (!result.success) return result.error ?? 'Resolve failed.';
+    set({ gameState: result.state, undoStack: [...get().undoStack, gameState] });
+    return null;
+  },
 
-    if (found) set(() => ({ zones: nextZones }));
-  }
+  manualDraw: (count = 1) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = drawCards(gameState, 0, count);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualMulligan: () => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = mulligan(gameState, 0);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualToggleActive: (instanceId) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = toggleActive(gameState, instanceId);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualAddDamage: (instanceId, amount) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = addDamage(gameState, instanceId, amount);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualDestroy: (instanceId) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = destroyCard(gameState, instanceId);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualReturnToHand: (instanceId) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = returnToHand(gameState, instanceId);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualDiscard: (instanceId) => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = discardFromHand(gameState, instanceId);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  manualShuffleDeck: () => {
+    const { gameState } = get();
+    if (!gameState) return;
+    const next = shuffleDeck(gameState, 0);
+    set({ gameState: next, undoStack: [...get().undoStack, gameState] });
+  },
+
+  setSelectedInstanceId: (id) => set({ selectedInstanceId: id }),
+  setHoveredZone: (zone) => set({ hoveredZone: zone }),
+
+  undo: () => {
+    const { undoStack } = get();
+    if (undoStack.length === 0) return;
+    const prev = undoStack[undoStack.length - 1];
+    set({ gameState: prev, undoStack: undoStack.slice(0, -1) });
+  },
 }));
+
+// Re-export engine helpers for UI use
+export {
+  getEffectiveAP,
+  getEffectiveHP,
+  getRemainingHP,
+  getActivePlayer,
+  countActiveResources,
+  countTotalResources,
+  PHASE_LABELS,
+  BATTLE_PHASE_ORDER,
+};
+export type { GameState, GameCard, TurnPhase };
