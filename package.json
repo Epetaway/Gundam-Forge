@@ -10,6 +10,13 @@
     "qa": "npm run lint && npm run build",
     "build": "npm run --workspaces --if-present build",
     "dev:web": "npm --workspace @gundam-forge/web run dev",
-    "fetch-assets": "tsx scripts/fetchCardAssets.ts"
+    "sync-cards": "tsx scripts/sync-official-cards.ts",
+    "sync-cards-xlsx": "tsx scripts/sync-cards-from-xlsx.ts",
+    "fetch-assets": "tsx scripts/fetchCardAssets.ts",
+    "fetch-hq-images": "tsx scripts/fetch-hq-images.ts"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2",
+    "xlsx": "^0.18.5"
   }
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { validateDeck, type CardDefinition, type CardType } from '@gundam-forge/shared';
 import { useDeckStore } from './deckStore';
+import { resolveCardImage } from '../../utils/resolveCardImage';
 import { resolveDeckEntries } from './deckSelectors';
 import { useCardsStore } from './cardsStore';
 
@@ -194,9 +195,7 @@ export function DeckBuilderPanel({ cards }: DeckBuilderPanelProps) {
                   {/* Card Rows */}
                   {!isCollapsed && (
                     <div className="space-y-0.5 mb-2">
-                      {items.map((entry) => {
-                        const imageSrc = entry.card.imageUrl || entry.card.placeholderArt;
-                        return (
+                      {items.map((entry) => (
                           <div
                             key={entry.cardId}
                             onClick={() => setSelectedCardId(entry.cardId)}
@@ -207,7 +206,7 @@ export function DeckBuilderPanel({ cards }: DeckBuilderPanelProps) {
 
                             {/* Card Thumbnail */}
                             <img
-                              src={imageSrc}
+                              src={resolveCardImage(entry.card)}
                               alt={entry.card.name}
                               className="h-9 w-7 rounded object-cover flex-shrink-0"
                               loading="lazy"
@@ -253,8 +252,7 @@ export function DeckBuilderPanel({ cards }: DeckBuilderPanelProps) {
                               </button>
                             </div>
                           </div>
-                        );
-                      })}
+                        ))}
                     </div>
                   )}
                 </div>

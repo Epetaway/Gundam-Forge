@@ -1,4 +1,6 @@
 import type { CardDefinition } from '@gundam-forge/shared';
+import { resolveCardImage } from '../../utils/resolveCardImage';
+import { useBrokenImageStore } from '../../utils/brokenImageStore';
 
 interface CardPreviewPanelProps {
   card: CardDefinition | undefined;
@@ -19,19 +21,23 @@ export function CardPreviewPanel({ card }: CardPreviewPanelProps) {
     );
   }
 
-  // Use imageUrl if available, otherwise fall back to placeholderArt
-  const imageSource = card.imageUrl || card.placeholderArt;
+  const imageSource = resolveCardImage(card);
+  const markBroken = useBrokenImageStore((state) => state.markBroken);
+  const isBroken = useBrokenImageStore((state) => state.brokenIds)[card.id];
 
   return (
     <aside className="rounded-lg border border-slate-800 bg-slate-900 p-4">
       <h2 className="text-lg font-semibold">Technical Spec</h2>
       <div className="mt-4 space-y-3">
-        {imageSource && (
+        {imageSource && !isBroken && (
           <img
             src={imageSource}
             alt={`${card.name} card art`}
             className="w-full rounded-md border border-slate-800 object-cover"
             loading="lazy"
+            onError={() => {
+              markBroken(card.id);
+            }}
           />
         )}
         <div className="grid grid-cols-2 gap-2 text-sm">

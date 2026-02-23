@@ -2,6 +2,8 @@ import { useEffect, useMemo } from 'react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import cardsJson from './data/cards.json';
 import { validateDeck, type CardDefinition } from '@gundam-forge/shared';
+import { resolveCardImage } from './utils/resolveCardImage';
+import { useBrokenImageStore } from './utils/brokenImageStore';
 import { ModernCardCatalog } from './features/deckbuilder/ModernCardCatalog';
 import { EnhancedCardPreview } from './features/deckbuilder/EnhancedCardPreview';
 import { useCardsStore } from './features/deckbuilder/cardsStore';
@@ -160,41 +162,7 @@ function App() {
           <Route
             path="/catalog"
             element={
-              <div className="flex h-[calc(100vh-64px)]">
-                <div className="w-80 flex-shrink-0 border-r border-gf-border bg-white overflow-y-auto custom-scrollbar">
-                  <ModernCardCatalog cards={catalogCards} />
-                </div>
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                    {catalogCards.map((card) => {
-                      const imageSrc = card.imageUrl || card.placeholderArt;
-                      return (
-                        <div
-                          key={card.id}
-                          className="cursor-pointer group"
-                          onClick={() => useCardsStore.getState().setSelectedCardId(card.id)}
-                        >
-                          <div className="relative overflow-hidden rounded-lg border border-gf-border bg-white transition-all hover:border-gf-blue hover:shadow-md">
-                            <div className="relative w-full pb-[140%] bg-gray-100">
-                              <img
-                                src={imageSrc}
-                                alt={card.name}
-                                className="absolute inset-0 h-full w-full object-cover"
-                                loading="lazy"
-                              />
-                              <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-gf-blue text-xs font-bold text-white shadow">
-                                {card.cost}
-                              </div>
-                            </div>
-                          </div>
-                          <p className="mt-1.5 truncate text-xs font-medium text-gf-text">{card.name}</p>
-                          <p className="text-xs text-gf-text-secondary">{card.id}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              <CatalogPage catalogCards={catalogCards} />
             }
           />
 
@@ -214,6 +182,54 @@ function App() {
           <Route path="*" element={<Navigate to="/builder" replace />} />
         </Routes>
       )}
+    </div>
+  );
+}
+
+function CatalogPage({ catalogCards }: { catalogCards: CardDefinition[] }) {
+  const brokenIds = useBrokenImageStore((state) => state.brokenIds);
+  const markBroken = useBrokenImageStore((state) => state.markBroken);
+
+  return (
+    <div className="flex h-[calc(100vh-64px)]">
+      <div className="w-80 flex-shrink-0 border-r border-gf-border bg-white overflow-y-auto custom-scrollbar">
+        <ModernCardCatalog cards={catalogCards} />
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          {catalogCards.map((card) => {
+            if (brokenIds[card.id]) return null;
+
+            const imageSrc = resolveCardImage(card);
+            return (
+              <div
+                key={card.id}
+                className="cursor-pointer group"
+                onClick={() => useCardsStore.getState().setSelectedCardId(card.id)}
+              >
+                <div className="relative overflow-hidden rounded-lg border border-gf-border bg-white transition-all hover:border-gf-blue hover:shadow-md">
+                  <div className="relative w-full pb-[140%] bg-gray-100">
+                    <img
+                      src={imageSrc}
+                      alt={card.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      loading="lazy"
+                      onError={() => {
+                        markBroken(card.id);
+                      }}
+                    />
+                    <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-gf-blue text-xs font-bold text-white shadow">
+                      {card.cost}
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-1.5 truncate text-xs font-medium text-gf-text">{card.name}</p>
+                <p className="text-xs text-gf-text-secondary">{card.id}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
