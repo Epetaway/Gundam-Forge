@@ -192,7 +192,7 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
 
             {/* Preview */}
             {parsed.length > 0 && (
-              <div className="rounded-xl border border-gf-border bg-gf-light/50 p-4 max-h-48 overflow-y-auto custom-scrollbar">
+              <div className="rounded-xl border border-gf-border bg-gf-light/50 p-4 max-h-48 overflow-y-auto gf-scroll">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-gf-text">Preview</span>
                   <div className="flex items-center gap-3 text-[10px]">

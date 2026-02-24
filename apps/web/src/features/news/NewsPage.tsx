@@ -54,7 +54,7 @@ export function NewsPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-8">
       <div className="mb-8">
-        <h1 className="font-heading text-2xl font-bold text-gf-text">News & Updates</h1>
+          <h1 className="font-heading text-2xl font-bold text-gf-text">News & Updates</h1>
         <p className="text-sm text-gf-text-secondary mt-1">
           Stay up to date with Gundam Forge development and the Gundam TCG community
         </p>

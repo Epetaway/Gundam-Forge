@@ -1,0 +1,149 @@
+/* ============================================================
+   GUNDAM FORGE — Motion & Animation System
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. Keyframes
+   ---------------------------------------------------------- */
+@keyframes gf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gf-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes gf-slide-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes gf-slide-down {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes gf-scale-in {
+  from { transform: scale(0.96); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gf-qty-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gf-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gf-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gf-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes gf-modal-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}
+
+@keyframes gf-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gf-backdrop-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ----------------------------------------------------------
+   2. Animation Utility Classes
+   ---------------------------------------------------------- */
+.gf-animate-fade-in {
+  animation: gf-fade-in var(--gf-duration-normal) var(--gf-ease-out);
+}
+
+.gf-animate-slide-up {
+  animation: gf-slide-up var(--gf-duration-normal) var(--gf-ease-out);
+}
+
+.gf-animate-slide-down {
+  animation: gf-slide-down var(--gf-duration-normal) var(--gf-ease-out);
+}
+
+.gf-animate-scale-in {
+  animation: gf-scale-in var(--gf-duration-normal) var(--gf-ease-out);
+}
+
+.gf-animate-qty-pulse {
+  animation: gf-qty-pulse 300ms var(--gf-ease-bounce);
+}
+
+.gf-animate-spin {
+  animation: gf-spin 700ms linear infinite;
+}
+
+.gf-animate-shimmer {
+  animation: gf-shimmer 1.5s var(--gf-ease-in-out) infinite;
+}
+
+/* Modal transitions */
+.gf-modal-backdrop[data-state="open"] {
+  animation: gf-backdrop-in 150ms var(--gf-ease-out);
+}
+
+.gf-modal-backdrop[data-state="closed"] {
+  animation: gf-backdrop-out 150ms var(--gf-ease-in);
+}
+
+.gf-modal-content[data-state="open"] {
+  animation: gf-modal-in var(--gf-duration-modal) var(--gf-ease-out);
+}
+
+.gf-modal-content[data-state="closed"] {
+  animation: gf-modal-out var(--gf-duration-normal) var(--gf-ease-in);
+}
+
+/* Autosave spinner */
+.gf-autosave-spinner {
+  animation: gf-spin 700ms linear infinite;
+}
+
+/* Skeleton shimmer */
+.gf-skeleton {
+  animation: gf-shimmer 1.5s var(--gf-ease-in-out) infinite;
+}
+
+/* ----------------------------------------------------------
+   3. Reduced Motion
+   ---------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

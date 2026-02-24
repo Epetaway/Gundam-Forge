@@ -65,7 +65,7 @@ export function EnhancedCardPreview({ card, onInspect }: EnhancedCardPreviewProp
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto gf-scroll">
         {/* Card Image */}
         <div
           className="relative mx-4 mt-4 overflow-hidden rounded-xl border border-gf-border shadow-sm bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer group"
@@ -172,7 +172,7 @@ export function EnhancedCardPreview({ card, onInspect }: EnhancedCardPreviewProp
           <button
             onClick={() => removeCard(card.id)}
             disabled={qty === 0}
-            className="gf-btn gf-btn-danger flex-1 text-xs py-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="gf-btn gf-btn-destructive flex-1 text-xs py-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path d="M5 12h14" strokeLinecap="round" />
