@@ -444,7 +444,20 @@ export async function fetchBulkLikeStatus(deckIds: string[]): Promise<Set<string
   return new Set((data ?? []).map((r) => r.deck_id));
 }
 
-/** Increment view count for a public deck */
+/** Generate a simple viewer hash for anonymous view deduplication */
+function getViewerHash(): string {
+  let hash = sessionStorage.getItem('gf_viewer_hash');
+  if (!hash) {
+    hash = crypto.randomUUID();
+    sessionStorage.setItem('gf_viewer_hash', hash);
+  }
+  return hash;
+}
+
+/** Increment view count for a public deck (rate-limited: 1 per viewer per 24h) */
 export async function incrementDeckView(deckId: string): Promise<void> {
-  await supabase.rpc('increment_deck_view', { deck_id: deckId });
+  await supabase.rpc('increment_deck_view', {
+    p_deck_id: deckId,
+    p_viewer_hash: getViewerHash(),
+  });
 }
