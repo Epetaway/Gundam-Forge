@@ -84,6 +84,7 @@ create table if not exists public.decks (
   archetype   text,
   source      text not null default 'user' check (source in ('user', 'official')),
   source_url  text,
+  slug        text unique,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -107,6 +108,7 @@ create index if not exists idx_decks_view_count on public.decks(view_count desc)
 create index if not exists idx_decks_like_count on public.decks(like_count desc) where is_public = true;
 create index if not exists idx_decks_archetype on public.decks(archetype) where archetype is not null;
 create index if not exists idx_decks_source on public.decks(source);
+create index if not exists idx_decks_slug on public.decks(slug) where slug is not null;
 create index if not exists idx_deck_cards_deck_id on public.deck_cards(deck_id);
 create index if not exists idx_profiles_username on public.profiles(username);
 
@@ -291,6 +293,41 @@ create trigger trg_profiles_updated_at
   before update on public.profiles
   for each row
   execute function public.update_updated_at();
+
+-- ============================================================
+-- Auto-generate deck slug from name
+-- ============================================================
+create or replace function public.generate_deck_slug()
+returns trigger as $$
+declare
+  base_slug text;
+  final_slug text;
+  counter integer := 0;
+begin
+  if new.slug is null and new.name is not null then
+    base_slug := lower(regexp_replace(
+      regexp_replace(new.name, '[^a-zA-Z0-9\s-]', '', 'g'),
+      '[\s-]+', '-', 'g'
+    ));
+    base_slug := trim(both '-' from base_slug);
+    final_slug := base_slug;
+    loop
+      exit when not exists (
+        select 1 from public.decks where slug = final_slug and id != new.id
+      );
+      counter := counter + 1;
+      final_slug := base_slug || '-' || counter;
+    end loop;
+    new.slug := final_slug;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_decks_generate_slug
+  before insert or update of name on public.decks
+  for each row
+  execute function public.generate_deck_slug();
 
 -- ============================================================
 -- 6. User card collections (owned cards)

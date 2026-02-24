@@ -19,14 +19,19 @@
   --gf-blue-900: #041E5C;
 
   /* ── Semantic Colors ── */
-  --gf-success:    #10B981;
-  --gf-success-bg: #ECFDF5;
-  --gf-warning:    #F59E0B;
-  --gf-warning-bg: #FFFBEB;
-  --gf-error:      #EF4444;
-  --gf-error-bg:   #FEF2F2;
-  --gf-info:       #3B82F6;
-  --gf-info-bg:    #EFF6FF;
+  --gf-success:       #10B981;
+  --gf-success-hover: #059669;
+  --gf-success-bg:    #ECFDF5;
+  --gf-warning:       #F59E0B;
+  --gf-warning-hover: #D97706;
+  --gf-warning-bg:    #FFFBEB;
+  --gf-error:         #EF4444;
+  --gf-error-hover:   #DC2626;
+  --gf-error-bg:      #FEF2F2;
+  --gf-info:          #3B82F6;
+  --gf-info-bg:       #EFF6FF;
+  --gf-purple:        #8B5CF6;
+  --gf-amber:         #F59E0B;
 
   /* ── Neutral Gray Scale ── */
   --gf-gray-50:  #F9FAFB;
