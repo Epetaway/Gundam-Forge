@@ -153,29 +153,6 @@
   transition-duration: var(--gf-duration-fast);
 }
 
-/* Specular light sweep */
-.gf-card-tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.15) 45%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0.15) 55%,
-    transparent 60%
-  );
-  transform: translateX(-100%);
-  transition: transform var(--gf-duration-slower) var(--gf-ease-default);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.gf-card-tile:hover::after {
-  transform: translateX(100%);
-}
-
 .gf-card-tile[data-selected="true"] {
   box-shadow: 0 0 0 2px var(--gf-blue-500), var(--gf-shadow-sm);
 }
