@@ -3,6 +3,11 @@ import type { DeckEntry } from '../features/deckbuilder/deckStore';
 import { OFFICIAL_DECKS, type OfficialDeck } from '../data/officialDecks';
 import { getMetaTierForColors, type MetaTier } from '../data/metaTierList';
 
+/** Escape special LIKE pattern characters (%, _) to prevent injection */
+function escapeLikePattern(input: string): string {
+  return input.replace(/[%_\\]/g, '\\$&');
+}
+
 export interface DeckRecord {
   id: string;
   user_id: string | null;
@@ -312,7 +317,8 @@ export async function fetchPublicDecks(options?: {
       .limit(limit + 1);
 
     if (options?.search) {
-      query = query.ilike('name', `%${options.search}%`);
+      const escaped = escapeLikePattern(options.search);
+      query = query.ilike('name', `%${escaped}%`);
     }
 
     if (options?.archetype) {
