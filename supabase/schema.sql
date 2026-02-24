@@ -109,6 +109,7 @@ create index if not exists idx_decks_like_count on public.decks(like_count desc)
 create index if not exists idx_decks_archetype on public.decks(archetype) where archetype is not null;
 create index if not exists idx_decks_source on public.decks(source);
 create index if not exists idx_decks_slug on public.decks(slug) where slug is not null;
+create index if not exists idx_decks_colors_gin on public.decks using gin (colors);
 create index if not exists idx_deck_cards_deck_id on public.deck_cards(deck_id);
 create index if not exists idx_profiles_username on public.profiles(username);
 
