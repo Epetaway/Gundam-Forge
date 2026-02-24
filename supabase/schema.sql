@@ -400,6 +400,46 @@ create trigger trg_user_collections_updated_at
   execute function public.update_updated_at();
 
 -- ============================================================
+-- 7. Events (tournaments, locals, online)
+-- ============================================================
+create table if not exists public.events (
+  id            uuid primary key default gen_random_uuid(),
+  name          text not null,
+  slug          text unique not null,
+  event_type    text not null check (event_type in ('regional','national','local','online')),
+  date          date not null,
+  location      text,
+  player_count  integer,
+  source_url    text,
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists idx_events_date on public.events(date desc);
+create index if not exists idx_events_slug on public.events(slug);
+create index if not exists idx_events_type on public.events(event_type);
+
+-- ============================================================
+-- 8. Event placements (deck results at events)
+-- ============================================================
+create table if not exists public.event_placements (
+  id            uuid primary key default gen_random_uuid(),
+  event_id      uuid not null references public.events(id) on delete cascade,
+  deck_id       uuid references public.decks(id) on delete set null,
+  player_name   text,
+  placement     integer not null,
+  archetype_id  text references public.archetypes(id),
+  wins          integer not null default 0,
+  losses        integer not null default 0,
+  draws         integer not null default 0,
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists idx_event_placements_event on public.event_placements(event_id);
+create index if not exists idx_event_placements_archetype on public.event_placements(archetype_id);
+create index if not exists idx_event_placements_deck on public.event_placements(deck_id);
+create index if not exists idx_event_placements_placement on public.event_placements(placement);
+
+-- ============================================================
 -- Increment view count (called via RPC from the client)
 -- ============================================================
 create or replace function public.increment_deck_view(deck_id uuid)
