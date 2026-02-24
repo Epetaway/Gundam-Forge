@@ -265,21 +265,21 @@
 }
 
 .gf-action-rail-btn.gf-rail-add {
-  background: #22c55e;
+  background: var(--gf-success);
   color: white;
 }
 
 .gf-action-rail-btn.gf-rail-add:hover {
-  background: #16a34a;
+  background: var(--gf-success-hover);
 }
 
 .gf-action-rail-btn.gf-rail-remove {
-  background: #ef4444;
+  background: var(--gf-error);
   color: white;
 }
 
 .gf-action-rail-btn.gf-rail-remove:hover {
-  background: #dc2626;
+  background: var(--gf-error-hover);
 }
 
 .gf-action-rail-btn.gf-rail-inspect {
@@ -315,22 +315,22 @@
 }
 
 .gf-card-type-badge[data-type="Pilot"] {
-  background: #8b5cf6;
+  background: var(--gf-purple);
   color: white;
 }
 
 .gf-card-type-badge[data-type="Command"] {
-  background: #f59e0b;
+  background: var(--gf-amber);
   color: white;
 }
 
 .gf-card-type-badge[data-type="Base"] {
-  background: #6b7280;
+  background: var(--gf-gray-500);
   color: white;
 }
 
 .gf-card-type-badge[data-type="Resource"] {
-  background: #10b981;
+  background: var(--gf-success);
   color: white;
 }
 
@@ -416,21 +416,21 @@
 }
 
 .gf-qty-btn-add {
-  background: #22c55e;
+  background: var(--gf-success);
   color: white;
 }
 
 .gf-qty-btn-add:hover:not(:disabled) {
-  background: #16a34a;
+  background: var(--gf-success-hover);
 }
 
 .gf-qty-btn-remove {
-  background: #ef4444;
+  background: var(--gf-error);
   color: white;
 }
 
 .gf-qty-btn-remove:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--gf-error-hover);
 }
 
 /* ----------------------------------------------------------
@@ -469,11 +469,11 @@
 }
 
 .gf-progress-fill[data-status="complete"] {
-  background: linear-gradient(90deg, var(--gf-success), #059669);
+  background: linear-gradient(90deg, var(--gf-success), var(--gf-success-hover));
 }
 
 .gf-progress-fill[data-status="warning"] {
-  background: linear-gradient(90deg, var(--gf-warning), #D97706);
+  background: linear-gradient(90deg, var(--gf-warning), var(--gf-warning-hover));
 }
 
 /* ----------------------------------------------------------
