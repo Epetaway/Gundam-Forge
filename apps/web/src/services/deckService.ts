@@ -15,6 +15,7 @@ export interface DeckRecord {
   archetype: string | null;
   source: 'user' | 'official';
   source_url: string | null;
+  slug: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -176,6 +177,7 @@ function officialDeckToPublic(deck: OfficialDeck): PublicDeckRecord {
     archetype: deck.archetype,
     source: 'official',
     source_url: deck.sourceUrl,
+    slug: deck.slug,
     created_at: now,
     updated_at: now,
     profiles: null,
@@ -199,6 +201,7 @@ function officialDeckToRecord(deck: OfficialDeck): DeckRecord {
     archetype: deck.archetype,
     source: 'official',
     source_url: deck.sourceUrl,
+    slug: deck.slug,
     created_at: now,
     updated_at: now,
   };
@@ -283,6 +286,7 @@ export interface PublicDeckRecord {
   archetype: string | null;
   source: 'user' | 'official';
   source_url: string | null;
+  slug: string | null;
   created_at: string;
   updated_at: string;
   profiles: { username: string | null; display_name: string | null } | null;
@@ -307,7 +311,7 @@ export async function fetchPublicDecks(options?: {
 
     let query = supabase
       .from('decks')
-      .select('id, name, description, colors, is_public, view_count, like_count, archetype, source, source_url, created_at, updated_at, profiles(username, display_name)')
+      .select('id, name, description, colors, is_public, view_count, like_count, archetype, source, source_url, slug, created_at, updated_at, profiles(username, display_name)')
       .eq('is_public', true)
       .order(orderBy, { ascending: false })
       .limit(limit);
