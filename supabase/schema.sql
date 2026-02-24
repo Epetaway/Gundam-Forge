@@ -29,6 +29,13 @@ create table if not exists public.cards (
   rarity      text,
   illustrator text,
   release_date date,
+  search_vector tsvector generated always as (
+    to_tsvector('english',
+      coalesce(name, '') || ' ' ||
+      coalesce(text, '') || ' ' ||
+      coalesce(array_to_string(traits, ' '), '')
+    )
+  ) stored,
   created_at  timestamptz not null default now()
 );
 
@@ -116,6 +123,8 @@ create index if not exists idx_decks_colors_gin on public.decks using gin (color
 create index if not exists idx_decks_name_trgm on public.decks using gin (name gin_trgm_ops);
 create index if not exists idx_deck_cards_deck_id on public.deck_cards(deck_id);
 create index if not exists idx_profiles_username on public.profiles(username);
+create index if not exists idx_cards_search on public.cards using gin (search_vector);
+create index if not exists idx_cards_name_trgm on public.cards using gin (name gin_trgm_ops);
 
 -- 5b. Deck likes (user-to-deck many-to-many)
 create table if not exists public.deck_likes (
