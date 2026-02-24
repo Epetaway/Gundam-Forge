@@ -10,6 +10,8 @@ import {
   type DeckRecord,
   type DeckEntryWithBoss,
 } from '../../services/deckService';
+import { getMetaTierForColors, TIER_LABELS, TIER_COLORS } from '../../data/metaTierList';
+import { resolveCardImage } from '../../utils/resolveCardImage';
 import type { CardDefinition } from '@gundam-forge/shared';
 
 const COLOR_DOT: Record<string, string> = {
@@ -155,6 +157,15 @@ export function PublicDeckViewPage() {
                 Official GCG
               </span>
             )}
+            {(() => {
+              const meta = getMetaTierForColors(deck.colors);
+              if (!meta) return null;
+              return (
+                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${TIER_COLORS[meta.tier]}`}>
+                  Tier {TIER_LABELS[meta.tier]}
+                </span>
+              );
+            })()}
             {deck.archetype && (
               <span className="rounded-full bg-gf-blue/5 border border-gf-blue/20 px-2.5 py-0.5 text-[10px] font-medium text-gf-blue">
                 {deck.archetype}
@@ -250,27 +261,30 @@ export function PublicDeckViewPage() {
             Key / Boss Cards
           </h2>
           <div className="flex flex-wrap gap-2">
-            {bossCards.map((e) => (
-              <div
-                key={e.cardId}
-                className="flex items-center gap-2 rounded-lg bg-white border border-yellow-200 px-3 py-2"
-              >
-                {e.card?.imageUrl && (
-                  <img
-                    src={e.card.imageUrl}
-                    alt={e.card.name}
-                    className="h-10 w-7 rounded object-cover"
-                  />
-                )}
-                <div>
-                  <p className="text-xs font-bold text-gf-text">{e.card?.name ?? e.cardId}</p>
-                  <p className="text-[10px] text-gf-text-muted">
-                    {e.card?.type} &middot; Cost {e.card?.cost ?? '?'}
-                    {e.card?.ap !== undefined && ` &middot; ${e.card.ap} AP`}
-                  </p>
+            {bossCards.map((e) => {
+              const imgSrc = e.card ? resolveCardImage(e.card) : undefined;
+              return (
+                <div
+                  key={e.cardId}
+                  className="flex items-center gap-2 rounded-lg bg-white border border-yellow-200 px-3 py-2"
+                >
+                  {imgSrc && (
+                    <img
+                      src={imgSrc}
+                      alt={e.card?.name ?? e.cardId}
+                      className="h-10 w-7 rounded object-cover"
+                    />
+                  )}
+                  <div>
+                    <p className="text-xs font-bold text-gf-text">{e.card?.name ?? e.cardId}</p>
+                    <p className="text-[10px] text-gf-text-muted">
+                      {e.card?.type} &middot; Cost {e.card?.cost ?? '?'}
+                      {e.card?.ap !== undefined && ` \u00B7 ${e.card.ap} AP`}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -364,6 +378,29 @@ export function PublicDeckViewPage() {
               ))}
             </div>
           </div>
+
+          {/* Meta Tier Info */}
+          {(() => {
+            const meta = getMetaTierForColors(deck.colors);
+            if (!meta) return null;
+            return (
+              <div className="rounded-xl border border-gf-border bg-white p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-md border text-[10px] font-bold ${TIER_COLORS[meta.tier]}`}>
+                    {TIER_LABELS[meta.tier]}
+                  </span>
+                  <h3 className="text-sm font-bold text-gf-text">Meta Tier {TIER_LABELS[meta.tier]}</h3>
+                </div>
+                <p className="text-xs text-gf-text-secondary mb-2">{meta.summary}</p>
+                {meta.highlights && (
+                  <p className="text-[10px] text-gf-text-muted italic">{meta.highlights}</p>
+                )}
+                <p className="text-[10px] text-gf-text-muted mt-2">
+                  Source: gundamcard.gg
+                </p>
+              </div>
+            );
+          })()}
 
           {!authUser && (
             <div className="rounded-xl border border-dashed border-gf-border bg-gf-light/50 p-5 text-center">

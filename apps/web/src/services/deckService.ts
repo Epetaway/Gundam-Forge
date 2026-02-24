@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase';
 import type { DeckEntry } from '../features/deckbuilder/deckStore';
+import { OFFICIAL_DECKS, type OfficialDeck } from '../data/officialDecks';
+import { getMetaTierForColors, type MetaTier } from '../data/metaTierList';
 
 export interface DeckRecord {
   id: string;
@@ -43,6 +45,21 @@ export async function fetchUserDecks(): Promise<DeckRecord[]> {
 
 /** Fetch a single deck with its cards */
 export async function fetchDeck(deckId: string): Promise<{ deck: DeckRecord; cards: DeckEntryWithBoss[] }> {
+  // Check for local official deck IDs (e.g. "official-deck-001")
+  if (deckId.startsWith('official-')) {
+    const localDeck = findOfficialDeckByLocalId(deckId);
+    if (localDeck) {
+      return {
+        deck: officialDeckToRecord(localDeck),
+        cards: localDeck.cards.map((c) => ({
+          cardId: c.cardId,
+          qty: c.qty,
+          isBoss: c.isBoss,
+        })),
+      };
+    }
+  }
+
   const [deckRes, cardsRes] = await Promise.all([
     supabase.from('decks').select('*').eq('id', deckId).single(),
     supabase.from('deck_cards').select('card_id, qty, is_boss').eq('deck_id', deckId),
@@ -140,6 +157,118 @@ export async function deleteDeck(deckId: string) {
 }
 
 /* ============================================================
+   Local Official Deck Fallback
+   ============================================================ */
+
+/** Convert a static OfficialDeck to a PublicDeckRecord for offline/local display */
+function officialDeckToPublic(deck: OfficialDeck): PublicDeckRecord {
+  const now = new Date().toISOString();
+  const meta = getMetaTierForColors(deck.colors);
+  const bossIds = deck.cards.filter((c) => c.isBoss).map((c) => c.cardId);
+  return {
+    id: `official-${deck.slug}`,
+    name: deck.name,
+    description: deck.description,
+    colors: deck.colors,
+    is_public: true,
+    view_count: 0,
+    like_count: 0,
+    archetype: deck.archetype,
+    source: 'official',
+    source_url: deck.sourceUrl,
+    created_at: now,
+    updated_at: now,
+    profiles: null,
+    meta_tier: meta?.tier,
+    boss_card_ids: bossIds.length > 0 ? bossIds : undefined,
+  };
+}
+
+/** Convert a static OfficialDeck to a DeckRecord for the detail page */
+function officialDeckToRecord(deck: OfficialDeck): DeckRecord {
+  const now = new Date().toISOString();
+  return {
+    id: `official-${deck.slug}`,
+    user_id: null,
+    name: deck.name,
+    description: deck.description,
+    is_public: true,
+    view_count: 0,
+    like_count: 0,
+    colors: deck.colors,
+    archetype: deck.archetype,
+    source: 'official',
+    source_url: deck.sourceUrl,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+/** Find an official deck by its local ID (e.g. "official-deck-001") */
+function findOfficialDeckByLocalId(id: string): OfficialDeck | undefined {
+  const slug = id.replace(/^official-/, '');
+  return OFFICIAL_DECKS.find((d) => d.slug === slug);
+}
+
+/** Look up boss card IDs for any deck that matches an official deck (by slug or name) */
+function getBossCardIdsForDeck(deckId: string): string[] | undefined {
+  // Try by local ID pattern
+  const local = findOfficialDeckByLocalId(deckId);
+  if (local) {
+    const ids = local.cards.filter((c) => c.isBoss).map((c) => c.cardId);
+    return ids.length > 0 ? ids : undefined;
+  }
+  // Try matching by name for Supabase decks
+  const byName = OFFICIAL_DECKS.find(
+    (d) => deckId === d.slug || deckId.endsWith(d.slug),
+  );
+  if (byName) {
+    const ids = byName.cards.filter((c) => c.isBoss).map((c) => c.cardId);
+    return ids.length > 0 ? ids : undefined;
+  }
+  return undefined;
+}
+
+/** Get official decks as PublicDeckRecords with basic client-side filtering */
+function getLocalOfficialDecks(options?: {
+  search?: string;
+  archetype?: string;
+  source?: 'user' | 'official' | 'all';
+  color?: string;
+  orderBy?: string;
+  limit?: number;
+}): PublicDeckRecord[] {
+  // If filtering for community-only, return nothing from local
+  if (options?.source === 'user') return [];
+
+  let decks = OFFICIAL_DECKS.map(officialDeckToPublic);
+
+  if (options?.search) {
+    const q = options.search.toLowerCase();
+    decks = decks.filter(
+      (d) =>
+        d.name.toLowerCase().includes(q) ||
+        (d.description?.toLowerCase().includes(q) ?? false) ||
+        (d.archetype?.toLowerCase().includes(q) ?? false),
+    );
+  }
+
+  if (options?.archetype) {
+    decks = decks.filter((d) => d.archetype === options.archetype);
+  }
+
+  if (options?.color) {
+    decks = decks.filter((d) => d.colors.includes(options.color!));
+  }
+
+  if (options?.limit) {
+    decks = decks.slice(0, options.limit);
+  }
+
+  return decks;
+}
+
+/* ============================================================
    Public / Community Decks
    ============================================================ */
 
@@ -157,6 +286,10 @@ export interface PublicDeckRecord {
   created_at: string;
   updated_at: string;
   profiles: { username: string | null; display_name: string | null } | null;
+  /** Meta tier from gundamcard.gg tier list (based on color combination) */
+  meta_tier?: MetaTier;
+  /** Boss/key card IDs for thumbnail display */
+  boss_card_ids?: string[];
 }
 
 /** Fetch public community decks (for homepage & explorer) */
@@ -197,12 +330,22 @@ export async function fetchPublicDecks(options?: {
 
     const { data, error } = await query;
     if (error) {
-      console.warn('[Decks] Failed to fetch public decks:', error.message);
-      return [];
+      console.warn('[Decks] Supabase fetch failed, using local official decks:', error.message);
+      return getLocalOfficialDecks(options);
     }
-    return (data as unknown as PublicDeckRecord[]) ?? [];
+    const results = ((data as unknown as PublicDeckRecord[]) ?? []).map((d) => ({
+      ...d,
+      meta_tier: d.meta_tier ?? getMetaTierForColors(d.colors)?.tier,
+      boss_card_ids: d.boss_card_ids ?? getBossCardIdsForDeck(d.id),
+    }));
+
+    // If Supabase returned results, use them
+    if (results.length > 0) return results;
+
+    // Otherwise fall back to local official decks
+    return getLocalOfficialDecks(options);
   } catch {
-    return [];
+    return getLocalOfficialDecks(options);
   }
 }
 
