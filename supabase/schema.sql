@@ -92,7 +92,7 @@ create table if not exists public.decks (
 create table if not exists public.deck_cards (
   id          uuid primary key default gen_random_uuid(),
   deck_id     uuid not null references public.decks(id) on delete cascade,
-  card_id     text not null,
+  card_id     text not null references public.cards(id),
   qty         integer not null default 1 check (qty > 0 and qty <= 4),
   is_boss     boolean not null default false,
   created_at  timestamptz not null default now(),
@@ -298,7 +298,7 @@ create trigger trg_profiles_updated_at
 create table if not exists public.user_collections (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users(id) on delete cascade,
-  card_id     text not null,
+  card_id     text not null references public.cards(id),
   qty         integer not null default 1 check (qty > 0),
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
