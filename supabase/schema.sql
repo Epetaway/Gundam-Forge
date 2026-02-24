@@ -6,6 +6,17 @@
 -- Extensions
 create extension if not exists pg_trgm;
 
+-- ============================================================
+-- Shared utility functions (must be created before triggers)
+-- ============================================================
+create or replace function public.update_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
 -- 1. Cards table (read-only reference data)
 create table if not exists public.cards (
   id          text primary key,
@@ -92,6 +103,18 @@ create table if not exists public.archetypes (
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+alter table public.archetypes enable row level security;
+
+create policy "Archetypes are publicly readable"
+  on public.archetypes for select
+  to anon, authenticated
+  using (true);
+
+create trigger trg_archetypes_updated_at
+  before update on public.archetypes
+  for each row
+  execute function public.update_updated_at();
 
 -- 4. Decks (user-owned and official)
 create table if not exists public.decks (
@@ -300,17 +323,6 @@ create policy "Users can unlike decks"
   to authenticated
   using (auth.uid() = user_id);
 
--- ============================================================
--- Updated_at trigger for decks
--- ============================================================
-create or replace function public.update_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
 create trigger trg_decks_updated_at
   before update on public.decks
   for each row
@@ -418,6 +430,13 @@ create index if not exists idx_events_date on public.events(date desc);
 create index if not exists idx_events_slug on public.events(slug);
 create index if not exists idx_events_type on public.events(event_type);
 
+alter table public.events enable row level security;
+
+create policy "Events are publicly readable"
+  on public.events for select
+  to anon, authenticated
+  using (true);
+
 -- ============================================================
 -- 8. Event placements (deck results at events)
 -- ============================================================
@@ -439,6 +458,13 @@ create index if not exists idx_event_placements_archetype on public.event_placem
 create index if not exists idx_event_placements_deck on public.event_placements(deck_id);
 create index if not exists idx_event_placements_placement on public.event_placements(placement);
 
+alter table public.event_placements enable row level security;
+
+create policy "Event placements are publicly readable"
+  on public.event_placements for select
+  to anon, authenticated
+  using (true);
+
 -- ============================================================
 -- 9. Tags (taxonomy system)
 -- ============================================================
@@ -458,6 +484,39 @@ create table if not exists public.deck_tags (
 
 create index if not exists idx_deck_tags_tag on public.deck_tags(tag_id);
 
+alter table public.tags enable row level security;
+alter table public.deck_tags enable row level security;
+
+create policy "Tags are publicly readable"
+  on public.tags for select
+  to anon, authenticated
+  using (true);
+
+create policy "Deck tags are publicly readable"
+  on public.deck_tags for select
+  to anon, authenticated
+  using (true);
+
+create policy "Deck owners can add tags"
+  on public.deck_tags for insert
+  to authenticated
+  with check (
+    exists (
+      select 1 from public.decks
+      where id = deck_id and user_id = auth.uid()
+    )
+  );
+
+create policy "Deck owners can remove tags"
+  on public.deck_tags for delete
+  to authenticated
+  using (
+    exists (
+      select 1 from public.decks
+      where id = deck_id and user_id = auth.uid()
+    )
+  );
+
 -- ============================================================
 -- 10. Comments (on public decks)
 -- ============================================================
@@ -473,6 +532,39 @@ create table if not exists public.comments (
 create index if not exists idx_comments_deck on public.comments(deck_id);
 create index if not exists idx_comments_user on public.comments(user_id);
 create index if not exists idx_comments_created on public.comments(created_at desc);
+
+alter table public.comments enable row level security;
+
+create policy "Comments on public decks are readable"
+  on public.comments for select
+  to anon, authenticated
+  using (
+    exists (
+      select 1 from public.decks
+      where id = deck_id and is_public = true
+    )
+  );
+
+create policy "Authenticated users can create comments"
+  on public.comments for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "Users can update their own comments"
+  on public.comments for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "Users can delete their own comments"
+  on public.comments for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+create trigger trg_comments_updated_at
+  before update on public.comments
+  for each row
+  execute function public.update_updated_at();
 
 -- ============================================================
 -- Increment view count (called via RPC from the client)
