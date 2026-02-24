@@ -1,4 +1,5 @@
-import { useDeferredValue, useMemo } from 'react';
+import { useDeferredValue, useMemo, useRef, useState, useCallback } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import type { CardDefinition, CardColor, CardType } from '@gundam-forge/shared';
 import { filterCatalogCards, useCardsStore } from '../deckbuilder/cardsStore';
 import { useDeckStore } from '../deckbuilder/deckStore';
@@ -19,6 +20,27 @@ const colorOptions: { color: CardColor; bg: string; label: string }[] = [
 ];
 
 const typeOptions: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
+
+// Column count mirrors the Tailwind grid breakpoints
+function useColumnCount() {
+  const [cols, setCols] = useState(2);
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const update = () => {
+      const w = node.clientWidth;
+      if (w >= 1280) setCols(6);       // xl
+      else if (w >= 1024) setCols(5);   // lg
+      else if (w >= 768) setCols(4);    // md
+      else if (w >= 640) setCols(3);    // sm
+      else setCols(2);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, []);
+  return { cols, ref };
+}
 
 export function CardDatabasePage({ cards }: CardDatabasePageProps) {
   const query = useCardsStore((s) => s.query);
@@ -49,10 +71,32 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
 
   const hasActiveFilters = query || filters.color !== 'All' || filters.type !== 'All' || filters.set !== 'All';
 
+  const { cols, ref: gridContainerRef } = useColumnCount();
+
+  // Group cards into rows based on column count
+  const gridRows = useMemo(() => {
+    const rows: CardDefinition[][] = [];
+    for (let i = 0; i < filteredCards.length; i += cols) {
+      rows.push(filteredCards.slice(i, i + cols));
+    }
+    return rows;
+  }, [filteredCards, cols]);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: gridRows.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 260,
+    overscan: 5,
+  });
+
   return (
-    <div className="min-h-[calc(100vh-var(--gf-header-height))] bg-gf-light">
+    <div
+      ref={scrollRef}
+      className="h-[calc(100vh-var(--gf-header-height))] overflow-y-auto bg-gf-light"
+    >
       {/* Header + Filters */}
-      <div className="border-b border-gf-border bg-white">
+      <div className="border-b border-gf-border bg-gf-white">
         <div className="mx-auto max-w-7xl px-6 py-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -74,7 +118,7 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
                   <path d="m21 21-4.35-4.35" strokeLinecap="round" />
                 </svg>
                 <input
-                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:bg-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:bg-gf-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
                   placeholder="Search by name or ID..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -122,7 +166,7 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
                     className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
                       filters.type === type
                         ? 'border-gf-blue bg-gf-blue text-white'
-                        : 'border-gf-border bg-white text-gf-text-secondary hover:border-gf-blue hover:text-gf-blue'
+                        : 'border-gf-border bg-gf-white text-gf-text-secondary hover:border-gf-blue hover:text-gf-blue'
                     }`}
                   >
                     {type}
@@ -137,7 +181,7 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
               <select
                 value={(filters.set as string) || 'All'}
                 onChange={(e) => setFilter('set', e.target.value)}
-                className="w-full rounded-lg border border-gf-border bg-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
+                className="w-full rounded-lg border border-gf-border bg-gf-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
               >
                 {setOptions.map((set) => (
                   <option key={set} value={set}>{set === 'All' ? 'All Sets' : set}</option>
@@ -149,7 +193,7 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="rounded-md border border-gf-border bg-white px-3 py-1.5 text-[11px] font-medium text-gf-text-muted hover:text-gf-text hover:border-gf-blue transition-colors"
+                className="rounded-md border border-gf-border bg-gf-white px-3 py-1.5 text-[11px] font-medium text-gf-text-muted hover:text-gf-text hover:border-gf-blue transition-colors"
               >
                 Clear All
               </button>
@@ -158,8 +202,8 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
         </div>
       </div>
 
-      {/* Card Grid */}
-      <div className="mx-auto max-w-7xl px-6 py-6">
+      {/* Virtualized Card Grid */}
+      <div ref={gridContainerRef} className="mx-auto max-w-7xl px-6 py-6">
         {filteredCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <svg className="mb-3 h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,89 +222,112 @@ export function CardDatabasePage({ cards }: CardDatabasePageProps) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {filteredCards.map((card) => {
-              const imageSrc = resolveCardImage(card);
-              const qty = qtyByCardId.get(card.id) ?? 0;
+          <div
+            className="relative w-full"
+            style={{ height: virtualizer.getTotalSize() }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const rowCards = gridRows[virtualRow.index];
               return (
                 <div
-                  key={card.id}
-                  className="cursor-pointer group"
-                  onClick={() => openInspection(card.id)}
+                  key={virtualRow.key}
+                  className="absolute left-0 right-0"
+                  style={{
+                    top: virtualRow.start,
+                    height: virtualRow.size,
+                  }}
                 >
-                  <div className="gf-card-tile bg-white">
-                    <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
-                      <img
-                        src={imageSrc}
-                        alt={card.name}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        onError={() => markBroken(card.id)}
-                      />
-
-                      {/* Type badge */}
-                      <span className="gf-card-type-badge" data-type={card.type}>
-                        {card.type}
-                      </span>
-
-                      {/* Qty + Cost badges */}
-                      <div className="absolute top-1.5 right-1.5 flex items-center gap-1 z-[3]">
-                        {qty > 0 && (
-                          <span className="flex h-5 min-w-[20px] items-center justify-center rounded bg-gf-dark/80 px-1 text-[9px] font-bold text-white">
-                            {qty}x
-                          </span>
-                        )}
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gf-gray-800/80 text-[9px] font-bold text-white">
-                          {card.cost}
-                        </span>
-                      </div>
-
-                      {/* Floating action rail */}
-                      <div className="gf-action-rail">
-                        <button
-                          className="gf-action-rail-btn gf-rail-add"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addCard(card.id);
-                          }}
-                          aria-label={`Add ${card.name} to deck`}
+                  <div
+                    className="grid gap-4"
+                    style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+                  >
+                    {rowCards.map((card) => {
+                      const imageSrc = resolveCardImage(card);
+                      const qty = qtyByCardId.get(card.id) ?? 0;
+                      return (
+                        <div
+                          key={card.id}
+                          className="cursor-pointer group"
+                          onClick={() => openInspection(card.id)}
                         >
-                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                          </svg>
-                        </button>
-                        {qty > 0 && (
-                          <button
-                            className="gf-action-rail-btn gf-rail-remove"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeCard(card.id);
-                            }}
-                            aria-label={`Remove ${card.name} from deck`}
-                          >
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                              <path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                          </button>
-                        )}
-                        <button
-                          className="gf-action-rail-btn gf-rail-inspect"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openInspection(card.id);
-                          }}
-                          aria-label={`Inspect ${card.name}`}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
+                          <div className="gf-card-tile bg-gf-white">
+                            <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
+                              <img
+                                src={imageSrc}
+                                alt={card.name}
+                                className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
+                                loading="lazy"
+                                decoding="async"
+                                onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1'; }}
+                                onError={() => markBroken(card.id)}
+                              />
+
+                              {/* Type badge */}
+                              <span className="gf-card-type-badge" data-type={card.type}>
+                                {card.type}
+                              </span>
+
+                              {/* Qty + Cost badges */}
+                              <div className="absolute top-1.5 right-1.5 flex items-center gap-1 z-[3]">
+                                {qty > 0 && (
+                                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded bg-gf-dark/80 px-1 text-[9px] font-bold text-white">
+                                    {qty}x
+                                  </span>
+                                )}
+                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gf-gray-800/80 text-[9px] font-bold text-white">
+                                  {card.cost}
+                                </span>
+                              </div>
+
+                              {/* Floating action rail */}
+                              <div className="gf-action-rail">
+                                <button
+                                  className="gf-action-rail-btn gf-rail-add"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addCard(card.id);
+                                  }}
+                                  aria-label={`Add ${card.name} to deck`}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                  </svg>
+                                </button>
+                                {qty > 0 && (
+                                  <button
+                                    className="gf-action-rail-btn gf-rail-remove"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      removeCard(card.id);
+                                    }}
+                                    aria-label={`Remove ${card.name} from deck`}
+                                  >
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                      <path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                  </button>
+                                )}
+                                <button
+                                  className="gf-action-rail-btn gf-rail-inspect"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openInspection(card.id);
+                                  }}
+                                  aria-label={`Inspect ${card.name}`}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="mt-1.5 truncate text-xs font-medium text-gf-text">{card.name}</p>
+                          <p className="truncate text-[9px] text-gf-text-muted">{card.color} · {card.set}</p>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <p className="mt-1.5 truncate text-xs font-medium text-gf-text">{card.name}</p>
-                  <p className="truncate text-[9px] text-gf-text-muted">{card.color} · {card.set}</p>
                 </div>
               );
             })}

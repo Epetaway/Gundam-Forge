@@ -116,7 +116,7 @@ export function CardInspectionModal({ card, open, onClose }: CardInspectionModal
               {/* Price below image (Moxfield-style) */}
               {marketPrice !== undefined && (
                 <div className="mt-4 w-full">
-                  <div className="flex items-center justify-between rounded-lg bg-white border border-gf-border px-3 py-2">
+                  <div className="flex items-center justify-between rounded-lg bg-gf-white border border-gf-border px-3 py-2">
                     <span className="text-xs text-gf-text-muted">Market</span>
                     <span className="text-sm font-bold text-gf-text">${marketPrice.toFixed(2)}</span>
                   </div>

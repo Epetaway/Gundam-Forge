@@ -69,7 +69,7 @@ export function DeckExplorerPage() {
   return (
     <div className="min-h-[calc(100vh-var(--gf-header-height))] bg-gf-light">
       {/* ── Header + Filters (matches CardDatabasePage chrome) ── */}
-      <div className="border-b border-gf-border bg-white">
+      <div className="border-b border-gf-border bg-gf-white">
         <div className="mx-auto max-w-7xl px-6 py-5">
           {/* Title row */}
           <div className="flex items-center justify-between mb-4">
@@ -111,7 +111,7 @@ export function DeckExplorerPage() {
                   <path d="m21 21-4.35-4.35" strokeLinecap="round" />
                 </svg>
                 <input
-                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:bg-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:bg-gf-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
                   placeholder="Search by name or archetype..."
                   value={search}
                   onChange={(e) => handleSearchChange(e.target.value)}
@@ -159,7 +159,7 @@ export function DeckExplorerPage() {
                     className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
                       tab === t.key
                         ? 'border-gf-blue bg-gf-blue text-white'
-                        : 'border-gf-border bg-white text-gf-text-secondary hover:border-gf-blue hover:text-gf-blue'
+                        : 'border-gf-border bg-gf-white text-gf-text-secondary hover:border-gf-blue hover:text-gf-blue'
                     }`}
                   >
                     {t.label}
@@ -174,7 +174,7 @@ export function DeckExplorerPage() {
               <select
                 value={archetype ?? ''}
                 onChange={(e) => setArchetype(e.target.value || null)}
-                className="w-full rounded-lg border border-gf-border bg-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
+                className="w-full rounded-lg border border-gf-border bg-gf-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
               >
                 <option value="">All Archetypes</option>
                 {PREDEFINED_ARCHETYPES.map((a) => (
@@ -189,7 +189,7 @@ export function DeckExplorerPage() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="w-full rounded-lg border border-gf-border bg-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
+                className="w-full rounded-lg border border-gf-border bg-gf-white px-3 py-1.5 text-xs text-gf-text outline-none focus:border-gf-blue transition-colors"
               >
                 <option value="popular">Most Popular</option>
                 <option value="most_liked">Most Liked</option>
@@ -201,7 +201,7 @@ export function DeckExplorerPage() {
             {hasActiveFilters && (
               <button
                 onClick={handleClearFilters}
-                className="rounded-md border border-gf-border bg-white px-3 py-1.5 text-[11px] font-medium text-gf-text-muted hover:text-gf-text hover:border-gf-blue transition-colors"
+                className="rounded-md border border-gf-border bg-gf-white px-3 py-1.5 text-[11px] font-medium text-gf-text-muted hover:text-gf-text hover:border-gf-blue transition-colors"
               >
                 Clear All
               </button>
@@ -254,7 +254,7 @@ export function DeckExplorerPage() {
 
         {/* CTA */}
         {!loading && (
-          <div className="mt-10 rounded-xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] p-8 text-center">
+          <div className="mt-10 rounded-xl bg-gf-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] p-8 text-center">
             <p className="text-sm font-medium text-gf-text">Want to share your deck?</p>
             <p className="text-xs text-gf-text-secondary mt-1">
               Build a deck in the Forge and publish it for the community to discover.

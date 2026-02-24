@@ -131,7 +131,7 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
       <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-2xl rounded-2xl border border-gf-border bg-white shadow-2xl overflow-hidden"
+          className="pointer-events-auto w-full max-w-2xl rounded-2xl border border-gf-border bg-gf-white shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -163,7 +163,7 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                     mode === 'replace'
                       ? 'bg-gf-blue text-white'
-                      : 'bg-white text-gf-text-secondary hover:bg-gf-light'
+                      : 'bg-gf-white text-gf-text-secondary hover:bg-gf-light'
                   }`}
                 >
                   Replace Deck
@@ -173,7 +173,7 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                     mode === 'merge'
                       ? 'bg-gf-blue text-white'
-                      : 'bg-white text-gf-text-secondary hover:bg-gf-light'
+                      : 'bg-gf-white text-gf-text-secondary hover:bg-gf-light'
                   }`}
                 >
                   Merge Into Deck
@@ -246,7 +246,7 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
           <div className="flex items-center justify-end gap-3 border-t border-gf-border px-6 py-4 bg-gf-light/30">
             <button
               onClick={handleClose}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
+              className="rounded-lg border border-gf-border bg-gf-white px-4 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
             >
               Cancel
             </button>

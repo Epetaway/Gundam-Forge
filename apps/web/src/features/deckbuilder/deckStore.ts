@@ -14,6 +14,7 @@ interface DeckState {
   addCard: (cardId: string) => void;
   removeCard: (cardId: string) => void;
   toggleBoss: (cardId: string) => void;
+  moveEntry: (fromIndex: number, toIndex: number) => void;
   setDeck: (entries: DeckEntry[]) => void;
   clearDeck: () => void;
   loadFromStorage: () => void;
@@ -100,6 +101,15 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
   setDeck: (entries) => set(() => ({ entries: normalizeDeckEntries(entries) })),
   clearDeck: () => set(() => ({ entries: [] })),
+
+  moveEntry: (fromIndex, toIndex) =>
+    set((state) => {
+      if (fromIndex === toIndex) return state;
+      const next = [...state.entries];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return { entries: next };
+    }),
 
   loadFromStorage: () => {
     if (get().hydratedFromStorage) return;

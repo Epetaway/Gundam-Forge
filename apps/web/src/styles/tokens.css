@@ -193,3 +193,41 @@
   /* ── Color Scheme ── */
   color-scheme: light;
 }
+
+/* ── Dark Theme Overrides ── */
+[data-theme="dark"] {
+  /* Surfaces */
+  --gf-bg:              #0F1117;
+  --gf-surface:         #1A1D27;
+  --gf-surface-raised:  #222636;
+  --gf-surface-overlay: rgba(26, 29, 39, 0.95);
+  --gf-surface-inset:   #141720;
+
+  /* Borders */
+  --gf-border:        #2A2E3E;
+  --gf-border-strong: #3A3F52;
+
+  /* Text */
+  --gf-text-primary:   #E8EAF0;
+  --gf-text-secondary: #8B90A0;
+  --gf-text-muted:     #5C6170;
+  --gf-text-inverse:   #111827;
+  --gf-text-link:      var(--gf-blue-400);
+
+  /* Semantic backgrounds */
+  --gf-success-bg: rgba(16, 185, 129, 0.12);
+  --gf-warning-bg: rgba(245, 158, 11, 0.12);
+  --gf-error-bg:   rgba(239, 68, 68, 0.12);
+  --gf-info-bg:    rgba(59, 130, 246, 0.12);
+
+  /* Shadows (deeper in dark mode) */
+  --gf-shadow-xs:    0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --gf-shadow-sm:    0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --gf-shadow-md:    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --gf-shadow-lg:    0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --gf-shadow-xl:    0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --gf-shadow-focus: 0 0 0 3px rgba(26, 92, 255, 0.35);
+  --gf-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}

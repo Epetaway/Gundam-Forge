@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useUIStore } from '../../stores/uiStore';
 import { useState } from 'react';
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { to: '/', label: 'Home', exact: true },
   { to: '/decks', label: 'Explorer' },
   { to: '/forge', label: 'Forge' },
@@ -14,6 +15,8 @@ export function Header() {
   const location = useLocation();
   const authUser = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
+  const theme = useUIStore((s) => s.theme);
+  const toggleTheme = useUIStore((s) => s.toggleTheme);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const isHomePage = location.pathname === '/';
@@ -43,7 +46,7 @@ export function Header() {
       className={
         isHomePage
           ? 'gf-header-transparent z-header'
-          : 'sticky top-0 z-header border-b border-gf-border bg-white shadow-xs'
+          : 'sticky top-0 z-header border-b border-gf-border bg-gf-white shadow-xs'
       }
     >
       <div className="flex h-14 items-center justify-between px-6">
@@ -84,8 +87,31 @@ export function Header() {
           })}
         </nav>
 
-        {/* Right: Auth */}
+        {/* Right: Theme Toggle + Auth */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+              isHomePage
+                ? 'bg-white/15 text-white hover:bg-white/25'
+                : 'bg-gf-surface-inset text-gf-text-secondary hover:text-gf-text hover:bg-gf-border'
+            }`}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? (
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <circle cx="12" cy="12" r="5" />
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
+
           {authUser ? (
             <div className="relative">
               <button
@@ -119,7 +145,7 @@ export function Header() {
                     className="fixed inset-0 z-overlay"
                     onClick={() => setUserMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),var(--gf-shadow-lg)] z-modal overflow-hidden gf-animate-fade-in">
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-gf-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),var(--gf-shadow-lg)] z-modal overflow-hidden gf-animate-fade-in">
                     <div className="border-b border-gf-border px-4 py-3">
                       <p className="text-sm font-medium text-gf-text truncate">
                         {authUser.email}
