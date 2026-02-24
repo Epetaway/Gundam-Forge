@@ -339,6 +339,26 @@ export async function fetchPublicDecks(options?: {
   }
 }
 
+/** Fetch trending decks via RPC (time-decayed popularity score) */
+export async function fetchTrendingDecks(limit = 20): Promise<PublicDeckRecord[]> {
+  try {
+    const { data, error } = await supabase.rpc('get_trending_decks', { lim: limit });
+    if (error) {
+      console.warn('[Decks] Trending RPC failed, falling back to popular:', error.message);
+      return fetchPublicDecks({ limit, orderBy: 'view_count' });
+    }
+
+    return ((data as unknown as PublicDeckRecord[]) ?? []).map((d) => ({
+      ...d,
+      profiles: null,
+      meta_tier: getMetaTierForColors(d.colors)?.tier,
+      boss_card_ids: getBossCardIdsForDeck(d.id),
+    }));
+  } catch {
+    return fetchPublicDecks({ limit, orderBy: 'view_count' });
+  }
+}
+
 /* ============================================================
    Likes
    ============================================================ */
