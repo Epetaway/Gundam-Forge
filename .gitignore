@@ -1,6 +1,8 @@
 node_modules
 dist
 .vite
+.next
+apps/web/.next
 .DS_Store
 *.log
 *.tsbuildinfo
