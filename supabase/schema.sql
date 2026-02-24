@@ -3,6 +3,9 @@
 -- Run this in the Supabase SQL Editor to set up all tables.
 -- ============================================================
 
+-- Extensions
+create extension if not exists pg_trgm;
+
 -- 1. Cards table (read-only reference data)
 create table if not exists public.cards (
   id          text primary key,
@@ -110,6 +113,7 @@ create index if not exists idx_decks_archetype on public.decks(archetype) where 
 create index if not exists idx_decks_source on public.decks(source);
 create index if not exists idx_decks_slug on public.decks(slug) where slug is not null;
 create index if not exists idx_decks_colors_gin on public.decks using gin (colors);
+create index if not exists idx_decks_name_trgm on public.decks using gin (name gin_trgm_ops);
 create index if not exists idx_deck_cards_deck_id on public.deck_cards(deck_id);
 create index if not exists idx_profiles_username on public.profiles(username);
 
