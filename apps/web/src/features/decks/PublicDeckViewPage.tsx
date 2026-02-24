@@ -11,7 +11,7 @@ import {
   type DeckEntryWithBoss,
 } from '../../services/deckService';
 import { getMetaTierForColors, TIER_LABELS, TIER_COLORS } from '../../data/metaTierList';
-import { resolveCardImage } from '../../utils/resolveCardImage';
+import { resolveCardImage, formatUnknownCardId } from '../../utils/resolveCardImage';
 import type { CardDefinition } from '@gundam-forge/shared';
 
 const COLOR_DOT: Record<string, string> = {
@@ -26,7 +26,7 @@ interface ResolvedEntry extends DeckEntryWithBoss {
 export function PublicDeckViewPage() {
   const { id } = useParams<{ id: string }>();
   const authUser = useAuthStore((s) => s.user);
-  const catalogCards = useCardsStore((s) => s.cards);
+  const cardsById = useCardsStore((s) => s.cardsById);
 
   const [deck, setDeck] = useState<DeckRecord | null>(null);
   const [entries, setEntries] = useState<DeckEntryWithBoss[]>([]);
@@ -67,7 +67,7 @@ export function PublicDeckViewPage() {
   // Resolve cards
   const resolvedEntries: ResolvedEntry[] = entries.map((e) => ({
     ...e,
-    card: catalogCards.find((c) => c.id === e.cardId),
+    card: cardsById.get(e.cardId),
   }));
 
   const bossCards = resolvedEntries.filter((e) => e.isBoss);
@@ -90,7 +90,7 @@ export function PublicDeckViewPage() {
 
   const handleCopyList = () => {
     const list = resolvedEntries
-      .map((e) => `${e.qty}x ${e.card?.name ?? e.cardId}${e.isBoss ? ' *' : ''}`)
+      .map((e) => `${e.qty}x ${e.card?.name ?? formatUnknownCardId(e.cardId)}${e.isBoss ? ' *' : ''}`)
       .join('\n');
     navigator.clipboard.writeText(list);
   };
@@ -346,7 +346,7 @@ export function PublicDeckViewPage() {
                         <span className="flex h-5 w-5 items-center justify-center rounded bg-gf-light text-[10px] font-bold text-gf-text">
                           {entry.qty}
                         </span>
-                        <span className="text-sm text-gf-text-muted">{entry.cardId}</span>
+                        <span className="text-sm text-gf-text-muted">{formatUnknownCardId(entry.cardId)}</span>
                       </div>
                     </div>
                   ))}

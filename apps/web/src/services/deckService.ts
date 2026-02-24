@@ -3,6 +3,46 @@ import type { DeckEntry } from '../features/deckbuilder/deckStore';
 import { OFFICIAL_DECKS, type OfficialDeck } from '../data/officialDecks';
 import { getMetaTierForColors, type MetaTier } from '../data/metaTierList';
 
+/* ============================================================
+   Simple TTL Cache
+   ============================================================ */
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+class SimpleCache<T> {
+  private store = new Map<string, CacheEntry<T>>();
+  constructor(private ttlMs: number) {}
+
+  get(key: string): T | undefined {
+    const entry = this.store.get(key);
+    if (!entry) return undefined;
+    if (Date.now() - entry.timestamp > this.ttlMs) {
+      this.store.delete(key);
+      return undefined;
+    }
+    return entry.data;
+  }
+
+  set(key: string, data: T): void {
+    this.store.set(key, { data, timestamp: Date.now() });
+  }
+
+  invalidate(key: string): void {
+    this.store.delete(key);
+  }
+
+  clear(): void {
+    this.store.clear();
+  }
+}
+
+const deckCache = new SimpleCache<{ deck: DeckRecord; cards: DeckEntryWithBoss[] }>(5 * 60 * 1000);
+const publicDecksCache = new SimpleCache<PublicDeckRecord[]>(2 * 60 * 1000);
+const likeStatusCache = new SimpleCache<boolean>(5 * 60 * 1000);
+
 /** Escape special LIKE pattern characters (%, _) to prevent injection */
 function escapeLikePattern(input: string): string {
   return input.replace(/[%_\\]/g, '\\$&');
@@ -51,11 +91,15 @@ export async function fetchUserDecks(): Promise<DeckRecord[]> {
 
 /** Fetch a single deck with its cards */
 export async function fetchDeck(deckId: string): Promise<{ deck: DeckRecord; cards: DeckEntryWithBoss[] }> {
+  // Check cache first
+  const cached = deckCache.get(deckId);
+  if (cached) return cached;
+
   // Check for local official deck IDs (e.g. "official-deck-001")
   if (deckId.startsWith('official-')) {
     const localDeck = findOfficialDeckByLocalId(deckId);
     if (localDeck) {
-      return {
+      const result = {
         deck: officialDeckToRecord(localDeck),
         cards: localDeck.cards.map((c) => ({
           cardId: c.cardId,
@@ -63,6 +107,8 @@ export async function fetchDeck(deckId: string): Promise<{ deck: DeckRecord; car
           isBoss: c.isBoss,
         })),
       };
+      deckCache.set(deckId, result);
+      return result;
     }
   }
 
@@ -74,7 +120,7 @@ export async function fetchDeck(deckId: string): Promise<{ deck: DeckRecord; car
   if (deckRes.error) throw deckRes.error;
   if (cardsRes.error) throw cardsRes.error;
 
-  return {
+  const result = {
     deck: deckRes.data,
     cards: (cardsRes.data ?? []).map((c) => ({
       cardId: c.card_id,
@@ -82,6 +128,9 @@ export async function fetchDeck(deckId: string): Promise<{ deck: DeckRecord; car
       isBoss: c.is_boss ?? false,
     })),
   };
+
+  deckCache.set(deckId, result);
+  return result;
 }
 
 /** Create a new deck */
@@ -110,6 +159,8 @@ export async function updateDeck(
     .eq('id', deckId);
 
   if (error) throw error;
+  deckCache.invalidate(deckId);
+  publicDecksCache.clear();
 }
 
 /** Save deck cards atomically via RPC */
@@ -128,6 +179,8 @@ export async function saveDeckCards(deckId: string, entries: DeckEntryWithBoss[]
   });
 
   if (error) throw error;
+  deckCache.invalidate(deckId);
+  publicDecksCache.clear();
 }
 
 /** Duplicate a deck */
@@ -146,6 +199,8 @@ export async function deleteDeck(deckId: string) {
     .eq('id', deckId);
 
   if (error) throw error;
+  deckCache.invalidate(deckId);
+  publicDecksCache.clear();
 }
 
 /* ============================================================
@@ -304,6 +359,10 @@ export async function fetchPublicDecks(options?: {
   color?: string;
   cursor?: string;
 }): Promise<PublicDeckRecord[]> {
+  const cacheKey = JSON.stringify(options ?? {});
+  const cached = publicDecksCache.get(cacheKey);
+  if (cached) return cached;
+
   try {
     const limit = options?.limit ?? 12;
     const orderBy = options?.orderBy ?? 'view_count';
@@ -350,10 +409,15 @@ export async function fetchPublicDecks(options?: {
     }));
 
     // If Supabase returned results, use them
-    if (results.length > 0) return results;
+    if (results.length > 0) {
+      publicDecksCache.set(cacheKey, results);
+      return results;
+    }
 
     // Otherwise fall back to local official decks
-    return getLocalOfficialDecks(options);
+    const fallback = getLocalOfficialDecks(options);
+    publicDecksCache.set(cacheKey, fallback);
+    return fallback;
   } catch {
     return getLocalOfficialDecks(options);
   }
@@ -418,11 +482,17 @@ export async function fetchTrendingDecks(limit = 20): Promise<PublicDeckRecord[]
 export async function toggleDeckLike(deckId: string): Promise<{ liked: boolean; like_count: number }> {
   const { data, error } = await supabase.rpc('toggle_deck_like', { target_deck_id: deckId });
   if (error) throw error;
-  return data as { liked: boolean; like_count: number };
+  const result = data as { liked: boolean; like_count: number };
+  likeStatusCache.set(deckId, result.liked);
+  publicDecksCache.clear();
+  return result;
 }
 
 /** Check if the current user has liked a specific deck */
 export async function fetchLikeStatus(deckId: string): Promise<boolean> {
+  const cachedLike = likeStatusCache.get(deckId);
+  if (cachedLike !== undefined) return cachedLike;
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
 
@@ -433,7 +503,9 @@ export async function fetchLikeStatus(deckId: string): Promise<boolean> {
     .eq('deck_id', deckId)
     .maybeSingle();
 
-  return !!data;
+  const liked = !!data;
+  likeStatusCache.set(deckId, liked);
+  return liked;
 }
 
 /** Check like status for multiple decks at once (batch) */

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { useDeckStore, type DeckEntry } from './deckStore';
+import { useCardsStore } from './cardsStore';
 
 interface ImportDeckModalProps {
   open: boolean;
@@ -24,7 +25,7 @@ interface ParsedLine {
  *   2x TS2-001
  *   TS2-001
  */
-function parseLine(line: string, cards: CardDefinition[]): ParsedLine | null {
+function parseLine(line: string, cards: CardDefinition[], cardsById: Map<string, CardDefinition>): ParsedLine | null {
   const trimmed = line.trim();
   if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('//')) return null;
 
@@ -49,8 +50,13 @@ function parseLine(line: string, cards: CardDefinition[]): ParsedLine | null {
 
   const lowerName = nameOrId.toLowerCase();
 
-  // Try exact ID match first
-  let matched = cards.find((c) => c.id.toLowerCase() === lowerName);
+  // Try exact ID match first (O(1) via Map)
+  let matched = cardsById.get(nameOrId);
+
+  // Try case-insensitive ID match (fallback for typed-in IDs)
+  if (!matched) {
+    matched = cards.find((c) => c.id.toLowerCase() === lowerName);
+  }
 
   // Try exact name match
   if (!matched) {
@@ -77,14 +83,15 @@ export function ImportDeckModal({ open, onClose, cards }: ImportDeckModalProps) 
   const setDeck = useDeckStore((s) => s.setDeck);
   const currentEntries = useDeckStore((s) => s.entries);
   const addCard = useDeckStore((s) => s.addCard);
+  const cardsById = useCardsStore((s) => s.cardsById);
 
   const parsed = useMemo(() => {
     if (!text.trim()) return [];
     return text
       .split('\n')
-      .map((line) => parseLine(line, cards))
+      .map((line) => parseLine(line, cards, cardsById))
       .filter((r): r is ParsedLine => r !== null);
-  }, [text, cards]);
+  }, [text, cards, cardsById]);
 
   const matchedCount = parsed.filter((p) => p.matchedCard).length;
   const unmatchedCount = parsed.filter((p) => !p.matchedCard).length;

@@ -8,6 +8,9 @@ import 'swiper/css/free-mode';
 import { useAuthStore } from '../../stores/authStore';
 import { fetchPublicDecks, type PublicDeckRecord } from '../../services/deckService';
 import { TopDeckCard } from '../../components/deck/TopDeckCard';
+import { getCardById } from '../deckbuilder/cardsStore';
+import { resolveCardImage } from '../../utils/resolveCardImage';
+import { preloadImages } from '../../utils/preloadImages';
 import heroBg from '/hero-bg.png?url';
 
 export function HomePage() {
@@ -21,7 +24,20 @@ export function HomePage() {
   useEffect(() => {
     let cancelled = false;
     fetchPublicDecks({ limit: 12, orderBy: 'view_count' })
-      .then((data) => { if (!cancelled) setDecks(data); })
+      .then((data) => {
+        if (!cancelled) {
+          setDecks(data);
+          // Preload boss card hero images
+          const heroUrls = data.flatMap((d) =>
+            (d.boss_card_ids ?? [])
+              .map((id) => {
+                const card = getCardById(id);
+                return card ? resolveCardImage(card) : undefined;
+              })
+          );
+          preloadImages(heroUrls);
+        }
+      })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };

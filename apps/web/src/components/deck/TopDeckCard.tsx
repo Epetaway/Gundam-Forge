@@ -27,7 +27,7 @@ interface TopDeckCardProps {
 }
 
 export function TopDeckCard({ deck }: TopDeckCardProps) {
-  const catalogCards = useCardsStore((s) => s.cards);
+  const cardsById = useCardsStore((s) => s.cardsById);
   const colors: string[] = deck.colors ?? [];
 
   // Resolve the first boss card image from the card database
@@ -35,7 +35,7 @@ export function TopDeckCard({ deck }: TopDeckCardProps) {
   let heroName: string | undefined;
   if (deck.boss_card_ids) {
     for (const cardId of deck.boss_card_ids) {
-      const card = catalogCards.find((c) => c.id === cardId);
+      const card = cardsById.get(cardId);
       if (card) {
         const src = resolveCardImage(card);
         if (src) {

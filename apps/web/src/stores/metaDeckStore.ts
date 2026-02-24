@@ -6,6 +6,9 @@ import {
   toggleDeckLike,
   type PublicDeckRecord,
 } from '../services/deckService';
+import { getCardById } from '../features/deckbuilder/cardsStore';
+import { resolveCardImage } from '../utils/resolveCardImage';
+import { preloadImages } from '../utils/preloadImages';
 
 export type ExplorerTab = 'all' | 'official' | 'community';
 export type SortOption = 'popular' | 'newest' | 'most_liked' | 'trending';
@@ -85,6 +88,16 @@ export const useMetaDeckStore = create<MetaDeckState>((set, get) => ({
       }
 
       set({ decks, loading: false });
+
+      // Preload boss card hero images
+      const heroUrls = decks.flatMap((d) =>
+        (d.boss_card_ids ?? [])
+          .map((id) => {
+            const card = getCardById(id);
+            return card ? resolveCardImage(card) : undefined;
+          })
+      );
+      preloadImages(heroUrls);
 
       // Fetch like status in background
       if (decks.length > 0) {

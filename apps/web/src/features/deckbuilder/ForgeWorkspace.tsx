@@ -23,13 +23,14 @@ export function ForgeWorkspace({ cards }: ForgeWorkspaceProps) {
   const openInspection = useUIStore((s) => s.openInspection);
   const selectedCardId = useCardsStore((s) => s.selectedCardId);
   const catalogCards = useCardsStore((s) => s.cards);
+  const cardsById = useCardsStore((s) => s.cardsById);
   const deckEntries = useDeckStore((s) => s.entries);
 
   const [importOpen, setImportOpen] = useState(false);
 
   const selectedCard = useMemo(
-    () => catalogCards.find((c) => c.id === selectedCardId),
-    [catalogCards, selectedCardId],
+    () => selectedCardId ? cardsById.get(selectedCardId) : undefined,
+    [cardsById, selectedCardId],
   );
 
   const validation = useMemo(

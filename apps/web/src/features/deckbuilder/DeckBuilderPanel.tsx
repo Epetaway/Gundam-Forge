@@ -47,6 +47,7 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
   const removeCard = useDeckStore((state) => state.removeCard);
   const toggleBoss = useDeckStore((state) => state.toggleBoss);
   const setSelectedCardId = useCardsStore((state) => state.setSelectedCardId);
+  const cardsById = useCardsStore((state) => state.cardsById);
 
   const [deckName, setDeckName] = useState('RX-78 Strike Deck');
   const [deckArchetype, setDeckArchetype] = useState('');
@@ -56,7 +57,7 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
 
   const bossCount = useMemo(() => entries.filter((e) => e.isBoss).length, [entries]);
 
-  const resolvedEntries = useMemo(() => resolveDeckEntries(entries, cards), [entries, cards]);
+  const resolvedEntries = useMemo(() => resolveDeckEntries(entries, cardsById), [entries, cardsById]);
   const validation = useMemo(() => validateDeck(entries, cards), [entries, cards]);
 
   const totalCards = useMemo(
