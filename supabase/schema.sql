@@ -645,6 +645,11 @@ create policy "Users can delete their own comments"
   to authenticated
   using (auth.uid() = user_id);
 
+create policy "Moderators can delete any comment"
+  on public.comments for delete
+  to authenticated
+  using (public.has_role('moderator'));
+
 create trigger trg_comments_updated_at
   before update on public.comments
   for each row
