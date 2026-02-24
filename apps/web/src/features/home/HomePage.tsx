@@ -1,17 +1,14 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/free-mode';
 import { useAuthStore } from '../../stores/authStore';
 import { fetchPublicDecks, type PublicDeckRecord } from '../../services/deckService';
+import { TopDeckCard } from '../../components/deck/TopDeckCard';
 import heroBg from '/hero-bg.png?url';
-
-const COLOR_DOT: Record<string, string> = {
-  Blue: 'bg-blue-500',
-  Red: 'bg-red-500',
-  Green: 'bg-green-500',
-  White: 'bg-gray-300',
-  Purple: 'bg-purple-500',
-  Colorless: 'bg-gray-400',
-};
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -23,7 +20,7 @@ export function HomePage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicDecks({ limit: 6, orderBy: 'view_count' })
+    fetchPublicDecks({ limit: 12, orderBy: 'view_count' })
       .then((data) => { if (!cancelled) setDecks(data); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -129,16 +126,31 @@ export function HomePage() {
           </div>
 
           {loading ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-24 animate-pulse rounded-lg bg-gf-border/20" />
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-[220px] flex-shrink-0 rounded-xl bg-gf-border/20 animate-pulse h-[200px]" />
               ))}
             </div>
           ) : decks.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {decks.map((deck) => (
-                <DeckCard key={deck.id} deck={deck} />
-              ))}
+            <div className="gf-deck-swiper">
+              <Swiper
+                modules={[Navigation, FreeMode]}
+                spaceBetween={16}
+                slidesPerView="auto"
+                freeMode={{ enabled: true, sticky: false }}
+                navigation
+                breakpoints={{
+                  640:  { slidesPerView: 2 },
+                  768:  { slidesPerView: 3 },
+                  1024: { slidesPerView: 4 },
+                }}
+              >
+                {decks.map((deck) => (
+                  <SwiperSlide key={deck.id} style={{ width: 'auto' }}>
+                    <TopDeckCard deck={deck} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           ) : (
             <div className="rounded-xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-10 text-center">
@@ -205,70 +217,5 @@ export function HomePage() {
         </div>
       </footer>
     </div>
-  );
-}
-
-/* ============================================================
-   Deck Card
-   ============================================================ */
-
-function DeckCard({ deck }: { deck: PublicDeckRecord }) {
-  const author = deck.source === 'official'
-    ? 'Official GCG'
-    : deck.profiles?.display_name || deck.profiles?.username || 'Anonymous';
-  const colors: string[] = deck.colors ?? [];
-
-  return (
-    <Link
-      to={`/decks/${deck.id}`}
-      className="group flex items-center gap-3 rounded-xl bg-white p-4 shadow-[0_0_0_1px_rgba(0,0,0,0.05)] hover:shadow-[0_0_0_1px_rgba(0,0,0,0.1),var(--gf-shadow-sm)] transition-all"
-    >
-      {/* Color bar */}
-      <div className="flex flex-col gap-0.5">
-        {colors.length > 0 ? (
-          colors.map((c) => (
-            <span key={c} className={`h-2.5 w-2.5 rounded-full ${COLOR_DOT[c] || 'bg-gray-400'}`} />
-          ))
-        ) : (
-          <span className="h-2.5 w-2.5 rounded-full bg-gray-300" />
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <h3 className="text-sm font-bold text-gf-text truncate group-hover:text-gf-blue transition-colors">
-            {deck.name}
-          </h3>
-          {deck.source === 'official' && (
-            <span className="flex-shrink-0 rounded-full bg-yellow-50 border border-yellow-200 px-1.5 py-0.5 text-[8px] font-bold text-yellow-700">
-              Official
-            </span>
-          )}
-          {deck.archetype && (
-            <span className="flex-shrink-0 rounded-full bg-gf-blue/5 border border-gf-blue/20 px-1.5 py-0.5 text-[8px] font-medium text-gf-blue hidden sm:inline">
-              {deck.archetype}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-[10px] text-gf-text-muted">by {author}</span>
-          <span className="text-[10px] text-gf-text-muted">&middot;</span>
-          <span className="text-[10px] text-gf-text-muted">{deck.view_count ?? 0} views</span>
-          <span className="text-[10px] text-gf-text-muted">&middot;</span>
-          <span className="text-[10px] text-gf-text-muted flex items-center gap-0.5">
-            <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {deck.like_count ?? 0}
-          </span>
-        </div>
-      </div>
-
-      {/* Arrow */}
-      <svg className="h-3.5 w-3.5 text-gf-text-muted group-hover:text-gf-blue transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-        <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </Link>
   );
 }

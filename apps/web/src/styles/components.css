@@ -659,3 +659,26 @@
   background-size: 200% 100%;
   border-radius: var(--gf-radius-md);
 }
+
+/* ----------------------------------------------------------
+   16. Swiper Deck Carousel
+   ---------------------------------------------------------- */
+.gf-deck-swiper .swiper-button-next,
+.gf-deck-swiper .swiper-button-prev {
+  color: var(--gf-blue-500);
+  width: 32px;
+  height: 32px;
+  background: var(--gf-surface);
+  border-radius: var(--gf-radius-full);
+  box-shadow: var(--gf-shadow-sm);
+}
+
+.gf-deck-swiper .swiper-button-next::after,
+.gf-deck-swiper .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gf-deck-swiper .swiper-button-disabled {
+  opacity: 0.3;
+}
