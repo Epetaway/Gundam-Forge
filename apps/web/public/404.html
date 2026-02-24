@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gundam Forge</title>
+    <script>
+      // SPA redirect for GitHub Pages.
+      // Encodes the current path/query/hash into a query string so that
+      // index.html can restore it via history.replaceState before React Router
+      // boots. The base repo name occupies 1 path segment, so we keep it.
+      const l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 2).join('/') +
+        '/?p=' + encodeURIComponent(l.pathname.split('/').slice(2).join('/')) +
+        (l.search ? '&q=' + encodeURIComponent(l.search.slice(1)) : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
