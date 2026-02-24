@@ -440,6 +440,25 @@ create index if not exists idx_event_placements_deck on public.event_placements(
 create index if not exists idx_event_placements_placement on public.event_placements(placement);
 
 -- ============================================================
+-- 9. Tags (taxonomy system)
+-- ============================================================
+create table if not exists public.tags (
+  id          text primary key,
+  label       text not null,
+  category    text not null check (category in ('strategy','series','mechanic')),
+  created_at  timestamptz not null default now()
+);
+
+-- 9b. Deck tags (junction)
+create table if not exists public.deck_tags (
+  deck_id     uuid not null references public.decks(id) on delete cascade,
+  tag_id      text not null references public.tags(id) on delete cascade,
+  primary key (deck_id, tag_id)
+);
+
+create index if not exists idx_deck_tags_tag on public.deck_tags(tag_id);
+
+-- ============================================================
 -- Increment view count (called via RPC from the client)
 -- ============================================================
 create or replace function public.increment_deck_view(deck_id uuid)
