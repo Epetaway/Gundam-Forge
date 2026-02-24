@@ -199,7 +199,7 @@
   transform: scale(0.8);
   transition:
     opacity var(--gf-duration-normal) var(--gf-ease-default),
-    transform var(--gf-duration-normal) var(--gf-ease-bounce);
+    transform var(--gf-duration-normal) var(--gf-ease-out);
   cursor: pointer;
   border: none;
   z-index: 3;

@@ -112,7 +112,7 @@ const config: Config = {
         'fade-in':    'gf-fade-in var(--gf-duration-normal) var(--gf-ease-out)',
         'slide-up':   'gf-slide-up var(--gf-duration-normal) var(--gf-ease-out)',
         'scale-in':   'gf-scale-in var(--gf-duration-normal) var(--gf-ease-out)',
-        'qty-pulse':  'gf-qty-pulse 300ms var(--gf-ease-bounce)',
+        'qty-pulse':  'gf-qty-pulse 300ms var(--gf-ease-out)',
         'spin-slow':  'spin 2s linear infinite',
         'shimmer':    'gf-shimmer 1.5s var(--gf-ease-in-out) infinite',
       },
