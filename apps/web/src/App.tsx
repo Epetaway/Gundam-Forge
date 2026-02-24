@@ -7,6 +7,7 @@ import { DECK_STORAGE_KEY, serializeDeck, useDeckStore } from './features/deckbu
 import { useAuthStore } from './stores/authStore';
 import { useUIStore } from './stores/uiStore';
 import { useCollectionStore } from './stores/collectionStore';
+import { AuthGuard } from './components/AuthGuard';
 
 // Layout
 import { Header } from './components/layout/Header';
@@ -166,7 +167,7 @@ function AppShell({
             </div>
           }
         />
-        <Route path="/my-decks" element={<DeckLibraryPage />} />
+        <Route path="/my-decks" element={<AuthGuard><DeckLibraryPage /></AuthGuard>} />
         <Route path="/news" element={<NewsPage />} />
 
         {/* Legacy redirects */}
