@@ -68,6 +68,7 @@ create table if not exists public.profiles (
   display_name text,
   avatar_url  text,
   bio         text,
+  role        text not null default 'user' check (role in ('user', 'moderator', 'admin')),
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
@@ -90,6 +91,25 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row
   execute function public.handle_new_user();
+
+-- Helper: check if current user has a specific role
+create or replace function public.has_role(required_role text)
+returns boolean as $$
+declare
+  v_role text;
+begin
+  select role into v_role from public.profiles where id = auth.uid();
+  if v_role is null then return false; end if;
+  case required_role
+    when 'admin' then return v_role = 'admin';
+    when 'moderator' then return v_role in ('admin', 'moderator');
+    when 'user' then return true;
+    else return false;
+  end case;
+end;
+$$ language plpgsql stable security definer;
+
+create index if not exists idx_profiles_role on public.profiles(role);
 
 -- 3b. Archetypes (normalized meta archetype reference)
 create table if not exists public.archetypes (
