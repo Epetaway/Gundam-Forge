@@ -131,6 +131,22 @@ create policy "Archetypes are publicly readable"
   to anon, authenticated
   using (true);
 
+create policy "Admins can create archetypes"
+  on public.archetypes for insert
+  to authenticated
+  with check (public.has_role('moderator'));
+
+create policy "Admins can update archetypes"
+  on public.archetypes for update
+  to authenticated
+  using (public.has_role('moderator'))
+  with check (public.has_role('moderator'));
+
+create policy "Admins can delete archetypes"
+  on public.archetypes for delete
+  to authenticated
+  using (public.has_role('admin'));
+
 create trigger trg_archetypes_updated_at
   before update on public.archetypes
   for each row
@@ -457,6 +473,22 @@ create policy "Events are publicly readable"
   to anon, authenticated
   using (true);
 
+create policy "Admins can create events"
+  on public.events for insert
+  to authenticated
+  with check (public.has_role('moderator'));
+
+create policy "Admins can update events"
+  on public.events for update
+  to authenticated
+  using (public.has_role('moderator'))
+  with check (public.has_role('moderator'));
+
+create policy "Admins can delete events"
+  on public.events for delete
+  to authenticated
+  using (public.has_role('admin'));
+
 -- ============================================================
 -- 8. Event placements (deck results at events)
 -- ============================================================
@@ -485,6 +517,22 @@ create policy "Event placements are publicly readable"
   to anon, authenticated
   using (true);
 
+create policy "Admins can create event placements"
+  on public.event_placements for insert
+  to authenticated
+  with check (public.has_role('moderator'));
+
+create policy "Admins can update event placements"
+  on public.event_placements for update
+  to authenticated
+  using (public.has_role('moderator'))
+  with check (public.has_role('moderator'));
+
+create policy "Admins can delete event placements"
+  on public.event_placements for delete
+  to authenticated
+  using (public.has_role('admin'));
+
 -- ============================================================
 -- 9. Tags (taxonomy system)
 -- ============================================================
@@ -511,6 +559,22 @@ create policy "Tags are publicly readable"
   on public.tags for select
   to anon, authenticated
   using (true);
+
+create policy "Admins can create tags"
+  on public.tags for insert
+  to authenticated
+  with check (public.has_role('moderator'));
+
+create policy "Admins can update tags"
+  on public.tags for update
+  to authenticated
+  using (public.has_role('moderator'))
+  with check (public.has_role('moderator'));
+
+create policy "Admins can delete tags"
+  on public.tags for delete
+  to authenticated
+  using (public.has_role('admin'));
 
 create policy "Deck tags are publicly readable"
   on public.deck_tags for select
