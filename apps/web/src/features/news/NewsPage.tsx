@@ -64,7 +64,7 @@ export function NewsPage() {
         {NEWS_ITEMS.map((item) => (
           <article
             key={item.id}
-            className="rounded-xl border border-gf-border bg-white p-6 hover:border-gf-blue/20 hover:shadow-sm transition-all"
+            className="rounded-xl border border-gf-border bg-gf-white p-6 hover:border-gf-blue/20 hover:shadow-sm transition-all"
           >
             <div className="flex items-center gap-2 mb-3">
               <span className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${TAG_STYLES[item.tag] || 'bg-gray-100 text-gray-600'}`}>

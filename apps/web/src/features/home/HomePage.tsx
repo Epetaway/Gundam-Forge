@@ -164,7 +164,7 @@ export function HomePage() {
               </Swiper>
             </div>
           ) : (
-            <div className="rounded-xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-10 text-center">
+            <div className="rounded-xl bg-gf-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-10 text-center">
               <svg className="mx-auto mb-2 h-8 w-8 text-gf-border" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <path d="M12 8v8M8 12h8" strokeLinecap="round" />
@@ -185,7 +185,7 @@ export function HomePage() {
       {!authUser && (
         <section className="bg-gray-50 pb-16">
           <div className="mx-auto max-w-5xl px-6">
-            <div className="rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-8 text-center">
+            <div className="rounded-2xl bg-gf-white shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-8 text-center">
               <h2 className="text-lg font-bold text-gf-text">
                 Ready to build?
               </h2>

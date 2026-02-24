@@ -72,13 +72,13 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
                 />
 
                 {/* Cost Badge */}
-                <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gcg-border text-xs font-bold text-gcg-text shadow-sm">
+                <div className="absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-gf-white border border-gcg-border text-xs font-bold text-gcg-text shadow-sm">
                   {card.cost}
                 </div>
 
                 {/* Power Badge (if exists) */}
                 {card.power !== undefined && card.power  !== null && card.power > 0 && (
-                  <div className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gcg-border text-xs font-bold text-gcg-text shadow-sm">
+                  <div className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-gf-white border border-gcg-border text-xs font-bold text-gcg-text shadow-sm">
                     {card.power}
                   </div>
                 )}
@@ -129,7 +129,7 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
               </button>
               {qty > 0 && (
                 <div className={`flex h-6 w-6 items-center justify-center rounded border text-xs font-bold ${
-                  qty >= 3 ? 'border-gcg-primary bg-gcg-primary text-white' : 'border-gcg-border bg-white text-gcg-text'
+                  qty >= 3 ? 'border-gcg-primary bg-gcg-primary text-white' : 'border-gcg-border bg-gf-white text-gcg-text'
                 }`}>
                   {qty}
                 </div>

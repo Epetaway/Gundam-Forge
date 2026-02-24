@@ -41,7 +41,7 @@ export function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gf-white rounded-2xl shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-6 space-y-4">
 
           {error && (
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
@@ -58,7 +58,7 @@ export function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg bg-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
+              className="w-full rounded-lg bg-gf-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
               placeholder="pilot@gundam-forge.app"
             />
           </div>
@@ -72,7 +72,7 @@ export function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg bg-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
+              className="w-full rounded-lg bg-gf-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
               placeholder="Enter password"
             />
           </div>

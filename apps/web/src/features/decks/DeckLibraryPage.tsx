@@ -123,7 +123,7 @@ export function DeckLibraryPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-heading text-xl font-bold text-gf-text">My Decks</h1>
         </div>
-        <div className="rounded-xl border border-gf-border bg-white p-8 text-center">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-8 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gf-light mx-auto mb-4">
             <svg className="h-7 w-7 text-gf-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" strokeLinecap="round" strokeLinejoin="round" />
@@ -179,7 +179,7 @@ export function DeckLibraryPage() {
             <path d="m21 21-4.35-4.35" strokeLinecap="round" />
           </svg>
           <input
-            className="w-full rounded-lg border border-gf-border bg-white py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+            className="w-full rounded-lg border border-gf-border bg-gf-white py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:ring-1 focus:ring-gf-blue/30 transition-colors"
             placeholder="Search your decks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -216,7 +216,7 @@ export function DeckLibraryPage() {
         </div>
       ) : filteredDecks.length === 0 && !searchQuery ? (
         /* Empty state */
-        <div className="rounded-xl border border-gf-border bg-white p-12 text-center">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-12 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gf-light mx-auto mb-4">
             <svg className="h-8 w-8 text-gf-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" strokeLinecap="round" strokeLinejoin="round" />
@@ -235,7 +235,7 @@ export function DeckLibraryPage() {
           </button>
         </div>
       ) : filteredDecks.length === 0 && searchQuery ? (
-        <div className="rounded-xl border border-gf-border bg-white p-8 text-center">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-8 text-center">
           <p className="text-sm text-gf-text-secondary">No decks match your search.</p>
           <button
             onClick={() => setSearchQuery('')}
@@ -250,7 +250,7 @@ export function DeckLibraryPage() {
           {filteredDecks.map((deck) => (
             <div
               key={deck.id}
-              className="group rounded-xl border border-gf-border bg-white hover:border-gf-blue/40 hover:shadow-sm transition-all"
+              className="group rounded-xl border border-gf-border bg-gf-white hover:border-gf-blue/40 hover:shadow-sm transition-all"
             >
               <div className="flex items-center gap-4 p-4">
                 {/* Deck icon */}
@@ -272,7 +272,7 @@ export function DeckLibraryPage() {
                         value={renameValue}
                         onChange={(e) => setRenameValue(e.target.value)}
                         autoFocus
-                        className="flex-1 rounded border border-gf-blue bg-white px-2 py-1 text-sm text-gf-text outline-none"
+                        className="flex-1 rounded border border-gf-blue bg-gf-white px-2 py-1 text-sm text-gf-text outline-none"
                         onKeyDown={(e) => { if (e.key === 'Escape') setRenamingId(null); }}
                       />
                       <button type="submit" className="text-xs text-gf-blue font-medium hover:underline">

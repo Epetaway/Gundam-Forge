@@ -11,6 +11,7 @@ import { AuthGuard } from './components/AuthGuard';
 
 // Layout
 import { Header } from './components/layout/Header';
+import { BottomTabBar } from './components/layout/BottomTabBar';
 
 // Feature pages
 import { HomePage } from './features/home/HomePage';
@@ -78,23 +79,47 @@ function App() {
     [deckEntries, catalogCards],
   );
 
-  // Keyboard: Space opens inspection for selected card
+  // Keyboard shortcuts
   const selectedCardId = useCardsStore((s) => s.selectedCardId);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && selectedCardId && !inspectedCardId) {
-        const target = e.target as HTMLElement;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+      // Space: inspect selected card
+      if (e.code === 'Space' && selectedCardId && !inspectedCardId && !isInput) {
         e.preventDefault();
         useUIStore.getState().openInspection(selectedCardId);
+        return;
+      }
+
+      // Escape: close inspection / modals
+      if (e.code === 'Escape' && inspectedCardId) {
+        closeInspection();
+        return;
+      }
+
+      // Ctrl+K or /: focus search (when not in input)
+      if ((e.code === 'Slash' || (e.code === 'KeyK' && (e.metaKey || e.ctrlKey))) && !isInput) {
+        e.preventDefault();
+        const searchInput = document.querySelector<HTMLInputElement>('[data-search-input]');
+        searchInput?.focus();
+        return;
+      }
+
+      // ?: show keyboard shortcuts help (when not in input)
+      if (e.code === 'Slash' && e.shiftKey && !isInput) {
+        e.preventDefault();
+        // Could open a help modal in the future
+        return;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedCardId, inspectedCardId]);
+  }, [selectedCardId, inspectedCardId, closeInspection]);
 
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className="min-h-screen w-full bg-gf-light">
       <Routes>
         {/* Auth routes — standalone layout */}
         <Route path="/auth/login" element={<LoginPage />} />
@@ -121,7 +146,7 @@ function App() {
 }
 
 /* ============================================================
-   APP SHELL — Header + Routes + Modal
+   APP SHELL — Header + Routes + Bottom Tab Bar + Modal
    ============================================================ */
 function AppShell({
   cards,
@@ -144,39 +169,43 @@ function AppShell({
     <>
       <Header />
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/decks" element={<DeckExplorerPage />} />
-        <Route path="/decks/:id" element={<PublicDeckViewPage />} />
-        <Route path="/forge" element={<ForgeWorkspace cards={cards} />} />
-        <Route path="/cards" element={<CardDatabasePage cards={cards} />} />
-        <Route
-          path="/sim"
-          element={
-            <SimulatorPanel
-              cards={catalogCards}
-              deckEntries={deckEntries}
-              validation={validation}
-            />
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <div className="gf-container py-8">
-              <DiagnosticsPanel validation={validation} />
-            </div>
-          }
-        />
-        <Route path="/my-decks" element={<AuthGuard><DeckLibraryPage /></AuthGuard>} />
-        <Route path="/news" element={<NewsPage />} />
+      <div className="pb-14 md:pb-0">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/decks" element={<DeckExplorerPage />} />
+          <Route path="/decks/:id" element={<PublicDeckViewPage />} />
+          <Route path="/forge" element={<ForgeWorkspace cards={cards} />} />
+          <Route path="/cards" element={<CardDatabasePage cards={cards} />} />
+          <Route
+            path="/sim"
+            element={
+              <SimulatorPanel
+                cards={catalogCards}
+                deckEntries={deckEntries}
+                validation={validation}
+              />
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <div className="gf-container py-8">
+                <DiagnosticsPanel validation={validation} />
+              </div>
+            }
+          />
+          <Route path="/my-decks" element={<AuthGuard><DeckLibraryPage /></AuthGuard>} />
+          <Route path="/news" element={<NewsPage />} />
 
-        {/* Legacy redirects */}
-        <Route path="/builder" element={<Navigate to="/forge" replace />} />
-        <Route path="/catalog" element={<Navigate to="/cards" replace />} />
-        <Route path="/diagnostics" element={<Navigate to="/analytics" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Legacy redirects */}
+          <Route path="/builder" element={<Navigate to="/forge" replace />} />
+          <Route path="/catalog" element={<Navigate to="/cards" replace />} />
+          <Route path="/diagnostics" element={<Navigate to="/analytics" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+
+      <BottomTabBar />
 
       {/* Inspection Modal (global, single instance) */}
       <CardInspectionModal

@@ -59,7 +59,7 @@ export function TopDeckCard({ deck }: TopDeckCardProps) {
       to={`/decks/${deck.id}`}
       className="group block"
     >
-      <div className="gf-card-tile bg-white">
+      <div className="gf-card-tile bg-gf-white">
         <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
           {/* Boss card art or gradient fallback */}
           {heroSrc ? (

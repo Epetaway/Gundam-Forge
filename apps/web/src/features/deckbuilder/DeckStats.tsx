@@ -81,16 +81,16 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
           { label: 'Median Cost', value: stats.medianCost },
           { label: 'Avg Power', value: stats.avgPower },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-lg border border-gcg-border bg-white p-3 text-center shadow-sm">
+          <div key={label} className="rounded-lg border border-gf-border bg-gf-white p-3 text-center shadow-sm">
             <p className="text-xs uppercase tracking-wider text-gray-500">{label}</p>
-            <p className="mt-1 text-2xl font-bold text-gcg-dark">{value}</p>
+            <p className="mt-1 text-2xl font-bold text-gf-text">{value}</p>
           </div>
         ))}
       </div>
 
       {/* Cost Curve */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
+      <div className="rounded-lg border border-gf-border bg-gf-white p-4 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gf-text">
           Cost Curve Analysis
         </h3>
         {curveEntries.length === 0 ? (
@@ -100,13 +100,13 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
             {curveEntries.map(({ cost, count }) => (
               <div key={cost} className="flex items-center gap-3">
                 <span className="w-12 text-sm font-bold text-gray-700">{cost}</span>
-                <div className="relative h-6 flex-1 overflow-hidden rounded border border-gcg-border bg-gcg-light">
+                <div className="relative h-6 flex-1 overflow-hidden rounded border border-gf-border bg-gf-light">
                   <div
-                    className="h-full bg-gradient-to-r from-gcg-primary to-red-700 transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-gf-blue to-red-700 transition-all duration-300"
                     style={{ width: `${(count / maxCurveCount) * 100}%` }}
                   />
                 </div>
-                <span className="w-12 text-right text-sm font-bold text-gcg-dark">{count}</span>
+                <span className="w-12 text-right text-sm font-bold text-gf-text">{count}</span>
               </div>
             ))}
           </div>
@@ -114,8 +114,8 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
       </div>
 
       {/* Color Distribution */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
+      <div className="rounded-lg border border-gf-border bg-gf-white p-4 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gf-text">
           Color Distribution
         </h3>
         {colorEntries.length === 0 ? (
@@ -126,8 +126,8 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
               const percentage = ((count / stats.totalCards) * 100).toFixed(1);
               return (
                 <div key={color} className="flex items-center gap-3">
-                  <span className="w-20 truncate text-sm font-semibold text-gcg-dark">{color}</span>
-                  <div className="relative h-6 flex-1 overflow-hidden rounded border border-gcg-border bg-gcg-light">
+                  <span className="w-20 truncate text-sm font-semibold text-gf-text">{color}</span>
+                  <div className="relative h-6 flex-1 overflow-hidden rounded border border-gf-border bg-gf-light">
                     <div
                       className={`h-full bg-gradient-to-r ${colorGradients[color] || colorGradients.Colorless} transition-all duration-300`}
                       style={{ width: `${percentage}%` }}
@@ -144,8 +144,8 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
       </div>
 
       {/* Type Distribution */}
-      <div className="rounded-lg border border-gcg-border bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gcg-dark">
+      <div className="rounded-lg border border-gf-border bg-gf-white p-4 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gf-text">
           Type Distribution
         </h3>
         {typeEntries.length === 0 ? (
@@ -157,10 +157,10 @@ export function DeckStats({ resolvedEntries }: DeckStatsProps) {
               return (
                 <div
                   key={type}
-                  className="rounded-lg border border-gcg-border bg-white p-3 text-center shadow-sm"
+                  className="rounded-lg border border-gf-border bg-gf-white p-3 text-center shadow-sm"
                 >
                   <p className="text-xs uppercase tracking-wider text-gray-500">{type}</p>
-                  <p className="mt-1 text-2xl font-bold text-gcg-dark">{count}</p>
+                  <p className="mt-1 text-2xl font-bold text-gf-text">{count}</p>
                   <p className="mt-1 text-xs text-gray-600">{percentage}%</p>
                 </div>
               );

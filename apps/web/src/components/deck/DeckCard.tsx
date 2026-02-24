@@ -26,7 +26,7 @@ export const DeckCard = React.memo(function DeckCard({ deck, onClick }: DeckCard
   return (
     <button
       onClick={onClick}
-      className="rounded-xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),var(--gf-shadow-xs)] group w-full text-left p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.1),var(--gf-shadow-card-hover)] active:scale-[0.98] active:shadow-xs"
+      className="rounded-xl bg-gf-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),var(--gf-shadow-xs)] group w-full text-left p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.1),var(--gf-shadow-card-hover)] active:scale-[0.98] active:shadow-xs"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1">

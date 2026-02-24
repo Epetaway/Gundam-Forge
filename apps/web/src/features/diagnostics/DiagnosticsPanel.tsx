@@ -91,7 +91,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
           { label: 'Colors', value: colorRows.length, color: 'text-orange-500' },
           { label: 'Unique', value: costCurveRows.length > 0 ? Object.values(validation.metrics.costCurve).reduce((a, b) => a + (b > 0 ? 1 : 0), 0) : 0, color: 'text-pink-600' },
         ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-xl border border-gf-border bg-white p-4 shadow-sm">
+          <div key={label} className="rounded-xl border border-gf-border bg-gf-white p-4 shadow-sm">
             <p className="text-[10px] text-gf-text-muted uppercase tracking-wide">{label}</p>
             <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
           </div>
@@ -100,7 +100,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
 
       {/* Validation Summary */}
       {(validation.errors.length > 0 || validation.warnings.length > 0) && (
-        <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-6 shadow-sm">
           <h3 className="mb-3 text-sm font-bold text-gf-text">Validation Summary</h3>
           <div className="space-y-2">
             {validation.errors.map((err, i) => (
@@ -125,7 +125,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
       )}
 
       {/* Cost Curve */}
-      <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gf-border bg-gf-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold text-gf-text">Cost Curve Distribution</h3>
         {costCurveRows.length === 0 ? (
           <p className="text-sm text-gf-text-secondary">No data available</p>
@@ -154,7 +154,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Type Distribution */}
-        <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-bold text-gf-text">Type Distribution</h3>
           <div className="space-y-3">
             {typeRows.map((row) => {
@@ -178,7 +178,7 @@ export function DiagnosticsPanel({ validation }: DiagnosticsPanelProps) {
         </div>
 
         {/* Color Distribution */}
-        <div className="rounded-xl border border-gf-border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gf-border bg-gf-white p-6 shadow-sm">
           <h3 className="mb-4 text-sm font-bold text-gf-text">Color Distribution</h3>
           {colorRows.length === 0 ? (
             <p className="text-sm text-gf-text-secondary">No colors yet</p>

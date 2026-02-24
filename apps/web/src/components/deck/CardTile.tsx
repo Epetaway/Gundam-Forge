@@ -53,7 +53,7 @@ export const CardTile = React.memo(function CardTile({
       }}
     >
       <div
-        className="gf-card-tile bg-white"
+        className="gf-card-tile bg-gf-white"
         data-selected={selected || undefined}
       >
         <div className="relative w-full" style={{ aspectRatio: '5/7' }}>

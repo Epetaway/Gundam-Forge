@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useCardsStore } from '../deckbuilder/cardsStore';
+import { useDeckStore } from '../deckbuilder/deckStore';
 import {
   fetchDeck,
   fetchLikeStatus,
@@ -25,16 +26,19 @@ interface ResolvedEntry extends DeckEntryWithBoss {
 
 export function PublicDeckViewPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const authUser = useAuthStore((s) => s.user);
   const cardsById = useCardsStore((s) => s.cardsById);
+  const cloneToDeck = useDeckStore((s) => s.setDeck);
 
-  const [deck, setDeck] = useState<DeckRecord | null>(null);
+  const [deck, setDeckRecord] = useState<DeckRecord | null>(null);
   const [entries, setEntries] = useState<DeckEntryWithBoss[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [viewIncremented, setViewIncremented] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
 
   // Fetch deck data
   useEffect(() => {
@@ -43,7 +47,7 @@ export function PublicDeckViewPage() {
     setError(null);
     fetchDeck(id)
       .then(({ deck: d, cards }) => {
-        setDeck(d);
+        setDeckRecord(d);
         setEntries(cards);
         setLikeCount(d.like_count);
       })
@@ -109,6 +113,25 @@ export function PublicDeckViewPage() {
     a.download = `${deck.name.replace(/\s+/g, '_')}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleShareLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2000);
+    } catch {
+      // Fallback: use Web Share API
+      if (navigator.share) {
+        navigator.share({ title: deck?.name ?? 'Deck', url }).catch(() => {});
+      }
+    }
+  };
+
+  const handleCloneDeck = () => {
+    cloneToDeck(entries.map((e) => ({ cardId: e.cardId, qty: e.qty, isBoss: e.isBoss })));
+    navigate('/forge');
   };
 
   if (loading) {
@@ -204,14 +227,14 @@ export function PublicDeckViewPage() {
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {authUser && (
             <button
               onClick={handleToggleLike}
               className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 liked
                   ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100'
-                  : 'border-gf-border bg-white text-gf-text hover:bg-gf-light'
+                  : 'border-gf-border bg-gf-white text-gf-text hover:bg-gf-light'
               }`}
             >
               <svg className="h-3.5 w-3.5" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -220,34 +243,53 @@ export function PublicDeckViewPage() {
               {liked ? 'Liked' : 'Like'}
             </button>
           )}
+          <div className="relative">
+            <button
+              onClick={handleShareLink}
+              className="rounded-lg border border-gf-border bg-gf-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors flex items-center gap-1.5"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Share
+            </button>
+            {shareToast && (
+              <div className="absolute right-0 top-full mt-1 rounded-lg bg-gf-success px-3 py-1.5 text-xs font-medium text-white shadow-md z-toast animate-fade-in whitespace-nowrap">
+                Link copied!
+              </div>
+            )}
+          </div>
           <button
             onClick={handleCopyList}
-            className="rounded-lg border border-gf-border bg-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
+            className="rounded-lg border border-gf-border bg-gf-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
           >
             Copy List
           </button>
           <button
             onClick={handleExportJSON}
-            className="rounded-lg border border-gf-border bg-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
+            className="rounded-lg border border-gf-border bg-gf-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
           >
             Export JSON
+          </button>
+          <button
+            onClick={handleCloneDeck}
+            className="rounded-lg border border-gf-blue bg-gf-blue px-3 py-2 text-xs font-bold text-white hover:bg-gf-blue/90 transition-colors flex items-center gap-1.5"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Clone to Forge
           </button>
           {deck.source === 'official' && deck.source_url && (
             <a
               href={deck.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-gf-border bg-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
+              className="rounded-lg border border-gf-border bg-gf-white px-3 py-2 text-xs font-medium text-gf-text hover:bg-gf-light transition-colors"
             >
               View on GCG
             </a>
           )}
-          <Link
-            to={`/forge?import=${deck.id}`}
-            className="gf-btn gf-btn-primary text-xs py-2 px-4"
-          >
-            Open in Forge
-          </Link>
         </div>
       </div>
 
@@ -266,7 +308,7 @@ export function PublicDeckViewPage() {
               return (
                 <div
                   key={e.cardId}
-                  className="flex items-center gap-2 rounded-lg bg-white border border-yellow-200 px-3 py-2"
+                  className="flex items-center gap-2 rounded-lg bg-gf-white border border-yellow-200 px-3 py-2"
                 >
                   {imgSrc && (
                     <img
@@ -292,7 +334,7 @@ export function PublicDeckViewPage() {
       {/* Deck List + Stats */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-gf-border bg-white">
+          <div className="rounded-xl border border-gf-border bg-gf-white">
             <div className="border-b border-gf-border px-4 py-3">
               <h2 className="text-sm font-bold text-gf-text">Deck List</h2>
             </div>
@@ -358,7 +400,7 @@ export function PublicDeckViewPage() {
 
         {/* Stats Sidebar */}
         <div className="space-y-4">
-          <div className="rounded-xl border border-gf-border bg-white p-5">
+          <div className="rounded-xl border border-gf-border bg-gf-white p-5">
             <h3 className="text-sm font-bold text-gf-text mb-3">Deck Stats</h3>
             <div className="space-y-2">
               {[
@@ -384,7 +426,7 @@ export function PublicDeckViewPage() {
             const meta = getMetaTierForColors(deck.colors);
             if (!meta) return null;
             return (
-              <div className="rounded-xl border border-gf-border bg-white p-5">
+              <div className="rounded-xl border border-gf-border bg-gf-white p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <span className={`flex h-6 w-6 items-center justify-center rounded-md border text-[10px] font-bold ${TIER_COLORS[meta.tier]}`}>
                     {TIER_LABELS[meta.tier]}

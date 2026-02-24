@@ -160,7 +160,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
               const isPast = gi < PHASE_GROUPS.findIndex((g) => g.phases.some((p) => p === phase));
               return (
                 <div key={group.label} className="flex items-center">
-                  {gi > 0 && <div className={`mx-1 h-px w-4 ${isPast ? 'bg-gf-blue' : 'bg-white/20'}`} />}
+                  {gi > 0 && <div className={`mx-1 h-px w-4 ${isPast ? 'bg-gf-blue' : 'bg-gf-white/20'}`} />}
                   <span
                     className={`rounded-md px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors ${
                       isActive
@@ -290,7 +290,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
         </div>
 
         {/* Bottom Controls */}
-        <div className="flex items-center justify-between bg-white border-t border-gf-border px-4 py-2">
+        <div className="flex items-center justify-between bg-gf-white border-t border-gf-border px-4 py-2">
           <div className="flex gap-2 flex-wrap">
             {!isGameOver && (
               <>
@@ -342,20 +342,20 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
             )}
             <button
               onClick={() => manualDraw(1)}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
+              className="rounded-lg border border-gf-border bg-gf-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
             >
               Draw
             </button>
             <button
               onClick={manualMulligan}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
+              className="rounded-lg border border-gf-border bg-gf-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
             >
               Mulligan
             </button>
             {selectedInstanceId && player.hand.some((c) => c.instanceId === selectedInstanceId) && (
               <button
                 onClick={() => manualDiscard(selectedInstanceId!)}
-                className="rounded-lg border border-gf-border bg-white px-3 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
+                className="rounded-lg border border-gf-border bg-gf-white px-3 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors"
               >
                 Discard
               </button>
@@ -365,7 +365,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
             <button
               onClick={undo}
               disabled={undoStack.length === 0}
-              className="rounded-lg border border-gf-border bg-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors disabled:opacity-30"
+              className="rounded-lg border border-gf-border bg-gf-white px-4 py-2 text-sm font-medium text-gf-text hover:bg-gray-50 transition-colors disabled:opacity-30"
             >
               Undo
             </button>
@@ -380,7 +380,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
       </div>
 
       {/* Right Panel - Card Detail + Game Log */}
-      <div className="w-72 flex-shrink-0 border-l border-gf-border bg-white overflow-hidden flex flex-col">
+      <div className="w-72 flex-shrink-0 border-l border-gf-border bg-gf-white overflow-hidden flex flex-col">
         {selectedDef ? (
           <div className="p-4 border-b border-gf-border overflow-y-auto gf-scroll">
             <div className="relative overflow-hidden rounded-xl border border-gf-border shadow-sm">
