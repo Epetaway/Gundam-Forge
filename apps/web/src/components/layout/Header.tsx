@@ -127,14 +127,7 @@ export function Header() {
                     </div>
                     <div className="py-1">
                       <Link
-                        to="/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gf-text hover:bg-gf-gray-50 transition-colors"
-                      >
-                        My Profile
-                      </Link>
-                      <Link
-                        to="/forge"
+                        to="/my-decks"
                         onClick={() => setUserMenuOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gf-text hover:bg-gf-gray-50 transition-colors"
                       >
