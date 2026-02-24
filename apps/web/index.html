@@ -4,6 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gundam Forge - Deck Builder</title>
+    <!-- Restore route after GitHub Pages 404 redirect -->
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const p = params.get('p');
+        if (p !== null) {
+          const q = params.get('q');
+          params.delete('p');
+          params.delete('q');
+          const rest = params.toString();
+          const search = (q ? q + (rest ? '&' + rest : '') : rest);
+          window.history.replaceState(
+            null, null,
+            window.location.pathname.replace(/\/$/, '') + '/' + p +
+            (search ? '?' + search : '') +
+            window.location.hash
+          );
+        }
+      })();
+    </script>
     <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
