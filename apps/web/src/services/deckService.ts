@@ -107,36 +107,22 @@ export async function updateDeck(
   if (error) throw error;
 }
 
-/** Save deck cards (replace all) */
+/** Save deck cards atomically via RPC */
 export async function saveDeckCards(deckId: string, entries: DeckEntryWithBoss[]) {
-  // Delete existing cards
-  const { error: deleteError } = await supabase
-    .from('deck_cards')
-    .delete()
-    .eq('deck_id', deckId);
+  const cards = entries
+    .filter((e) => e.qty > 0)
+    .map((e) => ({
+      card_id: e.cardId,
+      qty: e.qty,
+      is_boss: e.isBoss ?? false,
+    }));
 
-  if (deleteError) throw deleteError;
+  const { error } = await supabase.rpc('save_deck_cards', {
+    p_deck_id: deckId,
+    p_cards: cards,
+  });
 
-  // Insert new cards
-  if (entries.length > 0) {
-    const rows = entries
-      .filter((e) => e.qty > 0)
-      .map((e) => ({
-        deck_id: deckId,
-        card_id: e.cardId,
-        qty: e.qty,
-        is_boss: e.isBoss ?? false,
-      }));
-
-    const { error: insertError } = await supabase
-      .from('deck_cards')
-      .insert(rows);
-
-    if (insertError) throw insertError;
-  }
-
-  // Touch updated_at
-  await supabase.from('decks').update({ updated_at: new Date().toISOString() }).eq('id', deckId);
+  if (error) throw error;
 }
 
 /** Duplicate a deck */
