@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import {
   fetchPublicDecks,
+  fetchTrendingDecks,
   fetchBulkLikeStatus,
   toggleDeckLike,
   type PublicDeckRecord,
 } from '../services/deckService';
 
 export type ExplorerTab = 'all' | 'official' | 'community';
-export type SortOption = 'popular' | 'newest' | 'most_liked';
+export type SortOption = 'popular' | 'newest' | 'most_liked' | 'trending';
 
 interface MetaDeckState {
   tab: ExplorerTab;
@@ -34,6 +35,7 @@ const sortToOrderBy = (sort: SortOption): 'view_count' | 'updated_at' | 'like_co
     case 'popular': return 'view_count';
     case 'newest': return 'updated_at';
     case 'most_liked': return 'like_count';
+    case 'trending': return 'view_count';
   }
 };
 
@@ -67,14 +69,20 @@ export const useMetaDeckStore = create<MetaDeckState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const decks = await fetchPublicDecks({
-        limit: 50,
-        search: search || undefined,
-        orderBy: sortToOrderBy(sort),
-        archetype: archetype || undefined,
-        source: tabToSource(tab),
-        color: colorFilter || undefined,
-      });
+      let decks: PublicDeckRecord[];
+
+      if (sort === 'trending') {
+        decks = await fetchTrendingDecks(50);
+      } else {
+        decks = await fetchPublicDecks({
+          limit: 50,
+          search: search || undefined,
+          orderBy: sortToOrderBy(sort),
+          archetype: archetype || undefined,
+          source: tabToSource(tab),
+          color: colorFilter || undefined,
+        });
+      }
 
       set({ decks, loading: false });
 
