@@ -97,7 +97,7 @@ export const validateDeck = (
   }
 
   // Rule 2: Resource deck = exactly 10 cards (Rule 6-1-1)
-  if (resourceDeckCards > 0 && resourceDeckCards !== RESOURCE_DECK_SIZE) {
+  if (resourceDeckCards !== RESOURCE_DECK_SIZE) {
     errors.push(`Resource deck must contain exactly ${RESOURCE_DECK_SIZE} cards (currently ${resourceDeckCards}).`);
   }
 
@@ -123,11 +123,15 @@ export const validateDeck = (
 
   // Warnings
   if (mainDeckCards > 0 && typeCounts.Unit < 15) {
-    warnings.push(`Consider adding more Unit cards (currently ${typeCounts.Unit}, recommend at least 15).`);
+    warnings.push(`Consider adding more Unit cards (currently ${typeCounts.Unit}, recommend 15 minimum, 25-28 optimal).`);
+  } else if (mainDeckCards > 0 && typeCounts.Unit < 25) {
+    warnings.push(`Unit count is low (${typeCounts.Unit}). Optimal range is 25-28 Unit cards.`);
   }
 
-  if (resourceDeckCards === 0 && mainDeckCards > 0) {
-    warnings.push(`No Resource cards in deck. The simulator will generate placeholder resources.`);
+  if (mainDeckCards > 0 && typeCounts.Pilot < 6) {
+    warnings.push(`Consider adding more Pilot cards (currently ${typeCounts.Pilot}, recommend 6-8 for consistent attachments).`);
+  } else if (mainDeckCards > 0 && typeCounts.Pilot > 8) {
+    warnings.push(`High Pilot count (${typeCounts.Pilot}). Consider reducing to 6-8 to avoid dead draws.`);
   }
 
   if (mainDeckCards > 0) {

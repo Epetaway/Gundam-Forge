@@ -29,7 +29,7 @@
 **Starting Life**: 20  
 **Starting Hand**: 7 cards (with mulligan option)  
 **Deck Size**: Exactly 60 cards  
-**Max Copies**: 3 per card (except Basic Resources)  
+**Max Copies**: 4 per card (except Basic Resources)  
 
 ---
 
@@ -85,9 +85,10 @@
 ### Core Rules
 - **Exactly 60 cards** required
 - **Maximum 2 colors** per deck (excluding Colorless)
-- **Maximum 3 copies** of any single card
+- **Maximum 4 copies** of any single card
 - **Colorless cards** don't count toward color limit
-- At least **15 Unit cards** recommended
+- At least **15 Unit cards** recommended (25-28 optimal)
+- Recommended **6-8 Pilot cards** for consistent attachments
 
 ### Color Identity
 - **White**: Defense, healing, protection (Federation focus)
@@ -358,7 +359,7 @@ Represents aerial superiority.
 
 ### Deck Construction (Competitive)
 - Exactly 60 cards
-- Maximum 3 copies per card
+- Maximum 4 copies per card
 - Maximum 2 colors (excluding Colorless)
 - All cards must be from legal sets (not banned)
 - Deck list must be submitted before tournament

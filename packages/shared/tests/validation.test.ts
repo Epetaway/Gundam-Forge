@@ -163,7 +163,7 @@ describe('validateDeck', () => {
   });
 
   describe('resource deck (Rule 6-1-1)', () => {
-    it('errors when resource deck is not exactly 10 (if any resources present)', () => {
+    it('errors when resource deck is not exactly 10', () => {
       const mainCards = makeCards(50);
       const resourceCards = makeCards(5, { type: 'Resource' }).map((c, i) => ({
         ...c,
@@ -180,6 +180,33 @@ describe('validateDeck', () => {
         expect.arrayContaining([expect.stringContaining('Resource deck must contain exactly 10')])
       );
     });
+
+    it('errors when resource deck is missing entirely', () => {
+      const cards = makeCards(50);
+      const deck = makeDeck(cards.map((c) => c.id));
+      const result = validateDeck(deck, cards);
+
+      expect(result.errors).toEqual(
+        expect.arrayContaining([expect.stringContaining('Resource deck must contain exactly 10')])
+      );
+    });
+
+    it('passes when resource deck has exactly 10 cards', () => {
+      const mainCards = makeCards(50);
+      const resourceCards = makeCards(10, { type: 'Resource' }).map((c, i) => ({
+        ...c,
+        id: `RES-${i}`,
+      }));
+      const allCards = [...mainCards, ...resourceCards];
+      const deck = [
+        ...makeDeck(mainCards.map((c) => c.id)),
+        ...makeDeck(resourceCards.map((c) => c.id)),
+      ];
+      const result = validateDeck(deck, allCards);
+
+      const resourceErrors = result.errors.filter((e) => e.includes('Resource deck'));
+      expect(resourceErrors).toHaveLength(0);
+    });
   });
 
   describe('warnings', () => {
@@ -190,16 +217,6 @@ describe('validateDeck', () => {
 
       expect(result.warnings).toEqual(
         expect.arrayContaining([expect.stringContaining('Unit cards')])
-      );
-    });
-
-    it('warns when no Resource cards', () => {
-      const cards = makeCards(50);
-      const deck = makeDeck(cards.map((c) => c.id));
-      const result = validateDeck(deck, cards);
-
-      expect(result.warnings).toEqual(
-        expect.arrayContaining([expect.stringContaining('No Resource cards')])
       );
     });
 
@@ -285,10 +302,18 @@ describe('validateDeck', () => {
       expect(result.metrics.totalCards).toBe(0);
     });
 
-    it('valid 50-card mono-color deck passes', () => {
-      const cards = makeCards(50, { color: 'Blue', type: 'Unit', cost: 2 });
-      const deck = makeDeck(cards.map((c) => c.id));
-      const result = validateDeck(deck, cards);
+    it('valid 50-card main deck + 10-card resource deck passes', () => {
+      const mainCards = makeCards(50, { color: 'Blue', type: 'Unit', cost: 2 });
+      const resourceCards = makeCards(10, { type: 'Resource' }).map((c, i) => ({
+        ...c,
+        id: `RES-${i}`,
+      }));
+      const allCards = [...mainCards, ...resourceCards];
+      const deck = [
+        ...makeDeck(mainCards.map((c) => c.id)),
+        ...makeDeck(resourceCards.map((c) => c.id)),
+      ];
+      const result = validateDeck(deck, allCards);
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
