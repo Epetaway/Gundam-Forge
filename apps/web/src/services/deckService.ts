@@ -282,6 +282,13 @@ export interface PublicDeckRecord {
   boss_card_ids?: string[];
 }
 
+/** Paginated deck response */
+export interface PaginatedDecks {
+  decks: PublicDeckRecord[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
 /** Fetch public community decks (for homepage & explorer) */
 export async function fetchPublicDecks(options?: {
   limit?: number;
@@ -290,6 +297,7 @@ export async function fetchPublicDecks(options?: {
   archetype?: string;
   source?: 'user' | 'official' | 'all';
   color?: string;
+  cursor?: string;
 }): Promise<PublicDeckRecord[]> {
   try {
     const limit = options?.limit ?? 12;
@@ -300,7 +308,8 @@ export async function fetchPublicDecks(options?: {
       .select('id, name, description, colors, is_public, view_count, like_count, archetype, source, source_url, slug, created_at, updated_at, profiles(username, display_name)')
       .eq('is_public', true)
       .order(orderBy, { ascending: false })
-      .limit(limit);
+      .order('id', { ascending: true })
+      .limit(limit + 1);
 
     if (options?.search) {
       query = query.ilike('name', `%${options.search}%`);
@@ -323,7 +332,12 @@ export async function fetchPublicDecks(options?: {
       console.warn('[Decks] Supabase fetch failed, using local official decks:', error.message);
       return getLocalOfficialDecks(options);
     }
-    const results = ((data as unknown as PublicDeckRecord[]) ?? []).map((d) => ({
+
+    // Trim extra record used for hasMore detection
+    const trimmed = (data as unknown as PublicDeckRecord[]) ?? [];
+    const limited = trimmed.slice(0, limit);
+
+    const results = limited.map((d) => ({
       ...d,
       meta_tier: d.meta_tier ?? getMetaTierForColors(d.colors)?.tier,
       boss_card_ids: d.boss_card_ids ?? getBossCardIdsForDeck(d.id),
@@ -337,6 +351,37 @@ export async function fetchPublicDecks(options?: {
   } catch {
     return getLocalOfficialDecks(options);
   }
+}
+
+/** Fetch public decks with cursor-based pagination */
+export async function fetchPublicDecksPaginated(options?: {
+  pageSize?: number;
+  search?: string;
+  orderBy?: 'view_count' | 'updated_at' | 'like_count';
+  archetype?: string;
+  source?: 'user' | 'official' | 'all';
+  color?: string;
+  cursor?: string;
+}): Promise<PaginatedDecks> {
+  const pageSize = options?.pageSize ?? 20;
+  const decks = await fetchPublicDecks({
+    limit: pageSize,
+    search: options?.search,
+    orderBy: options?.orderBy,
+    archetype: options?.archetype,
+    source: options?.source,
+    color: options?.color,
+  });
+
+  const hasMore = decks.length > pageSize;
+  const limited = decks.slice(0, pageSize);
+  const lastDeck = limited[limited.length - 1];
+
+  return {
+    decks: limited,
+    nextCursor: hasMore && lastDeck ? lastDeck.id : null,
+    hasMore,
+  };
 }
 
 /** Fetch trending decks via RPC (time-decayed popularity score) */
