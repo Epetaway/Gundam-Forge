@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+
+const repoName = 'Gundam-Forge'; // Change if your repo name is different
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -18,6 +20,10 @@ const nextConfig = {
       },
     ],
   },
+  output: 'export',
+  basePath: `/${repoName}`,
+  assetPrefix: `/${repoName}/`,
+  trailingSlash: true,
 };
 
 export default nextConfig;

@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "qa": "npm run lint && npm run build",
     "build": "NAPI_RS_NATIVE_LIBRARY_PATH=$PWD/lib/tailwind-oxide-fallback.cjs next build",
+    "export": "next export",
     "start": "next start"
   },
   "dependencies": {

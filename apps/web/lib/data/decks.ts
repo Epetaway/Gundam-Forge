@@ -18,7 +18,7 @@ export interface DeckRecord {
   entries: DeckEntry[];
 }
 
-const deckCatalog: DeckRecord[] = [
+export const deckCatalog: DeckRecord[] = [
   {
     id: 'blue-white-midrange',
     name: 'Blue / White Midrange',
