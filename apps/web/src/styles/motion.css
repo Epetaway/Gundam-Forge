@@ -97,7 +97,7 @@
 }
 
 .gf-animate-qty-pulse {
-  animation: gf-qty-pulse 300ms var(--gf-ease-bounce);
+  animation: gf-qty-pulse 300ms var(--gf-ease-out);
 }
 
 .gf-animate-spin {
