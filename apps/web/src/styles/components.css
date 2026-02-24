@@ -442,15 +442,15 @@
   height: 100%;
   border-radius: var(--gf-radius-full);
   transition: width 300ms var(--gf-ease-default);
-  background: linear-gradient(90deg, var(--gf-blue-500), var(--gf-blue-600));
+  background: var(--gf-blue-500);
 }
 
 .gf-progress-fill[data-status="complete"] {
-  background: linear-gradient(90deg, var(--gf-success), var(--gf-success-hover));
+  background: var(--gf-success);
 }
 
 .gf-progress-fill[data-status="warning"] {
-  background: linear-gradient(90deg, var(--gf-warning), var(--gf-warning-hover));
+  background: var(--gf-warning);
 }
 
 /* ----------------------------------------------------------
