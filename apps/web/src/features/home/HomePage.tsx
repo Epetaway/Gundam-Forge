@@ -127,26 +127,21 @@ export function HomePage() {
 
           {loading ? (
             <div className="flex gap-4 overflow-hidden">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="w-[220px] flex-shrink-0 rounded-xl bg-gf-border/20 animate-pulse h-[200px]" />
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="w-[150px] flex-shrink-0 rounded-xl bg-gf-border/20 animate-pulse" style={{ aspectRatio: '5/7' }} />
               ))}
             </div>
           ) : decks.length > 0 ? (
             <div className="gf-deck-swiper">
               <Swiper
                 modules={[Navigation, FreeMode]}
-                spaceBetween={16}
+                spaceBetween={12}
                 slidesPerView="auto"
                 freeMode={{ enabled: true, sticky: false }}
                 navigation
-                breakpoints={{
-                  640:  { slidesPerView: 2 },
-                  768:  { slidesPerView: 3 },
-                  1024: { slidesPerView: 4 },
-                }}
               >
                 {decks.map((deck) => (
-                  <SwiperSlide key={deck.id} style={{ width: 'auto' }}>
+                  <SwiperSlide key={deck.id} style={{ width: '150px' }}>
                     <TopDeckCard deck={deck} />
                   </SwiperSlide>
                 ))}

@@ -1,14 +1,8 @@
 import { Link } from 'react-router-dom';
 import type { PublicDeckRecord } from '../../services/deckService';
-
-const COLOR_VALUE: Record<string, string> = {
-  Blue: 'var(--gf-card-blue)',
-  Red: 'var(--gf-card-red)',
-  Green: 'var(--gf-card-green)',
-  White: '#D1D5DB',
-  Purple: 'var(--gf-card-purple)',
-  Colorless: 'var(--gf-gray-400)',
-};
+import { useCardsStore } from '../../features/deckbuilder/cardsStore';
+import { resolveCardImage } from '../../utils/resolveCardImage';
+import { TIER_LABELS, TIER_COLORS, type MetaTier } from '../../data/metaTierList';
 
 const COLOR_DOT: Record<string, string> = {
   Blue: 'bg-blue-500',
@@ -19,103 +13,118 @@ const COLOR_DOT: Record<string, string> = {
   Colorless: 'bg-gray-400',
 };
 
-function buildColorBar(colors: string[]): string {
-  if (colors.length === 0) return 'var(--gf-gray-300)';
-  if (colors.length === 1) return COLOR_VALUE[colors[0]] || 'var(--gf-gray-300)';
-  const stops = colors.map((c, i) => {
-    const val = COLOR_VALUE[c] || 'var(--gf-gray-300)';
-    const pct = Math.round((i / (colors.length - 1)) * 100);
-    return `${val} ${pct}%`;
-  });
-  return `linear-gradient(90deg, ${stops.join(', ')})`;
-}
+const COLOR_VALUE: Record<string, string> = {
+  Blue: '#3B82F6',
+  Red: '#EF4444',
+  Green: '#22C55E',
+  White: '#D1D5DB',
+  Purple: '#A855F7',
+  Colorless: '#9CA3AF',
+};
 
 interface TopDeckCardProps {
   deck: PublicDeckRecord;
 }
 
 export function TopDeckCard({ deck }: TopDeckCardProps) {
-  const author =
-    deck.source === 'official'
-      ? 'Official GCG'
-      : deck.profiles?.display_name || deck.profiles?.username || 'Anonymous';
+  const catalogCards = useCardsStore((s) => s.cards);
   const colors: string[] = deck.colors ?? [];
+
+  // Resolve the first boss card image from the card database
+  let heroSrc: string | undefined;
+  let heroName: string | undefined;
+  if (deck.boss_card_ids) {
+    for (const cardId of deck.boss_card_ids) {
+      const card = catalogCards.find((c) => c.id === cardId);
+      if (card) {
+        const src = resolveCardImage(card);
+        if (src) {
+          heroSrc = src;
+          heroName = card.name;
+          break;
+        }
+      }
+    }
+  }
+
+  // Build a subtle gradient fallback from the deck colors
+  const gradientBg = colors.length >= 2
+    ? `linear-gradient(135deg, ${COLOR_VALUE[colors[0]] ?? '#6B7280'}55, ${COLOR_VALUE[colors[1]] ?? '#6B7280'}55)`
+    : colors.length === 1
+      ? `linear-gradient(135deg, ${COLOR_VALUE[colors[0]] ?? '#6B7280'}55, ${COLOR_VALUE[colors[0]] ?? '#6B7280'}22)`
+      : 'linear-gradient(135deg, #6B728055, #6B728022)';
 
   return (
     <Link
       to={`/decks/${deck.id}`}
-      className="group block w-[220px] rounded-xl bg-white border border-gf-border overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] active:scale-[0.98]"
+      className="group block"
     >
-      {/* Color identity bar */}
-      <div
-        className="h-1.5 w-full"
-        style={{ background: buildColorBar(colors) }}
-      />
-
-      {/* Card content */}
-      <div className="p-4">
-        {/* Name + Official badge */}
-        <div className="flex items-start gap-1.5 mb-1.5">
-          {deck.source === 'official' && (
-            <svg className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-            </svg>
+      <div className="gf-card-tile bg-white">
+        <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
+          {/* Boss card art or gradient fallback */}
+          {heroSrc ? (
+            <img
+              src={heroSrc}
+              alt={heroName ?? deck.name}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ background: gradientBg }}
+            >
+              <svg className="h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M12 8v8M8 12h8" strokeLinecap="round" />
+              </svg>
+            </div>
           )}
-          <h3 className="text-sm font-bold text-gf-text leading-snug line-clamp-2 group-hover:text-gf-blue transition-colors">
-            {deck.name}
-          </h3>
-        </div>
 
-        {/* Archetype pill */}
+          {/* Bottom gradient overlay for text */}
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+          {/* Tier badge */}
+          {deck.meta_tier && (
+            <span className={`absolute top-1.5 right-1.5 z-[3] flex h-5 min-w-[20px] items-center justify-center rounded px-1 text-[9px] font-bold border ${TIER_COLORS[deck.meta_tier as MetaTier]}`}>
+              {TIER_LABELS[deck.meta_tier as MetaTier]}
+            </span>
+          )}
+
+          {/* Official badge */}
+          {deck.source === 'official' && (
+            <span className="absolute top-1.5 left-1.5 z-[3] flex h-5 items-center gap-0.5 rounded bg-yellow-400/90 px-1.5 text-[8px] font-bold text-yellow-900">
+              <svg className="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+              </svg>
+              GCG
+            </span>
+          )}
+
+          {/* Bottom text overlay */}
+          <div className="absolute inset-x-0 bottom-0 z-[2] p-2.5">
+            {/* Color dots */}
+            <div className="flex items-center gap-1 mb-1">
+              {colors.map((c) => (
+                <span
+                  key={c}
+                  className={`h-2 w-2 rounded-full border border-white/40 ${COLOR_DOT[c] || 'bg-gray-400'}`}
+                />
+              ))}
+            </div>
+            <h3 className="text-[11px] font-bold text-white leading-tight line-clamp-2 drop-shadow-sm">
+              {deck.name}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Below-tile info */}
+      <div className="mt-1.5">
         {deck.archetype && (
-          <span className="inline-block rounded-full bg-gf-blue/5 border border-gf-blue/20 px-2 py-0.5 text-[9px] font-medium text-gf-blue mb-3">
-            {deck.archetype}
-          </span>
+          <p className="truncate text-[9px] text-gf-text-muted">{deck.archetype}</p>
         )}
-        {!deck.archetype && <div className="mb-3" />}
-
-        {/* Separator */}
-        <div className="border-t border-gf-border mb-3" />
-
-        {/* Author */}
-        <div className="flex items-center gap-1.5 mb-2">
-          <svg className="h-3 w-3 text-gf-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <span className="text-[11px] text-gf-text-secondary truncate">{author}</span>
-        </div>
-
-        {/* Stats row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Likes */}
-            <span className="flex items-center gap-1 text-[10px] text-gf-text-muted">
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {deck.like_count ?? 0}
-            </span>
-            {/* Views */}
-            <span className="flex items-center gap-1 text-[10px] text-gf-text-muted">
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              {deck.view_count ?? 0}
-            </span>
-          </div>
-
-          {/* Color dots */}
-          <div className="flex items-center gap-1">
-            {colors.map((c) => (
-              <span
-                key={c}
-                className={`h-2.5 w-2.5 rounded-full border border-white/50 ${COLOR_DOT[c] || 'bg-gray-400'}`}
-              />
-            ))}
-          </div>
-        </div>
       </div>
     </Link>
   );
