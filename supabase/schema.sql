@@ -80,6 +80,19 @@ create trigger on_auth_user_created
   for each row
   execute function public.handle_new_user();
 
+-- 3b. Archetypes (normalized meta archetype reference)
+create table if not exists public.archetypes (
+  id          text primary key,
+  name        text not null,
+  colors      text[] not null,
+  tier        smallint check (tier between 1 and 4),
+  description text,
+  key_cards   text[] not null default '{}',
+  highlights  text,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
 -- 4. Decks (user-owned and official)
 create table if not exists public.decks (
   id          uuid primary key default gen_random_uuid(),
