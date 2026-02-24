@@ -1,3 +1,9 @@
+// Required for static export: generateStaticParams
+import { deckCatalog } from '@/lib/data/decks';
+
+export function generateStaticParams() {
+  return deckCatalog.map(deck => ({ id: deck.id }));
+}
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
