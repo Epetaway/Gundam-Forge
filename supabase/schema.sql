@@ -459,6 +459,22 @@ create table if not exists public.deck_tags (
 create index if not exists idx_deck_tags_tag on public.deck_tags(tag_id);
 
 -- ============================================================
+-- 10. Comments (on public decks)
+-- ============================================================
+create table if not exists public.comments (
+  id          uuid primary key default gen_random_uuid(),
+  deck_id     uuid not null references public.decks(id) on delete cascade,
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  body        text not null check (length(body) between 1 and 2000),
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+create index if not exists idx_comments_deck on public.comments(deck_id);
+create index if not exists idx_comments_user on public.comments(user_id);
+create index if not exists idx_comments_created on public.comments(created_at desc);
+
+-- ============================================================
 -- Increment view count (called via RPC from the client)
 -- ============================================================
 create or replace function public.increment_deck_view(deck_id uuid)
