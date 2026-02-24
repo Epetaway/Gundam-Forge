@@ -1,0 +1,661 @@
+/* ============================================================
+   GUNDAM FORGE — Component Base Styles
+   ============================================================
+   Clean, minimal Tailwind v4 / Catalyst-inspired patterns.
+   Ring-based borders, subtle shadows, generous radius.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. Panels
+   ---------------------------------------------------------- */
+.gf-panel {
+  background: var(--gf-surface);
+  border: none;
+  border-radius: var(--gf-radius-xl);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), var(--gf-shadow-xs);
+}
+
+.gf-panel-flat {
+  background: var(--gf-surface);
+  border: none;
+  border-radius: var(--gf-radius-lg);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.gf-panel-inset {
+  background: var(--gf-surface-inset);
+  border: none;
+  border-radius: var(--gf-radius-lg);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ----------------------------------------------------------
+   2. Buttons
+   ---------------------------------------------------------- */
+.gf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gf-space-1-5);
+  font-family: var(--gf-font-sans);
+  font-weight: var(--gf-weight-medium);
+  border-radius: var(--gf-radius-lg);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--gf-duration-fast) var(--gf-ease-default),
+    box-shadow var(--gf-duration-fast) var(--gf-ease-default),
+    color var(--gf-duration-fast) var(--gf-ease-default),
+    transform var(--gf-duration-instant) var(--gf-ease-default);
+}
+
+.gf-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.gf-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Size: sm */
+.gf-btn-sm {
+  height: 32px;
+  padding: 0 var(--gf-space-3);
+  font-size: var(--gf-text-sm);
+}
+
+/* Size: md (default) */
+.gf-btn-md {
+  height: 36px;
+  padding: 0 var(--gf-space-4);
+  font-size: var(--gf-text-base);
+}
+
+/* Size: lg */
+.gf-btn-lg {
+  height: 44px;
+  padding: 0 var(--gf-space-6);
+  font-size: var(--gf-text-md);
+}
+
+/* Variant: primary */
+.gf-btn-primary {
+  background: var(--gf-blue-500);
+  color: var(--gf-text-inverse);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), var(--gf-shadow-xs);
+}
+
+.gf-btn-primary:hover:not(:disabled) {
+  background: var(--gf-blue-600);
+}
+
+/* Variant: secondary */
+.gf-btn-secondary {
+  background: var(--gf-surface);
+  color: var(--gf-text-primary);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), var(--gf-shadow-xs);
+}
+
+.gf-btn-secondary:hover:not(:disabled) {
+  background: var(--gf-gray-50);
+}
+
+/* Variant: ghost */
+.gf-btn-ghost {
+  background: transparent;
+  color: var(--gf-text-secondary);
+}
+
+.gf-btn-ghost:hover:not(:disabled) {
+  background: var(--gf-gray-50);
+  color: var(--gf-text-primary);
+}
+
+/* Variant: destructive */
+.gf-btn-destructive {
+  background: transparent;
+  color: var(--gf-error);
+  box-shadow: 0 0 0 1px var(--gf-error);
+}
+
+.gf-btn-destructive:hover:not(:disabled) {
+  background: var(--gf-error-bg);
+}
+
+/* ----------------------------------------------------------
+   3. Card Tiles
+   ---------------------------------------------------------- */
+.gf-card-tile {
+  position: relative;
+  border-radius: var(--gf-radius-lg);
+  border: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition:
+    transform var(--gf-duration-normal) var(--gf-ease-default),
+    box-shadow var(--gf-duration-normal) var(--gf-ease-default);
+  will-change: transform;
+}
+
+.gf-card-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), var(--gf-shadow-card-hover);
+}
+
+.gf-card-tile:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), var(--gf-shadow-xs);
+  transition-duration: var(--gf-duration-fast);
+}
+
+/* Specular light sweep */
+.gf-card-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform var(--gf-duration-slower) var(--gf-ease-default);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gf-card-tile:hover::after {
+  transform: translateX(100%);
+}
+
+.gf-card-tile[data-selected="true"] {
+  box-shadow: 0 0 0 2px var(--gf-blue-500), var(--gf-shadow-sm);
+}
+
+/* ----------------------------------------------------------
+   4. Quick-add Button
+   ---------------------------------------------------------- */
+.gf-quick-add {
+  position: absolute;
+  bottom: var(--gf-space-2);
+  right: var(--gf-space-2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--gf-radius-full);
+  background: var(--gf-blue-500);
+  color: var(--gf-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity var(--gf-duration-normal) var(--gf-ease-default),
+    transform var(--gf-duration-normal) var(--gf-ease-bounce);
+  cursor: pointer;
+  border: none;
+  z-index: 3;
+  box-shadow: var(--gf-shadow-md);
+}
+
+.gf-card-tile:hover .gf-quick-add {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gf-quick-add:hover {
+  background: var(--gf-blue-600);
+}
+
+.gf-quick-add:active {
+  transform: scale(0.9);
+}
+
+/* ----------------------------------------------------------
+   4b. Floating Action Rail
+   ---------------------------------------------------------- */
+.gf-action-rail {
+  position: absolute;
+  top: 50%;
+  right: var(--gf-space-1-5);
+  transform: translateY(-50%) translateX(4px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transition:
+    opacity var(--gf-duration-normal) var(--gf-ease-default),
+    transform var(--gf-duration-normal) var(--gf-ease-default);
+  z-index: 3;
+}
+
+.gf-card-tile:hover .gf-action-rail {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.gf-action-rail-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--gf-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color var(--gf-duration-fast) var(--gf-ease-default),
+    transform var(--gf-duration-fast) var(--gf-ease-default);
+  box-shadow: var(--gf-shadow-sm);
+}
+
+.gf-action-rail-btn:active {
+  transform: scale(0.9);
+}
+
+.gf-action-rail-btn.gf-rail-add {
+  background: #22c55e;
+  color: white;
+}
+
+.gf-action-rail-btn.gf-rail-add:hover {
+  background: #16a34a;
+}
+
+.gf-action-rail-btn.gf-rail-remove {
+  background: #ef4444;
+  color: white;
+}
+
+.gf-action-rail-btn.gf-rail-remove:hover {
+  background: #dc2626;
+}
+
+.gf-action-rail-btn.gf-rail-inspect {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--gf-gray-700);
+  backdrop-filter: blur(4px);
+}
+
+.gf-action-rail-btn.gf-rail-inspect:hover {
+  background: white;
+  color: var(--gf-text-primary);
+}
+
+/* Type badge on card tile */
+.gf-card-type-badge {
+  position: absolute;
+  top: var(--gf-space-1-5);
+  left: var(--gf-space-1-5);
+  padding: 2px 8px;
+  border-radius: var(--gf-radius-sm);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 16px;
+  z-index: 3;
+  box-shadow: var(--gf-shadow-xs);
+}
+
+.gf-card-type-badge[data-type="Unit"] {
+  background: var(--gf-blue-500);
+  color: white;
+}
+
+.gf-card-type-badge[data-type="Pilot"] {
+  background: #8b5cf6;
+  color: white;
+}
+
+.gf-card-type-badge[data-type="Command"] {
+  background: #f59e0b;
+  color: white;
+}
+
+.gf-card-type-badge[data-type="Base"] {
+  background: #6b7280;
+  color: white;
+}
+
+.gf-card-type-badge[data-type="Resource"] {
+  background: #10b981;
+  color: white;
+}
+
+/* ----------------------------------------------------------
+   4c. Inspection Modal
+   ---------------------------------------------------------- */
+.gf-inspect-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: calc(var(--gf-z-modal) + 1);
+  width: calc(100vw - 48px);
+  max-width: 960px;
+  max-height: calc(100vh - 48px);
+  background: var(--gf-surface);
+  border-radius: var(--gf-radius-2xl);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), var(--gf-shadow-xl);
+  overflow: hidden;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.gf-inspect-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--gf-border);
+  background: var(--gf-gray-50);
+}
+
+.gf-inspect-tab {
+  padding: var(--gf-space-3) var(--gf-space-4);
+  font-size: var(--gf-text-sm);
+  font-weight: var(--gf-weight-medium);
+  color: var(--gf-text-secondary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition:
+    color var(--gf-duration-fast) var(--gf-ease-default),
+    border-color var(--gf-duration-fast) var(--gf-ease-default);
+}
+
+.gf-inspect-tab:hover {
+  color: var(--gf-text-primary);
+}
+
+.gf-inspect-tab[data-active="true"] {
+  color: var(--gf-blue-500);
+  border-bottom-color: var(--gf-blue-500);
+  background: var(--gf-surface);
+}
+
+/* Qty controls */
+.gf-qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--gf-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color var(--gf-duration-fast) var(--gf-ease-default),
+    transform var(--gf-duration-fast) var(--gf-ease-default);
+}
+
+.gf-qty-btn:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.gf-qty-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gf-qty-btn-add {
+  background: #22c55e;
+  color: white;
+}
+
+.gf-qty-btn-add:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.gf-qty-btn-remove {
+  background: #ef4444;
+  color: white;
+}
+
+.gf-qty-btn-remove:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+/* ----------------------------------------------------------
+   5. Deck Rows
+   ---------------------------------------------------------- */
+.gf-deck-row {
+  position: relative;
+  border-radius: var(--gf-radius-md);
+  transition:
+    background-color var(--gf-duration-normal) var(--gf-ease-default);
+}
+
+.gf-deck-row:hover {
+  background-color: var(--gf-gray-50);
+}
+
+.gf-deck-row[data-selected="true"] {
+  background-color: var(--gf-blue-50);
+}
+
+/* ----------------------------------------------------------
+   6. Progress Bar
+   ---------------------------------------------------------- */
+.gf-progress-bar {
+  height: 6px;
+  border-radius: var(--gf-radius-full);
+  background: var(--gf-gray-200);
+  overflow: hidden;
+}
+
+.gf-progress-fill {
+  height: 100%;
+  border-radius: var(--gf-radius-full);
+  transition: width 300ms var(--gf-ease-default);
+  background: linear-gradient(90deg, var(--gf-blue-500), var(--gf-blue-600));
+}
+
+.gf-progress-fill[data-status="complete"] {
+  background: linear-gradient(90deg, var(--gf-success), #059669);
+}
+
+.gf-progress-fill[data-status="warning"] {
+  background: linear-gradient(90deg, var(--gf-warning), #D97706);
+}
+
+/* ----------------------------------------------------------
+   7. Status Indicators (formerly LEDs)
+   ---------------------------------------------------------- */
+.gf-led {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--gf-radius-full);
+  flex-shrink: 0;
+}
+
+.gf-led[data-status="valid"] {
+  background: var(--gf-success);
+}
+
+.gf-led[data-status="warning"] {
+  background: var(--gf-warning);
+}
+
+.gf-led[data-status="error"] {
+  background: var(--gf-error);
+}
+
+/* ----------------------------------------------------------
+   8. Autosave Indicator
+   ---------------------------------------------------------- */
+.gf-autosave {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gf-space-1-5);
+  font-size: var(--gf-text-xs);
+  color: var(--gf-text-muted);
+  transition: color var(--gf-duration-normal) var(--gf-ease-default);
+}
+
+.gf-autosave[data-status="saving"] {
+  color: var(--gf-blue-500);
+}
+
+.gf-autosave[data-status="saved"] {
+  color: var(--gf-success);
+}
+
+.gf-autosave-spinner {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--gf-border);
+  border-top-color: var(--gf-blue-500);
+  border-radius: var(--gf-radius-full);
+}
+
+/* ----------------------------------------------------------
+   9. Section Collapse
+   ---------------------------------------------------------- */
+.gf-section-body {
+  overflow: hidden;
+  transition:
+    max-height var(--gf-duration-slow) var(--gf-ease-default),
+    opacity var(--gf-duration-normal) var(--gf-ease-default);
+}
+
+.gf-section-body[data-collapsed="true"] {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* ----------------------------------------------------------
+   10. Modal
+   ---------------------------------------------------------- */
+.gf-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: var(--gf-z-modal);
+}
+
+.gf-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: calc(var(--gf-z-modal) + 1);
+  width: calc(100vw - 64px);
+  max-height: calc(100vh - 64px);
+  background: var(--gf-surface);
+  border-radius: var(--gf-radius-xl);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), var(--gf-shadow-xl);
+  overflow: hidden;
+  outline: none;
+}
+
+.gf-modal-sm { max-width: 480px; }
+.gf-modal-md { max-width: 640px; }
+.gf-modal-lg { max-width: 900px; }
+
+/* Modal header — clean, sans-serif */
+.gf-inspection-header {
+  display: flex;
+  align-items: center;
+  gap: var(--gf-space-3);
+  padding: var(--gf-space-4) var(--gf-space-6);
+  border-bottom: 1px solid var(--gf-border);
+  font-family: var(--gf-font-sans);
+  font-size: var(--gf-text-md);
+  font-weight: var(--gf-weight-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--gf-text-primary);
+}
+
+/* ----------------------------------------------------------
+   11. Navigation
+   ---------------------------------------------------------- */
+.gf-nav-link {
+  position: relative;
+  padding: var(--gf-space-2) var(--gf-space-4);
+  font-size: var(--gf-text-sm);
+  font-weight: var(--gf-weight-medium);
+  color: var(--gf-text-secondary);
+  transition: color var(--gf-duration-normal) var(--gf-ease-default);
+  border-radius: var(--gf-radius-lg);
+  text-decoration: none;
+}
+
+.gf-nav-link:hover {
+  color: var(--gf-text-primary);
+}
+
+.gf-nav-link[data-active="true"] {
+  color: var(--gf-blue-500);
+  font-weight: var(--gf-weight-semibold);
+}
+
+/* ----------------------------------------------------------
+   12. Scrollbar
+   ---------------------------------------------------------- */
+.gf-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.gf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gf-scroll::-webkit-scrollbar-thumb {
+  background: var(--gf-gray-300);
+  border-radius: var(--gf-radius-full);
+}
+
+.gf-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--gf-gray-400);
+}
+
+/* ----------------------------------------------------------
+   13. Focus Visible (Accessibility)
+   ---------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--gf-blue-500);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------
+   14. Transition Utility
+   ---------------------------------------------------------- */
+.gf-transition {
+  transition-property: transform, opacity, box-shadow, background-color;
+  transition-duration: var(--gf-duration-normal);
+  transition-timing-function: var(--gf-ease-default);
+}
+
+/* ----------------------------------------------------------
+   15. Skeleton Shimmer
+   ---------------------------------------------------------- */
+.gf-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--gf-gray-100) 25%,
+    var(--gf-gray-50) 50%,
+    var(--gf-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--gf-radius-md);
+}

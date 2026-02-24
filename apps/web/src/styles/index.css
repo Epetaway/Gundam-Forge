@@ -1,0 +1,36 @@
+/* ============================================================
+   GUNDAM FORGE — Master Stylesheet
+   ============================================================
+   All @import statements must come first (CSS spec).
+   Tailwind directives follow. Local rules last.
+   ============================================================ */
+
+@import './tokens.css';
+@import './layout.css';
+@import './components.css';
+@import './motion.css';
+@import './scrollbar.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global Defaults ── */
+body {
+  margin: 0;
+  background-color: var(--gf-bg);
+  color: var(--gf-text-primary);
+  font-family: var(--gf-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Legacy compat: .fade-in used in existing components */
+.fade-in {
+  animation: gf-fade-in 0.3s ease-in-out;
+}

@@ -39,7 +39,7 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gf-light gf-blueprint px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gf-gray-50 px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
@@ -53,8 +53,7 @@ export function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gf-border shadow-sm p-6 space-y-4">
-          <div className="gf-accent-line mb-4" />
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-[0_0_0_1px_rgba(0,0,0,0.05)] shadow-sm p-6 space-y-4">
 
           {error && (
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
@@ -76,7 +75,7 @@ export function RegisterPage() {
           ) : (
             <>
               <div>
-                <label className="block text-[10px] font-medium text-gf-text-muted uppercase tracking-wide mb-1.5">
+                <label className="block text-sm font-medium text-gf-gray-700 mb-1.5">
                   Email
                 </label>
                 <input
@@ -84,13 +83,13 @@ export function RegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2.5 px-3 text-sm text-gf-text outline-none focus:border-gf-blue focus:bg-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+                  className="w-full rounded-lg bg-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
                   placeholder="pilot@gundam-forge.app"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-medium text-gf-text-muted uppercase tracking-wide mb-1.5">
+                <label className="block text-sm font-medium text-gf-gray-700 mb-1.5">
                   Password
                 </label>
                 <input
@@ -98,13 +97,13 @@ export function RegisterPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2.5 px-3 text-sm text-gf-text outline-none focus:border-gf-blue focus:bg-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+                  className="w-full rounded-lg bg-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
                   placeholder="Min 6 characters"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-medium text-gf-text-muted uppercase tracking-wide mb-1.5">
+                <label className="block text-sm font-medium text-gf-gray-700 mb-1.5">
                   Confirm Password
                 </label>
                 <input
@@ -112,7 +111,7 @@ export function RegisterPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-lg border border-gf-border bg-gf-light py-2.5 px-3 text-sm text-gf-text outline-none focus:border-gf-blue focus:bg-white focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+                  className="w-full rounded-lg bg-white py-2.5 px-3 text-sm text-gf-text outline-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] focus:shadow-[0_0_0_2px_var(--gf-blue-500)] transition-shadow placeholder:text-gf-text-muted"
                   placeholder="Confirm password"
                 />
               </div>
@@ -120,7 +119,7 @@ export function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="gf-btn gf-btn-primary gf-btn-cut w-full py-2.5 text-sm disabled:opacity-60"
+                className="gf-btn gf-btn-primary w-full py-2.5 text-sm disabled:opacity-60"
               >
                 {loading ? 'Creating account...' : 'Create Account'}
               </button>

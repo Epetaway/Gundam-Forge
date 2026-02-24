@@ -382,7 +382,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
       {/* Right Panel - Card Detail + Game Log */}
       <div className="w-72 flex-shrink-0 border-l border-gf-border bg-white overflow-hidden flex flex-col">
         {selectedDef ? (
-          <div className="p-4 border-b border-gf-border overflow-y-auto custom-scrollbar">
+          <div className="p-4 border-b border-gf-border overflow-y-auto gf-scroll">
             <div className="relative overflow-hidden rounded-xl border border-gf-border shadow-sm">
               <img
                 src={resolveCardImage(selectedDef)}
@@ -441,7 +441,7 @@ export function SimulatorPanel({ cards, deckEntries, validation }: SimulatorPane
           <div className="px-4 py-2 border-b border-gf-border">
             <h4 className="text-xs font-bold text-gf-text uppercase tracking-wider">Game Log</h4>
           </div>
-          <div className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-4 py-2 gf-scroll">
             {gameState.log.map((entry, i) => (
               <p key={i} className="text-[11px] text-gf-text-secondary leading-relaxed py-0.5 border-b border-gf-border/30 last:border-0">
                 {entry}

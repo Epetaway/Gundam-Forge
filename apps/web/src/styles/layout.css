@@ -1,0 +1,103 @@
+/* ============================================================
+   GUNDAM FORGE — Layout System
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. Container Widths
+   ---------------------------------------------------------- */
+.gf-container {
+  max-width: var(--gf-content-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gf-space-6);
+  padding-right: var(--gf-space-6);
+}
+
+.gf-container-wide {
+  max-width: var(--gf-content-wide);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gf-space-6);
+  padding-right: var(--gf-space-6);
+}
+
+.gf-container-full {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ----------------------------------------------------------
+   2. Forge 3-Column Layout
+   ---------------------------------------------------------- */
+.gf-forge-layout {
+  display: grid;
+  grid-template-columns: var(--gf-sidebar-width) 1fr var(--gf-detail-width);
+  height: calc(100vh - var(--gf-header-height));
+  overflow: hidden;
+}
+
+/* Tablet: hide detail dock */
+@media (max-width: 1279px) {
+  .gf-forge-layout {
+    grid-template-columns: var(--gf-sidebar-width) 1fr;
+  }
+}
+
+/* Small tablet: collapse catalog */
+@media (max-width: 1023px) {
+  .gf-forge-layout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+/* Mobile: single column */
+@media (max-width: 767px) {
+  .gf-forge-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------------------------
+   3. Cards Page 2-Column Layout
+   ---------------------------------------------------------- */
+.gf-cards-layout {
+  display: grid;
+  grid-template-columns: var(--gf-sidebar-width) 1fr;
+  height: calc(100vh - var(--gf-header-height));
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .gf-cards-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------------------------
+   4. Forge Column Panels
+   ---------------------------------------------------------- */
+.gf-forge-column {
+  height: 100%;
+  overflow-y: auto;
+  border-right: var(--gf-border-thin) solid var(--gf-border);
+}
+
+.gf-forge-column:last-child {
+  border-right: none;
+}
+
+/* ----------------------------------------------------------
+   5. Transparent Header (Homepage Hero Overlay)
+   ---------------------------------------------------------- */
+.gf-header-transparent {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-bottom: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+

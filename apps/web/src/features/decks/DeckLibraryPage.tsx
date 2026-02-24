@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import {
@@ -21,6 +21,7 @@ export function DeckLibraryPage() {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const supabaseConfigured =
     !!import.meta.env.VITE_SUPABASE_URL &&
@@ -45,6 +46,16 @@ export function DeckLibraryPage() {
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);
+
+  const filteredDecks = useMemo(() => {
+    if (!searchQuery.trim()) return decks;
+    const q = searchQuery.toLowerCase();
+    return decks.filter(
+      (d) =>
+        d.name.toLowerCase().includes(q) ||
+        (d.archetype && d.archetype.toLowerCase().includes(q))
+    );
+  }, [decks, searchQuery]);
 
   const handleCreate = async () => {
     setCreatingDeck(true);
@@ -123,7 +134,7 @@ export function DeckLibraryPage() {
             You're running in local mode. Your current deck is saved in browser storage.
           </p>
           <div className="flex justify-center gap-2">
-            <Link to="/builder" className="gf-btn gf-btn-primary gf-btn-cut text-xs py-2 px-4">
+            <Link to="/builder" className="gf-btn gf-btn-primarytext-xs py-2 px-4">
               Open Deck Builder
             </Link>
             {!authUser && supabaseConfigured === false && (
@@ -144,13 +155,14 @@ export function DeckLibraryPage() {
         <div>
           <h1 className="font-heading text-xl font-bold text-gf-text">My Decks</h1>
           <p className="text-xs text-gf-text-secondary mt-0.5">
-            {decks.length} deck{decks.length !== 1 ? 's' : ''}
+            {filteredDecks.length} deck{filteredDecks.length !== 1 ? 's' : ''}
+            {searchQuery && ` matching "${searchQuery}"`}
           </p>
         </div>
         <button
           onClick={handleCreate}
           disabled={creatingDeck}
-          className="gf-btn gf-btn-primary gf-btn-cut text-sm py-2 px-4 disabled:opacity-60"
+          className="gf-btn gf-btn-primarytext-sm py-2 px-4 disabled:opacity-60"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path d="M12 5v14M5 12h14" strokeLinecap="round" />
@@ -158,6 +170,32 @@ export function DeckLibraryPage() {
           {creatingDeck ? 'Creating...' : 'New Deck'}
         </button>
       </div>
+
+      {/* Search */}
+      {decks.length > 0 && (
+        <div className="relative max-w-sm mb-4">
+          <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gf-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" strokeLinecap="round" />
+          </svg>
+          <input
+            className="w-full rounded-lg border border-gf-border bg-white py-2 pl-9 pr-9 text-sm text-gf-text placeholder-gf-text-muted outline-none focus:border-gf-blue focus:ring-1 focus:ring-gf-blue/30 transition-colors"
+            placeholder="Search your decks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-gf-text-muted hover:bg-gray-200 hover:text-gf-text transition-colors"
+            >
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Error */}
       {error && (
@@ -176,7 +214,7 @@ export function DeckLibraryPage() {
         <div className="flex items-center justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gf-blue border-t-transparent" />
         </div>
-      ) : decks.length === 0 ? (
+      ) : filteredDecks.length === 0 && !searchQuery ? (
         /* Empty state */
         <div className="rounded-xl border border-gf-border bg-white p-12 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gf-light mx-auto mb-4">
@@ -191,15 +229,25 @@ export function DeckLibraryPage() {
           <button
             onClick={handleCreate}
             disabled={creatingDeck}
-            className="gf-btn gf-btn-primary gf-btn-cut text-sm py-2 px-4"
+            className="gf-btn gf-btn-primarytext-sm py-2 px-4"
           >
             Create First Deck
+          </button>
+        </div>
+      ) : filteredDecks.length === 0 && searchQuery ? (
+        <div className="rounded-xl border border-gf-border bg-white p-8 text-center">
+          <p className="text-sm text-gf-text-secondary">No decks match your search.</p>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="mt-2 text-xs font-medium text-gf-blue hover:underline"
+          >
+            Clear search
           </button>
         </div>
       ) : (
         /* Deck Grid */
         <div className="grid gap-3">
-          {decks.map((deck) => (
+          {filteredDecks.map((deck) => (
             <div
               key={deck.id}
               className="group rounded-xl border border-gf-border bg-white hover:border-gf-blue/40 hover:shadow-sm transition-all"
@@ -236,7 +284,14 @@ export function DeckLibraryPage() {
                     </form>
                   ) : (
                     <>
-                      <h3 className="text-sm font-bold text-gf-text truncate">{deck.name}</h3>
+                      <h3 className="text-sm font-bold text-gf-text truncate">
+                        {deck.name}
+                        {deck.archetype && (
+                          <span className="ml-2 rounded-full bg-gf-blue/5 border border-gf-blue/20 px-2 py-0.5 text-[9px] font-medium text-gf-blue">
+                            {deck.archetype}
+                          </span>
+                        )}
+                      </h3>
                       <p className="text-[10px] text-gf-text-muted mt-0.5">
                         Updated {formatDate(deck.updated_at)}
                         {deck.is_public && (
@@ -327,7 +382,7 @@ export function DeckLibraryPage() {
                     </button>
                     <button
                       onClick={() => handleDelete(deck.id)}
-                      className="gf-btn gf-btn-danger text-xs py-1 px-3"
+                      className="gf-btn gf-btn-destructive text-xs py-1 px-3"
                     >
                       Delete
                     </button>

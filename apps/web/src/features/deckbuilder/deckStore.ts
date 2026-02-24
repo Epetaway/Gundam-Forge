@@ -5,6 +5,7 @@ export const DECK_STORAGE_KEY = 'gundam-forge:deck:v1';
 export interface DeckEntry {
   cardId: string;
   qty: number;
+  isBoss?: boolean;
 }
 
 interface DeckState {
@@ -12,13 +13,14 @@ interface DeckState {
   hydratedFromStorage: boolean;
   addCard: (cardId: string) => void;
   removeCard: (cardId: string) => void;
+  toggleBoss: (cardId: string) => void;
   setDeck: (entries: DeckEntry[]) => void;
   clearDeck: () => void;
   loadFromStorage: () => void;
 }
 
 export const normalizeDeckEntries = (entries: DeckEntry[]) => {
-  const counter = new Map<string, number>();
+  const counter = new Map<string, { qty: number; isBoss: boolean }>();
 
   for (const entry of entries) {
     const cardId = entry.cardId?.trim();
@@ -26,11 +28,15 @@ export const normalizeDeckEntries = (entries: DeckEntry[]) => {
     if (!Number.isFinite(entry.qty)) continue;
     const qty = Math.floor(entry.qty);
     if (qty <= 0) continue;
-    counter.set(cardId, (counter.get(cardId) ?? 0) + qty);
+    const existing = counter.get(cardId);
+    counter.set(cardId, {
+      qty: (existing?.qty ?? 0) + qty,
+      isBoss: entry.isBoss ?? existing?.isBoss ?? false,
+    });
   }
 
   return [...counter.entries()]
-    .map(([cardId, qty]) => ({ cardId, qty }))
+    .map(([cardId, v]) => ({ cardId, qty: v.qty, isBoss: v.isBoss }))
     .sort((a, b) => a.cardId.localeCompare(b.cardId));
 };
 
@@ -61,7 +67,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
         };
       }
 
-      return { entries: [...state.entries, { cardId, qty: 1 }] };
+      return { entries: [...state.entries, { cardId, qty: 1, isBoss: false }] };
     }),
 
   removeCard: (cardId) =>
@@ -76,6 +82,19 @@ export const useDeckStore = create<DeckState>((set, get) => ({
         entries: state.entries.map((entry) =>
           entry.cardId === cardId ? { ...entry, qty: entry.qty - 1 } : entry
         )
+      };
+    }),
+
+  toggleBoss: (cardId) =>
+    set((state) => {
+      const bossCount = state.entries.filter((e) => e.isBoss).length;
+      return {
+        entries: state.entries.map((entry) => {
+          if (entry.cardId !== cardId) return entry;
+          const newIsBoss = !entry.isBoss;
+          if (newIsBoss && bossCount >= 4) return entry;
+          return { ...entry, isBoss: newIsBoss };
+        }),
       };
     }),
 

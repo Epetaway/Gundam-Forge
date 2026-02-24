@@ -4,6 +4,7 @@ import type { DeckEntry } from './deckStore';
 export interface ResolvedDeckEntry {
   cardId: string;
   qty: number;
+  isBoss: boolean;
   card: CardDefinition;
 }
 
@@ -13,7 +14,7 @@ export const resolveDeckEntries = (entries: DeckEntry[], cards: CardDefinition[]
     .map((entry) => {
       const card = cardsById.get(entry.cardId);
       if (!card) return null;
-      return { cardId: entry.cardId, qty: entry.qty, card };
+      return { cardId: entry.cardId, qty: entry.qty, isBoss: entry.isBoss ?? false, card };
     })
     .filter((entry): entry is ResolvedDeckEntry => Boolean(entry));
 };

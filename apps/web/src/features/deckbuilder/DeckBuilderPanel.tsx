@@ -4,6 +4,7 @@ import { useDeckStore } from './deckStore';
 import { resolveCardImage } from '../../utils/resolveCardImage';
 import { resolveDeckEntries } from './deckSelectors';
 import { useCardsStore } from './cardsStore';
+import { PREDEFINED_ARCHETYPES, MAX_ARCHETYPE_LENGTH } from '../../data/archetypes';
 
 interface DeckBuilderPanelProps {
   cards: CardDefinition[];
@@ -44,12 +45,16 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
   const entries = useDeckStore((state) => state.entries);
   const addCard = useDeckStore((state) => state.addCard);
   const removeCard = useDeckStore((state) => state.removeCard);
+  const toggleBoss = useDeckStore((state) => state.toggleBoss);
   const setSelectedCardId = useCardsStore((state) => state.setSelectedCardId);
 
   const [deckName, setDeckName] = useState('RX-78 Strike Deck');
+  const [deckArchetype, setDeckArchetype] = useState('');
   const [collapsedSections, setCollapsedSections] = useState<Set<CardType>>(new Set());
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [pulsingCardId, setPulsingCardId] = useState<string | null>(null);
+
+  const bossCount = useMemo(() => entries.filter((e) => e.isBoss).length, [entries]);
 
   const resolvedEntries = useMemo(() => resolveDeckEntries(entries, cards), [entries, cards]);
   const validation = useMemo(() => validateDeck(entries, cards), [entries, cards]);
@@ -149,6 +154,20 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
               </button>
             </div>
 
+            {/* Archetype Selector */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <select
+                value={deckArchetype}
+                onChange={(e) => setDeckArchetype(e.target.value.slice(0, MAX_ARCHETYPE_LENGTH))}
+                className="rounded-lg border border-gf-border bg-white px-2 py-1 text-[10px] text-gf-text outline-none focus:border-gf-blue"
+              >
+                <option value="">No Archetype</option>
+                {PREDEFINED_ARCHETYPES.map((a) => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Right: Count + LED + Autosave */}
             <div className="flex items-center gap-4 flex-shrink-0">
               {/* Autosave */}
@@ -209,7 +228,7 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
       </div>
 
       {/* Deck List */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+      <div className="flex-1 overflow-y-auto gf-scroll px-6 py-4">
         {resolvedEntries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gf-light mb-4">
@@ -283,6 +302,21 @@ export function DeckBuilderPanel({ cards, onInspect }: DeckBuilderPanelProps) {
                               className="h-9 w-7 rounded object-cover flex-shrink-0"
                               loading="lazy"
                             />
+
+                            {/* Boss Card Star */}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleBoss(entry.cardId); }}
+                              className={`flex h-5 w-5 items-center justify-center rounded-sm transition-colors flex-shrink-0 ${
+                                entry.isBoss
+                                  ? 'text-yellow-500'
+                                  : 'text-gf-text-muted/30 hover:text-yellow-400'
+                              }`}
+                              title={entry.isBoss ? 'Remove boss card' : `Mark as boss card (${bossCount}/4)`}
+                            >
+                              <svg className="h-3.5 w-3.5" fill={entry.isBoss ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
 
                             {/* Card Name */}
                             <span className="flex-1 truncate text-sm font-medium text-gf-text">
