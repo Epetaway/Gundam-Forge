@@ -13,12 +13,20 @@
   "dependencies": {
     "@gundam-forge/shared": "0.0.1",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/supabase-js": "^2.97.0",
     "@tanstack/react-virtual": "^3.13.18",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "swiper": "^12.1.2",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
