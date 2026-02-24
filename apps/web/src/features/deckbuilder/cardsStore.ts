@@ -10,6 +10,7 @@ export interface CatalogFilters {
 
 interface CardsState {
   cards: CardDefinition[];
+  cardsById: Map<string, CardDefinition>;
   query: string;
   selectedCardId: string | null;
   filters: CatalogFilters;
@@ -29,12 +30,14 @@ const defaultFilters: CatalogFilters = {
 
 export const useCardsStore = create<CardsState>((set) => ({
   cards: [],
+  cardsById: new Map(),
   query: '',
   selectedCardId: null,
   filters: defaultFilters,
   hydrateCards: (cards) =>
     set(() => ({
       cards,
+      cardsById: new Map(cards.map((c) => [c.id, c])),
       selectedCardId: cards.length > 0 ? cards[0].id : null
     })),
   setQuery: (query) => set(() => ({ query })),
@@ -48,6 +51,10 @@ export const useCardsStore = create<CardsState>((set) => ({
     })),
   clearFilters: () => set(() => ({ filters: defaultFilters, query: '' }))
 }));
+
+/** O(1) card lookup — use outside React components */
+export const getCardById = (id: string): CardDefinition | undefined =>
+  useCardsStore.getState().cardsById.get(id);
 
 export const filterCatalogCards = (cards: CardDefinition[], query: string, filters: CatalogFilters) => {
   const normalizedQuery = query.trim().toLowerCase();

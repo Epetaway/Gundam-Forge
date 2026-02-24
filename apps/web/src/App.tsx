@@ -31,6 +31,7 @@ const cards = cardsJson as CardDefinition[];
 function App() {
   const hydrateCards = useCardsStore((s) => s.hydrateCards);
   const catalogCards = useCardsStore((s) => s.cards);
+  const cardsById = useCardsStore((s) => s.cardsById);
   const deckEntries = useDeckStore((s) => s.entries);
   const loadFromStorage = useDeckStore((s) => s.loadFromStorage);
   const hydratedFromStorage = useDeckStore((s) => s.hydratedFromStorage);
@@ -68,8 +69,8 @@ function App() {
   }, [deckEntries, hydratedFromStorage]);
 
   const inspectionCard = useMemo(
-    () => catalogCards.find((c) => c.id === inspectedCardId),
-    [catalogCards, inspectedCardId],
+    () => inspectedCardId ? cardsById.get(inspectedCardId) : undefined,
+    [cardsById, inspectedCardId],
   );
 
   const validation = useMemo(

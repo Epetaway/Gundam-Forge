@@ -8,8 +8,7 @@ export interface ResolvedDeckEntry {
   card: CardDefinition;
 }
 
-export const resolveDeckEntries = (entries: DeckEntry[], cards: CardDefinition[]): ResolvedDeckEntry[] => {
-  const cardsById = new Map(cards.map((card) => [card.id, card]));
+export const resolveDeckEntries = (entries: DeckEntry[], cardsById: Map<string, CardDefinition>): ResolvedDeckEntry[] => {
   return entries
     .map((entry) => {
       const card = cardsById.get(entry.cardId);

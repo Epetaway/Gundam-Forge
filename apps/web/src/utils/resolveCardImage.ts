@@ -53,3 +53,8 @@ export function resolveCardImage(card: CardDefinition): string | undefined {
 
   return resolveAssetUrl(source);
 }
+
+/** Format a card ID for display when the card is not in the catalog */
+export function formatUnknownCardId(cardId: string): string {
+  return `Unknown (${cardId})`;
+}
