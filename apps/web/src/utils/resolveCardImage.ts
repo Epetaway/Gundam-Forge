@@ -1,9 +1,9 @@
 import type { CardDefinition } from '@gundam-forge/shared';
 
 /**
- * Convert known external card-image URLs to local paths when the file is
- * available in public/card_art/.  This avoids CORS / hot-link issues with
- * the official site while keeping the sync scripts' data intact.
+ * Convert known gundam-gcg.com URLs to local /card_art/ paths.
+ * The images are committed to git in public/card_art/ so they are served
+ * from our own origin — no hotlinking required.
  */
 function toLocalPathIfPossible(source: string): string {
   try {
@@ -20,11 +20,14 @@ function toLocalPathIfPossible(source: string): string {
   return source;
 }
 
-function resolveAssetUrl(source: string): string {
-  // Normalise known remote hosts to local paths first
+export function resolveCardImage(card: CardDefinition): string | undefined {
+  const source = card.imageUrl || card.placeholderArt;
+  if (!source) return undefined;
+
+  // Convert gcg URLs to local paths (images committed to public/card_art/).
   const normalised = toLocalPathIfPossible(source);
 
-  // Return external URLs and data URIs as-is
+  // External URLs (placehold.co, exburst.dev, etc.) are used as-is.
   if (
     normalised.startsWith('http://') ||
     normalised.startsWith('https://') ||
@@ -34,9 +37,10 @@ function resolveAssetUrl(source: string): string {
     return normalised;
   }
 
-  // For relative paths, prefix with the Next.js base path.
-  // NEXT_PUBLIC_BASE_PATH is injected at build time via next.config.mjs `env`.
-  // It is '/Gundam-Forge' in production (GitHub Pages) and '' in development.
+  // Local paths: raw <img> tags don't receive Next.js basePath injection,
+  // so prepend NEXT_PUBLIC_BASE_PATH manually.
+  // Value is '/Gundam-Forge' in production and '' in development
+  // (set via next.config.mjs env block).
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
   if (normalised.startsWith('/')) {
@@ -44,16 +48,6 @@ function resolveAssetUrl(source: string): string {
   }
 
   return `${basePath}/${normalised}`;
-}
-
-export function resolveCardImage(card: CardDefinition): string | undefined {
-  const source = card.imageUrl || card.placeholderArt;
-
-  if (!source) {
-    return undefined;
-  }
-
-  return resolveAssetUrl(source);
 }
 
 /** Format a card ID for display when the card is not in the catalog */

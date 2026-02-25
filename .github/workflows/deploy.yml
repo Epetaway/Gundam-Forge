@@ -28,7 +28,13 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-      
+
+      - name: Download card images
+        run: npm run fetch-assets
+        env:
+          # Skip live price lookups in CI — use the prices already in cards.json.
+          USE_MOCK_PRICES: 'true'
+
       - name: Build project
         run: npm run build
       
