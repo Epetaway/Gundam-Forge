@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import type { CardDefinition } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
-import { useBrokenImageStore } from '../../utils/brokenImageStore';
+import { CardImage } from '../../components/ui/CardImage';
 import { useUIStore } from '../../stores/uiStore';
 import { useCardsStore } from './cardsStore';
 import { useDeckStore } from './deckStore';
@@ -39,9 +38,6 @@ export function CardInspectionModal({ card, open, onClose }: CardInspectionModal
   if (!card) return null;
 
   const qty = deckEntries.find((e) => e.cardId === card.id)?.qty ?? 0;
-  const imageSrc = resolveCardImage(card);
-  const isBroken = useBrokenImageStore.getState().brokenIds[card.id];
-  const markBroken = useBrokenImageStore.getState().markBroken;
   const marketPrice = card.price?.market;
   const rarityLabel = (card as unknown as Record<string, unknown>).rarity as string || 'Common';
 
@@ -101,18 +97,10 @@ export function CardInspectionModal({ card, open, onClose }: CardInspectionModal
           <div className="flex flex-1 min-h-0 overflow-hidden">
             {/* Left: Card Image */}
             <div className="w-[340px] flex-shrink-0 bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col items-center justify-center p-5 border-r border-gf-border">
-              {isBroken ? (
-                <div className="flex items-center justify-center h-48 text-gf-text-secondary text-sm">
-                  Image unavailable
-                </div>
-              ) : (
-                <img
-                  src={imageSrc}
-                  alt={card.name}
-                  className="max-h-[420px] w-auto rounded-xl shadow-lg object-contain"
-                  onError={() => markBroken(card.id)}
-                />
-              )}
+              <CardImage
+                card={card}
+                className="max-h-[420px] w-auto rounded-xl shadow-lg object-contain"
+              />
               {/* Price below image (Moxfield-style) */}
               {marketPrice !== undefined && (
                 <div className="mt-4 w-full">

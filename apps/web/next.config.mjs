@@ -14,18 +14,10 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export (no /_next/image API at runtime)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'www.gundam-gcg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'exburst.dev',
-      },
+      // Primary card art source — also downloaded locally by fetchCardAssets
+      { protocol: 'https', hostname: 'exburst.dev' },
+      // Placeholder art (placehold.co SVGs used as last-resort fallback)
+      { protocol: 'https', hostname: 'placehold.co' },
     ],
   },
   output: 'export',

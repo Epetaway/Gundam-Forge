@@ -1,14 +1,17 @@
 #!/usr/bin/env tsx
 /**
- * fetchCardAssets.ts - Enhanced version
- * 
- * Fetches card art from ExBurst API and pricing from TCG marketplaces
- * 
+ * fetchCardAssets.ts
+ *
+ * Downloads card art from exburst.dev with concurrent fetching.
+ * Skips cards that already have a local file on disk.
+ * Updates cards.json imageUrl to the local path after a successful download.
+ *
  * Usage:
  *   npm run fetch-assets
- * 
+ *
  * Environment variables:
- *   USE_MOCK_PRICES - Use mock prices (default: true)
+ *   CONCURRENCY           - Parallel download limit (default: 10)
+ *   USE_MOCK_PRICES       - Use mock prices, skip live fetch (default: true)
  *   TCGPLAYER_PUBLIC_KEY, TCGPLAYER_PRIVATE_KEY
  *   CARDMARKET_API_KEY
  */
@@ -22,108 +25,63 @@ import {
   CardmarketPriceSource,
   TCGPlayerPriceSource,
 } from '../packages/shared/src/price-api';
-import type { CardDefinition, CardPrice } from '../packages/shared/src/types';
+import type { CardDefinition } from '../packages/shared/src/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-/**
- * ExBurst card database lookup
- */
-async function searchExBurstCard(cardName: string): Promise<string | null> {
-  try {
-    // Try searching ExBurst for the card
-    const searchUrl = 'https://exburst.dev/gundam/cardlist';
-    console.log(`    Searching ExBurst for "${cardName}"...`);
-    
-    // Note: ExBurst uses client-side rendering, so we can't directly query it
-    // Instead, try common image URL patterns
-    return null;
-  } catch (error) {
-    console.warn(`    ExBurst search error: ${error}`);
-    return null;
-  }
+const EXBURST_BASE = 'https://exburst.dev/gundam/cards/sd';
+const CONCURRENCY = Number(process.env.CONCURRENCY ?? 10);
+
+/** Canonical exburst image URL for a card ID */
+function exburstUrl(cardId: string): string {
+  return `${EXBURST_BASE}/${cardId}.webp`;
 }
 
-/**
- * Try multiple image URL patterns for ExBurst
- */
-async function tryExBurstUrls(cardId: string): Promise<string | null> {
-  const patterns = [
-    `https://exburst.dev/gundam/cards/sd/${cardId}.webp`,
-    // Some newer cards have timestamps
-    `https://exburst.dev/gundam/cards/sd/${cardId}_*.webp`, // This won't work without actual timestamp
-  ];
-
-  for (const pattern of patterns) {
-    if (pattern.includes('*')) continue; // Skip patterns with wildcards
-
-    try {
-      const response = await fetch(pattern);
-      if (response.ok) {
-        const buffer = await response.arrayBuffer();
-        // Check if response is likely valid (>5KB)
-        if (buffer.byteLength > 5000) {
-          return pattern;
-        }
-      }
-    } catch (error) {
-      // Continue to next pattern
-    }
-  }
-
-  return null;
-}
-
-/**
- * Download and save image (preserving quality)
- */
-async function downloadImage(
-  imageUrl: string,
-  outputPath: string,
-  cardId: string
-): Promise<boolean> {
+/** Download a URL to disk. Returns true on success (file written, >5 KB). */
+async function downloadImage(url: string, dest: string): Promise<boolean> {
   try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      console.warn(`    ✗ Download failed (${response.status})`);
-      return false;
-    }
+    const res = await fetch(url);
+    if (!res.ok) return false;
 
-    const buffer = await response.arrayBuffer();
-    
-    // Check file size - if too small, likely an error
-    if (buffer.byteLength < 5000) {
-      console.warn(`    ✗ File too small (${(buffer.byteLength / 1024).toFixed(1)}KB) - skipping`);
-      return false;
-    }
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength < 5_000) return false; // Likely an error page or placeholder
 
-    const dir = path.dirname(outputPath);
-    await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(outputPath, Buffer.from(buffer));
-    
-    // Get content type for quality info
-    const contentType = response.headers.get('content-type') || 'unknown';
-    const sizeKB = (buffer.byteLength / 1024).toFixed(1);
-    console.log(
-      `    ✓ Downloaded (${sizeKB}KB, ${contentType})`
-    );
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.writeFile(dest, Buffer.from(buf));
     return true;
-  } catch (error) {
-    console.warn(`    Error: ${error}`);
+  } catch {
     return false;
   }
 }
 
 /**
- * Setup price manager
+ * Run async task factories with at most `limit` running concurrently.
+ * Preserves insertion order in the returned results array.
  */
+async function runConcurrent<T>(
+  tasks: Array<() => Promise<T>>,
+  limit: number,
+): Promise<T[]> {
+  const results = new Array<T>(tasks.length);
+  let next = 0;
+
+  async function worker(): Promise<void> {
+    while (next < tasks.length) {
+      const i = next++;
+      results[i] = await tasks[i]();
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));
+  return results;
+}
+
 function setupPriceManager(): PriceAPIManager {
   const manager = new PriceAPIManager();
 
   if (process.env.USE_MOCK_PRICES !== 'false') {
-    console.log('  Using mock price source\n');
     manager.addSource(new MockPriceSource());
     return manager;
   }
@@ -132,8 +90,8 @@ function setupPriceManager(): PriceAPIManager {
     manager.addSource(
       new TCGPlayerPriceSource(
         process.env.TCGPLAYER_PUBLIC_KEY,
-        process.env.TCGPLAYER_PRIVATE_KEY
-      )
+        process.env.TCGPLAYER_PRIVATE_KEY,
+      ),
     );
   }
 
@@ -141,116 +99,99 @@ function setupPriceManager(): PriceAPIManager {
     manager.addSource(new CardmarketPriceSource(process.env.CARDMARKET_API_KEY));
   }
 
+  // Always have a mock fallback so the script never crashes on missing keys
   manager.addSource(new MockPriceSource());
   return manager;
 }
 
-/**
- * Main fetch operation
- */
 async function main() {
-  console.log('🎨 Gundam Forge - ExBurst Card Fetcher\n');
-  console.log('=====================================\n');
+  console.log('Gundam Forge — Card Asset Fetcher');
+  console.log(`Source     : ${EXBURST_BASE}`);
+  console.log(`Concurrency: ${CONCURRENCY}\n`);
 
   const cardsPath = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'cards.json');
-  let cards: CardDefinition[];
+  const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
 
+  let cards: CardDefinition[];
   try {
-    const cardsData = await fs.readFile(cardsPath, 'utf-8');
-    cards = JSON.parse(cardsData);
-    console.log(`✓ Loaded ${cards.length} cards from ${cardsPath}\n`);
-  } catch (error) {
-    console.error(`✗ Failed to load cards: ${error}`);
+    cards = JSON.parse(await fs.readFile(cardsPath, 'utf-8'));
+    console.log(`Loaded ${cards.length} cards from cards.json\n`);
+  } catch (err) {
+    console.error(`Failed to load cards.json: ${err}`);
     process.exit(1);
   }
 
-  const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
-  const priceManager = setupPriceManager();
+  // ── Image downloads ────────────────────────────────────────────────────────
+  let downloaded = 0;
+  let skipped = 0;
+  let failed = 0;
 
-  let cardsWithImages = 0;
-  let cardsWithPrices = 0;
+  const imageTasks = cards.map((card, i) => async () => {
+    const dest = path.join(cardArtDir, `${card.id}.webp`);
+    const localPath = `/card_art/${card.id}.webp`;
+    const tag = `[${String(i + 1).padStart(String(cards.length).length, ' ')}/${cards.length}]`;
 
-  // Process each card
-  for (let i = 0; i < cards.length; i++) {
-    const card = cards[i];
-    const progress = `[${i + 1}/${cards.length}]`;
-
-    console.log(`${progress} ${card.id} - ${card.name}`);
-
-    // Try to get image from official gundam-gcg.com first (highest quality)
-    let imageUrl: string | null = null;
-    let source = 'ExBurst';
-    
-    // Check if we have an official imageUrl already (from sync-official-cards)
-    if (card.imageUrl && card.imageUrl.includes('gundam-gcg.com')) {
-      imageUrl = card.imageUrl;
-      source = 'Official (gundam-gcg.com)';
-    }
-    
-    // Fallback to ExBurst if no official image
-    if (!imageUrl) {
-      imageUrl = await tryExBurstUrls(card.id);
-      source = 'ExBurst';
-    }
-    
+    // Skip if the file already exists on disk
     try {
-      if (imageUrl) {
-        console.log(`  Downloading image from ${source}...`);
-        const extension = imageUrl.includes('.webp') ? 'webp' : imageUrl.split('.').pop() || 'webp';
-        const outputPath = path.join(cardArtDir, `${card.id}.${extension}`);
-
-        const downloaded = await downloadImage(imageUrl, outputPath, card.id);
-        if (downloaded) {
-          card.imageUrl = `/card_art/${card.id}.${extension}`;
-          cardsWithImages++;
-        }
-      } else {
-        console.log(`  ℹ Image not found (using placeholder)`);
-      }
-    } catch (error) {
-      console.warn(`  Error fetching image: ${error}`);
+      await fs.access(dest);
+      if (card.imageUrl !== localPath) card.imageUrl = localPath;
+      skipped++;
+      console.log(`${tag} SKIP  ${card.id}`);
+      return;
+    } catch {
+      // File not found — download it
     }
 
-    // Fetch price
-    try {
-      console.log(`  Fetching price...`);
-      const price = await priceManager.fetchPrice(card.name, card.set);
-      if (price) {
-        card.price = price;
-        cardsWithPrices++;
-        console.log(
-          `    ✓ $${price.market ? price.market.toFixed(2) : 'N/A'} (mid: $${price.mid ? price.mid.toFixed(2) : 'N/A'})`
-        );
-      }
-    } catch (error) {
-      console.warn(`  Error fetching price: ${error}`);
+    const ok = await downloadImage(exburstUrl(card.id), dest);
+    if (ok) {
+      card.imageUrl = localPath;
+      downloaded++;
+      console.log(`${tag} OK    ${card.id}`);
+    } else {
+      failed++;
+      console.log(`${tag} FAIL  ${card.id}`);
     }
+  });
 
-    console.log();
+  console.log('Downloading images...\n');
+  await runConcurrent(imageTasks, CONCURRENCY);
+
+  // ── Price fetch (sequential — rate-limit friendly) ─────────────────────────
+  const useMockPrices = process.env.USE_MOCK_PRICES !== 'false';
+  if (useMockPrices) {
+    console.log('\nSkipping price fetch (USE_MOCK_PRICES=true)');
+  } else {
+    console.log('\nFetching prices (sequential)...\n');
+    const priceManager = setupPriceManager();
+    for (const card of cards) {
+      try {
+        const price = await priceManager.fetchPrice(card.name, card.set);
+        if (price) card.price = price;
+      } catch {
+        // Non-fatal — keep existing price data
+      }
+    }
   }
 
-  // Write updated cards back
-  console.log('Writing updated cards.json...');
+  // ── Write updated cards.json ───────────────────────────────────────────────
+  console.log('\nWriting cards.json...');
   try {
     await fs.writeFile(cardsPath, JSON.stringify(cards, null, 2) + '\n');
-    console.log('✓ Successfully wrote cards.json\n');
-  } catch (error) {
-    console.error(`✗ Failed to write cards: ${error}`);
+    console.log('Written.\n');
+  } catch (err) {
+    console.error(`Failed to write cards.json: ${err}`);
     process.exit(1);
   }
 
-  // Summary
-  console.log('📊 Fetch Summary:');
-  console.log(`  Total cards: ${cards.length}`);
-  console.log(`  Cards with images: ${cardsWithImages}/${cards.length}`);
-  console.log(`  Cards with prices: ${cardsWithPrices}/${cards.length}`);
-  console.log(
-    `\nℹ Cards without images will use placeholderArt URLs as fallback.\n`
-  );
-  console.log('✅ Done!\n');
+  console.log('Summary:');
+  console.log(`  Total      ${cards.length}`);
+  console.log(`  Downloaded ${downloaded}`);
+  console.log(`  Skipped    ${skipped}`);
+  console.log(`  Failed     ${failed}`);
+  console.log('\nDone.');
 }
 
-main().catch((error) => {
-  console.error('Fatal error:', error);
+main().catch((err) => {
+  console.error(err);
   process.exit(1);
 });

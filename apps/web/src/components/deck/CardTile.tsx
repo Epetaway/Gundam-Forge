@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import type { CardDefinition } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
+import { CardImage } from '../ui/CardImage';
 
 interface CardTileProps {
   card: CardDefinition;
@@ -27,8 +27,6 @@ export const CardTile = React.memo(function CardTile({
   showActions = true,
   lazy = true,
 }: CardTileProps) {
-  const imgSrc = resolveCardImage(card);
-
   const handleAction = useCallback(
     (e: React.MouseEvent, fn?: () => void) => {
       e.stopPropagation();
@@ -57,9 +55,8 @@ export const CardTile = React.memo(function CardTile({
         data-selected={selected || undefined}
       >
         <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
-          <img
-            src={imgSrc}
-            alt={card.name}
+          <CardImage
+            card={card}
             className="absolute inset-0 w-full h-full object-cover"
             loading={lazy ? 'lazy' : 'eager'}
             decoding="async"

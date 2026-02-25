@@ -1,5 +1,5 @@
 import { OFFICIAL_PLAYMAT_ZONE_TEMPLATE } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
+import { CardImage } from '../../components/ui/CardImage';
 import {
   type GameCard,
   type GameState,
@@ -41,7 +41,6 @@ function GameCardView({
   small?: boolean;
 }) {
   const def = card.definition;
-  const imageSrc = resolveCardImage(def);
   const colorBorder = COLOR_MAP[def.color] ?? 'border-gray-400';
   const isRested = !card.active;
 
@@ -75,14 +74,10 @@ function GameCardView({
       onDoubleClick={onDoubleClick}
       title={`${def.name} (${def.type}) - Cost: ${def.cost}`}
     >
-      {imageSrc ? (
-        <img src={imageSrc} alt={def.name} className="h-full w-full object-cover" />
-      ) : (
-        <div className="flex h-full flex-col justify-between bg-gray-800 p-1">
-          <p className="line-clamp-2 text-[7px] font-medium text-white leading-tight">{def.name}</p>
-          <p className="text-[6px] text-gray-400">{def.type}</p>
-        </div>
-      )}
+      <CardImage
+        card={def}
+        className="h-full w-full object-cover"
+      />
 
       {/* Cost badge */}
       <div className="absolute top-0.5 left-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-[7px] font-bold text-white">
