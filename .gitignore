@@ -3,6 +3,7 @@ dist
 .vite
 .next
 apps/web/.next
+apps/web/out
 .DS_Store
 *.log
 *.tsbuildinfo
