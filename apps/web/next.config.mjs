@@ -6,6 +6,11 @@ const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Expose basePath to client-side code so image resolvers can prefix paths correctly.
+  // NEXT_PUBLIC_* vars are baked in at build time, making them safe for static exports.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isProd ? `/${repoName}` : '',
+  },
   images: {
     unoptimized: true, // Required for static export (no /_next/image API at runtime)
     remotePatterns: [
