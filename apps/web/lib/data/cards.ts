@@ -35,8 +35,32 @@ export function getCard(id: string): CardDefinition | undefined {
 }
 
 export function getCardImage(card: CardDefinition): string {
-  if (card.imageUrl?.startsWith('http://') || card.imageUrl?.startsWith('https://') || card.imageUrl?.startsWith('/')) {
-    return card.imageUrl;
+  const imageUrl = card.imageUrl;
+
+  // Convert gcg URLs to local paths — images are committed to public/card_art/.
+  // Next.js <Image> prepends basePath automatically for local paths.
+  if (imageUrl?.includes('gundam-gcg.com')) {
+    try {
+      const filename = new URL(imageUrl).pathname.split('/').pop();
+      if (filename) return `/card_art/${filename}`;
+    } catch {
+      // fall through
+    }
+  }
+
+  // Already a local path — Next.js <Image> injects basePath.
+  if (imageUrl?.startsWith('/')) {
+    return imageUrl;
+  }
+
+  // Any other external URL (placehold.co, exburst.dev, etc.).
+  if (imageUrl?.startsWith('http://') || imageUrl?.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // No imageUrl — show placeholder with card name text.
+  if (card.placeholderArt) {
+    return card.placeholderArt;
   }
 
   return `/card_art/${card.id}.webp`;
