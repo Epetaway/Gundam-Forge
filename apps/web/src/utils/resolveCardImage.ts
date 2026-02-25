@@ -34,14 +34,16 @@ function resolveAssetUrl(source: string): string {
     return normalised;
   }
 
-  // For relative paths, prefix with the Vite base URL
-  const baseUrl = import.meta.env.BASE_URL ?? '/';
+  // For relative paths, prefix with the Next.js base path.
+  // NEXT_PUBLIC_BASE_PATH is injected at build time via next.config.mjs `env`.
+  // It is '/Gundam-Forge' in production (GitHub Pages) and '' in development.
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
   if (normalised.startsWith('/')) {
-    return `${baseUrl}${normalised.slice(1)}`;
+    return `${basePath}${normalised}`;
   }
 
-  return `${baseUrl}${normalised}`;
+  return `${basePath}/${normalised}`;
 }
 
 export function resolveCardImage(card: CardDefinition): string | undefined {
