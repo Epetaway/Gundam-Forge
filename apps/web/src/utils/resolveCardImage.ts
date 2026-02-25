@@ -1,51 +1,53 @@
 import type { CardDefinition } from '@gundam-forge/shared';
 
 /**
- * Resolve the display URL for a card image.
- *
- * Images are downloaded at CI build time by `npm run fetch-assets` and stored
- * in public/card_art/, which Next.js includes in the static export.  At
- * runtime all card art is served from the same GitHub Pages origin — no
- * cross-origin hotlinking required.
- *
- * Raw <img> tags (CardGrid, CardTile, CardPreviewPanel) do NOT receive Next.js
- * basePath injection automatically, so we prepend NEXT_PUBLIC_BASE_PATH here.
- * The Next.js <Image> component (CardsClient) handles basePath on its own.
- *
- * Fallback chain:
- *   1. Local path from cards.json (/card_art/…) → prefix with basePath
- *   2. Any non-gcg external URL stored in cards.json → use directly
- *   3. placeholderArt (placehold.co) → use directly
+ * Convert known gundam-gcg.com URLs to local /card_art/ paths.
+ * The images are committed to git in public/card_art/ so they are served
+ * from our own origin — no hotlinking required.
  */
+function toLocalPathIfPossible(source: string): string {
+  try {
+    const url = new URL(source);
+    if (url.hostname === 'www.gundam-gcg.com' || url.hostname === 'gundam-gcg.com') {
+      const filename = url.pathname.split('/').pop();
+      if (filename) {
+        return `/card_art/${filename}`;
+      }
+    }
+  } catch {
+    // not a full URL – fall through
+  }
+  return source;
+}
+
 export function resolveCardImage(card: CardDefinition): string | undefined {
-  const imageUrl = card.imageUrl;
+  const source = card.imageUrl || card.placeholderArt;
+  if (!source) return undefined;
+
+  // Convert gcg URLs to local paths (images committed to public/card_art/).
+  const normalised = toLocalPathIfPossible(source);
+
+  // External URLs (placehold.co, exburst.dev, etc.) are used as-is.
+  if (
+    normalised.startsWith('http://') ||
+    normalised.startsWith('https://') ||
+    normalised.startsWith('data:') ||
+    normalised.startsWith('blob:')
+  ) {
+    return normalised;
+  }
+
+  // Local paths: raw <img> tags don't receive Next.js basePath injection,
+  // so prepend NEXT_PUBLIC_BASE_PATH manually.
+  // Value is '/Gundam-Forge' in production and '' in development
+  // (set via next.config.mjs env block).
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-  // Prefer local paths — images were downloaded to public/card_art/ by
-  // `npm run fetch-assets` and are served from our own origin.
-  if (imageUrl?.startsWith('/')) {
-    return `${basePath}${imageUrl}`;
+  if (normalised.startsWith('/')) {
+    return `${basePath}${normalised}`;
   }
 
-  // Non-gcg external URLs (rare — future CDN entries in cards.json) work
-  // in the browser without hotlink issues.
-  // gundam-gcg.com is excluded: it blocks cross-origin browser requests.
-  if (
-    imageUrl &&
-    (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) &&
-    !imageUrl.includes('gundam-gcg.com')
-  ) {
-    return imageUrl;
-  }
-
-  // gcg URLs or no imageUrl at all — use the placeholder so the card slot
-  // shows the card name rather than a broken image icon.
-  if (card.placeholderArt) {
-    return card.placeholderArt;
-  }
-
-  // Last resort: derive expected local path (may 404 if asset wasn't fetched).
-  return `${basePath}/card_art/${card.id}.webp`;
+  return `${basePath}/${normalised}`;
 }
 
 /** Format a card ID for display when the card is not in the catalog */
