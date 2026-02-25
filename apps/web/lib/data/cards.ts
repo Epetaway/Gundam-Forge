@@ -35,9 +35,18 @@ export function getCard(id: string): CardDefinition | undefined {
 }
 
 export function getCardImage(card: CardDefinition): string {
-  if (card.imageUrl?.startsWith('http://') || card.imageUrl?.startsWith('https://') || card.imageUrl?.startsWith('/')) {
-    return card.imageUrl;
+  const imageUrl = card.imageUrl;
+
+  // Use non-gcg external URLs directly. gundam-gcg.com blocks cross-origin
+  // image requests, and local /card_art/ paths are not deployed to GitHub Pages.
+  if (
+    imageUrl &&
+    (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) &&
+    !imageUrl.includes('gundam-gcg.com')
+  ) {
+    return imageUrl;
   }
 
-  return `/card_art/${card.id}.webp`;
+  // Derive from community CDN (project's configured CARD_ART_BASE_URL).
+  return `https://exburst.dev/gundam/cards/sd/${card.id}.webp`;
 }
