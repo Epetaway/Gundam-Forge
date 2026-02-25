@@ -37,8 +37,14 @@ export function getCard(id: string): CardDefinition | undefined {
 export function getCardImage(card: CardDefinition): string {
   const imageUrl = card.imageUrl;
 
-  // Use non-gcg external URLs directly. gundam-gcg.com blocks cross-origin
-  // image requests, and local /card_art/ paths are not deployed to GitHub Pages.
+  // Local paths: Next.js <Image> automatically prepends basePath when building
+  // the static export, so return the path as-is.
+  if (imageUrl?.startsWith('/')) {
+    return imageUrl;
+  }
+
+  // Non-gcg external URLs work in the browser without hotlink issues.
+  // gundam-gcg.com is excluded: it blocks cross-origin browser requests.
   if (
     imageUrl &&
     (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) &&
@@ -47,6 +53,11 @@ export function getCardImage(card: CardDefinition): string {
     return imageUrl;
   }
 
-  // Derive from community CDN (project's configured CARD_ART_BASE_URL).
-  return `https://exburst.dev/gundam/cards/sd/${card.id}.webp`;
+  // gcg URLs or no imageUrl — use placeholder so the slot shows card name text.
+  if (card.placeholderArt) {
+    return card.placeholderArt;
+  }
+
+  // Last resort: derive expected local path. Next.js <Image> handles basePath.
+  return `/card_art/${card.id}.webp`;
 }
