@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 const DEFAULT_BASE_URL = 'https://www.gundam-gcg.com';
-const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/en/cards/index.php`;
+const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/en/cards`;
 const USE_PLAYWRIGHT = process.env.GUNDAM_GCG_USE_PLAYWRIGHT !== 'false';
 
 const CARD_ID_PATTERN = /^(?:[A-Z]{2,4}\d{2}|[A-Z]{2,4})-\d{3,4}$/;
