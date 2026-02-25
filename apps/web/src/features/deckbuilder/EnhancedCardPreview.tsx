@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { CardDefinition } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
-import { useBrokenImageStore } from '../../utils/brokenImageStore';
+import { CardImage } from '../../components/ui/CardImage';
 import { useDeckStore } from './deckStore';
 
 interface EnhancedCardPreviewProps {
@@ -32,9 +31,6 @@ export function EnhancedCardPreview({ card, onInspect }: EnhancedCardPreviewProp
   }
 
   const qty = deckEntries.find((entry) => entry.cardId === card.id)?.qty ?? 0;
-  const imageSrc = resolveCardImage(card);
-  const markBroken = useBrokenImageStore.getState().markBroken;
-  const isBroken = useBrokenImageStore.getState().brokenIds[card.id];
   const marketPrice = card.price?.market;
 
   const rarityLabel = (card as unknown as Record<string, unknown>).rarity as string || 'Common';
@@ -71,31 +67,18 @@ export function EnhancedCardPreview({ card, onInspect }: EnhancedCardPreviewProp
           className="relative mx-4 mt-4 overflow-hidden rounded-xl border border-gf-border shadow-sm bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer group"
           onClick={() => onInspect?.(card.id)}
         >
-          {isBroken ? (
-            <div className="flex items-center justify-center h-64 text-gf-text-secondary text-xs">
-              Image unavailable
+          <CardImage
+            card={card}
+            className="h-auto w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+          {/* Hover overlay for inspection */}
+          <div className="absolute inset-0 bg-gf-dark/0 group-hover:bg-gf-dark/10 gf-transition flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 gf-transition bg-white/90 rounded-lg px-3 py-1.5 shadow text-xs font-medium text-gf-text">
+              Click to inspect
             </div>
-          ) : (
-            <>
-              <img
-                src={imageSrc}
-                alt={card.name}
-                className="h-auto w-full object-cover fade-in"
-                loading="lazy"
-                decoding="async"
-                onError={() => markBroken(card.id)}
-                onLoad={(e) => {
-                  (e.target as HTMLImageElement).classList.add('fade-in');
-                }}
-              />
-              {/* Hover overlay for inspection */}
-              <div className="absolute inset-0 bg-gf-dark/0 group-hover:bg-gf-dark/10 gf-transition flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 gf-transition bg-white/90 rounded-lg px-3 py-1.5 shadow text-xs font-medium text-gf-text">
-                  Click to inspect
-                </div>
-              </div>
-            </>
-          )}
+          </div>
           {/* Cost overlay */}
           <div className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-gf-blue text-sm font-bold text-white shadow-lg">
             {card.cost}

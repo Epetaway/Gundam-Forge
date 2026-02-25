@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { PublicDeckRecord } from '../../services/deckService';
 import { useCardsStore } from '../../features/deckbuilder/cardsStore';
-import { resolveCardImage } from '../../utils/resolveCardImage';
+import { CardImage } from '../ui/CardImage';
 import { TIER_LABELS, TIER_COLORS, type MetaTier } from '../../data/metaTierList';
 
 const COLOR_DOT: Record<string, string> = {
@@ -30,22 +30,10 @@ export function TopDeckCard({ deck }: TopDeckCardProps) {
   const cardsById = useCardsStore((s) => s.cardsById);
   const colors: string[] = deck.colors ?? [];
 
-  // Resolve the first boss card image from the card database
-  let heroSrc: string | undefined;
-  let heroName: string | undefined;
-  if (deck.boss_card_ids) {
-    for (const cardId of deck.boss_card_ids) {
-      const card = cardsById.get(cardId);
-      if (card) {
-        const src = resolveCardImage(card);
-        if (src) {
-          heroSrc = src;
-          heroName = card.name;
-          break;
-        }
-      }
-    }
-  }
+  // Resolve the first boss card from the card database for hero art
+  let heroCard = deck.boss_card_ids
+    ?.map((id) => cardsById.get(id))
+    .find((c) => c != null);
 
   // Build a subtle gradient fallback from the deck colors
   const gradientBg = colors.length >= 2
@@ -62,10 +50,9 @@ export function TopDeckCard({ deck }: TopDeckCardProps) {
       <div className="gf-card-tile bg-gf-white">
         <div className="relative w-full" style={{ aspectRatio: '5/7' }}>
           {/* Boss card art or gradient fallback */}
-          {heroSrc ? (
-            <img
-              src={heroSrc}
-              alt={heroName ?? deck.name}
+          {heroCard ? (
+            <CardImage
+              card={heroCard}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
               decoding="async"

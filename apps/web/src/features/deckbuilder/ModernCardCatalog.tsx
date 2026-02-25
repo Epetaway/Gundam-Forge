@@ -1,8 +1,7 @@
 import { useDeferredValue, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { CardDefinition, CardColor, CardType } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
-import { useBrokenImageStore } from '../../utils/brokenImageStore';
+import { CardImage } from '../../components/ui/CardImage';
 import { filterCatalogCards, useCardsStore } from './cardsStore';
 import { useDeckStore } from './deckStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -35,9 +34,6 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
 
   const addCard = useDeckStore((state) => state.addCard);
   const deckEntries = useDeckStore((state) => state.entries);
-  const brokenIds = useBrokenImageStore((state) => state.brokenIds);
-  const markBroken = useBrokenImageStore((state) => state.markBroken);
-
   const authUser = useAuthStore((state) => state.user);
   const collectionCardIds = useCollectionStore((state) => state.ownedCardIds);
 
@@ -50,8 +46,7 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
 
   const deferredQuery = useDeferredValue(query);
   const filteredCards = useMemo(() => {
-    let result = filterCatalogCards(cards, deferredQuery, filters)
-      .filter((card) => !brokenIds[card.id]);
+    let result = filterCatalogCards(cards, deferredQuery, filters);
 
     // When viewing collection, only show owned cards
     if (activeTab === 'collection' && authUser) {
@@ -59,7 +54,7 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
     }
 
     return result;
-  }, [cards, deferredQuery, filters, brokenIds, activeTab, authUser, collectionCardIds]);
+  }, [cards, deferredQuery, filters, activeTab, authUser, collectionCardIds]);
 
   // Card recommendations: cards matching deck's dominant colors/types, not already in deck
   const suggestedCards = useMemo(() => {
@@ -86,7 +81,7 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
 
     // Score each card not in deck
     const scored = cards
-      .filter((c) => !deckCardIds.has(c.id) && !brokenIds[c.id])
+      .filter((c) => !deckCardIds.has(c.id))
       .map((card) => {
         let score = 0;
         if (topColors.includes(card.color)) score += 10;
@@ -100,7 +95,7 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
       .map((s) => s.card);
 
     return scored;
-  }, [cards, deckEntries, brokenIds]);
+  }, [cards, deckEntries]);
 
   const setOptions = useMemo(() => ['All', ...new Set(cards.map((card) => card.set))], [cards]);
   const traitOptions = useMemo(() => {
@@ -319,9 +314,8 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
                     setShowSuggestions(false);
                   }}
                 >
-                  <img
-                    src={resolveCardImage(card)}
-                    alt={card.name}
+                  <CardImage
+                    card={card}
                     className="h-7 w-5 rounded object-cover flex-shrink-0"
                     loading="lazy"
                   />
@@ -586,7 +580,6 @@ export function ModernCardCatalog({ cards, onInspect }: ModernCardCatalogProps) 
                         onSelect={() => setSelectedCardId(card.id)}
                         onQuickAdd={handleQuickAdd}
                         onInspect={onInspect}
-                        onBroken={markBroken}
                       />
                     ))}
                   </div>
@@ -612,12 +605,9 @@ interface CardTileProps {
   onSelect: () => void;
   onQuickAdd: (e: React.MouseEvent, cardId: string) => void;
   onInspect?: (cardId: string) => void;
-  onBroken: (cardId: string) => void;
 }
 
-function CardTile({ card, qty, isSelected, isOwned, showOwned, onSelect, onQuickAdd, onInspect, onBroken }: CardTileProps) {
-  const imageSrc = resolveCardImage(card);
-
+function CardTile({ card, qty, isSelected, isOwned, showOwned, onSelect, onQuickAdd, onInspect }: CardTileProps) {
   return (
     <div className="cursor-pointer group" onClick={onSelect} onDoubleClick={() => onInspect?.(card.id)}>
       <div
@@ -625,14 +615,12 @@ function CardTile({ card, qty, isSelected, isOwned, showOwned, onSelect, onQuick
         data-selected={isSelected ? 'true' : undefined}
       >
         <div className="relative w-full pb-[140%] bg-gradient-to-b from-gray-100 to-gray-200">
-          <img
-            src={imageSrc}
-            alt={card.name}
+          <CardImage
+            card={card}
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
             loading="lazy"
             decoding="async"
             onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1'; }}
-            onError={() => onBroken(card.id)}
           />
 
           {/* Type badge (Moxfield-style) */}

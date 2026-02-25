@@ -3,7 +3,7 @@ import type { CardDefinition } from '@gundam-forge/shared';
 import { IconButton } from '../ui/IconButton';
 import { Tabs } from '../ui/Tabs';
 import { EmptyState } from '../ui/EmptyState';
-import { resolveCardImage } from '../../utils/resolveCardImage';
+import { CardImage } from '../ui/CardImage';
 
 interface CardDetailsDockProps {
   card: CardDefinition | null;
@@ -41,8 +41,6 @@ export function CardDetailsDock({
     );
   }
 
-  const imgSrc = resolveCardImage(card);
-
   return (
     <div key={card.id} className="flex flex-col h-full gf-animate-fade-in">
       {/* Header */}
@@ -53,9 +51,8 @@ export function CardDetailsDock({
       {/* Card Image */}
       <div className="p-4 flex-shrink-0">
         <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '5/7' }}>
-          <img
-            src={imgSrc}
-            alt={card.name}
+          <CardImage
+            card={card}
             className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
           />

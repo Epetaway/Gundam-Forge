@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { CardDefinition } from '@gundam-forge/shared';
-import { resolveCardImage } from '../../utils/resolveCardImage';
-import { useBrokenImageStore } from '../../utils/brokenImageStore';
+import { CardImage } from '../../components/ui/CardImage';
 import { useDeckStore } from './deckStore';
 
 interface CardGridProps {
@@ -14,8 +13,6 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const deckEntries = useDeckStore((state) => state.entries);
   const addCard = useDeckStore((state) => state.addCard);
-  const brokenIds = useBrokenImageStore((state) => state.brokenIds);
-  const markBroken = useBrokenImageStore((state) => state.markBroken);
 
   const qtyByCardId = new Map(deckEntries.map((entry) => [entry.cardId, entry.qty] as const));
 
@@ -31,12 +28,9 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       {cards.map((card) => {
-        if (brokenIds[card.id]) return null;
-
         const qty = qtyByCardId.get(card.id) ?? 0;
         const isSelected = selectedCardId === card.id;
         const isHovered = hoveredCardId === card.id;
-        const imageSrc = resolveCardImage(card);
 
         return (
           <div
@@ -56,19 +50,11 @@ export function CardGrid({ cards, selectedCardId, onCardSelect }: CardGridProps)
             >
               {/* Image */}
               <div className="relative w-full pb-[140%] bg-gradient-to-b from-gray-200 to-gray-300">
-                <img
-                  src={imageSrc}
-                  alt={card.name}
+                <CardImage
+                  card={card}
                   className="absolute inset-0 h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
                   loading="lazy"
                   decoding="async"
-                  sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 20vw"
-                  onError={() => {
-                    markBroken(card.id);
-                  }}
-                  onLoad={(e) => {
-                    (e.target as HTMLImageElement).classList.add('fade-in');
-                  }}
                 />
 
                 {/* Cost Badge */}
