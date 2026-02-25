@@ -37,27 +37,31 @@ export function getCard(id: string): CardDefinition | undefined {
 export function getCardImage(card: CardDefinition): string {
   const imageUrl = card.imageUrl;
 
-  // Local paths: Next.js <Image> automatically prepends basePath when building
-  // the static export, so return the path as-is.
+  // Convert gcg URLs to local paths — images are committed to public/card_art/.
+  // Next.js <Image> prepends basePath automatically for local paths.
+  if (imageUrl?.includes('gundam-gcg.com')) {
+    try {
+      const filename = new URL(imageUrl).pathname.split('/').pop();
+      if (filename) return `/card_art/${filename}`;
+    } catch {
+      // fall through
+    }
+  }
+
+  // Already a local path — Next.js <Image> injects basePath.
   if (imageUrl?.startsWith('/')) {
     return imageUrl;
   }
 
-  // Non-gcg external URLs work in the browser without hotlink issues.
-  // gundam-gcg.com is excluded: it blocks cross-origin browser requests.
-  if (
-    imageUrl &&
-    (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) &&
-    !imageUrl.includes('gundam-gcg.com')
-  ) {
+  // Any other external URL (placehold.co, exburst.dev, etc.).
+  if (imageUrl?.startsWith('http://') || imageUrl?.startsWith('https://')) {
     return imageUrl;
   }
 
-  // gcg URLs or no imageUrl — use placeholder so the slot shows card name text.
+  // No imageUrl — show placeholder with card name text.
   if (card.placeholderArt) {
     return card.placeholderArt;
   }
 
-  // Last resort: derive expected local path. Next.js <Image> handles basePath.
   return `/card_art/${card.id}.webp`;
 }
