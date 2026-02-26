@@ -17,6 +17,23 @@
   --destructive-foreground: 0 0% 100%;
   --success: 163 95% 30%;
   --warning: 37 69% 50%;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --background: 224 28% 8%;
+  --foreground: 210 20% 92%;
+  --surface: 223 24% 12%;
+  --surface-muted: 222 20% 16%;
+  --accent: 221 100% 62%;
+  --accent-foreground: 0 0% 100%;
+  --border: 219 18% 24%;
+  --ring: 221 100% 62%;
+  --destructive: 0 77% 61%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 74% 40%;
+  --warning: 39 100% 56%;
+  color-scheme: dark;
 }
 
 @layer base {
@@ -29,6 +46,12 @@
     background-image:
       radial-gradient(1200px 480px at 50% -5%, rgba(42, 102, 255, 0.08), transparent 70%),
       linear-gradient(to bottom, rgba(148, 163, 184, 0.06), transparent 35%);
+  }
+
+  [data-theme='dark'] body {
+    background-image:
+      radial-gradient(1200px 520px at 50% -8%, rgba(64, 123, 255, 0.18), transparent 70%),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.45), transparent 45%);
   }
 
   h1,

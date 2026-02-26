@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
 import { MainNav } from '@/components/layout/MainNav';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 
 interface AppShellProps {
@@ -21,6 +22,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           </Link>
           <div className="flex items-center gap-3">
             <MainNav />
+            <ThemeToggle />
             <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
               <Link href="/auth/login">Sign in</Link>
             </Button>
