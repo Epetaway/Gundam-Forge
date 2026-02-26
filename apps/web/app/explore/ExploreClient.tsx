@@ -43,6 +43,9 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
           Most Viewed
         </Button>
         <span className="ml-auto text-xs text-steel-600">{isFetching ? 'Refreshing deck index...' : `${visibleDecks.length} decks`}</span>
+        <Link href="/decks/new" className="ml-4">
+          <Button size="sm" variant="primary">+ Create Deck</Button>
+        </Link>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
