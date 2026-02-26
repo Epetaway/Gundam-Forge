@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils/cn';
 
 const navItems = [
   { href: '/', label: 'Home' },
-  { href: '/forge', label: 'Forge' },
+  { href: '/decks/new', label: '+ Create Deck' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },

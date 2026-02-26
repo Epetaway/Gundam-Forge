@@ -36,9 +36,7 @@ export function CardPreviewTile({ imageUrl, name, qty, onClick, onAdd, onRemove 
           )}
         </div>
       )}
-      <div className="pt-1 px-1">
-        <p className="truncate text-xs font-semibold text-foreground">{name}</p>
-      </div>
+      
     </div>
   );
 }
