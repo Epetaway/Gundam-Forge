@@ -39,6 +39,7 @@ jobs:
         run: npm run build
         env:
           NEXT_OUTPUT_MODE: 'export'
+          NEXT_PUBLIC_BASE_PATH: '/Gundam-Forge'
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
