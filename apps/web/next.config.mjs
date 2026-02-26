@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 
+const isStaticExport = process.env.NEXT_OUTPUT_MODE === 'export';
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  ...(isStaticExport ? { output: 'export' } : {}),
   images: {
+    ...(isStaticExport ? { unoptimized: true } : {}),
     remotePatterns: [
       // Primary card art source — also downloaded locally by fetchCardAssets
       { protocol: 'https', hostname: 'exburst.dev' },
