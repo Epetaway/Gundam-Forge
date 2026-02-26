@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import type { DeckRecord } from '@/lib/data/decks';
-import { getCard } from '@/lib/data/cards';
+import { getCard, getCardImage } from '@/lib/data/cards';
+import { withBasePath } from '@/lib/utils/basePath';
 import { getEvents } from '@/lib/data/events';
 import { rankTrendingDecks } from '@/lib/meta/engine';
 import { useDecksQuery } from '@/lib/query/useDecksQuery';
@@ -18,6 +20,7 @@ interface ExploreClientProps {
 type ExploreSort = 'trending' | 'winRate' | 'mostViewed';
 
 export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX.Element {
+  const router = useRouter();
   const [sort, setSort] = React.useState<ExploreSort>('trending');
   const events = React.useMemo(() => getEvents(), []);
   const { data: decks = initialDecks, isFetching } = useDecksQuery({ initialData: initialDecks });
@@ -54,7 +57,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
           return (
             <DeckPreviewCard
               key={deck.id}
-              heroUrl={previewCard?.imageUrl || '/default-hero.jpg'}
+              heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
               title={deck.name}
               subtitle={deck.archetype}
               author={deck.owner || 'Unknown'}
@@ -64,7 +67,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
               colors={deck.colors || []}
               tags={deck.archetype ? [deck.archetype] : []}
               avatarUrl={undefined}
-              onClick={() => window.location.href = `/decks/${deck.id}`}
+              onClick={() => router.push(`/decks/${deck.id}`)}
               onMenu={() => {}}
             />
           );
@@ -72,20 +75,4 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
       </div>
     </div>
   );
-}
-
-function getArchetypeAccent(archetype: string): string {
-  const key = archetype.toLowerCase();
-  if (key.includes('aggro')) return 'bg-red-500';
-  if (key.includes('control')) return 'bg-cobalt-500';
-  if (key.includes('midrange')) return 'bg-violet-500';
-  if (key.includes('ramp')) return 'bg-emerald-500';
-  if (key.includes('combo')) return 'bg-amber-500';
-  return 'bg-steel-500';
-}
-
-function getWinRateTone(winRate: number): string {
-  if (winRate >= 0.8) return 'text-emerald-300';
-  if (winRate >= 0.7) return 'text-amber-300';
-  return 'text-red-300';
 }

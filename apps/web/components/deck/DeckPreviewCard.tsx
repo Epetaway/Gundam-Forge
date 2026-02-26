@@ -1,13 +1,12 @@
 import React from "react";
 
-// Helper: map color code to Tailwind bg class or hex
 const COLOR_MAP: Record<string, string> = {
-  W: "bg-[#cbd5e1]", // White
-  U: "bg-[#3b82f6]", // Blue
-  B: "bg-[#6b7280]", // Black/Colorless
-  R: "bg-[#ef4444]", // Red
-  G: "bg-[#22c55e]", // Green
-  P: "bg-[#a855f7]", // Purple
+  Blue: "bg-[#3b82f6]",
+  Green: "bg-[#22c55e]",
+  Red: "bg-[#ef4444]",
+  White: "bg-[#cbd5e1]",
+  Purple: "bg-[#a855f7]",
+  Colorless: "bg-[#6b7280]",
 };
 function colorToClass(color: string) {
   return COLOR_MAP[color] || "bg-neutral-300";
@@ -71,17 +70,17 @@ export function DeckPreviewCard({
       </div>
 
       {/* Color identity bar */}
-      <div className="mt-3 flex h-10 w-full gap-1 px-4">
+      <div className="mt-3 flex h-6 w-full gap-1 px-4">
         {colors.length > 0 ? (
           colors.map((color, i) => (
             <div
               key={color + i}
-              className={`flex-1 h-full rounded-xl ring-1 ring-white/10 ${colorToClass(color)}`}
+              className={`flex-1 h-full rounded-md ring-1 ring-white/10 ${colorToClass(color)}`}
               title={color}
             />
           ))
         ) : (
-          <div className="flex-1 h-full rounded-xl ring-1 ring-white/10 bg-neutral-800" />
+          <div className="flex-1 h-full rounded-md ring-1 ring-white/10 bg-neutral-800" />
         )}
       </div>
 
@@ -89,11 +88,17 @@ export function DeckPreviewCard({
       <div className="flex items-center gap-4 px-5 mt-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <img
-            src={avatarUrl || '/avatar-default.png'}
-            alt={author}
-            className="h-12 w-12 rounded-full object-cover border border-neutral-800"
-          />
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={author}
+              className="h-12 w-12 rounded-full object-cover border border-neutral-800"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-full bg-neutral-700 border border-neutral-800 flex items-center justify-center text-sm font-bold text-neutral-300">
+              {author.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         {/* Title and subtitle */}
         <div className="flex-1 min-w-0">
