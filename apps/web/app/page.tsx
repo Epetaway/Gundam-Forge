@@ -4,7 +4,8 @@ import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/Trendin
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { getCard } from '@/lib/data/cards';
+import { getCard, getCardImage } from '@/lib/data/cards';
+import { withBasePath } from '@/lib/utils/basePath';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
 import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
@@ -73,7 +74,7 @@ export default function HomePage(): JSX.Element {
               const previewCard = getCard(deck.entries[0]?.cardId);
               return {
                 id: deck.id,
-                heroUrl: previewCard?.imageUrl || '/default-hero.jpg',
+                heroUrl: previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png'),
                 title: deck.name,
                 subtitle: deck.archetype,
                 author: deck.owner || 'Unknown',
@@ -158,20 +159,4 @@ function Stat({ label, value }: { label: string; value: string }): JSX.Element {
       <p className="mt-1 font-display text-xl font-semibold text-foreground">{value}</p>
     </div>
   );
-}
-
-function getArchetypeAccent(archetype: string): string {
-  const key = archetype.toLowerCase();
-  if (key.includes('aggro')) return 'bg-red-500';
-  if (key.includes('control')) return 'bg-cobalt-500';
-  if (key.includes('midrange')) return 'bg-violet-500';
-  if (key.includes('ramp')) return 'bg-emerald-500';
-  if (key.includes('combo')) return 'bg-amber-500';
-  return 'bg-steel-500';
-}
-
-function getWinRateTone(winRate: number): string {
-  if (winRate >= 0.8) return 'text-emerald-300';
-  if (winRate >= 0.7) return 'text-amber-300';
-  return 'text-red-300';
 }
