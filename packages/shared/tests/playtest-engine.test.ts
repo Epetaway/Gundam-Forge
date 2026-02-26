@@ -332,4 +332,104 @@ describe('GundamPlaytestEngine gameplay', () => {
     expect(engine.state.gameOver).toBe(true);
     expect(engine.state.winner).toBe(standby);
   });
+
+  it('does not spend resources when an illegal play is attempted', () => {
+    const engine = setupMainPhase();
+    const active = engine.state.activePlayer;
+    const player = engine.state.players[active];
+    const pilotId = player.hand[0];
+
+    engine.state.cards[pilotId].definition = {
+      ...makeUnit('PILOT-ONLY', { type: 'Pilot', cost: 1, level: 1 }),
+      type: 'Pilot',
+    };
+
+    const activeBefore = player.resourceArea.filter((id) => !engine.state.cards[id].rested).length;
+    const result = engine.playCard(active, pilotId, {});
+    const activeAfter = player.resourceArea.filter((id) => !engine.state.cards[id].rested).length;
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('attachToUnitId');
+    expect(activeAfter).toBe(activeBefore);
+    expect(player.hand).toContain(pilotId);
+  });
+
+  it('infers command effects from text and enforces target requirements', () => {
+    const engine = setupMainPhase();
+    const active = engine.state.activePlayer;
+    const standby = active === 0 ? 1 : 0;
+    const activeCard = engine.state.players[active].hand[0];
+
+    engine.state.cards[activeCard].definition = {
+      ...makeUnit('CMD-TEXT-DRAW', { type: 'Command', cost: 0, level: 0, text: 'Draw 2 cards.' }),
+      type: 'Command',
+    };
+
+    const handBefore = engine.state.players[active].hand.length;
+    expect(engine.playCard(active, activeCard).ok).toBe(true);
+    expect(engine.passPriority(standby).ok).toBe(true);
+    expect(engine.passPriority(active).ok).toBe(true);
+    expect(engine.state.players[active].hand.length).toBe(handBefore + 1);
+
+    const targetCmd = engine.state.players[active].hand[0];
+    engine.state.cards[targetCmd].definition = {
+      ...makeUnit('CMD-TARGET', { type: 'Command', cost: 0, level: 0, text: 'Deal 2 damage to target unit.' }),
+      type: 'Command',
+    };
+
+    const failNoTarget = engine.playCard(active, targetCmd);
+    expect(failNoTarget.ok).toBe(false);
+    expect(failNoTarget.error).toContain('requires a target unit');
+
+    const defenderUnitId = engine.state.players[standby].hand[0];
+    engine.state.players[standby].hand = engine.state.players[standby].hand.filter((id) => id !== defenderUnitId);
+    engine.state.players[standby].battleArea.push(defenderUnitId);
+    engine.state.cards[defenderUnitId].definition = makeUnit('DEF-TARGET', { hp: 5, ap: 1, cost: 0, level: 0 });
+
+    expect(engine.playCard(active, targetCmd, { targetUnitId: defenderUnitId }).ok).toBe(true);
+    expect(engine.passPriority(standby).ok).toBe(true);
+    expect(engine.passPriority(active).ok).toBe(true);
+    expect(engine.state.cards[defenderUnitId].damage).toBe(2);
+  });
+
+  it('returns legal actions and excludes illegal card plays', () => {
+    const engine = setupMainPhase();
+    const active = engine.state.activePlayer;
+    const standby = active === 0 ? 1 : 0;
+    const player = engine.state.players[active];
+    const cheapUnitId = player.hand[0];
+    const expensiveUnitId = player.hand[1];
+    const needsTargetCmdId = player.hand[2];
+
+    engine.state.cards[cheapUnitId].definition = makeUnit('CHEAP', { cost: 1, level: 1, ap: 2, hp: 2 });
+    engine.state.cards[expensiveUnitId].definition = makeUnit('EXPENSIVE', { cost: 5, level: 5, ap: 6, hp: 6 });
+    engine.state.cards[needsTargetCmdId].definition = {
+      ...makeUnit('CMD-NEEDS-TARGET', { type: 'Command', cost: 0, level: 0, text: 'Destroy target unit.' }),
+      type: 'Command',
+    };
+
+    engine.state.players[standby].battleArea = [];
+    const legal = engine.getLegalActions(active).filter((a) => a.kind === 'play-card');
+    const legalPlayIds = legal.map((action) => action.handCardId);
+
+    expect(legalPlayIds).toContain(cheapUnitId);
+    expect(legalPlayIds).not.toContain(expensiveUnitId);
+    expect(legalPlayIds).not.toContain(needsTargetCmdId);
+  });
+
+  it('recommends strategic action from current legal actions', () => {
+    const engine = setupMainPhase();
+    const active = engine.state.activePlayer;
+    const attackerId = engine.state.players[active].hand[0];
+
+    engine.state.players[active].hand = [];
+    engine.state.players[active].battleArea.push(attackerId);
+    engine.state.cards[attackerId].definition = makeUnit('ATTACKER', { cost: 0, level: 0, ap: 3, hp: 3 });
+    engine.state.cards[attackerId].enteredTurn = engine.state.turn - 1;
+    engine.state.cards[attackerId].rested = false;
+
+    const recommendation = engine.recommendAction(active);
+    expect(recommendation).not.toBeNull();
+    expect(recommendation?.action.kind).toBe('declare-attack');
+  });
 });

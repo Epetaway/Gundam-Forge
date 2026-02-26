@@ -135,6 +135,7 @@ export interface CardScriptContext {
 }
 
 export interface CardScript {
+  needsUnitTarget?: boolean;
   onPlay?: (ctx: CardScriptContext) => StackEffect[];
 }
 
@@ -452,7 +453,12 @@ export class GundamPlaytestEngine {
       }
     }
 
-    if (this.state.phase === 'main' && this.state.priority.window === 'main' && player === this.state.activePlayer) {
+    if (
+      this.state.phase === 'main'
+      && this.state.priority.window === 'main'
+      && player === this.state.activePlayer
+      && this.state.stack.length === 0
+    ) {
       for (const attackerId of playerState.battleArea) {
         const attacker = this.state.cards[attackerId];
         if (!attacker || attacker.definition.type !== 'Unit' || attacker.rested) {
@@ -629,6 +635,9 @@ export class GundamPlaytestEngine {
     if (this.state.phase !== 'main' || !this.state.priority || this.state.priority.window !== 'main') {
       return { ok: false, error: 'Attacks may only be declared in main phase action window.' };
     }
+    if (this.state.stack.length > 0) {
+      return { ok: false, error: 'Cannot declare attacks while effects are pending on stack.' };
+    }
     if (player !== this.state.activePlayer || this.state.priority.currentPlayer !== player) {
       return { ok: false, error: 'Only the active player with priority may declare an attack.' };
     }
@@ -794,6 +803,72 @@ export class GundamPlaytestEngine {
     return { ok: true };
   }
 
+  private validatePlayCardIntent(player: PlayerIndex, handCardId: string, options: PlayCardOptions): ActionResult {
+    if (!this.state.priority || this.state.priority.currentPlayer !== player) {
+      return { ok: false, error: 'Player does not currently have priority.' };
+    }
+
+    const playerState = this.state.players[player];
+    if (!playerState.hand.includes(handCardId)) {
+      return { ok: false, error: 'Card is not in hand.' };
+    }
+
+    const card = this.state.cards[handCardId];
+    if (!card) {
+      return { ok: false, error: 'Card instance not found.' };
+    }
+
+    if (card.definition.type === 'Resource') {
+      return { ok: false, error: 'Resource cards cannot be manually played from hand.' };
+    }
+
+    if (card.definition.type === 'Command') {
+      if (!this.canPlayCommandInCurrentWindow()) {
+        return { ok: false, error: 'Commands can only be played in an action window.' };
+      }
+      if (this.commandNeedsUnitTarget(card) && !options.targetUnitId) {
+        return { ok: false, error: 'Command requires a target unit.' };
+      }
+      if (options.targetUnitId && !this.getTargetableEnemyUnits(player).includes(options.targetUnitId)) {
+        return { ok: false, error: 'Selected target unit is not a valid enemy target.' };
+      }
+      return { ok: true };
+    }
+
+    if (this.state.stack.length > 0) {
+      return { ok: false, error: 'Only command-speed actions are legal while effects are pending on stack.' };
+    }
+
+    if (this.state.phase !== 'main' || this.state.priority.window !== 'main') {
+      return { ok: false, error: 'Units, Pilots, and Bases may only be played in the main action window.' };
+    }
+    if (player !== this.state.activePlayer) {
+      return { ok: false, error: 'Only the active player can play permanent cards in main phase.' };
+    }
+
+    if (card.definition.type === 'Unit' && playerState.battleArea.length >= MAX_BATTLE_AREA) {
+      return { ok: false, error: `Battle area is full (max ${MAX_BATTLE_AREA}).` };
+    }
+
+    if (card.definition.type === 'Pilot') {
+      if (!options.attachToUnitId) {
+        return { ok: false, error: 'Pilot play requires attachToUnitId.' };
+      }
+      const unit = this.state.cards[options.attachToUnitId];
+      if (!unit || unit.definition.type !== 'Unit') {
+        return { ok: false, error: 'Pilot may only attach to a Unit.' };
+      }
+      if (!playerState.battleArea.includes(options.attachToUnitId)) {
+        return { ok: false, error: 'Target unit is not controlled by player.' };
+      }
+      if (unit.attachedPilotId) {
+        return { ok: false, error: 'Target unit already has a paired pilot.' };
+      }
+    }
+
+    return { ok: true };
+  }
+
   private startStep(): void {
     const active = this.state.players[this.state.activePlayer];
     for (const resourceId of active.resourceArea) {
@@ -830,6 +905,23 @@ export class GundamPlaytestEngine {
     return this.state.phase === 'end';
   }
 
+  private commandNeedsUnitTarget(card: CardInstance): boolean {
+    const script = this.effects[card.definition.id];
+    const text = (card.definition.text ?? '').toLowerCase();
+    if (text.includes('target unit')) {
+      return true;
+    }
+    return script?.needsUnitTarget ?? false;
+  }
+
+  private getTargetableEnemyUnits(player: PlayerIndex): string[] {
+    const enemy = this.state.players[this.other(player)];
+    return enemy.battleArea.filter((id) => {
+      const card = this.state.cards[id];
+      return Boolean(card && card.definition.type === 'Unit');
+    });
+  }
+
   private canPayForCard(player: PlayerIndex, card: CardDefinition): ActionResult {
     const state = this.state.players[player];
     const totalResources = state.resourceArea.length;
@@ -844,6 +936,46 @@ export class GundamPlaytestEngine {
     }
 
     return { ok: true };
+  }
+
+  private inferEffectsFromCardText(source: CardInstance, controller: PlayerIndex, targetUnitId?: string): StackEffect[] {
+    const text = (source.definition.text ?? '').toLowerCase();
+    const effects: StackEffect[] = [];
+
+    const drawCount = this.extractCount(text, /draw\s+(\d+)\s+cards?/i) ?? (text.includes('draw a card') ? 1 : 0);
+    if (drawCount > 0) {
+      effects.push({ kind: 'draw', player: controller, amount: drawCount });
+    }
+
+    const targetUnitDamage = this.extractCount(text, /deal\s+(\d+)\s+damage\s+to\s+target\s+unit/i);
+    if (typeof targetUnitDamage === 'number' && targetUnitId) {
+      effects.push({ kind: 'damage-unit', targetUnitId, amount: targetUnitDamage });
+    }
+
+    if (text.includes('destroy target unit') && targetUnitId) {
+      effects.push({ kind: 'destroy-unit', targetUnitId });
+    }
+
+    const enemyBaseDamage = this.extractCount(text, /deal\s+(\d+)\s+damage\s+to\s+(?:enemy|opponent(?:'s)?)\s+base/i);
+    if (typeof enemyBaseDamage === 'number') {
+      effects.push({ kind: 'damage-base', player: this.other(controller), amount: enemyBaseDamage });
+    }
+
+    const resourceGain = this.extractCount(text, /gain\s+(\d+)\s+(?:temporary\s+)?resources?/i);
+    if (typeof resourceGain === 'number') {
+      effects.push({ kind: 'create-temp-resource', player: controller, amount: resourceGain });
+    }
+
+    return effects;
+  }
+
+  private extractCount(text: string, pattern: RegExp): number | null {
+    const match = text.match(pattern);
+    if (!match) {
+      return null;
+    }
+    const value = Number.parseInt(match[1], 10);
+    return Number.isFinite(value) ? value : null;
   }
 
   private payCost(player: PlayerIndex, cost: number): void {
@@ -903,13 +1035,17 @@ export class GundamPlaytestEngine {
 
   private queueCommandEffect(source: CardInstance, controller: PlayerIndex, targetUnitId?: string): void {
     const script = this.effects[source.definition.id];
-    const effects = script?.onPlay?.({
+    const scriptedEffects = script?.onPlay?.({
       engine: this,
       controller,
       opponent: this.other(controller),
       source,
       targetUnitId,
-    }) ?? [{ kind: 'log', message: `${source.definition.name} resolves with no scripted effect.` }];
+    });
+    const textEffects = this.inferEffectsFromCardText(source, controller, targetUnitId);
+    const effects = scriptedEffects ?? (textEffects.length > 0
+      ? textEffects
+      : [{ kind: 'log', message: `${source.definition.name} resolves with no scripted effect.` }]);
 
     const item: StackItem = {
       id: `stack-${String(this.nextStackId++).padStart(4, '0')}`,
@@ -1213,6 +1349,116 @@ export class GundamPlaytestEngine {
     this.state.activePlayer = this.other(this.state.activePlayer);
     this.state.turn += 1;
     this.state.log.push(`Turn ${this.state.turn}: ${this.state.players[this.state.activePlayer].name}'s turn begins.`);
+  }
+
+  private scoreAction(player: PlayerIndex, action: EngineAction, profile: StrategyProfile): StrategicRecommendation {
+    let score = 0;
+    let reason = 'Default legal action.';
+
+    if (action.kind === 'advance-phase') {
+      score = -0.25;
+      reason = 'Advance turn flow.';
+    } else if (action.kind === 'pass-priority') {
+      score = -1;
+      reason = 'Pass when no better line is available.';
+    } else if (action.kind === 'discard-hand-limit') {
+      const card = this.state.cards[action.handCardId];
+      score = -this.estimateCardValueForPlan(card.definition, profile);
+      reason = 'Discard lowest strategic value card.';
+    } else if (action.kind === 'declare-block') {
+      score = action.blockerId ? 2.1 : 0.9;
+      reason = action.blockerId ? 'Protect shields/base by blocking.' : 'Preserve board by skipping block.';
+    } else if (action.kind === 'declare-attack') {
+      const attacking = this.state.cards[action.attackerId];
+      const attackPower = this.getEffectiveAP(action.attackerId);
+      score = 3 + attackPower * 0.2;
+      if (action.target.kind === 'player') {
+        score += profile.style === 'aggro' ? 2 : 0.8;
+        reason = 'Pressure opponent shields/base.';
+      } else {
+        const target = this.state.cards[action.target.unitId];
+        const targetPower = this.getEffectiveAP(action.target.unitId);
+        score += targetPower * 0.15;
+        if (attacking && target && this.getEffectiveHP(action.target.unitId) <= attackPower) {
+          score += 1.25;
+        }
+        reason = 'Trade into a vulnerable enemy unit.';
+      }
+    } else if (action.kind === 'play-card') {
+      const card = this.state.cards[action.handCardId].definition;
+      if (card.type === 'Unit') {
+        const earlyCurveBonus = Math.max(0, 3 - card.cost) * 0.5;
+        score = 2 + this.estimateCardValueForPlan(card, profile) + earlyCurveBonus;
+        reason = 'Develop board presence.';
+      } else if (card.type === 'Pilot') {
+        score = 2.3 + this.estimateCardValueForPlan(card, profile);
+        reason = 'Upgrade unit with pilot synergy.';
+      } else if (card.type === 'Command') {
+        const inferredEffects = this.inferEffectsFromCardText(this.state.cards[action.handCardId], player, action.options?.targetUnitId);
+        const commandTempo = inferredEffects.length > 0 ? inferredEffects.length * 0.9 : 0.2;
+        score = 1.7 + this.estimateCardValueForPlan(card, profile) + commandTempo;
+        reason = 'Use command timing and effect value.';
+      } else if (card.type === 'Base') {
+        score = 1.1 + this.estimateCardValueForPlan(card, profile);
+        reason = 'Improve base durability profile.';
+      }
+    }
+
+    return { action, score, reason };
+  }
+
+  private estimateCardValueForPlan(card: CardDefinition, profile: StrategyProfile): number {
+    const ap = getCardAP(card);
+    const hp = getCardHP(card);
+    let value = 0;
+
+    if (card.type === 'Unit') {
+      value += ap * 0.3 + hp * 0.2;
+      if (profile.style === 'aggro') {
+        value += Math.max(0, 3 - card.cost) * 0.6;
+      } else if (profile.style === 'control') {
+        value += hp * 0.2;
+      }
+    } else if (card.type === 'Pilot') {
+      value += (card.apModifier ?? 0) * 0.35 + (card.hpModifier ?? 0) * 0.25;
+      if (profile.style === 'combo') {
+        value += 0.7;
+      }
+    } else if (card.type === 'Command') {
+      const text = (card.text ?? '').toLowerCase();
+      if (text.includes('draw')) {
+        value += profile.style === 'control' ? 1.3 : 0.8;
+      }
+      if (text.includes('destroy') || text.includes('damage')) {
+        value += 1;
+      }
+      if (text.includes('resource')) {
+        value += profile.style === 'aggro' ? 0.8 : 0.4;
+      }
+    } else if (card.type === 'Base') {
+      value += hp * 0.15;
+    }
+
+    return value - card.cost * 0.18;
+  }
+
+  private getCardsOwnedByPlayer(player: PlayerIndex): CardDefinition[] {
+    const playerState = this.state.players[player];
+    const allIds = [
+      ...playerState.mainDeck,
+      ...playerState.resourceDeck,
+      ...playerState.hand,
+      ...playerState.resourceArea,
+      ...playerState.battleArea,
+      ...playerState.shields,
+      ...(playerState.base ? [playerState.base] : []),
+      ...playerState.trash,
+      ...playerState.removed,
+    ];
+
+    return allIds
+      .map((id) => this.state.cards[id]?.definition)
+      .filter((card): card is CardDefinition => Boolean(card));
   }
 
   private moveToTrash(player: PlayerIndex, cardId: string): void {
