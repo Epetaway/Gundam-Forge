@@ -10,6 +10,7 @@ import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
+import { getCardImage } from '@/lib/data/cards';
 import { cn } from '@/lib/utils/cn';
 
 const colorOptions: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
@@ -248,7 +249,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             {sorted.slice(0, 360).map((card) => (
               <li key={card.id}>
                 <CardPreviewTile
-                  imageUrl={card.imageUrl}
+                  imageUrl={getCardImage(card)}
                   name={card.name}
                   qty={0}
                   onClick={() => setInspectCardId(card.id)}
