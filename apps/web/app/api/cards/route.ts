@@ -4,6 +4,8 @@ import { getCards, type CatalogFilters } from '@/lib/data/cards';
 
 const CARD_COLORS: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const CARD_TYPES: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 function parseFilters(searchParams: URLSearchParams): CatalogFilters {
   const query = searchParams.get('q') ?? undefined;
@@ -20,7 +22,10 @@ function parseFilters(searchParams: URLSearchParams): CatalogFilters {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const { searchParams } = new URL(request.url);
+  const searchParams =
+    process.env.NEXT_OUTPUT_MODE === 'export'
+      ? new URLSearchParams()
+      : new URL(request.url).searchParams;
   const filters = parseFilters(searchParams);
   const cards = getCards(filters);
   return NextResponse.json({ cards });
