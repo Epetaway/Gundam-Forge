@@ -1,5 +1,6 @@
 import type { CardDefinition } from '@gundam-forge/shared';
 import type { CatalogFilters } from '@/lib/data/cards';
+import { withBasePath } from '@/lib/utils/basePath';
 
 interface CardsApiResponse {
   cards: CardDefinition[];
@@ -19,7 +20,8 @@ function buildCardParams(filters: CatalogFilters): URLSearchParams {
 
 export async function fetchCards(filters: CatalogFilters = {}): Promise<CardDefinition[]> {
   const params = buildCardParams(filters);
-  const url = params.size > 0 ? `/api/cards?${params.toString()}` : '/api/cards';
+  const path = params.size > 0 ? `/api/cards?${params.toString()}` : '/api/cards';
+  const url = withBasePath(path);
   const response = await fetch(url, { cache: 'no-store' });
 
   if (!response.ok) {

@@ -1,5 +1,6 @@
 import type { DeckRecord } from '@/lib/data/decks';
 import type { DeckQueryFilters } from '@/lib/query/keys';
+import { withBasePath } from '@/lib/utils/basePath';
 
 interface DecksApiResponse {
   decks: DeckRecord[];
@@ -18,7 +19,8 @@ function buildDeckParams(filters: DeckQueryFilters): URLSearchParams {
 
 export async function fetchDecks(filters: DeckQueryFilters = {}): Promise<DeckRecord[]> {
   const params = buildDeckParams(filters);
-  const url = params.size > 0 ? `/api/decks?${params.toString()}` : '/api/decks';
+  const path = params.size > 0 ? `/api/decks?${params.toString()}` : '/api/decks';
+  const url = withBasePath(path);
   const response = await fetch(url, { cache: 'no-store' });
 
   if (!response.ok) {
