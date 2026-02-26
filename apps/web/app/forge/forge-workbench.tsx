@@ -59,17 +59,6 @@ const selectClassName =
   'h-9 w-full rounded-md border border-border bg-surface px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 type CatalogView = 'grid' | 'compact';
-const PLACEHOLDER_IMAGE_HOST = 'placehold.co';
-
-function hasRenderableImageUrl(imageUrl?: string): boolean {
-  if (!imageUrl || imageUrl.trim().length === 0) return false;
-  try {
-    const parsed = new URL(imageUrl);
-    return !(parsed.hostname === PLACEHOLDER_IMAGE_HOST || parsed.hostname.endsWith(`.${PLACEHOLDER_IMAGE_HOST}`));
-  } catch {
-    return !imageUrl.includes(PLACEHOLDER_IMAGE_HOST);
-  }
-}
 
 export type ForgeCard = Pick<
   CardDefinition,
@@ -105,7 +94,10 @@ interface DeckGroup {
 }
 
 export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
-  const visibleCards = React.useMemo(() => cards.filter((card) => hasRenderableImageUrl(card.imageUrl)), [cards]);
+  const visibleCards = React.useMemo(
+    () => cards.filter((card) => typeof card.imageUrl === 'string' && card.imageUrl.startsWith('/card_art/')),
+    [cards],
+  );
 
   const [deckName, setDeckName] = React.useState('Untitled Deck');
   const [query, setQuery] = React.useState('');

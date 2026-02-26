@@ -42,7 +42,7 @@ export default function CardsClient(): JSX.Element {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [draft, setDraft] = useState<FilterDraft>({ query: '', color: 'All', type: 'All', set: 'All' });
 
-  const filtered = getCards({ query, color, type, set });
+  const filtered = useMemo(() => getCards({ query, color, type, set }), [color, query, set, type]);
 
   const activeChips = useMemo<ActiveChip[]>(() => {
     const chips: ActiveChip[] = [];

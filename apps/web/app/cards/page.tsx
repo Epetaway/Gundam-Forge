@@ -1,5 +1,4 @@
-import dynamic from 'next/dynamic';
-const CardsClient = dynamic(() => import('./CardsClient'), { ssr: false });
+import CardsClient from './CardsClient';
 
 export default function CardsPage() {
   return <CardsClient />;
