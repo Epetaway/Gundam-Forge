@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils/cn';
 
 const navItems = [
   { href: '/', label: 'Home' },
-  { href: '/decks/new', label: '+ Create Deck' },
+  { href: '/forge', label: 'Forge' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },
@@ -28,7 +28,11 @@ export function MainNav(): JSX.Element {
     <>
       <nav aria-label="Primary" className="hidden items-center gap-2 md:flex">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          // Exact-match "/" so it doesn't activate on every sub-route
+          const isActive =
+            item.href === '/'
+              ? pathname === '/'
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <Link
               className={cn(

@@ -1,22 +1,23 @@
-import { Container } from '@/components/layout/Container';
-import { cards } from '@/lib/data/cards';
-import { DeckBuilderPage } from '@/app/forge/forge-workbench';
+import type { Metadata } from 'next';
+import { ForgeWorkbench } from '@/app/forge/forge-workbench';
 
+export const metadata: Metadata = {
+  title: 'Forge · Gundam Forge',
+  description: 'Build, tune, and validate your Gundam Card Game deck.',
+};
+
+/**
+ * Forge page — search-first deck builder.
+ *
+ * No card data is loaded at server-render time. The client-side
+ * ForgeWorkbench fetches cards on-demand via /api/cards/search
+ * only after the user types a query or applies a filter.
+ */
 export default function ForgePage(): JSX.Element {
-  const forgeCards = cards.map((card) => ({
-    id: card.id,
-    name: card.name,
-    color: card.color,
-    type: card.type,
-    cost: card.cost,
-    set: card.set,
-    text: card.text,
-    imageUrl: card.imageUrl,
-  }));
-
   return (
-    <Container className="py-3 lg:py-4" wide>
-      <DeckBuilderPage cards={forgeCards} />
-    </Container>
+    // Full viewport height minus the 4rem (64px) sticky header
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+      <ForgeWorkbench />
+    </div>
   );
 }

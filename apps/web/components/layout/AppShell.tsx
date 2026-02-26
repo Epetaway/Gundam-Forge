@@ -23,9 +23,6 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <div className="flex items-center gap-3">
             <MainNav />
             <ThemeToggle />
-            <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
           </div>
         </Container>
       </header>
