@@ -16,6 +16,7 @@
     "fetch-assets": "tsx scripts/fetchCardAssets.ts",
     "fetch-hq-images": "tsx scripts/fetch-hq-images.ts",
     "validate-cards": "tsx scripts/validate-cards.ts",
+    "build-card-catalog": "tsx scripts/build-card-catalog.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
