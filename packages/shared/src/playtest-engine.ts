@@ -349,6 +349,192 @@ export class GundamPlaytestEngine {
     return structuredClone(this.state);
   }
 
+  public performAction(action: EngineAction): ActionResult {
+    if (action.kind === 'advance-phase') {
+      if (action.player !== this.state.activePlayer) {
+        return { ok: false, error: 'Only the active player can advance turn phases.' };
+      }
+      return this.advanceToNextPhase();
+    }
+    if (action.kind === 'play-card') {
+      return this.playCard(action.player, action.handCardId, action.options ?? {});
+    }
+    if (action.kind === 'declare-attack') {
+      return this.declareAttack(action.player, action.attackerId, action.target);
+    }
+    if (action.kind === 'declare-block') {
+      return this.declareBlock(action.player, action.blockerId);
+    }
+    if (action.kind === 'pass-priority') {
+      return this.passPriority(action.player);
+    }
+    return this.discardForHandLimit(action.player, action.handCardId);
+  }
+
+  public getLegalActions(player: PlayerIndex): EngineAction[] {
+    if (this.state.gameOver) {
+      return [];
+    }
+
+    const actions: EngineAction[] = [];
+    const playerState = this.state.players[player];
+
+    if (this.state.pendingHandDiscards > 0) {
+      if (player === this.state.activePlayer) {
+        for (const handCardId of playerState.hand) {
+          actions.push({ kind: 'discard-hand-limit', player, handCardId });
+        }
+      }
+      return actions;
+    }
+
+    if (!this.state.priority && this.state.phase !== 'battle') {
+      if (player === this.state.activePlayer && (this.state.phase === 'start' || this.state.phase === 'draw' || this.state.phase === 'resource')) {
+        actions.push({ kind: 'advance-phase', player });
+      }
+      return actions;
+    }
+
+    if (this.state.phase === 'battle' && this.state.battle?.step === 'block') {
+      if (player === this.state.battle.defenderIndex) {
+        actions.push({ kind: 'declare-block', player, blockerId: null });
+        for (const unitId of playerState.battleArea) {
+          const unit = this.state.cards[unitId];
+          if (unit && unit.definition.type === 'Unit' && !unit.rested) {
+            actions.push({ kind: 'declare-block', player, blockerId: unitId });
+          }
+        }
+      }
+      return actions;
+    }
+
+    if (!this.state.priority || this.state.priority.currentPlayer !== player) {
+      return actions;
+    }
+
+    actions.push({ kind: 'pass-priority', player });
+
+    for (const handCardId of playerState.hand) {
+      const card = this.state.cards[handCardId];
+      if (!card) {
+        continue;
+      }
+
+      if (card.definition.type === 'Pilot') {
+        for (const unitId of playerState.battleArea) {
+          const unit = this.state.cards[unitId];
+          if (unit && unit.definition.type === 'Unit' && !unit.attachedPilotId) {
+            const options: PlayCardOptions = { attachToUnitId: unitId };
+            if (this.validatePlayCardIntent(player, handCardId, options).ok && this.canPayForCard(player, card.definition).ok) {
+              actions.push({ kind: 'play-card', player, handCardId, options });
+            }
+          }
+        }
+        continue;
+      }
+
+      if (card.definition.type === 'Command') {
+        if (this.commandNeedsUnitTarget(card)) {
+          for (const targetUnitId of this.getTargetableEnemyUnits(player)) {
+            const options: PlayCardOptions = { targetUnitId };
+            if (this.validatePlayCardIntent(player, handCardId, options).ok && this.canPayForCard(player, card.definition).ok) {
+              actions.push({ kind: 'play-card', player, handCardId, options });
+            }
+          }
+        } else if (this.validatePlayCardIntent(player, handCardId, {}).ok && this.canPayForCard(player, card.definition).ok) {
+          actions.push({ kind: 'play-card', player, handCardId, options: {} });
+        }
+        continue;
+      }
+
+      if (this.validatePlayCardIntent(player, handCardId, {}).ok && this.canPayForCard(player, card.definition).ok) {
+        actions.push({ kind: 'play-card', player, handCardId, options: {} });
+      }
+    }
+
+    if (this.state.phase === 'main' && this.state.priority.window === 'main' && player === this.state.activePlayer) {
+      for (const attackerId of playerState.battleArea) {
+        const attacker = this.state.cards[attackerId];
+        if (!attacker || attacker.definition.type !== 'Unit' || attacker.rested) {
+          continue;
+        }
+        if (attacker.enteredTurn === this.state.turn && !attacker.isLinked) {
+          continue;
+        }
+
+        actions.push({ kind: 'declare-attack', player, attackerId, target: { kind: 'player' } });
+        for (const unitId of this.getTargetableEnemyUnits(player)) {
+          const targetUnit = this.state.cards[unitId];
+          if (targetUnit?.rested) {
+            actions.push({ kind: 'declare-attack', player, attackerId, target: { kind: 'unit', unitId } });
+          }
+        }
+      }
+    }
+
+    return actions;
+  }
+
+  public inferStrategyProfile(player: PlayerIndex): StrategyProfile {
+    const owned = this.getCardsOwnedByPlayer(player);
+    const total = owned.length || 1;
+
+    let unitCount = 0;
+    let pilotCount = 0;
+    let commandCount = 0;
+    let totalCost = 0;
+    for (const card of owned) {
+      totalCost += card.cost;
+      if (card.type === 'Unit') {
+        unitCount += 1;
+      } else if (card.type === 'Pilot') {
+        pilotCount += 1;
+      } else if (card.type === 'Command') {
+        commandCount += 1;
+      }
+    }
+
+    const avgCost = totalCost / total;
+    const unitRatio = unitCount / total;
+    const commandRatio = commandCount / total;
+    const pilotRatio = pilotCount / total;
+
+    let style: StrategyStyle = 'midrange';
+    if (avgCost <= 2.3 && unitRatio >= 0.5) {
+      style = 'aggro';
+    } else if (commandRatio >= 0.3 || avgCost >= 3.7) {
+      style = 'control';
+    } else if (pilotRatio >= 0.16 && unitRatio >= 0.35) {
+      style = 'combo';
+    }
+
+    return {
+      style,
+      avgCost,
+      unitRatio,
+      commandRatio,
+      pilotRatio,
+    };
+  }
+
+  public recommendAction(player: PlayerIndex): StrategicRecommendation | null {
+    const legal = this.getLegalActions(player);
+    if (legal.length === 0) {
+      return null;
+    }
+
+    const profile = this.inferStrategyProfile(player);
+    let best: StrategicRecommendation | null = null;
+    for (const action of legal) {
+      const candidate = this.scoreAction(player, action, profile);
+      if (!best || candidate.score > best.score) {
+        best = candidate;
+      }
+    }
+
+    return best;
+  }
+
   public advanceToNextPhase(): ActionResult {
     if (this.state.gameOver) {
       return { ok: false, error: 'Game is already over.' };
@@ -388,33 +574,14 @@ export class GundamPlaytestEngine {
     if (this.state.gameOver) {
       return { ok: false, error: 'Game is already over.' };
     }
-    if (!this.state.priority || this.state.priority.currentPlayer !== player) {
-      return { ok: false, error: 'Player does not currently have priority.' };
+    const playValidation = this.validatePlayCardIntent(player, handCardId, options);
+    if (!playValidation.ok) {
+      return playValidation;
     }
 
     const playerState = this.state.players[player];
     const handIndex = playerState.hand.indexOf(handCardId);
-    if (handIndex === -1) {
-      return { ok: false, error: 'Card is not in hand.' };
-    }
-
     const card = this.state.cards[handCardId];
-    if (!card) {
-      return { ok: false, error: 'Card instance not found.' };
-    }
-
-    if (card.definition.type === 'Command') {
-      if (!this.canPlayCommandInCurrentWindow()) {
-        return { ok: false, error: 'Commands can only be played in an action window.' };
-      }
-    } else {
-      if (this.state.phase !== 'main' || this.state.priority.window !== 'main') {
-        return { ok: false, error: 'Units, Pilots, and Bases may only be played in the main action window.' };
-      }
-      if (player !== this.state.activePlayer) {
-        return { ok: false, error: 'Only the active player can play permanent cards in main phase.' };
-      }
-    }
 
     const payCheck = this.canPayForCard(player, card.definition);
     if (!payCheck.ok) {
@@ -425,25 +592,13 @@ export class GundamPlaytestEngine {
     playerState.hand.splice(handIndex, 1);
 
     if (card.definition.type === 'Unit') {
-      if (playerState.battleArea.length >= MAX_BATTLE_AREA) {
-        playerState.hand.splice(handIndex, 0, handCardId);
-        return { ok: false, error: `Battle area is full (max ${MAX_BATTLE_AREA}).` };
-      }
       card.enteredTurn = this.state.turn;
       card.rested = false;
       card.damage = 0;
       playerState.battleArea.push(handCardId);
       this.state.log.push(`${playerState.name} deployed ${card.definition.name}.`);
     } else if (card.definition.type === 'Pilot') {
-      if (!options.attachToUnitId) {
-        playerState.hand.splice(handIndex, 0, handCardId);
-        return { ok: false, error: 'Pilot play requires attachToUnitId.' };
-      }
-      const attachResult = this.attachPilotToUnit(player, handCardId, options.attachToUnitId);
-      if (!attachResult.ok) {
-        playerState.hand.splice(handIndex, 0, handCardId);
-        return attachResult;
-      }
+      this.attachPilotToUnit(player, handCardId, options.attachToUnitId!);
       this.state.log.push(`${playerState.name} paired ${card.definition.name}.`);
     } else if (card.definition.type === 'Base') {
       if (playerState.base) {
@@ -457,9 +612,6 @@ export class GundamPlaytestEngine {
       this.moveToTrash(player, handCardId);
       this.queueCommandEffect(card, player, options.targetUnitId);
       this.state.log.push(`${playerState.name} played command ${card.definition.name}.`);
-    } else if (card.definition.type === 'Resource') {
-      playerState.resourceArea.push(handCardId);
-      this.state.log.push(`${playerState.name} moved ${card.definition.name} to resources.`);
     }
 
     this.postActionPriorityShift(player);
