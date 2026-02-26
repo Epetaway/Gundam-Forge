@@ -18,21 +18,16 @@ import {
 } from 'lucide-react';
 import { validateDeck, type CardColor, type CardDefinition, type CardType } from '@gundam-forge/shared';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/Dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
+import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { cn } from '@/lib/utils/cn';
 
@@ -110,6 +105,9 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
   const [copyFeedback, setCopyFeedback] = React.useState('');
   const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
   const [quickAddQuery, setQuickAddQuery] = React.useState('');
+  const [importOpen, setImportOpen] = React.useState(false);
+  const [importText, setImportText] = React.useState('');
+  const [importFeedback, setImportFeedback] = React.useState('');
   const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
   const [draft, setDraft] = React.useState<FilterDraft>({
     query: '',
@@ -312,6 +310,43 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
     setQuickAddQuery('');
   };
 
+  const parseImportedDeck = React.useCallback((raw: string): Record<string, number> => {
+    const next: Record<string, number> = {};
+    const byName = new Map<string, string>(visibleCards.map((card) => [card.name.toLowerCase(), card.id]));
+
+    for (const line of raw.split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed.length === 0) continue;
+
+      const qtyMatch = trimmed.match(/^(\d+)\s*[xX]?\s*/);
+      const qty = Math.min(4, Math.max(1, qtyMatch ? Number.parseInt(qtyMatch[1], 10) : 1));
+      const normalized = qtyMatch ? trimmed.slice(qtyMatch[0].length).trim() : trimmed;
+
+      const idMatch = normalized.match(/([A-Z0-9]{2,8}-[0-9]{3}[A-Z]?)/i);
+      const cardId = idMatch ? idMatch[1].toUpperCase() : byName.get(normalized.toLowerCase());
+      if (!cardId || !cardMap.has(cardId)) continue;
+
+      next[cardId] = Math.min(4, (next[cardId] ?? 0) + qty);
+    }
+
+    return next;
+  }, [cardMap, visibleCards]);
+
+  const applyImportedDeck = React.useCallback((): void => {
+    const parsed = parseImportedDeck(importText);
+    const parsedCount = Object.keys(parsed).length;
+
+    if (parsedCount === 0) {
+      setImportFeedback('No valid cards were parsed from this input.');
+      return;
+    }
+
+    setDeck(parsed);
+    setImportFeedback(`Imported ${parsedCount} unique cards.`);
+    setImportOpen(false);
+    setImportText('');
+  }, [importText, parseImportedDeck]);
+
   const exportDeck = React.useCallback(
     async (format: 'text' | 'csv' | 'json') => {
       const rows = resolvedDeck.map((entry) => ({
@@ -422,6 +457,9 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
             </div>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Button onClick={() => setImportOpen(true)} size="sm" variant="secondary">
+                Import
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" variant="secondary">Export</Button>
@@ -449,6 +487,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                 {copyFeedback}
               </span>
             ) : null}
+            {importFeedback ? <span className="text-steel-700">{importFeedback}</span> : null}
           </div>
         </header>
 
@@ -609,43 +648,13 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                     const qty = deck[card.id] ?? 0;
                     return (
                       <li className="px-1.5 py-1" key={card.id}>
-                        <div className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md px-1 py-1 transition-colors hover:bg-steel-50">
-                          <button
-                            className="relative h-11 w-8 overflow-hidden rounded border border-border"
-                            onClick={() => setInspectCardId(card.id)}
-                            type="button"
-                          >
-                            <CardArtImage card={card} className="h-full w-full object-cover" fill sizes="32px" />
-                          </button>
-
-                          <button className="min-w-0 text-left" onClick={() => setInspectCardId(card.id)} type="button">
-                            <p className="truncate text-sm font-semibold text-foreground">{card.name}</p>
-                            <p className="truncate text-[11px] text-steel-600">
-                              {card.id} • {card.type} • {card.color} • Cost {card.cost}
-                            </p>
-                          </button>
-
-                          <div className="flex items-center gap-1">
-                            <button
-                              aria-label={`Remove ${card.name}`}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100 disabled:cursor-not-allowed disabled:opacity-40"
-                              disabled={qty === 0}
-                              onClick={() => removeCard(card.id)}
-                              type="button"
-                            >
-                              <Minus className="h-3.5 w-3.5" />
-                            </button>
-                            <span className="w-6 text-center text-xs font-semibold text-steel-700">{qty}</span>
-                            <button
-                              aria-label={`Add ${card.name}`}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100"
-                              onClick={() => addCard(card.id)}
-                              type="button"
-                            >
-                              <Plus className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </div>
+                        <ReferenceCardTile
+                          card={card}
+                          qty={qty}
+                          onAdd={() => addCard(card.id)}
+                          onOpen={() => setInspectCardId(card.id)}
+                          onRemove={() => removeCard(card.id)}
+                        />
                       </li>
                     );
                   })}
@@ -656,54 +665,13 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                     const qty = deck[card.id] ?? 0;
                     return (
                       <li key={card.id}>
-                        <div className="overflow-hidden rounded-md border border-border bg-surface">
-                          <button className="relative block aspect-[5/7] w-full bg-steel-100" onClick={() => setInspectCardId(card.id)} type="button">
-                            <CardArtImage
-                              card={card}
-                              className="h-full w-full object-cover"
-                              fill
-                              sizes="(max-width: 1280px) 50vw, 24vw"
-                            />
-                            {qty > 0 ? (
-                              <span className="absolute right-1.5 top-1.5 rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                                {qty}x
-                              </span>
-                            ) : null}
-                          </button>
-                          <div className="space-y-2 p-2">
-                            <div className="flex items-start justify-between gap-2">
-                              <button className="min-w-0 text-left" onClick={() => setInspectCardId(card.id)} type="button">
-                                <p className="line-clamp-2 text-xs font-semibold text-foreground">{card.name}</p>
-                                <p className="text-[10px] text-steel-600">{card.id}</p>
-                              </button>
-                              <Badge>{card.cost}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between text-[11px] text-steel-600">
-                              <span>{card.type}</span>
-                              <span>{card.color}</span>
-                            </div>
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                aria-label={`Remove ${card.name}`}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100 disabled:cursor-not-allowed disabled:opacity-40"
-                                disabled={qty === 0}
-                                onClick={() => removeCard(card.id)}
-                                type="button"
-                              >
-                                <Minus className="h-3.5 w-3.5" />
-                              </button>
-                              <span className="w-6 text-center text-xs font-semibold text-steel-700">{qty}</span>
-                              <button
-                                aria-label={`Add ${card.name}`}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100"
-                                onClick={() => addCard(card.id)}
-                                type="button"
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <ReferenceCardTile
+                          card={card}
+                          qty={qty}
+                          onAdd={() => addCard(card.id)}
+                          onOpen={() => setInspectCardId(card.id)}
+                          onRemove={() => removeCard(card.id)}
+                        />
                       </li>
                     );
                   })}
@@ -787,14 +755,6 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                               <ul className="divide-y divide-border" role="list">
                                 {group.entries.map((entry) => (
                                   <li className="flex items-center gap-2 px-2 py-1.5" key={entry.cardId}>
-                                    <button
-                                      className="relative h-9 w-6 flex-shrink-0 overflow-hidden rounded border border-border"
-                                      onClick={() => setInspectCardId(entry.cardId)}
-                                      type="button"
-                                    >
-                                      <CardArtImage card={entry.card} className="h-full w-full object-cover" fill sizes="24px" />
-                                    </button>
-
                                     <button className="min-w-0 flex-1 text-left" onClick={() => setInspectCardId(entry.cardId)} type="button">
                                       <p className="truncate text-sm font-medium text-foreground">{entry.card.name}</p>
                                       <p className="text-[11px] text-steel-600">{entry.card.id} • Cost {entry.card.cost}</p>
@@ -860,6 +820,27 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
           </aside>
         </div>
       </section>
+
+      <Dialog onOpenChange={setImportOpen} open={importOpen}>
+        <DialogContent aria-describedby="forge-import-description" className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Import Decklist</DialogTitle>
+            <DialogDescription id="forge-import-description">
+              Paste lines like `2 ST01-001`, `2x ST01-001`, or `2 Card Name`.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            className="min-h-56 w-full rounded-md border border-border bg-surface p-3 font-mono text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+            onChange={(event) => setImportText(event.target.value)}
+            placeholder={'4 ST01-001\n3 GD01-100\n2 Card Name'}
+            value={importText}
+          />
+          <div className="flex items-center justify-end gap-2">
+            <Button onClick={() => setImportOpen(false)} variant="secondary">Cancel</Button>
+            <Button onClick={applyImportedDeck}>Import deck</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {mobileFiltersOpen ? (
         <>
@@ -929,32 +910,14 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
         </>
       ) : null}
 
-      <Dialog onOpenChange={(open) => !open && setInspectCardId(null)} open={Boolean(inspectCard)}>
-        <DialogContent aria-describedby="forge-card-details">
-          <DialogHeader>
-            <DialogTitle>{inspectCard?.name}</DialogTitle>
-            <DialogDescription id="forge-card-details">
-              {inspectCard?.id} • {inspectCard?.color} • {inspectCard?.type} • Cost {inspectCard?.cost}
-            </DialogDescription>
-          </DialogHeader>
-
-          {inspectCard ? (
-            <div className="relative mx-auto aspect-[5/7] w-48 overflow-hidden rounded-md border border-border bg-steel-100">
-              <CardArtImage card={inspectCard} className="h-full w-full object-cover" fill sizes="192px" />
-            </div>
-          ) : null}
-
-          <p className="text-sm text-steel-700">{inspectCard?.text ?? 'No rules text for this entry.'}</p>
-          <div className="flex justify-end">
-            {inspectCard ? (
-              <Button onClick={() => addCard(inspectCard.id)}>
-                <Plus className="mr-1 h-4 w-4" />
-                Add to deck
-              </Button>
-            ) : null}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ReferenceCardDetailModal
+        card={inspectCard ?? null}
+        onAdd={inspectCard ? () => addCard(inspectCard.id) : undefined}
+        onOpenChange={(open) => !open && setInspectCardId(null)}
+        onRemove={inspectCard ? () => removeCard(inspectCard.id) : undefined}
+        open={Boolean(inspectCard)}
+        qty={inspectCard ? deck[inspectCard.id] ?? 0 : 0}
+      />
     </>
   );
 }
