@@ -32,8 +32,10 @@ export function MainNav(): JSX.Element {
           return (
             <Link
               className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                isActive ? 'bg-accent text-accent-foreground' : 'text-steel-600 hover:bg-steel-100 hover:text-foreground',
+                'rounded-sm border px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                isActive
+                  ? 'border-cobalt-400/70 bg-cobalt-500/25 text-cobalt-300 shadow-[0_0_14px_rgba(59,130,246,0.28)]'
+                  : 'border-transparent text-steel-600 hover:border-cobalt-500/30 hover:bg-steel-200 hover:text-foreground',
               )}
               href={item.href}
               key={item.href}

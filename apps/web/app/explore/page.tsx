@@ -9,7 +9,7 @@ export default function ExplorePage(): JSX.Element {
   return (
     <Container className="space-y-6 py-8">
       <PageHeader
-        description="Public deck explorer with competitive ranking signals, event influence, and win-rate-driven sorting."
+        description="Track the live ladder with trend momentum, event pressure, and win-rate intelligence."
         eyebrow="Explore"
         title="Deck Explorer"
       />

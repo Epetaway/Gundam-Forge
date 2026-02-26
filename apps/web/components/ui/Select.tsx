@@ -15,7 +15,7 @@ const SelectTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-surface placeholder:text-steel-500 focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50',
+      'flex h-10 w-full items-center justify-between rounded-md border border-border bg-surface-interactive px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-surface placeholder:text-steel-500 focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}
     ref={ref}
@@ -36,7 +36,7 @@ const SelectContent = React.forwardRef<
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       className={cn(
-        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-surface text-foreground shadow-md data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
+        'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-surface-elevated text-foreground shadow-md data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
         className,
@@ -65,7 +65,7 @@ const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Item
     className={cn(
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none focus:bg-steel-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-default select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none focus:bg-steel-200 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     ref={ref}

@@ -2,13 +2,34 @@
 @config '../tailwind.config.ts';
 
 :root {
-  --font-sans: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-display: "Rajdhani", "Bahnschrift", "Arial Narrow", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Rajdhani', 'Bahnschrift', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --background: 220 22% 7%;
+  --foreground: 215 46% 94%;
+  --surface: 218 24% 11%;
+  --surface-muted: 220 26% 15%;
+  --surface-elevated: 221 28% 19%;
+  --surface-interactive: 220 25% 18%;
+  --accent: 217 91% 60%;
+  --accent-foreground: 0 0% 100%;
+  --border: 218 24% 22%;
+  --ring: 217 91% 60%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 71% 45%;
+  --warning: 38 92% 50%;
+  --overlay: 0 0% 0%;
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
   --background: 210 24% 96%;
   --foreground: 222 47% 11%;
   --surface: 0 0% 100%;
   --surface-muted: 214 32% 91%;
+  --surface-elevated: 210 31% 95%;
+  --surface-interactive: 210 28% 92%;
   --accent: 223 100% 58%;
   --accent-foreground: 0 0% 100%;
   --border: 214 23% 85%;
@@ -17,23 +38,8 @@
   --destructive-foreground: 0 0% 100%;
   --success: 163 95% 30%;
   --warning: 37 69% 50%;
+  --overlay: 0 0% 0%;
   color-scheme: light;
-}
-
-[data-theme='dark'] {
-  --background: 224 28% 8%;
-  --foreground: 210 20% 92%;
-  --surface: 223 24% 12%;
-  --surface-muted: 222 20% 16%;
-  --accent: 221 100% 62%;
-  --accent-foreground: 0 0% 100%;
-  --border: 219 18% 24%;
-  --ring: 221 100% 62%;
-  --destructive: 0 77% 61%;
-  --destructive-foreground: 0 0% 100%;
-  --success: 152 74% 40%;
-  --warning: 39 100% 56%;
-  color-scheme: dark;
 }
 
 @layer base {
@@ -44,14 +50,15 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(1200px 480px at 50% -5%, rgba(42, 102, 255, 0.08), transparent 70%),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.06), transparent 35%);
+      radial-gradient(1200px 560px at 50% -10%, rgba(96, 165, 250, 0.16), transparent 72%),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(2, 6, 23, 0.95)),
+      repeating-linear-gradient(0deg, rgba(125, 142, 168, 0.04) 0, rgba(125, 142, 168, 0.04) 1px, transparent 1px, transparent 12px);
   }
 
-  [data-theme='dark'] body {
+  [data-theme='light'] body {
     background-image:
-      radial-gradient(1200px 520px at 50% -8%, rgba(64, 123, 255, 0.18), transparent 70%),
-      linear-gradient(to bottom, rgba(30, 41, 59, 0.45), transparent 45%);
+      radial-gradient(1200px 480px at 50% -5%, rgba(42, 102, 255, 0.08), transparent 70%),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.06), transparent 35%);
   }
 
   h1,
@@ -69,6 +76,24 @@
 
   a {
     @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+}
+
+@layer components {
+  .panel-level-1 {
+    @apply rounded-md border border-border bg-surface shadow-sm;
+  }
+
+  .panel-level-2 {
+    @apply rounded-md border border-steel-400 bg-surface-elevated shadow-md;
+  }
+
+  .panel-level-3 {
+    @apply rounded-md border border-cobalt-400/40 bg-surface-elevated shadow-lg;
+  }
+
+  .industrial-divider {
+    background-image: linear-gradient(to bottom, rgba(96, 165, 250, 0.24), transparent 55%);
   }
 }
 

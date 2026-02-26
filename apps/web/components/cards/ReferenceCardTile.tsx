@@ -25,24 +25,29 @@ export function ReferenceCardTile({
   onOpen,
 }: ReferenceCardTileProps): JSX.Element {
   return (
-    <article className={cn('rounded-[6px] border border-[#b9b9b9] bg-[#dfdfdf] p-2 text-[#2f2f2f]', className)}>
+    <article
+      className={cn(
+        'group rounded-[6px] border border-[#2a3444] bg-[#1c2330] p-2 text-[#e6edf8] shadow-[0_10px_24px_rgba(2,6,23,0.32)] transition-all duration-150 hover:-translate-y-0.5 hover:border-[#4c90fa] hover:shadow-[0_16px_32px_rgba(2,6,23,0.52)]',
+        className,
+      )}
+    >
       <div className="flex items-center justify-between text-[11px] font-semibold leading-none">
         <span className="truncate pr-2">{card.name}</span>
         <button
           aria-label={`Card menu for ${card.name}`}
-          className="rounded-[3px] p-0.5 text-[#4f4f4f] transition-colors hover:bg-black/10 hover:text-[#252525]"
+          className="rounded-[3px] p-0.5 text-[#9aa9bf] transition-colors hover:bg-[#111827] hover:text-[#e6edf8]"
           type="button"
         >
           <Ellipsis className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="mt-1 flex items-center justify-between text-[11px] text-[#5d5d5d]">
+      <div className="mt-1 flex items-center justify-between text-[11px] text-[#9aa9bf]">
         <span>Qty: {qty}</span>
         <span>{card.id}</span>
       </div>
 
-      <div className="relative mt-1.5 overflow-hidden rounded-[6px] border border-[#5c5c5c] bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+      <div className="relative mt-1.5 overflow-hidden rounded-[6px] border border-[#3a475c] bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]">
         <button
           aria-label={`Open ${card.name}`}
           className="block w-full text-left"
@@ -51,6 +56,7 @@ export function ReferenceCardTile({
         >
           <div className="relative aspect-[5/7] w-full">
             <CardArtImage card={card} className="h-full w-full object-cover" fill sizes="(max-width: 1024px) 45vw, 18vw" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/70 to-transparent" />
           </div>
         </button>
 
@@ -60,7 +66,7 @@ export function ReferenceCardTile({
           <div className="overflow-hidden rounded-[4px] border border-white/60 bg-black/30 backdrop-blur-[1px]">
             <button
               aria-label={`Add ${card.name}`}
-              className="flex h-8 w-8 items-center justify-center border-b border-white/60 text-white transition-colors hover:bg-white/20"
+              className="flex h-8 w-8 items-center justify-center border-b border-white/60 text-white transition-colors hover:bg-white/20 active:scale-95"
               onClick={onAdd}
               type="button"
             >
@@ -68,7 +74,7 @@ export function ReferenceCardTile({
             </button>
             <button
               aria-label={`Remove ${card.name}`}
-              className="flex h-8 w-8 items-center justify-center text-white transition-colors hover:bg-white/20 disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center text-white transition-colors hover:bg-white/20 active:scale-95 disabled:opacity-40"
               disabled={qty === 0}
               onClick={onRemove}
               type="button"
@@ -79,7 +85,7 @@ export function ReferenceCardTile({
 
           <button
             aria-label={`Open details for ${card.name}`}
-            className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-white/60 bg-black/35 text-white backdrop-blur-[1px] transition-colors hover:bg-white/20"
+            className="flex h-9 w-9 items-center justify-center rounded-[4px] border border-white/60 bg-black/35 text-white backdrop-blur-[1px] transition-colors hover:bg-white/20 active:scale-95"
             onClick={onOpen}
             type="button"
           >

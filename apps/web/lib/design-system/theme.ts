@@ -9,6 +9,8 @@ export const designTheme = {
     foreground: 'hsl(var(--foreground))',
     surface: 'hsl(var(--surface))',
     'surface-muted': 'hsl(var(--surface-muted))',
+    'surface-elevated': 'hsl(var(--surface-elevated))',
+    'surface-interactive': 'hsl(var(--surface-interactive))',
     border: 'hsl(var(--border))',
     ring: 'hsl(var(--ring))',
     accent: {

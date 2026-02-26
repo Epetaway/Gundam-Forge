@@ -16,9 +16,9 @@ const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command',
 type CatalogView = 'grid' | 'list';
 
 const inputClassName =
-  'h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'h-10 w-full rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 const selectClassName =
-  'h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'h-10 w-full rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 interface FilterDraft {
   query: string;
@@ -114,8 +114,8 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   return (
     <Container className="py-3 lg:py-4" wide>
-      <section className="rounded-xl border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[36rem] lg:overflow-hidden">
-        <header className="border-b border-border bg-steel-50/80 px-3 py-2">
+      <section className="rounded-md border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[36rem] lg:overflow-hidden">
+        <header className="border-b border-border bg-surface-interactive px-3 py-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-steel-500">Catalog Tooling</p>
@@ -162,7 +162,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         </header>
 
         <div className="grid gap-3 p-3 lg:h-[calc(100%-4.5rem)] lg:min-h-0 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-2">
-          <aside className="hidden min-h-0 rounded-lg border border-border bg-surface-muted/35 lg:flex lg:flex-col">
+          <aside className="hidden min-h-0 rounded-md border border-border bg-surface-muted/80 lg:flex lg:flex-col">
             <div className="flex items-center justify-between border-b border-border px-3 py-2">
               <h2 className="text-sm font-semibold text-foreground">Filters</h2>
               {activeChips.length > 0 ? (
@@ -218,7 +218,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 <div className="flex flex-wrap gap-1.5">
                   {activeChips.map((chip) => (
                     <button
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-steel-100 px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
+                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
                       key={chip.id}
                       onClick={chip.clear}
                     >
@@ -231,7 +231,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             </div>
           </aside>
 
-          <section className="min-h-0 rounded-lg border border-border bg-surface lg:flex lg:flex-col">
+          <section className="min-h-0 rounded-md border border-border bg-surface lg:flex lg:flex-col">
             <div className="border-b border-border px-3 py-2 lg:hidden">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
@@ -273,7 +273,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             className="fixed inset-0 z-40 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-2xl border border-border bg-surface p-4 shadow-2xl lg:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-md border border-border bg-surface p-4 shadow-2xl lg:hidden">
             <h3 className="text-sm font-semibold text-foreground">Filters</h3>
             <div className="mt-3 space-y-3">
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">

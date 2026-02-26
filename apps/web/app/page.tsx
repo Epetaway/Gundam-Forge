@@ -23,16 +23,15 @@ export default function HomePage(): JSX.Element {
   return (
     <>
       <section className="relative overflow-hidden border-b border-border">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(42,102,255,0.08),transparent_40%),linear-gradient(to_bottom,transparent,rgba(15,23,42,0.04))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_500px_at_18%_-10%,rgba(59,130,246,0.24),transparent_72%),linear-gradient(120deg,rgba(59,130,246,0.08),transparent_45%)]" />
         <Container className="relative grid gap-12 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:py-24">
           <div className="space-y-6">
-            <Badge variant="accent" className="w-fit">Foundation Reset</Badge>
+            <Badge variant="accent" className="w-fit">Command Interface V2</Badge>
             <h1 className="max-w-[18ch] font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-              Industrial-grade deck building for Gundam GCG.
+              Forge Winning Gundam Decks.
             </h1>
             <p className="max-w-[62ch] text-base text-steel-600">
-              Rebuilt on Next.js App Router with SSR-first pages, accessible Radix primitives, and tokenized Tailwind styling.
-              Card artwork stays dominant while UI chrome remains structured and mechanically minimal.
+              Built for competitive pilots. Powered by real tournament data and mechanical-grade deck tooling.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg">
@@ -44,7 +43,7 @@ export default function HomePage(): JSX.Element {
             </div>
           </div>
 
-          <Card className="overflow-hidden border-steel-200/80 bg-surface/90">
+          <Card className="overflow-hidden border-steel-400 bg-surface-elevated/90">
             <CardHeader>
               <CardTitle>Meta Snapshot</CardTitle>
               <CardDescription>Live-ready architecture with SSR by default and scoped client islands.</CardDescription>
@@ -72,8 +71,13 @@ export default function HomePage(): JSX.Element {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {trendingDecks.map((deck) => {
               const previewCard = getCard(deck.entries[0]?.cardId);
+              const accentClass = getArchetypeAccent(deck.archetype);
               return (
-                <Card key={deck.id} className="overflow-hidden">
+                <Card
+                  key={deck.id}
+                  className="group relative overflow-hidden border-steel-400 bg-surface-elevated transition-all duration-150 hover:-translate-y-0.5 hover:border-cobalt-400/70 hover:shadow-[0_18px_34px_rgba(2,6,23,0.52)]"
+                >
+                  <span className={`absolute inset-y-0 left-0 w-1 ${accentClass}`} />
                   <CardContent className="pb-0">
                     {previewCard ? (
                       <ReferenceCardTile
@@ -88,7 +92,7 @@ export default function HomePage(): JSX.Element {
                     </div>
                   </CardContent>
                   <CardContent className="flex items-center justify-between py-3">
-                    <p className="text-xs text-steel-600">
+                    <p className={`text-xs ${getWinRateTone(deck.winRate)}`}>
                       {(deck.winRate * 100).toFixed(1)}% win rate • {deck.eventAppearances} events
                     </p>
                     <Button asChild size="sm" variant="ghost">
@@ -104,14 +108,14 @@ export default function HomePage(): JSX.Element {
 
       <section className="pb-12">
         <Container className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card>
+          <Card className="bg-surface-elevated">
             <CardHeader>
               <CardTitle>Recent Tournament Results</CardTitle>
               <CardDescription>Latest placements informing the ranking engine.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {events.slice(0, 3).map((event) => (
-                <div className="rounded-md border border-border bg-steel-50 px-3 py-2" key={event.id}>
+                <div className="rounded-md border border-border bg-surface-interactive px-3 py-2" key={event.id}>
                   <div className="flex items-center justify-between text-sm">
                     <p className="font-semibold">{event.name}</p>
                     <Badge>{event.date}</Badge>
@@ -128,13 +132,13 @@ export default function HomePage(): JSX.Element {
           </Card>
 
           <div className="space-y-4">
-            <Card>
+            <Card className="bg-surface-elevated">
               <CardHeader>
                 <CardTitle>Popular Archetypes</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {archetypes.map((record) => (
-                  <div className="rounded-md border border-border bg-steel-50 px-3 py-2" key={record.archetype}>
+                  <div className="rounded-md border border-border bg-surface-interactive px-3 py-2" key={record.archetype}>
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-semibold">{record.archetype}</p>
                       <Badge variant="accent">{record.topThree} top 3</Badge>
@@ -145,13 +149,13 @@ export default function HomePage(): JSX.Element {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-surface-elevated">
               <CardHeader>
                 <CardTitle>Latest Updates</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {latestUpdates.map((update) => (
-                  <p className="rounded-md border border-border bg-steel-50 px-3 py-2 text-xs text-steel-700" key={update}>
+                  <p className="rounded-md border border-border bg-surface-interactive px-3 py-2 text-xs text-steel-700" key={update}>
                     {update}
                   </p>
                 ))}
@@ -166,9 +170,25 @@ export default function HomePage(): JSX.Element {
 
 function Stat({ label, value }: { label: string; value: string }): JSX.Element {
   return (
-    <div className="rounded-md border border-border bg-steel-50 px-3 py-2">
+    <div className="rounded-md border border-border bg-surface-interactive px-3 py-2">
       <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-steel-500">{label}</p>
       <p className="mt-1 font-display text-xl font-semibold text-foreground">{value}</p>
     </div>
   );
+}
+
+function getArchetypeAccent(archetype: string): string {
+  const key = archetype.toLowerCase();
+  if (key.includes('aggro')) return 'bg-red-500';
+  if (key.includes('control')) return 'bg-cobalt-500';
+  if (key.includes('midrange')) return 'bg-violet-500';
+  if (key.includes('ramp')) return 'bg-emerald-500';
+  if (key.includes('combo')) return 'bg-amber-500';
+  return 'bg-steel-500';
+}
+
+function getWinRateTone(winRate: number): string {
+  if (winRate >= 0.8) return 'text-emerald-300';
+  if (winRate >= 0.7) return 'text-amber-300';
+  return 'text-red-300';
 }
