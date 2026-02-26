@@ -389,6 +389,58 @@ const normalizeImageSource = (
   return { next, changed: false, missingImageSource: !hasImageSource(next), invalidLocalImage: false };
 };
 
+interface CleanStats {
+  scanned: number;
+  deleted: number;
+  errors: number;
+}
+
+const cleanCardArtDir = (cardArtDir: string, verbose: boolean): CleanStats => {
+  const stats: CleanStats = { scanned: 0, deleted: 0, errors: 0 };
+
+  if (!fs.existsSync(cardArtDir)) {
+    if (verbose) console.log(`   Card art directory not found: ${cardArtDir}`);
+    return stats;
+  }
+
+  const entries = fs.readdirSync(cardArtDir);
+
+  for (const entry of entries) {
+    const lower = entry.toLowerCase();
+    const ext = lower.split('.').pop() as string;
+    if (!(['webp', 'png', 'jpg', 'jpeg'] as const).includes(ext as LocalImageExtension)) continue;
+
+    const fullPath = path.join(cardArtDir, entry);
+    stats.scanned += 1;
+
+    const validExt = ext as LocalImageExtension;
+    if (!isValidLocalImageFile(fullPath, validExt)) {
+      const header = readImageHeader(fullPath, 16);
+      const preview = header
+        ? header.subarray(0, Math.min(header.length, 16)).toString('utf8').replace(/[^\x20-\x7e]/g, '.')
+        : '<unreadable>';
+
+      if (verbose) {
+        console.log(`   DELETE  ${entry}  (invalid ${validExt} header: "${preview}")`);
+      } else {
+        console.log(`   Deleting corrupt file: ${entry}`);
+      }
+
+      try {
+        fs.unlinkSync(fullPath);
+        stats.deleted += 1;
+      } catch (e) {
+        console.error(`   ERROR deleting ${entry}: ${e}`);
+        stats.errors += 1;
+      }
+    } else if (verbose) {
+      console.log(`   OK      ${entry}`);
+    }
+  }
+
+  return stats;
+};
+
 const autoFixCards = (rawCards: unknown[], filePath: string, verbose: boolean): { fixed: CardRecord[]; stats: FixStats } => {
   const projectRoot = process.cwd();
   const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
@@ -556,6 +608,12 @@ const validateCardsFile = (filePath: string, options: ValidationOptions): void =
   }
 
   if (options.fix) {
+    console.log('\n🧹 Cleaning card art directory...');
+    const projectRoot = process.cwd();
+    const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
+    const cleanStats = cleanCardArtDir(cardArtDir, Boolean(options.verbose));
+    console.log(`   - Scanned: ${cleanStats.scanned}  Deleted: ${cleanStats.deleted}  Errors: ${cleanStats.errors}`);
+
     console.log('\n🛠️  Running auto-fix pass...');
     const { fixed, stats } = autoFixCards(records, filePath, Boolean(options.verbose));
     records = fixed;

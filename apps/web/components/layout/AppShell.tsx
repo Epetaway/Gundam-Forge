@@ -15,10 +15,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
         <Container className="flex h-16 items-center justify-between">
           <Link className="flex items-center gap-2" href="/">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-cobalt-400/60 bg-cobalt-500/20 font-mono text-xs font-bold text-cobalt-300 shadow-[0_0_16px_rgba(59,130,246,0.35)]">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-cobalt-400/70 bg-cobalt-500/25 font-mono text-xs font-bold text-cobalt-300 shadow-[0_0_20px_rgba(59,130,246,0.45),inset_0_0_8px_rgba(59,130,246,0.15)]">
               GF
             </span>
-            <span className="font-display text-lg font-semibold uppercase tracking-[0.06em] text-steel-800">Gundam Forge</span>
+            <span className="font-display text-lg font-semibold uppercase tracking-[0.06em] text-foreground">Gundam Forge</span>
           </Link>
           <div className="flex items-center gap-3">
             <MainNav />

@@ -6,6 +6,7 @@ import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
 import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
+import { CollectionCardTile } from '@/components/cards/CollectionCardTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { cn } from '@/lib/utils/cn';
@@ -14,11 +15,10 @@ const colorOptions: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', '
 const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 
 type CatalogView = 'grid' | 'list';
+type SortKey = 'name' | 'cost-asc' | 'cost-desc' | 'set';
 
-const inputClassName =
-  'h-10 w-full rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 const selectClassName =
-  'h-10 w-full rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 interface FilterDraft {
   query: string;
@@ -37,11 +37,28 @@ interface CardsClientProps {
   initialCards: CardDefinition[];
 }
 
+function sortCards(cards: CardDefinition[], sortBy: SortKey): CardDefinition[] {
+  const arr = [...cards];
+  switch (sortBy) {
+    case 'name':
+      return arr.sort((a, b) => a.name.localeCompare(b.name));
+    case 'cost-asc':
+      return arr.sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name));
+    case 'cost-desc':
+      return arr.sort((a, b) => b.cost - a.cost || a.name.localeCompare(b.name));
+    case 'set':
+      return arr.sort((a, b) => a.set.localeCompare(b.set) || a.name.localeCompare(b.name));
+    default:
+      return arr;
+  }
+}
+
 export default function CardsClient({ initialCards }: CardsClientProps): JSX.Element {
   const [query, setQuery] = useState('');
   const [color, setColor] = useState<CardColor | 'All'>('All');
   const [type, setType] = useState<CardType | 'All'>('All');
   const [setCode, setSetCode] = useState('All');
+  const [sortBy, setSortBy] = useState<SortKey>('name');
   const [view, setView] = useState<CatalogView>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [inspectCardId, setInspectCardId] = useState<string | null>(null);
@@ -62,22 +79,17 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     [color, query, setCode, type],
   );
 
-  const {
-    data: filtered = initialCards,
-    isFetching,
-  } = useCardsQuery({
-    filters,
-    initialData: initialCards,
-  });
+  const { data: filtered = initialCards } = useCardsQuery({ filters, initialData: initialCards });
 
-  const cardLookup = useMemo(() => new Map(filtered.map((card) => [card.id, card])), [filtered]);
+  const sorted = useMemo(() => sortCards(filtered, sortBy), [filtered, sortBy]);
+
+  const cardLookup = useMemo(() => new Map(sorted.map((card) => [card.id, card])), [sorted]);
   const inspectCard = inspectCardId ? cardLookup.get(inspectCardId) : undefined;
 
   const activeChips = useMemo<ActiveChip[]>(() => {
     const chips: ActiveChip[] = [];
-
     if (query.trim().length > 0) {
-      chips.push({ id: `q:${query}`, label: `Search: ${query.trim()}`, clear: () => setQuery('') });
+      chips.push({ id: `q:${query}`, label: `"${query.trim()}"`, clear: () => setQuery('') });
     }
     if (color !== 'All') {
       chips.push({ id: `color:${color}`, label: `Color: ${color}`, clear: () => setColor('All') });
@@ -88,7 +100,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     if (setCode !== 'All') {
       chips.push({ id: `set:${setCode}`, label: `Set: ${setCode}`, clear: () => setSetCode('All') });
     }
-
     return chips;
   }, [color, query, setCode, type]);
 
@@ -113,159 +124,150 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   };
 
   return (
-    <Container className="py-3 lg:py-4" wide>
-      <section className="rounded-md border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[36rem] lg:overflow-hidden">
-        <header className="border-b border-border bg-surface-interactive px-3 py-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-steel-500">Catalog Tooling</p>
-              <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Card Database</h1>
+    <>
+      {/* ── CollectionToolbar — sticky below AppShell header ──── */}
+      <div className="sticky top-16 z-30 border-b border-border bg-surface/95 backdrop-blur-md">
+        <Container wide>
+          <div className="flex flex-wrap items-center gap-2 py-2">
+            {/* Results count */}
+            <span className="flex-none text-sm text-steel-600">
+              <span className="font-semibold text-foreground">{sorted.length}</span> cards
+            </span>
+
+            <div className="flex-1" />
+
+            {/* Sort */}
+            <select
+              className={selectClassName}
+              onChange={(event) => setSortBy(event.target.value as SortKey)}
+              value={sortBy}
+            >
+              <option value="name">Name A→Z</option>
+              <option value="cost-asc">Cost ↑</option>
+              <option value="cost-desc">Cost ↓</option>
+              <option value="set">Set</option>
+            </select>
+
+            {/* View toggles */}
+            <div className="inline-flex items-center rounded-md border border-border bg-surface-interactive p-1">
+              <button
+                aria-label="Grid view"
+                className={cn(
+                  'rounded px-2 py-1 text-xs font-semibold transition-colors',
+                  view === 'grid' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                )}
+                onClick={() => setView('grid')}
+                type="button"
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+              <button
+                aria-label="List view"
+                className={cn(
+                  'rounded px-2 py-1 text-xs font-semibold transition-colors',
+                  view === 'list' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                )}
+                onClick={() => setView('list')}
+                type="button"
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center rounded-md border border-border bg-steel-100/80 p-1">
+            {/* Search — visible on sm+ */}
+            <div className="relative hidden w-52 sm:block lg:w-64">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
+              <input
+                className="h-9 w-full rounded-md border border-border bg-surface-interactive pl-8 pr-8 text-sm text-foreground outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search cards..."
+                value={query}
+              />
+              {query.length > 0 ? (
                 <button
-                  aria-label="Grid view"
-                  className={cn(
-                    'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                    view === 'grid' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                  )}
-                  onClick={() => setView('grid')}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-steel-500 hover:text-foreground"
+                  onClick={() => setQuery('')}
                   type="button"
                 >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  aria-label="List view"
-                  className={cn(
-                    'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                    view === 'list' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                  )}
-                  onClick={() => setView('list')}
-                  type="button"
-                >
-                  <List className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              <Button className="lg:hidden" onClick={openMobileFilters} size="sm" variant="secondary">
-                <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
-                Filters {activeChips.length > 0 ? `(${activeChips.length})` : ''}
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-1 flex items-center justify-between text-xs text-steel-600">
-            <p>{filtered.length} cards matched</p>
-            <p className="hidden font-medium lg:block">{isFetching ? 'Refreshing...' : 'Reference card view enabled'}</p>
-          </div>
-        </header>
-
-        <div className="grid gap-3 p-3 lg:h-[calc(100%-4.5rem)] lg:min-h-0 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-2">
-          <aside className="hidden min-h-0 rounded-md border border-border bg-surface-muted/80 lg:flex lg:flex-col">
-            <div className="flex items-center justify-between border-b border-border px-3 py-2">
-              <h2 className="text-sm font-semibold text-foreground">Filters</h2>
-              {activeChips.length > 0 ? (
-                <button className="text-[11px] font-semibold uppercase tracking-wide text-steel-600 hover:text-foreground" onClick={clearAll}>
-                  Reset
+                  <X className="h-3.5 w-3.5" />
                 </button>
               ) : null}
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto p-3">
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Search
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
-                  <input
-                    className={cn(inputClassName, 'pl-8')}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Name, ID, text"
-                    value={query}
-                  />
-                </div>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Color
-                <select className={selectClassName} onChange={(event) => setColor(event.target.value as CardColor | 'All')} value={color}>
-                  {colorOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Type
-                <select className={selectClassName} onChange={(event) => setType(event.target.value as CardType | 'All')} value={type}>
-                  {typeOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Set
-                <select className={selectClassName} onChange={(event) => setSetCode(event.target.value)} value={setCode}>
-                  <option value="All">All</option>
-                  {allSets.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-
+            {/* Filters button — opens filter drawer */}
+            <Button onClick={openMobileFilters} size="sm" variant="secondary">
+              <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+              Filters
               {activeChips.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {activeChips.map((chip) => (
-                    <button
-                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
-                      key={chip.id}
-                      onClick={chip.clear}
-                    >
-                      {chip.label}
-                      <X className="h-3 w-3" />
-                    </button>
-                  ))}
-                </div>
+                <span className="ml-1.5 rounded-full bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold text-accent">
+                  {activeChips.length}
+                </span>
               ) : null}
-            </div>
-          </aside>
+            </Button>
+          </div>
 
-          <section className="min-h-0 rounded-md border border-border bg-surface lg:flex lg:flex-col">
-            <div className="border-b border-border px-3 py-2 lg:hidden">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
-                <input
-                  className={cn(inputClassName, 'pl-8')}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search cards"
-                  value={query}
+          {/* Active filter chips */}
+          {activeChips.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5 pb-2">
+              {activeChips.map((chip) => (
+                <button
+                  className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[11px] font-medium text-steel-700 transition-colors hover:border-accent hover:text-accent"
+                  key={chip.id}
+                  onClick={chip.clear}
+                  type="button"
+                >
+                  {chip.label}
+                  <X className="h-3 w-3" />
+                </button>
+              ))}
+              <button
+                className="text-[11px] font-semibold text-steel-600 hover:text-foreground"
+                onClick={clearAll}
+                type="button"
+              >
+                Clear all
+              </button>
+            </div>
+          ) : null}
+        </Container>
+      </div>
+
+      {/* ── Card Grid ─────────────────────────────────────────── */}
+      <Container className="py-4" wide>
+        {sorted.length === 0 ? (
+          <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
+            No cards match the active filters.
+          </p>
+        ) : view === 'grid' ? (
+          <ul
+            className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+            role="list"
+          >
+            {sorted.slice(0, 360).map((card) => (
+              <li key={card.id}>
+                <CollectionCardTile
+                  card={card}
+                  onOpen={() => setInspectCardId(card.id)}
                 />
-              </div>
-            </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="divide-y divide-border" role="list">
+            {sorted.slice(0, 400).map((card) => (
+              <li className="px-1.5 py-1" key={card.id}>
+                <ReferenceCardTile
+                  card={card}
+                  onOpen={() => setInspectCardId(card.id)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Container>
 
-            <div className="max-h-[64vh] overflow-y-auto p-2 lg:max-h-none lg:flex-1">
-              {filtered.length === 0 ? (
-                <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-steel-600">
-                  No cards match the active filters.
-                </p>
-              ) : (
-                <ul className={view === 'grid' ? 'grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid gap-2 md:grid-cols-2 xl:grid-cols-3'} role="list">
-                  {filtered.slice(0, view === 'grid' ? 200 : 140).map((card) => (
-                    <li key={card.id}>
-                      <ReferenceCardTile
-                        card={card}
-                        onOpen={() => setInspectCardId(card.id)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </section>
-        </div>
-      </section>
-
+      {/* ── Filter Drawer ─────────────────────────────────────── */}
       {mobileFiltersOpen ? (
         <>
           <button
@@ -273,14 +275,26 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             className="fixed inset-0 z-40 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-md border border-border bg-surface p-4 shadow-2xl lg:hidden">
-            <h3 className="text-sm font-semibold text-foreground">Filters</h3>
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-md border border-border bg-surface p-4 shadow-2xl sm:inset-auto sm:right-4 sm:top-24 sm:w-72 sm:rounded-md">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Filters</h3>
+              <button
+                aria-label="Close"
+                className="rounded p-1 text-steel-600 hover:text-foreground"
+                onClick={() => setMobileFiltersOpen(false)}
+                type="button"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
             <div className="mt-3 space-y-3">
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
+              {/* Search — mobile only, desktop has it in toolbar */}
+              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600 sm:hidden">
                 Search
                 <input
-                  className={inputClassName}
-                  onChange={(event) => setDraft((current) => ({ ...current, query: event.target.value }))}
+                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setDraft((c) => ({ ...c, query: event.target.value }))}
                   placeholder="Card name, ID, text"
                   value={draft.query}
                 />
@@ -289,40 +303,34 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Color
                 <select
-                  className={selectClassName}
-                  onChange={(event) => setDraft((current) => ({ ...current, color: event.target.value as CardColor | 'All' }))}
+                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setDraft((c) => ({ ...c, color: event.target.value as CardColor | 'All' }))}
                   value={draft.color}
                 >
-                  {colorOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
+                  {colorOptions.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
               </label>
 
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Type
                 <select
-                  className={selectClassName}
-                  onChange={(event) => setDraft((current) => ({ ...current, type: event.target.value as CardType | 'All' }))}
+                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setDraft((c) => ({ ...c, type: event.target.value as CardType | 'All' }))}
                   value={draft.type}
                 >
-                  {typeOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
+                  {typeOptions.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
               </label>
 
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Set
                 <select
-                  className={selectClassName}
-                  onChange={(event) => setDraft((current) => ({ ...current, setCode: event.target.value }))}
+                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setDraft((c) => ({ ...c, setCode: event.target.value }))}
                   value={draft.setCode}
                 >
-                  <option value="All">All</option>
-                  {allSets.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
+                  <option value="All">All Sets</option>
+                  {allSets.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
               </label>
             </div>
@@ -339,12 +347,13 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         </>
       ) : null}
 
+      {/* ── Detail modal ──────────────────────────────────────── */}
       <ReferenceCardDetailModal
         card={inspectCard ?? null}
         onOpenChange={(open) => !open && setInspectCardId(null)}
         open={Boolean(inspectCard)}
         qty={0}
       />
-    </Container>
+    </>
   );
 }

@@ -26,12 +26,12 @@ export default function HomePage(): JSX.Element {
         <div className="absolute inset-0 bg-[radial-gradient(1000px_500px_at_18%_-10%,rgba(59,130,246,0.24),transparent_72%),linear-gradient(120deg,rgba(59,130,246,0.08),transparent_45%)]" />
         <Container className="relative grid gap-12 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:py-24">
           <div className="space-y-6">
-            <Badge variant="accent" className="w-fit">Command Interface V2</Badge>
+            <Badge variant="accent" className="w-fit">Gundam Card Game Forge</Badge>
             <h1 className="max-w-[18ch] font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-              Forge Winning Gundam Decks.
+              Build. Test. Win.
             </h1>
-            <p className="max-w-[62ch] text-base text-steel-600">
-              Built for competitive pilots. Powered by real tournament data and mechanical-grade deck tooling.
+            <p className="max-w-[62ch] text-base text-steel-700">
+              Competitive deck-building for Gundam Card Game. Browse the full card pool, craft your list in the Forge, and validate it against official rules — all in one command interface.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg">
@@ -46,14 +46,14 @@ export default function HomePage(): JSX.Element {
           <Card className="overflow-hidden border-steel-400 bg-surface-elevated/90">
             <CardHeader>
               <CardTitle>Meta Snapshot</CardTitle>
-              <CardDescription>Live-ready architecture with SSR by default and scoped client islands.</CardDescription>
+              <CardDescription>Current tournament data powering the archetype rankings.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <Stat label="Decks Indexed" value={`${getDecks().length}`} />
-                <Stat label="Cards Loaded" value="500+" />
-                <Stat label="UI Primitives" value="9" />
-                <Stat label="Bundle Strategy" value="Minimal" />
+                <Stat label="Cards in Pool" value={`${716}`} />
+                <Stat label="Events Tracked" value={`${getEvents().length}`} />
+                <Stat label="Archetypes" value={`${rankArchetypes(events).length}`} />
               </div>
             </CardContent>
           </Card>

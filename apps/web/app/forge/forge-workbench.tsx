@@ -26,6 +26,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
+import { CardPanel } from '@/components/cards/CardPanel';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -662,12 +663,12 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                   })}
                 </ul>
               ) : (
-                <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3" role="list">
+                <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" role="list">
                   {filteredCards.slice(0, 210).map((card) => {
                     const qty = deck[card.id] ?? 0;
                     return (
                       <li key={card.id}>
-                        <ReferenceCardTile
+                        <CardPanel
                           card={card}
                           qty={qty}
                           onAdd={() => addCard(card.id)}
@@ -692,9 +693,9 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
               </div>
 
               <div className={cn(
-                'rounded-md border px-2.5 py-3',
+                'rounded-md border px-2.5 py-3 transition-all duration-300',
                 validation.isValid
-                  ? 'border-emerald-300/45 bg-emerald-400/10 shadow-[0_0_24px_rgba(34,197,94,0.25)]'
+                  ? 'border-emerald-300/50 bg-emerald-400/10 shadow-[0_0_28px_rgba(34,197,94,0.30),inset_0_0_12px_rgba(34,197,94,0.08)]'
                   : 'border-border bg-surface-interactive',
               )}>
                 <div className="flex items-center justify-between text-xs font-semibold text-steel-700">

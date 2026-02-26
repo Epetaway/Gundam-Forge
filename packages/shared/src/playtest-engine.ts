@@ -96,6 +96,30 @@ export interface PlayCardOptions {
   targetUnitId?: string;
 }
 
+export type EngineAction =
+  | { kind: 'advance-phase'; player: PlayerIndex }
+  | { kind: 'play-card'; player: PlayerIndex; handCardId: string; options?: PlayCardOptions }
+  | { kind: 'declare-attack'; player: PlayerIndex; attackerId: string; target: { kind: 'player' } | { kind: 'unit'; unitId: string } }
+  | { kind: 'declare-block'; player: PlayerIndex; blockerId: string | null }
+  | { kind: 'pass-priority'; player: PlayerIndex }
+  | { kind: 'discard-hand-limit'; player: PlayerIndex; handCardId: string };
+
+export type StrategyStyle = 'aggro' | 'midrange' | 'control' | 'combo';
+
+export interface StrategyProfile {
+  style: StrategyStyle;
+  avgCost: number;
+  unitRatio: number;
+  commandRatio: number;
+  pilotRatio: number;
+}
+
+export interface StrategicRecommendation {
+  action: EngineAction;
+  score: number;
+  reason: string;
+}
+
 export interface EnginePlayerSetup {
   name: string;
   mainDeck: CardDefinition[];
