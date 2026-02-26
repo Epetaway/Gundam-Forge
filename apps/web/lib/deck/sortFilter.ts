@@ -16,12 +16,38 @@ export interface DeckViewItem {
   qty: number;
   color?: string;
   set?: string;
+  // Gundam Card Game stats
+  ap?: number;
+  hp?: number;
+  level?: number;
+  traits?: string[];
+  linkCondition?: string;
+  apModifier?: number;
+  hpModifier?: number;
 }
 
 interface ResolvedDeckEntryLike {
   cardId: string;
   qty: number;
-  card?: Pick<CardDefinition, 'id' | 'name' | 'imageUrl' | 'placeholderArt' | 'type' | 'cost' | 'text' | 'color' | 'set'>;
+  card?: Pick<
+    CardDefinition,
+    | 'id'
+    | 'name'
+    | 'imageUrl'
+    | 'placeholderArt'
+    | 'type'
+    | 'cost'
+    | 'text'
+    | 'color'
+    | 'set'
+    | 'ap'
+    | 'hp'
+    | 'level'
+    | 'traits'
+    | 'linkCondition'
+    | 'apModifier'
+    | 'hpModifier'
+  >;
 }
 
 export interface DeckViewFilterState {
@@ -53,6 +79,13 @@ export function toDeckViewItem(entry: ResolvedDeckEntryLike): DeckViewItem | nul
     qty: entry.qty,
     color: entry.card.color,
     set: entry.card.set,
+    ap: entry.card.ap,
+    hp: entry.card.hp,
+    level: entry.card.level,
+    traits: entry.card.traits,
+    linkCondition: entry.card.linkCondition,
+    apModifier: entry.card.apModifier,
+    hpModifier: entry.card.hpModifier,
   };
 }
 

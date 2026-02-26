@@ -75,11 +75,76 @@ export function CardViewerModal({
                 </div>
               </div>
 
-              <div className="space-y-3 rounded-md border border-border bg-surface-muted/70 p-4">
+              <div className="space-y-3 overflow-y-auto rounded-md border border-border bg-surface-muted/70 p-4">
+                {/* Type */}
                 <div>
                   <p className="text-xs uppercase tracking-[0.12em] text-steel-600">Type</p>
                   <p className="text-sm font-semibold text-foreground">{currentCard.typeLine}</p>
                 </div>
+
+                {/* Combat stats — AP / HP / Level */}
+                {(currentCard.ap !== undefined || currentCard.hp !== undefined || currentCard.level !== undefined) ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {currentCard.level !== undefined ? (
+                      <div className="rounded-md border border-border bg-surface px-2 py-2 text-center">
+                        <p className="text-[10px] uppercase tracking-wider text-steel-600">Level</p>
+                        <p className="text-xl font-bold tabular-nums text-foreground">{currentCard.level}</p>
+                      </div>
+                    ) : null}
+                    {currentCard.ap !== undefined ? (
+                      <div className="rounded-md border border-border bg-surface px-2 py-2 text-center">
+                        <p className="text-[10px] uppercase tracking-wider text-steel-600">AP</p>
+                        <p className="text-xl font-bold tabular-nums text-foreground">{currentCard.ap}</p>
+                      </div>
+                    ) : null}
+                    {currentCard.hp !== undefined ? (
+                      <div className="rounded-md border border-border bg-surface px-2 py-2 text-center">
+                        <p className="text-[10px] uppercase tracking-wider text-steel-600">HP</p>
+                        <p className="text-xl font-bold tabular-nums text-foreground">{currentCard.hp}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {/* Pilot modifiers — shown only for Pilot cards */}
+                {(currentCard.apModifier !== undefined || currentCard.hpModifier !== undefined) ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {currentCard.apModifier !== undefined ? (
+                      <div className="rounded-md border border-cobalt-400/30 bg-cobalt-500/10 px-2 py-2 text-center">
+                        <p className="text-[10px] uppercase tracking-wider text-steel-600">AP Mod</p>
+                        <p className="text-lg font-bold tabular-nums text-cobalt-300">
+                          {currentCard.apModifier > 0 ? '+' : ''}{currentCard.apModifier}
+                        </p>
+                      </div>
+                    ) : null}
+                    {currentCard.hpModifier !== undefined ? (
+                      <div className="rounded-md border border-cobalt-400/30 bg-cobalt-500/10 px-2 py-2 text-center">
+                        <p className="text-[10px] uppercase tracking-wider text-steel-600">HP Mod</p>
+                        <p className="text-lg font-bold tabular-nums text-cobalt-300">
+                          {currentCard.hpModifier > 0 ? '+' : ''}{currentCard.hpModifier}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {/* Traits */}
+                {currentCard.traits?.length ? (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.12em] text-steel-600">Traits</p>
+                    <p className="text-sm text-foreground">{currentCard.traits.join(' · ')}</p>
+                  </div>
+                ) : null}
+
+                {/* Link Condition (Units) */}
+                {currentCard.linkCondition ? (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.12em] text-steel-600">Link Condition</p>
+                    <p className="text-sm text-foreground">{currentCard.linkCondition}</p>
+                  </div>
+                ) : null}
+
+                {/* Rules text */}
                 <div>
                   <p className="text-xs uppercase tracking-[0.12em] text-steel-600">Rules</p>
                   <p className="whitespace-pre-wrap text-sm text-steel-700">

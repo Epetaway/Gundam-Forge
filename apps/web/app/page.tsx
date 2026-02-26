@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
-import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
+import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/TrendingDecksClient';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -68,41 +68,24 @@ export default function HomePage(): JSX.Element {
               <Link href="/explore">See all decks</Link>
             </Button>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {trendingDecks.map((deck) => {
+          <TrendingDecksClient
+            decks={trendingDecks.map((deck) => {
               const previewCard = getCard(deck.entries[0]?.cardId);
-              const accentClass = getArchetypeAccent(deck.archetype);
-              return (
-                <Card
-                  key={deck.id}
-                  className="group relative overflow-hidden border-steel-400 bg-surface-elevated transition-all duration-150 hover:-translate-y-0.5 hover:border-cobalt-400/70 hover:shadow-[0_18px_34px_rgba(2,6,23,0.52)]"
-                >
-                  <span className={`absolute inset-y-0 left-0 w-1 ${accentClass}`} />
-                  <CardContent className="pb-0">
-                    {previewCard ? (
-                      <ReferenceCardTile
-                        card={previewCard}
-                        qty={deck.entries[0]?.qty ?? 1}
-                        onOpen={undefined}
-                      />
-                    ) : null}
-                    <div className="pt-3">
-                      <p className="text-xs uppercase tracking-wide text-steel-500">{deck.archetype}</p>
-                      <p className="font-display text-xl font-semibold text-foreground">{deck.name}</p>
-                    </div>
-                  </CardContent>
-                  <CardContent className="flex items-center justify-between py-3">
-                    <p className={`text-xs ${getWinRateTone(deck.winRate)}`}>
-                      {(deck.winRate * 100).toFixed(1)}% win rate • {deck.eventAppearances} events
-                    </p>
-                    <Button asChild size="sm" variant="ghost">
-                      <Link href={`/decks/${deck.id}`}>Open</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
+              return {
+                id: deck.id,
+                heroUrl: previewCard?.imageUrl || '/default-hero.jpg',
+                title: deck.name,
+                subtitle: deck.archetype,
+                author: deck.owner || 'Unknown',
+                views: deck.views || 0,
+                cardCount: deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0),
+                updatedAgo: 'recently',
+                colors: deck.colors || [],
+                tags: deck.archetype ? [deck.archetype] : [],
+                avatarUrl: undefined,
+              } satisfies TrendingDeckData;
             })}
-          </div>
+          />
         </Container>
       </section>
 

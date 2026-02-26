@@ -1,931 +1,157 @@
+
 'use client';
 
 import * as React from 'react';
-import {
-  BarChart3,
-  ChevronDown,
-  ChevronRight,
-  Copy,
-  Filter,
-  LayoutGrid,
-  List,
-  Minus,
-  Plus,
-  Search,
-  SlidersHorizontal,
-  Trash2,
-  X,
-} from 'lucide-react';
-import { validateDeck, type CardColor, type CardDefinition, type CardType } from '@gundam-forge/shared';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/Dropdown';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
-import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
-import { CardPanel } from '@/components/cards/CardPanel';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { cn } from '@/lib/utils/cn';
+import { DeckHeader } from '@/components/deck/DeckHeader';
+import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
+import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
+import { CardViewerModal } from '@/components/deck/CardViewerModal';
+import { LayoutGrid, SlidersHorizontal, Table2 } from 'lucide-react';
+import { toDeckViewItem, applyDeckFilterSort, buildDeckExportText, type DeckViewItem, type DeckDensity, type DeckSortKey, type DeckViewMode } from '@/lib/deck/sortFilter';
 
-const STORAGE_KEY = 'gundam-forge-next-deck';
-const STORAGE_NAME_KEY = 'gundam-forge-next-deck-name';
-const DECK_MAX = 50;
-
-const colorFilters: Array<'All' | CardColor> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
-const typeFilters: Array<'All' | CardType> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
-const typeOrder: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
-
-const colorSwatches: Record<CardColor, string> = {
-  Blue: '#3b82f6',
-  Green: '#22c55e',
-  Red: '#ef4444',
-  White: '#cbd5e1',
-  Purple: '#a855f7',
-  Colorless: '#6b7280',
-};
-
-const inputClassName =
-  'h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
-const selectClassName =
-  'h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
-
-type CatalogView = 'grid' | 'compact';
-
-export type ForgeCard = Pick<
-  CardDefinition,
-  'id' | 'name' | 'color' | 'type' | 'cost' | 'set' | 'text' | 'imageUrl' | 'placeholderArt'
->;
 
 interface ForgeWorkbenchProps {
-  cards: ForgeCard[];
+  cards: any[];
 }
 
-interface ActiveFilterChip {
-  id: string;
-  label: string;
-  clear: () => void;
-}
 
-interface FilterDraft {
-  query: string;
-  color: 'All' | CardColor;
-  type: 'All' | CardType;
-  setCode: string;
-}
+// Deck view registry (same as Deck Viewer)
+const viewRegistry = [
+  { id: 'image', label: 'Image', icon: LayoutGrid, Component: DeckListRenderer },
+  { id: 'stacks', label: 'Stacks', icon: SlidersHorizontal, Component: DeckListRenderer },
+  { id: 'text', label: 'Text', icon: Table2, Component: DeckListRenderer },
+] as const;
 
-interface DeckGroup {
-  key: string;
-  label: string;
-  total: number;
-  entries: Array<{
-    cardId: string;
-    qty: number;
-    card: ForgeCard;
-  }>;
-}
+export function DeckBuilderPage({ cards }: ForgeWorkbenchProps): JSX.Element | null {
+  // Hydration guard
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
 
-export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
-  const visibleCards = React.useMemo(
-    () => cards.filter((card) => typeof card.imageUrl === 'string' && card.imageUrl.startsWith('/card_art/')),
-    [cards],
-  );
-
-  const [deckName, setDeckName] = React.useState('Untitled Deck');
-  const [query, setQuery] = React.useState('');
-  const [color, setColor] = React.useState<'All' | CardColor>('All');
-  const [type, setType] = React.useState<'All' | CardType>('All');
-  const [setCode, setSetCode] = React.useState('All');
-  const [catalogView, setCatalogView] = React.useState<CatalogView>('compact');
-  const [deck, setDeck] = React.useState<Record<string, number>>({});
-  const [inspectCardId, setInspectCardId] = React.useState<string | null>(null);
-  const [copyFeedback, setCopyFeedback] = React.useState('');
-  const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
-  const [quickAddQuery, setQuickAddQuery] = React.useState('');
-  const [importOpen, setImportOpen] = React.useState(false);
-  const [importText, setImportText] = React.useState('');
-  const [importFeedback, setImportFeedback] = React.useState('');
-  const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({});
-  const [draft, setDraft] = React.useState<FilterDraft>({
-    query: '',
-    color: 'All',
-    type: 'All',
-    setCode: 'All',
+  // Deck meta and deck state
+  const [deckMeta, setDeckMeta] = React.useState({
+    name: 'Untitled Deck',
+    description: '',
+    archetype: '',
+    owner: 'You',
+    colors: [] as string[],
   });
+  const [deck, setDeck] = React.useState<Record<string, number>>({});
 
-  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  // UI state
+  const [viewMode, setViewMode] = React.useState<DeckViewMode>('image');
+  const [density, setDensity] = React.useState<DeckDensity>('comfortable');
+  const [query, setQuery] = React.useState('');
+  const [sortBy, setSortBy] = React.useState<DeckSortKey>('name');
+  const [activeCardId, setActiveCardId] = React.useState<string | null>(null);
+  const [feedback, setFeedback] = React.useState('');
 
-  const setOptions = React.useMemo(
-    () => ['All', ...Array.from(new Set(visibleCards.map((card) => card.set))).sort()],
-    [visibleCards],
+  // Convert deck state to DeckViewItem[]
+  const initialItems: DeckViewItem[] = React.useMemo(() => {
+    return Object.entries(deck)
+      .filter(([, qty]) => qty > 0)
+      .map(([cardId, qty]) => {
+        const card = cards.find((c) => c.id === cardId);
+        return card ? toDeckViewItem({ cardId, qty, card }) : null;
+      })
+      .filter(Boolean) as DeckViewItem[];
+  }, [deck, cards]);
+
+  // Filter/sort
+  const visibleCards = React.useMemo(
+    () => applyDeckFilterSort(initialItems, { query, sortBy }),
+    [initialItems, query, sortBy],
   );
 
   React.useEffect(() => {
+    if (!activeCardId) return;
+    const stillVisible = visibleCards.some((card) => card.id === activeCardId);
+    if (!stillVisible) setActiveCardId(null);
+  }, [activeCardId, visibleCards]);
+
+  // Handlers (customize for builder)
+  const handleExport = React.useCallback(async () => {
     try {
-      const rawDeck = localStorage.getItem(STORAGE_KEY);
-      const rawName = localStorage.getItem(STORAGE_NAME_KEY);
+      const text = buildDeckExportText(initialItems);
+      await navigator.clipboard.writeText(text);
+      setFeedback('Deck list copied to clipboard.');
+    } catch {
+      setFeedback('Unable to export to clipboard.');
+    }
+    window.setTimeout(() => setFeedback(''), 1800);
+  }, [initialItems]);
 
-      if (rawDeck) {
-        const parsed = JSON.parse(rawDeck) as Record<string, number>;
-        setDeck(parsed);
-      }
-
-      if (rawName && rawName.trim().length > 0) {
-        setDeckName(rawName.trim());
+  const handleShare = React.useCallback(async () => {
+    try {
+      const shareUrl = window.location.href;
+      if (navigator.share) {
+        await navigator.share({ title: deckMeta.name, url: shareUrl });
+        setFeedback('Deck link shared.');
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setFeedback('Deck link copied to clipboard.');
       }
     } catch {
-      setDeck({});
-      setDeckName('Untitled Deck');
+      setFeedback('Unable to share this deck on this device.');
     }
-  }, []);
+    window.setTimeout(() => setFeedback(''), 1800);
+  }, [deckMeta.name]);
 
-  React.useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(deck));
-    } catch {
-      // Ignore writes in constrained browser modes.
-    }
-  }, [deck]);
+  // Deck editing handlers (add/remove cards, update meta, etc.) would go here
 
-  React.useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_NAME_KEY, deckName.trim() || 'Untitled Deck');
-    } catch {
-      // Ignore writes in constrained browser modes.
-    }
-  }, [deckName]);
+  if (!mounted) return null;
 
-  React.useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent): void => {
-      const target = event.target as HTMLElement | null;
-      const isTypingTarget =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        Boolean(target?.isContentEditable);
-
-      if (
-        event.key === '/' &&
-        !event.metaKey &&
-        !event.ctrlKey &&
-        !event.altKey &&
-        !isTypingTarget
-      ) {
-        event.preventDefault();
-        searchInputRef.current?.focus();
-      }
-
-      if (event.key === 'Escape' && mobileFiltersOpen) {
-        event.preventDefault();
-        setMobileFiltersOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [mobileFiltersOpen]);
-
-  const cardMap = React.useMemo(() => new Map(visibleCards.map((card) => [card.id, card])), [visibleCards]);
-
-  const filteredCards = React.useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return visibleCards.filter((card) => {
-      if (color !== 'All' && card.color !== color) return false;
-      if (type !== 'All' && card.type !== type) return false;
-      if (setCode !== 'All' && card.set !== setCode) return false;
-      if (!normalizedQuery) return true;
-      return `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase().includes(normalizedQuery);
-    });
-  }, [color, query, setCode, type, visibleCards]);
-
-  const quickAddMatches = React.useMemo(() => {
-    const normalized = quickAddQuery.trim().toLowerCase();
-    if (!normalized) return [];
-
-    return visibleCards
-      .filter((card) => `${card.id} ${card.name}`.toLowerCase().includes(normalized))
-      .slice(0, 6);
-  }, [quickAddQuery, visibleCards]);
-
-  const quickAddPrimary = quickAddMatches[0];
-
-  const deckEntries = React.useMemo(
-    () => Object.entries(deck).filter((entry) => entry[1] > 0).map(([cardId, qty]) => ({ cardId, qty })),
-    [deck],
-  );
-
-  const resolvedDeck = React.useMemo(
-    () =>
-      deckEntries
-        .map((entry) => ({ ...entry, card: cardMap.get(entry.cardId) }))
-        .filter((entry): entry is { cardId: string; qty: number; card: ForgeCard } => Boolean(entry.card))
-        .sort((a, b) => {
-          const typeDelta = typeOrder.indexOf(a.card.type) - typeOrder.indexOf(b.card.type);
-          if (typeDelta !== 0) return typeDelta;
-          const costDelta = a.card.cost - b.card.cost;
-          if (costDelta !== 0) return costDelta;
-          return a.card.name.localeCompare(b.card.name);
-        }),
-    [cardMap, deckEntries],
-  );
-
-  const validation = React.useMemo(
-    () => validateDeck(deckEntries, visibleCards as CardDefinition[]),
-    [deckEntries, visibleCards],
-  );
-
-  const deckGroups = React.useMemo<DeckGroup[]>(() => {
-    const grouped = new Map<string, DeckGroup>();
-
-    for (const cardType of typeOrder) {
-      grouped.set(cardType, {
-        key: cardType,
-        label: cardType,
-        total: 0,
-        entries: [],
-      });
-    }
-
-    for (const entry of resolvedDeck) {
-      const group = grouped.get(entry.card.type) ?? grouped.get('Unit');
-      if (!group) continue;
-      group.total += entry.qty;
-      group.entries.push(entry);
-    }
-
-    return Array.from(grouped.values()).filter((group) => group.entries.length > 0);
-  }, [resolvedDeck]);
-
-  const inspectCard = inspectCardId ? cardMap.get(inspectCardId) : undefined;
-  const totalCards = validation.metrics.totalCards;
-
-  const totalDeckCost = React.useMemo(
-    () => resolvedDeck.reduce((sum, entry) => sum + entry.card.cost * entry.qty, 0),
-    [resolvedDeck],
-  );
-
-  const avgCost = totalCards > 0 ? totalDeckCost / totalCards : 0;
-
-  const deckColors = React.useMemo(() => {
-    const counts: Record<CardColor, number> = {
-      Blue: 0,
-      Green: 0,
-      Red: 0,
-      White: 0,
-      Purple: 0,
-      Colorless: 0,
-    };
-
-    for (const entry of resolvedDeck) {
-      counts[entry.card.color] += entry.qty;
-    }
-
-    return Object.entries(counts)
-      .filter(([, value]) => value > 0)
-      .sort((a, b) => b[1] - a[1]) as Array<[CardColor, number]>;
-  }, [resolvedDeck]);
-
-  const addCard = React.useCallback((cardId: string): void => {
-    setDeck((current) => ({ ...current, [cardId]: Math.min((current[cardId] ?? 0) + 1, 4) }));
-  }, []);
-
-  const removeCard = React.useCallback((cardId: string): void => {
-    setDeck((current) => {
-      const next = { ...current };
-      const qty = (next[cardId] ?? 0) - 1;
-      if (qty <= 0) delete next[cardId];
-      else next[cardId] = qty;
-      return next;
-    });
-  }, []);
-
-  const clearDeck = (): void => setDeck({});
-
-  const quickAddCard = (): void => {
-    if (!quickAddPrimary) return;
-    addCard(quickAddPrimary.id);
-    setQuickAddQuery('');
-  };
-
-  const parseImportedDeck = React.useCallback((raw: string): Record<string, number> => {
-    const next: Record<string, number> = {};
-    const byName = new Map<string, string>(visibleCards.map((card) => [card.name.toLowerCase(), card.id]));
-
-    for (const line of raw.split('\n')) {
-      const trimmed = line.trim();
-      if (trimmed.length === 0) continue;
-
-      const qtyMatch = trimmed.match(/^(\d+)\s*[xX]?\s*/);
-      const qty = Math.min(4, Math.max(1, qtyMatch ? Number.parseInt(qtyMatch[1], 10) : 1));
-      const normalized = qtyMatch ? trimmed.slice(qtyMatch[0].length).trim() : trimmed;
-
-      const idMatch = normalized.match(/([A-Z0-9]{2,8}-[0-9]{3}[A-Z]?)/i);
-      const cardId = idMatch ? idMatch[1].toUpperCase() : byName.get(normalized.toLowerCase());
-      if (!cardId || !cardMap.has(cardId)) continue;
-
-      next[cardId] = Math.min(4, (next[cardId] ?? 0) + qty);
-    }
-
-    return next;
-  }, [cardMap, visibleCards]);
-
-  const applyImportedDeck = React.useCallback((): void => {
-    const parsed = parseImportedDeck(importText);
-    const parsedCount = Object.keys(parsed).length;
-
-    if (parsedCount === 0) {
-      setImportFeedback('No valid cards were parsed from this input.');
-      return;
-    }
-
-    setDeck(parsed);
-    setImportFeedback(`Imported ${parsedCount} unique cards.`);
-    setImportOpen(false);
-    setImportText('');
-  }, [importText, parseImportedDeck]);
-
-  const exportDeck = React.useCallback(
-    async (format: 'text' | 'csv' | 'json') => {
-      const rows = resolvedDeck.map((entry) => ({
-        qty: entry.qty,
-        id: entry.card.id,
-        name: entry.card.name,
-        type: entry.card.type,
-        color: entry.card.color,
-      }));
-
-      const payload =
-        format === 'json'
-          ? JSON.stringify(rows, null, 2)
-          : format === 'csv'
-            ? ['Qty,ID,Name,Type,Color', ...rows.map((row) => `${row.qty},${row.id},"${row.name}",${row.type},${row.color}`)].join('\n')
-            : rows.map((row) => `${row.qty}x ${row.name} (${row.id})`).join('\n');
-
-      try {
-        await navigator.clipboard.writeText(payload);
-        setCopyFeedback(`Copied ${format.toUpperCase()} to clipboard`);
-        window.setTimeout(() => setCopyFeedback(''), 1600);
-      } catch {
-        setCopyFeedback('Clipboard unavailable');
-      }
-    },
-    [resolvedDeck],
-  );
-
-  const activeFilterChips = React.useMemo<ActiveFilterChip[]>(() => {
-    const chips: ActiveFilterChip[] = [];
-    const trimmed = query.trim();
-    if (trimmed.length > 0) {
-      chips.push({ id: `q:${trimmed}`, label: `Search: ${trimmed}`, clear: () => setQuery('') });
-    }
-    if (color !== 'All') {
-      chips.push({ id: `color:${color}`, label: `Color: ${color}`, clear: () => setColor('All') });
-    }
-    if (type !== 'All') {
-      chips.push({ id: `type:${type}`, label: `Type: ${type}`, clear: () => setType('All') });
-    }
-    if (setCode !== 'All') {
-      chips.push({ id: `set:${setCode}`, label: `Set: ${setCode}`, clear: () => setSetCode('All') });
-    }
-    return chips;
-  }, [color, query, setCode, type]);
-
-  const openMobileFilters = () => {
-    setDraft({ query, color, type, setCode });
-    setMobileFiltersOpen(true);
-  };
-
-  const applyMobileFilters = () => {
-    setQuery(draft.query);
-    setColor(draft.color);
-    setType(draft.type);
-    setSetCode(draft.setCode);
-    setMobileFiltersOpen(false);
-  };
-
-  const clearAllFilters = () => {
-    setQuery('');
-    setColor('All');
-    setType('All');
-    setSetCode('All');
-  };
-
-  const toggleGroup = (groupKey: string): void => {
-    setCollapsedGroups((current) => ({ ...current, [groupKey]: !current[groupKey] }));
-  };
+  // Pick the correct view renderer (all use DeckListRenderer for now)
+  const activeView = viewRegistry.find((v) => v.id === viewMode) ?? viewRegistry[0];
+  const ActiveRenderer = activeView.Component;
 
   return (
-    <>
-      <section className="rounded-md border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[38rem] lg:overflow-hidden">
-        <header className="border-b border-border bg-surface-interactive px-3 py-2">
-          <div className="flex flex-wrap items-end gap-2">
-            <label className="grid min-w-[12rem] flex-1 gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600 lg:max-w-[22rem]">
-              Deck Name
-              <input
-                className={inputClassName}
-                maxLength={80}
-                onChange={(event) => setDeckName(event.target.value)}
-                value={deckName}
-              />
-            </label>
+    <div className="space-y-4 py-6">
+      <DeckHeader
+        archetype={deckMeta.archetype}
+        colors={deckMeta.colors}
+        description={deckMeta.description}
+        feedback={feedback}
+        name={deckMeta.name}
+        onExport={handleExport}
+        onShare={handleShare}
+        owner={deckMeta.owner}
+        totalCards={initialItems.reduce((sum, item) => sum + item.qty, 0)}
+      >
+        {/* Builder-specific action buttons can go here */}
+      </DeckHeader>
 
-            <div className="grid min-w-[14rem] flex-1 gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600 lg:max-w-[26rem]">
-              Quick Add
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
-                  <input
-                    className={cn(inputClassName, 'pl-7')}
-                    onChange={(event) => setQuickAddQuery(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                        quickAddCard();
-                      }
-                    }}
-                    placeholder="Type card name, press Enter"
-                    value={quickAddQuery}
-                  />
-                </div>
-                <Button disabled={!quickAddPrimary} onClick={quickAddCard} size="sm" variant="secondary">
-                  Add
-                </Button>
-              </div>
-            </div>
+      <DeckToolbar
+        density={density}
+        onDensityChange={setDensity}
+        onQueryChange={setQuery}
+        onSortByChange={setSortBy}
+        onViewModeChange={setViewMode}
+        query={query}
+        sortBy={sortBy}
+        viewMode={activeView.id}
+        views={[...viewRegistry]}
+      />
 
-            <div className="ml-auto flex flex-wrap items-center gap-2">
-              <Button onClick={() => setImportOpen(true)} size="sm" variant="secondary">
-                Import
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="secondary">Export</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => exportDeck('text')}>Plain Text</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => exportDeck('csv')}>CSV</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => exportDeck('json')}>JSON</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button onClick={clearDeck} size="sm" variant="ghost">
-                <Trash2 className="mr-1 h-4 w-4" />
-                Clear
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-steel-600">
-            <span className="font-medium">Shortcut: `/` search catalog • `Enter` quick add • `Esc` close drawer</span>
-            {quickAddPrimary ? <span>Enter adds: {quickAddPrimary.name}</span> : null}
-            {copyFeedback ? (
-              <span className="inline-flex items-center gap-1 text-success">
-                <Copy className="h-3.5 w-3.5" />
-                {copyFeedback}
-              </span>
-            ) : null}
-            {importFeedback ? <span className="text-steel-700">{importFeedback}</span> : null}
-          </div>
-        </header>
-
-        <div className="relative grid gap-3 p-3 lg:h-[calc(100%-5.75rem)] lg:min-h-0 lg:grid-cols-[16rem_minmax(0,1fr)_23rem] lg:gap-2">
-          <span className="industrial-divider pointer-events-none absolute bottom-3 hidden w-px lg:block lg:left-[calc(16rem+0.8rem)] lg:top-3" />
-          <span className="industrial-divider pointer-events-none absolute bottom-3 hidden w-px lg:block lg:right-[23rem] lg:top-3" />
-          <aside className="hidden min-h-0 rounded-md border border-border bg-surface-muted/80 lg:flex lg:flex-col">
-            <div className="flex items-center justify-between border-b border-border px-3 py-2">
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Filter className="h-4 w-4 text-steel-500" />
-                Filters
-              </h2>
-              {activeFilterChips.length > 0 ? (
-                <button className="text-[11px] font-semibold uppercase tracking-wide text-steel-600 hover:text-foreground" onClick={clearAllFilters}>
-                  Reset
-                </button>
-              ) : null}
-            </div>
-
-            <div className="flex-1 space-y-3 overflow-y-auto p-3">
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Search
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
-                  <input
-                    className={cn(inputClassName, 'pl-7')}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Name, ID, text"
-                    ref={searchInputRef}
-                    value={query}
-                  />
-                </div>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Color
-                <select
-                  className={selectClassName}
-                  onChange={(event) => setColor(event.target.value as CardColor | 'All')}
-                  value={color}
-                >
-                  {colorFilters.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Type
-                <select
-                  className={selectClassName}
-                  onChange={(event) => setType(event.target.value as CardType | 'All')}
-                  value={type}
-                >
-                  {typeFilters.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Set
-                <select
-                  className={selectClassName}
-                  onChange={(event) => setSetCode(event.target.value)}
-                  value={setCode}
-                >
-                  {setOptions.map((option) => (
-                    <option key={option} value={option}>{option === 'All' ? 'All Sets' : option}</option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="rounded-md border border-border bg-surface-interactive px-2.5 py-2 text-xs text-steel-600">
-                <p>{filteredCards.length} cards matched</p>
-                <p>{Object.keys(deck).length} unique cards in deck</p>
-              </div>
-
-              {activeFilterChips.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {activeFilterChips.map((chip) => (
-                    <button
-                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
-                      key={chip.id}
-                      onClick={chip.clear}
-                    >
-                      {chip.label}
-                      <X className="h-3 w-3" />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </aside>
-
-          <section className="min-h-0 rounded-md border border-border bg-surface lg:flex lg:flex-col">
-            <div className="flex items-center justify-between border-b border-border px-3 py-2">
-              <h2 className="text-sm font-semibold text-foreground">Card Catalog</h2>
-              <div className="flex items-center gap-2">
-                <div className="inline-flex items-center rounded-md border border-border bg-surface-interactive p-1">
-                  <button
-                    aria-label="Grid view"
-                    className={cn(
-                      'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                      catalogView === 'grid' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                    )}
-                    onClick={() => setCatalogView('grid')}
-                    type="button"
-                  >
-                    <LayoutGrid className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    aria-label="Compact list view"
-                    className={cn(
-                      'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                      catalogView === 'compact' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                    )}
-                    onClick={() => setCatalogView('compact')}
-                    type="button"
-                  >
-                    <List className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-
-                <Button className="lg:hidden" onClick={openMobileFilters} size="sm" variant="secondary">
-                  <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
-                  Filters {activeFilterChips.length > 0 ? `(${activeFilterChips.length})` : ''}
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-border px-3 py-2 text-xs text-steel-600">
-              <p>{filteredCards.length} cards</p>
-              {activeFilterChips.length > 0 ? (
-                <div className="flex flex-wrap items-center justify-end gap-1.5 lg:hidden">
-                  {activeFilterChips.slice(0, 2).map((chip) => (
-                    <button
-                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold"
-                      key={chip.id}
-                      onClick={chip.clear}
-                    >
-                      {chip.label}
-                      <X className="h-3 w-3" />
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-medium">Density mode for fast decking</p>
-              )}
-            </div>
-
-            <div className="max-h-[62vh] overflow-y-auto p-2 lg:max-h-none lg:flex-1">
-              {filteredCards.length === 0 ? (
-                <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-steel-600">
-                  No cards match the active filters.
-                </p>
-              ) : catalogView === 'compact' ? (
-                <ul className="divide-y divide-border" role="list">
-                  {filteredCards.slice(0, 360).map((card) => {
-                    const qty = deck[card.id] ?? 0;
-                    return (
-                      <li className="px-1.5 py-1" key={card.id}>
-                        <ReferenceCardTile
-                          card={card}
-                          qty={qty}
-                          onAdd={() => addCard(card.id)}
-                          onOpen={() => setInspectCardId(card.id)}
-                          onRemove={() => removeCard(card.id)}
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" role="list">
-                  {filteredCards.slice(0, 210).map((card) => {
-                    const qty = deck[card.id] ?? 0;
-                    return (
-                      <li key={card.id}>
-                        <CardPanel
-                          card={card}
-                          qty={qty}
-                          onAdd={() => addCard(card.id)}
-                          onOpen={() => setInspectCardId(card.id)}
-                          onRemove={() => removeCard(card.id)}
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </section>
-
-          <aside className="min-h-0 rounded-md border border-border bg-[linear-gradient(160deg,rgba(59,130,246,0.08),rgba(21,26,34,0)_35%),repeating-linear-gradient(0deg,rgba(154,169,191,0.04)_0,rgba(154,169,191,0.04)_1px,transparent_1px,transparent_12px)] lg:flex lg:flex-col">
-            <div className="space-y-2 border-b border-border px-3 py-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-foreground">Deck Workspace</h2>
-                <Badge variant={validation.isValid ? 'success' : 'warning'}>
-                  {validation.isValid ? 'Valid' : `${validation.errors.length} issues`}
-                </Badge>
-              </div>
-
-              <div className={cn(
-                'rounded-md border px-2.5 py-3 transition-all duration-300',
-                validation.isValid
-                  ? 'border-emerald-300/50 bg-emerald-400/10 shadow-[0_0_28px_rgba(34,197,94,0.30),inset_0_0_12px_rgba(34,197,94,0.08)]'
-                  : 'border-border bg-surface-interactive',
-              )}>
-                <div className="flex items-center justify-between text-xs font-semibold text-steel-700">
-                  <span>{totalCards}/{DECK_MAX} cards</span>
-                  <span>Avg {avgCost.toFixed(2)}</span>
-                </div>
-                <div className="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-full bg-steel-200">
-                  {deckColors.length === 0 ? <span className="h-full w-full bg-steel-300" /> : null}
-                  {deckColors.map(([deckColor, count]) => (
-                    <span
-                      key={deckColor}
-                      className="h-full"
-                      style={{
-                        width: `${(count / Math.max(totalCards, 1)) * 100}%`,
-                        backgroundColor: colorSwatches[deckColor],
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 text-[11px] text-steel-600">
-                <span>{validation.metrics.mainDeckCards}/50 main</span>
-                <span>•</span>
-                <span>{validation.metrics.resourceDeckCards}/10 resource</span>
-                <span>•</span>
-                <span>{resolvedDeck.length} unique</span>
-              </div>
-            </div>
-
-            <div className="min-h-0 p-2 lg:flex-1">
-              <Tabs className="flex h-full min-h-0 flex-col" defaultValue="deck">
-                <TabsList className="h-9">
-                  <TabsTrigger className="text-xs" value="deck">Deck List</TabsTrigger>
-                  <TabsTrigger className="text-xs" value="validation">
-                    <BarChart3 className="mr-1 h-3.5 w-3.5" />
-                    Validation
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent className="mt-2 min-h-0 flex-1 overflow-y-auto" value="deck">
-                  {deckGroups.length === 0 ? (
-                    <p className="rounded-md border border-dashed border-border p-5 text-center text-sm text-steel-600">
-                      Add cards from the catalog to build your deck.
-                    </p>
-                  ) : (
-                    <ul className="space-y-2" role="list">
-                      {deckGroups.map((group) => {
-                        const isCollapsed = collapsedGroups[group.key] ?? false;
-                        return (
-                          <li className="overflow-hidden rounded-md border border-border bg-surface-interactive/85" key={group.key}>
-                            <button
-                              className="flex w-full items-center justify-between px-2.5 py-1.5 text-left text-xs font-semibold text-steel-700 transition-colors hover:bg-steel-200"
-                              onClick={() => toggleGroup(group.key)}
-                              type="button"
-                            >
-                              <span>{group.label}</span>
-                              <span className="inline-flex items-center gap-1.5">
-                                {group.total}
-                                {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                              </span>
-                            </button>
-
-                            {!isCollapsed ? (
-                              <ul className="divide-y divide-border" role="list">
-                                {group.entries.map((entry) => (
-                                  <li className="flex items-center gap-2 px-2 py-1.5" key={entry.cardId}>
-                                    <button className="min-w-0 flex-1 text-left" onClick={() => setInspectCardId(entry.cardId)} type="button">
-                                      <p className="truncate text-sm font-medium text-foreground">{entry.card.name}</p>
-                                      <p className="text-[11px] text-steel-600">{entry.card.id} • Cost {entry.card.cost}</p>
-                                    </button>
-
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        aria-label={`Remove ${entry.card.name}`}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-200"
-                                        onClick={() => removeCard(entry.cardId)}
-                                        type="button"
-                                      >
-                                        <Minus className="h-3.5 w-3.5" />
-                                      </button>
-                                      <span className="w-6 text-center text-xs font-semibold text-steel-700">{entry.qty}</span>
-                                      <button
-                                        aria-label={`Add ${entry.card.name}`}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-200"
-                                        onClick={() => addCard(entry.cardId)}
-                                        type="button"
-                                      >
-                                        <Plus className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : null}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </TabsContent>
-
-                <TabsContent className="mt-2 space-y-2 overflow-y-auto" value="validation">
-                  {validation.errors.length === 0 ? (
-                    <p className="rounded-md border border-emerald-300/35 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">
-                      No rule violations found.
-                    </p>
-                  ) : (
-                    <ul className="space-y-2">
-                      {validation.errors.map((error) => (
-                          <li className="rounded-md border border-red-300/35 bg-red-400/10 px-3 py-2 text-sm text-red-300" key={error}>
-                          {error}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {validation.warnings.length > 0 ? (
-                    <ul className="space-y-2">
-                      {validation.warnings.map((warning) => (
-                        <li className="rounded-md border border-amber-300/35 bg-amber-400/10 px-3 py-2 text-sm text-amber-300" key={warning}>
-                          {warning}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </TabsContent>
-              </Tabs>
-            </div>
-          </aside>
-        </div>
+      <section aria-live="polite" className="space-y-3 pb-4">
+        <p className="text-xs text-steel-600">{visibleCards.length} cards shown</p>
+        <ActiveRenderer
+          actions={{ onOpenCard: setActiveCardId }}
+          items={visibleCards}
+          selection={{ activeCardId }}
+          ui={{ density, features: { collection: false, deckEdit: true }, mode: 'builder' }}
+          viewMode={viewMode}
+        />
       </section>
 
-      <Dialog onOpenChange={setImportOpen} open={importOpen}>
-        <DialogContent aria-describedby="forge-import-description" className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Import Decklist</DialogTitle>
-            <DialogDescription id="forge-import-description">
-              Paste lines like `2 ST01-001`, `2x ST01-001`, or `2 Card Name`.
-            </DialogDescription>
-          </DialogHeader>
-          <textarea
-            className="min-h-56 w-full rounded-md border border-border bg-surface-interactive p-3 font-mono text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-            onChange={(event) => setImportText(event.target.value)}
-            placeholder={'4 ST01-001\n3 GD01-100\n2 Card Name'}
-            value={importText}
-          />
-          <div className="flex items-center justify-end gap-2">
-            <Button onClick={() => setImportOpen(false)} variant="secondary">Cancel</Button>
-            <Button onClick={applyImportedDeck}>Import deck</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {mobileFiltersOpen ? (
-        <>
-          <button
-            aria-label="Close filters"
-            className="fixed inset-0 z-40 bg-black/40"
-            onClick={() => setMobileFiltersOpen(false)}
-          />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-md border border-border bg-surface p-4 shadow-2xl lg:hidden">
-            <h3 className="text-sm font-semibold text-foreground">Filters</h3>
-            <div className="mt-3 space-y-3">
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Search
-                <input
-                  className={cn(inputClassName, 'h-10')}
-                  onChange={(event) => setDraft((current) => ({ ...current, query: event.target.value }))}
-                  placeholder="Card name, ID, text"
-                  value={draft.query}
-                />
-              </label>
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Color
-                <select
-                  className={cn(selectClassName, 'h-10')}
-                  onChange={(event) => setDraft((current) => ({ ...current, color: event.target.value as CardColor | 'All' }))}
-                  value={draft.color}
-                >
-                  {colorFilters.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Type
-                <select
-                  className={cn(selectClassName, 'h-10')}
-                  onChange={(event) => setDraft((current) => ({ ...current, type: event.target.value as CardType | 'All' }))}
-                  value={draft.type}
-                >
-                  {typeFilters.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Set
-                <select
-                  className={cn(selectClassName, 'h-10')}
-                  onChange={(event) => setDraft((current) => ({ ...current, setCode: event.target.value }))}
-                  value={draft.setCode}
-                >
-                  {setOptions.map((option) => (
-                    <option key={option} value={option}>{option === 'All' ? 'All Sets' : option}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="mt-4 flex items-center gap-2">
-              <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)} variant="secondary">
-                Cancel
-              </Button>
-              <Button className="flex-1" onClick={applyMobileFilters}>
-                Apply
-              </Button>
-            </div>
-          </div>
-        </>
-      ) : null}
-
-      <ReferenceCardDetailModal
-        card={inspectCard ?? null}
-        onAdd={inspectCard ? () => addCard(inspectCard.id) : undefined}
-        onOpenChange={(open) => !open && setInspectCardId(null)}
-        onRemove={inspectCard ? () => removeCard(inspectCard.id) : undefined}
-        open={Boolean(inspectCard)}
-        qty={inspectCard ? deck[inspectCard.id] ?? 0 : 0}
+      <CardViewerModal
+        activeCardId={activeCardId}
+        items={visibleCards}
+        onOpenChange={(open) => {
+          if (!open) setActiveCardId(null);
+        }}
+        onSelectCard={setActiveCardId}
       />
-    </>
+    </div>
   );
+// End of file
 }

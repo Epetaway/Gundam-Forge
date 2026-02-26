@@ -6,8 +6,9 @@ import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
 import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
-import { CollectionCardTile } from '@/components/cards/CollectionCardTile';
+import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
+import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { cn } from '@/lib/utils/cn';
 
@@ -246,9 +247,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
           >
             {sorted.slice(0, 360).map((card) => (
               <li key={card.id}>
-                <CollectionCardTile
-                  card={card}
-                  onOpen={() => setInspectCardId(card.id)}
+                <CardPreviewTile
+                  imageUrl={card.imageUrl}
+                  name={card.name}
+                  qty={0}
+                  onClick={() => setInspectCardId(card.id)}
                 />
               </li>
             ))}

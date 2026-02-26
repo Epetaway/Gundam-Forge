@@ -137,7 +137,7 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
           actions={{ onOpenCard: setActiveCardId }}
           items={visibleCards}
           selection={{ activeCardId }}
-          ui={{ density, features }}
+          ui={{ density, features, mode: 'viewer' }}
         />
       </section>
 
