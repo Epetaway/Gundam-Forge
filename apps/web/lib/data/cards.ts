@@ -1,5 +1,6 @@
 import cardsCatalogJson from '@/lib/data/cards.catalog.json';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
+import { withBasePath } from '@/lib/utils/basePath';
 
 export type CatalogFilters = {
   query?: string;
@@ -36,8 +37,8 @@ export function getCard(id: string): CardDefinition | undefined {
 }
 
 export function getCardImage(card: CardImageRef): string {
-  if (card.imageUrl?.startsWith('/card_art/')) return card.imageUrl;
+  if (card.imageUrl?.startsWith('/card_art/')) return withBasePath(card.imageUrl);
   if (card.imageUrl) return card.imageUrl;
   if (card.placeholderArt) return card.placeholderArt;
-  return `/card_art/${card.id}.webp`;
+  return withBasePath(`/card_art/${card.id}.webp`);
 }
