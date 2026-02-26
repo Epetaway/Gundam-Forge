@@ -49,9 +49,9 @@ const colorSwatches: Record<CardColor, string> = {
 };
 
 const inputClassName =
-  'h-9 w-full rounded-md border border-border bg-surface px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 const selectClassName =
-  'h-9 w-full rounded-md border border-border bg-surface px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 type CatalogView = 'grid' | 'compact';
 
@@ -419,8 +419,8 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
 
   return (
     <>
-      <section className="rounded-xl border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[38rem] lg:overflow-hidden">
-        <header className="border-b border-border bg-steel-50/80 px-3 py-2">
+      <section className="rounded-md border border-border bg-surface shadow-sm lg:h-[calc(100vh-11rem)] lg:min-h-[38rem] lg:overflow-hidden">
+        <header className="border-b border-border bg-surface-interactive px-3 py-2">
           <div className="flex flex-wrap items-end gap-2">
             <label className="grid min-w-[12rem] flex-1 gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600 lg:max-w-[22rem]">
               Deck Name
@@ -491,8 +491,10 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
           </div>
         </header>
 
-        <div className="grid gap-3 p-3 lg:h-[calc(100%-5.75rem)] lg:min-h-0 lg:grid-cols-[16rem_minmax(0,1fr)_23rem] lg:gap-2">
-          <aside className="hidden min-h-0 rounded-lg border border-border bg-surface-muted/35 lg:flex lg:flex-col">
+        <div className="relative grid gap-3 p-3 lg:h-[calc(100%-5.75rem)] lg:min-h-0 lg:grid-cols-[16rem_minmax(0,1fr)_23rem] lg:gap-2">
+          <span className="industrial-divider pointer-events-none absolute bottom-3 hidden w-px lg:block lg:left-[calc(16rem+0.8rem)] lg:top-3" />
+          <span className="industrial-divider pointer-events-none absolute bottom-3 hidden w-px lg:block lg:right-[23rem] lg:top-3" />
+          <aside className="hidden min-h-0 rounded-md border border-border bg-surface-muted/80 lg:flex lg:flex-col">
             <div className="flex items-center justify-between border-b border-border px-3 py-2">
               <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Filter className="h-4 w-4 text-steel-500" />
@@ -559,7 +561,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                 </select>
               </label>
 
-              <div className="rounded-md border border-border bg-surface px-2.5 py-2 text-xs text-steel-600">
+              <div className="rounded-md border border-border bg-surface-interactive px-2.5 py-2 text-xs text-steel-600">
                 <p>{filteredCards.length} cards matched</p>
                 <p>{Object.keys(deck).length} unique cards in deck</p>
               </div>
@@ -568,7 +570,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                 <div className="flex flex-wrap gap-1.5">
                   {activeFilterChips.map((chip) => (
                     <button
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-steel-100 px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
+                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold text-steel-700 transition-colors hover:border-accent hover:text-accent"
                       key={chip.id}
                       onClick={chip.clear}
                     >
@@ -581,11 +583,11 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
             </div>
           </aside>
 
-          <section className="min-h-0 rounded-lg border border-border bg-surface lg:flex lg:flex-col">
+          <section className="min-h-0 rounded-md border border-border bg-surface lg:flex lg:flex-col">
             <div className="flex items-center justify-between border-b border-border px-3 py-2">
               <h2 className="text-sm font-semibold text-foreground">Card Catalog</h2>
               <div className="flex items-center gap-2">
-                <div className="inline-flex items-center rounded-md border border-border bg-steel-100/80 p-1">
+                <div className="inline-flex items-center rounded-md border border-border bg-surface-interactive p-1">
                   <button
                     aria-label="Grid view"
                     className={cn(
@@ -623,7 +625,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                 <div className="flex flex-wrap items-center justify-end gap-1.5 lg:hidden">
                   {activeFilterChips.slice(0, 2).map((chip) => (
                     <button
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-steel-100 px-2 py-0.5 text-[10px] font-semibold"
+                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold"
                       key={chip.id}
                       onClick={chip.clear}
                     >
@@ -680,7 +682,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
             </div>
           </section>
 
-          <aside className="min-h-0 rounded-lg border border-border bg-surface lg:flex lg:flex-col">
+          <aside className="min-h-0 rounded-md border border-border bg-[linear-gradient(160deg,rgba(59,130,246,0.08),rgba(21,26,34,0)_35%),repeating-linear-gradient(0deg,rgba(154,169,191,0.04)_0,rgba(154,169,191,0.04)_1px,transparent_1px,transparent_12px)] lg:flex lg:flex-col">
             <div className="space-y-2 border-b border-border px-3 py-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-foreground">Deck Workspace</h2>
@@ -689,7 +691,12 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                 </Badge>
               </div>
 
-              <div className="rounded-md border border-border bg-steel-50 px-2.5 py-2">
+              <div className={cn(
+                'rounded-md border px-2.5 py-3',
+                validation.isValid
+                  ? 'border-emerald-300/45 bg-emerald-400/10 shadow-[0_0_24px_rgba(34,197,94,0.25)]'
+                  : 'border-border bg-surface-interactive',
+              )}>
                 <div className="flex items-center justify-between text-xs font-semibold text-steel-700">
                   <span>{totalCards}/{DECK_MAX} cards</span>
                   <span>Avg {avgCost.toFixed(2)}</span>
@@ -738,9 +745,9 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                       {deckGroups.map((group) => {
                         const isCollapsed = collapsedGroups[group.key] ?? false;
                         return (
-                          <li className="overflow-hidden rounded-md border border-border bg-steel-50/70" key={group.key}>
+                          <li className="overflow-hidden rounded-md border border-border bg-surface-interactive/85" key={group.key}>
                             <button
-                              className="flex w-full items-center justify-between px-2.5 py-1.5 text-left text-xs font-semibold text-steel-700 transition-colors hover:bg-steel-100"
+                              className="flex w-full items-center justify-between px-2.5 py-1.5 text-left text-xs font-semibold text-steel-700 transition-colors hover:bg-steel-200"
                               onClick={() => toggleGroup(group.key)}
                               type="button"
                             >
@@ -763,7 +770,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                                     <div className="flex items-center gap-1">
                                       <button
                                         aria-label={`Remove ${entry.card.name}`}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100"
+                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-200"
                                         onClick={() => removeCard(entry.cardId)}
                                         type="button"
                                       >
@@ -772,7 +779,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                                       <span className="w-6 text-center text-xs font-semibold text-steel-700">{entry.qty}</span>
                                       <button
                                         aria-label={`Add ${entry.card.name}`}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-100"
+                                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-surface text-steel-700 transition-colors hover:bg-steel-200"
                                         onClick={() => addCard(entry.cardId)}
                                         type="button"
                                       >
@@ -792,13 +799,13 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
 
                 <TabsContent className="mt-2 space-y-2 overflow-y-auto" value="validation">
                   {validation.errors.length === 0 ? (
-                    <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                    <p className="rounded-md border border-emerald-300/35 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">
                       No rule violations found.
                     </p>
                   ) : (
                     <ul className="space-y-2">
                       {validation.errors.map((error) => (
-                        <li className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" key={error}>
+                          <li className="rounded-md border border-red-300/35 bg-red-400/10 px-3 py-2 text-sm text-red-300" key={error}>
                           {error}
                         </li>
                       ))}
@@ -808,7 +815,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
                   {validation.warnings.length > 0 ? (
                     <ul className="space-y-2">
                       {validation.warnings.map((warning) => (
-                        <li className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700" key={warning}>
+                        <li className="rounded-md border border-amber-300/35 bg-amber-400/10 px-3 py-2 text-sm text-amber-300" key={warning}>
                           {warning}
                         </li>
                       ))}
@@ -830,7 +837,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
             </DialogDescription>
           </DialogHeader>
           <textarea
-            className="min-h-56 w-full rounded-md border border-border bg-surface p-3 font-mono text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+            className="min-h-56 w-full rounded-md border border-border bg-surface-interactive p-3 font-mono text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
             onChange={(event) => setImportText(event.target.value)}
             placeholder={'4 ST01-001\n3 GD01-100\n2 Card Name'}
             value={importText}
@@ -849,7 +856,7 @@ export function ForgeWorkbench({ cards }: ForgeWorkbenchProps): JSX.Element {
             className="fixed inset-0 z-40 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-2xl border border-border bg-surface p-4 shadow-2xl lg:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] rounded-t-md border border-border bg-surface p-4 shadow-2xl lg:hidden">
             <h3 className="text-sm font-semibold text-foreground">Filters</h3>
             <div className="mt-3 space-y-3">
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">

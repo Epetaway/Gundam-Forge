@@ -15,10 +15,10 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
         <Container className="flex h-16 items-center justify-between">
           <Link className="flex items-center gap-2" href="/">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-cobalt-500/30 bg-cobalt-500/10 font-mono text-xs font-bold text-cobalt-600">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-cobalt-400/60 bg-cobalt-500/20 font-mono text-xs font-bold text-cobalt-300 shadow-[0_0_16px_rgba(59,130,246,0.35)]">
               GF
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight">Gundam Forge</span>
+            <span className="font-display text-lg font-semibold uppercase tracking-[0.06em] text-steel-800">Gundam Forge</span>
           </Link>
           <div className="flex items-center gap-3">
             <MainNav />
@@ -32,7 +32,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       <main>{children}</main>
 
-      <footer className="border-t border-border bg-surface">
+      <footer className="border-t border-border bg-surface/90">
         <Container className="flex flex-col gap-3 py-6 text-xs text-steel-600 sm:flex-row sm:items-center sm:justify-between">
           <p>Built for high-velocity Gundam GCG deck iteration.</p>
           <p className="font-mono uppercase tracking-[0.16em]">SSR first • Accessible • Tokenized</p>
