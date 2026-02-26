@@ -6,11 +6,11 @@ export function generateStaticParams() {
 }
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { Container } from '@/components/layout/Container';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Card, CardContent } from '@/components/ui/Card';
 import { getDeckById, getDeckCardCount, getResolvedEntries } from '@/lib/data/decks';
 
@@ -74,17 +74,13 @@ export default function DeckViewPage({ params }: DeckViewPageProps): JSX.Element
 
         <div className="space-y-4">
           <Card className="overflow-hidden">
-            {previewCard ? (
-              <div className="relative aspect-[5/7] bg-steel-100">
-                <CardArtImage
-                  card={previewCard}
-                  className="h-full w-full object-cover"
-                  height={840}
-                  width={600}
-                />
-              </div>
-            ) : null}
             <CardContent className="space-y-3 py-3">
+              {previewCard ? (
+                <ReferenceCardTile
+                  card={previewCard}
+                  qty={deck.entries.find((entry) => entry.cardId === previewCard.id)?.qty ?? 1}
+                />
+              ) : null}
               <div className="flex flex-wrap gap-2">
                 {deck.colors.map((color) => (
                   <Badge key={color} variant="accent">{color}</Badge>

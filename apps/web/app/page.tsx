@@ -1,14 +1,24 @@
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
+import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { getCard } from '@/lib/data/cards';
 import { getDecks } from '@/lib/data/decks';
+import { getEvents } from '@/lib/data/events';
+import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
 
 export default function HomePage(): JSX.Element {
-  const decks = getDecks().slice(0, 3);
+  const decks = getDecks();
+  const events = getEvents();
+  const trendingDecks = rankTrendingDecks(decks, events, 3);
+  const archetypes = rankArchetypes(events).slice(0, 4);
+  const latestUpdates = [
+    'Meta engine now factors event-weighted placements and social momentum.',
+    'Cards and Forge now use unified reference card tile and detail modal.',
+    'Deck explorer sorting now includes trending and win-rate derived order.',
+  ];
 
   return (
     <>
@@ -54,32 +64,33 @@ export default function HomePage(): JSX.Element {
       <section className="py-12">
         <Container className="space-y-5">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="font-display text-2xl font-semibold">Featured Decks</h2>
+            <h2 className="font-display text-2xl font-semibold">Trending Decks</h2>
             <Button asChild size="sm" variant="secondary">
-              <Link href="/decks">See all decks</Link>
+              <Link href="/explore">See all decks</Link>
             </Button>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {decks.map((deck) => {
+            {trendingDecks.map((deck) => {
               const previewCard = getCard(deck.entries[0]?.cardId);
               return (
                 <Card key={deck.id} className="overflow-hidden">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-steel-100">
+                  <CardContent className="pb-0">
                     {previewCard ? (
-                      <CardArtImage
+                      <ReferenceCardTile
                         card={previewCard}
-                        className="h-full w-full object-cover"
-                        height={480}
-                        width={720}
+                        qty={deck.entries[0]?.qty ?? 1}
+                        onOpen={undefined}
                       />
                     ) : null}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <p className="text-xs uppercase tracking-wide text-white/75">{deck.archetype}</p>
-                      <p className="font-display text-xl font-semibold text-white">{deck.name}</p>
+                    <div className="pt-3">
+                      <p className="text-xs uppercase tracking-wide text-steel-500">{deck.archetype}</p>
+                      <p className="font-display text-xl font-semibold text-foreground">{deck.name}</p>
                     </div>
-                  </div>
+                  </CardContent>
                   <CardContent className="flex items-center justify-between py-3">
-                    <p className="text-xs text-steel-600">{deck.likes} likes • {deck.views} views</p>
+                    <p className="text-xs text-steel-600">
+                      {(deck.winRate * 100).toFixed(1)}% win rate • {deck.eventAppearances} events
+                    </p>
                     <Button asChild size="sm" variant="ghost">
                       <Link href={`/decks/${deck.id}`}>Open</Link>
                     </Button>
@@ -87,6 +98,65 @@ export default function HomePage(): JSX.Element {
                 </Card>
               );
             })}
+          </div>
+        </Container>
+      </section>
+
+      <section className="pb-12">
+        <Container className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Tournament Results</CardTitle>
+              <CardDescription>Latest placements informing the ranking engine.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {events.slice(0, 3).map((event) => (
+                <div className="rounded-md border border-border bg-steel-50 px-3 py-2" key={event.id}>
+                  <div className="flex items-center justify-between text-sm">
+                    <p className="font-semibold">{event.name}</p>
+                    <Badge>{event.date}</Badge>
+                  </div>
+                  <p className="text-xs text-steel-600">
+                    #{event.placements[0]?.placement} {event.placements[0]?.deckName} • {event.location}
+                  </p>
+                </div>
+              ))}
+              <Button asChild className="w-full" variant="secondary">
+                <Link href="/events">View events</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Popular Archetypes</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {archetypes.map((record) => (
+                  <div className="rounded-md border border-border bg-steel-50 px-3 py-2" key={record.archetype}>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold">{record.archetype}</p>
+                      <Badge variant="accent">{record.topThree} top 3</Badge>
+                    </div>
+                    <p className="text-xs text-steel-600">{(record.winRate * 100).toFixed(1)}% win rate</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Latest Updates</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {latestUpdates.map((update) => (
+                  <p className="rounded-md border border-border bg-steel-50 px-3 py-2 text-xs text-steel-700" key={update}>
+                    {update}
+                  </p>
+                ))}
+              </CardContent>
+            </Card>
           </div>
         </Container>
       </section>

@@ -15,9 +15,10 @@ import { cn } from '@/lib/utils/cn';
 const navItems = [
   { href: '/', label: 'Home' },
   { href: '/forge', label: 'Forge' },
-  { href: '/cards', label: 'Card Database' },
-  { href: '/decks', label: 'Decks' },
-  { href: '/profile', label: 'Profile' },
+  { href: '/explore', label: 'Explore' },
+  { href: '/cards', label: 'Cards' },
+  { href: '/events', label: 'Events' },
+  { href: '/auth/login', label: 'Login' },
 ] as const;
 
 export function MainNav(): JSX.Element {
