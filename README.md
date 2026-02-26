@@ -4,7 +4,7 @@ Gundam Forge is a beta deck builder + playtest simulator for Bandai Gundam TCG w
 
 ## Workspace
 
-- `apps/web`: React + TypeScript + Vite + Tailwind UI
+- `apps/web`: Next.js + React + TypeScript + Tailwind UI
 - `packages/shared`: shared types, playmat zone template, validation engine
 
 ## Quick start
@@ -14,11 +14,11 @@ npm install
 npm run dev:web
 ```
 
-Open the local URL printed by Vite.
+Open the local URL printed by Next.js.
 
 ## Official card sync
 
-Syncs cards from the official Gundam Card Game site into `apps/web/src/data/cards.json`.
+Syncs cards from the official Gundam Card Game site into `apps/web/lib/data/cards.json`.
 
 ```bash
 npm run sync-cards
@@ -53,13 +53,15 @@ Optional environment variables:
 ## Routes
 
 - `/` — Hangar
-- `/builder` — Inventory Rack + Assembly Dock + Technical Spec panel
-- `/sim` — Official playmat simulator controls and drag/drop workflow
-- `/diagnostics` — Cost curve, type counts, color distribution
+- `/forge` — Card catalog + deck assembly + validation workspace
+- `/cards` — Card database browser
+- `/decks` — Deck catalog
+- `/decks/[id]` — Individual deck view
+- `/profile` — User profile panel
 
 ## Beta features implemented
 
-- Card catalog from local `apps/web/src/data/cards.json`
+- Card catalog from local `apps/web/lib/data/cards.json`
 - Search and filters (name, color, cost, type, set) with pagination
 - Card preview panel
 - Deck add/remove, grouped list, export decklist to clipboard
@@ -111,6 +113,16 @@ Card art images and market prices can be automatically fetched and updated via t
    CARD_ART_NAMING_PATTERN={id}.webp
    ```
 
+4. **Configure image quality/size budget (optional):**
+   
+   The asset scripts will probe multiple formats (`webp`, `png`, `jpg`, `jpeg`) and choose
+   the highest-detail candidate that stays within your file size budget.
+   ```
+   CARD_IMAGE_MIN_BYTES=10000
+   CARD_IMAGE_TARGET_MAX_BYTES=450000
+   CARD_IMAGE_HARD_MAX_BYTES=1200000
+   ```
+
 ### Current Status
 
 | Set | Cards | Images | Status |
@@ -141,7 +153,7 @@ npm run fetch-assets
 This will:
 - Download card images to `apps/web/public/card_art/` (not committed)
 - Fetch current market prices from configured API
-- Update `apps/web/src/data/cards.json` with `imageUrl` and `price` fields
+- Update `apps/web/lib/data/cards.json` with `imageUrl` and `price` fields
 - Log a summary of success/failure counts
 
 ### Adding Missing Card Images
@@ -149,8 +161,8 @@ This will:
 Some card sets (GD04, GD05, GD06, ST09) aren't yet in the ExBurst database. To add images for these:
 
 1. **Find the images** from an alternative source (e.g., Moxfield, TCGPlayer, or official Bandai assets)
-2. **Download manually** and place in `apps/web/public/card_art/{id}.webp`
-3. **Update cards.json** with `imageUrl` field pointing to `/card_art/{id}.webp`
+2. **Download manually** and place in `apps/web/public/card_art/{id}.{webp|png|jpg|jpeg}`
+3. **Update cards.json** with `imageUrl` field pointing to `/card_art/{id}.{ext}`
 4. The UI will automatically display the real images instead of placeholders
 
 ### Key Features
@@ -167,7 +179,7 @@ Some card sets (GD04, GD05, GD06, ST09) aren't yet in the ExBurst database. To a
 🎨 Gundam Forge Card Asset Fetcher
 =====================================
 
-Loading cards from: /path/to/apps/web/src/data/cards.json
+Loading cards from: /path/to/apps/web/lib/data/cards.json
 ✓ Loaded 31 cards
 
 [1/31] Processing: GD01-001 - RX-78-2 Gundam
@@ -195,7 +207,7 @@ Loading cards from: /path/to/apps/web/src/data/cards.json
   Verify `CARD_ART_BASE_URL` is correct. The script logs attempted URLs for debugging.
 
 - **Cards.json not updated?**  
-  Ensure the file exists and is writable. Check permissions on `apps/web/src/data/`.
+  Ensure the file exists and is writable. Check permissions on `apps/web/lib/data/`.
 
 ### Advanced: Custom Image Source
 
@@ -229,7 +241,7 @@ This repo does **not** include copyrighted card art.
 	- `widthPercent = width / frameWidth * 100`
 	- `heightPercent = height / frameHeight * 100`
 4. Update values in `packages/shared/src/playmat-zones.ts`.
-5. Reload `/sim` and confirm overlays align.
+5. Reload the simulator/playmat screen and confirm overlays align.
 
 ## Quality commands
 

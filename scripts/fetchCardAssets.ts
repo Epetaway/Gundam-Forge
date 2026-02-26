@@ -3,14 +3,18 @@
  * fetchCardAssets.ts
  *
  * Downloads card art from exburst.dev with concurrent fetching.
+ * Probes multiple formats (webp/png/jpg/jpeg), then picks the best quality/size candidate.
  * Skips cards that already have a local file on disk.
- * Updates cards.json imageUrl to the local path after a successful download.
+ * Updates cards.json imageUrl to the exact local path after a successful download.
  *
  * Usage:
  *   npm run fetch-assets
  *
  * Environment variables:
  *   CONCURRENCY           - Parallel download limit (default: 10)
+ *   CARD_IMAGE_MIN_BYTES
+ *   CARD_IMAGE_TARGET_MAX_BYTES
+ *   CARD_IMAGE_HARD_MAX_BYTES
  *   USE_MOCK_PRICES       - Use mock prices, skip live fetch (default: true)
  *   TCGPLAYER_PUBLIC_KEY, TCGPLAYER_PRIVATE_KEY
  *   CARDMARKET_API_KEY
@@ -33,27 +37,104 @@ const projectRoot = path.resolve(__dirname, '..');
 
 const EXBURST_BASE = 'https://exburst.dev/gundam/cards/sd';
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 10);
+const IMAGE_EXTENSIONS = ['webp', 'png', 'jpg', 'jpeg'] as const;
+const MIN_IMAGE_BYTES = Number(process.env.CARD_IMAGE_MIN_BYTES ?? 10_000);
+const TARGET_IMAGE_MAX_BYTES = Number(process.env.CARD_IMAGE_TARGET_MAX_BYTES ?? 450_000);
+const HARD_IMAGE_MAX_BYTES = Number(process.env.CARD_IMAGE_HARD_MAX_BYTES ?? 1_200_000);
 
-/** Canonical exburst image URL for a card ID */
-function exburstUrl(cardId: string): string {
-  return `${EXBURST_BASE}/${cardId}.webp`;
+type ImageExtension = (typeof IMAGE_EXTENSIONS)[number];
+
+interface ImageCandidate {
+  url: string;
+  ext: ImageExtension;
+  bytes: number;
+  buffer: Buffer;
 }
 
-/** Download a URL to disk. Returns true on success (file written, >5 KB). */
-async function downloadImage(url: string, dest: string): Promise<boolean> {
+/** Canonical exburst image URL for a card ID */
+function exburstUrl(cardId: string, ext: ImageExtension): string {
+  return `${EXBURST_BASE}/${cardId}.${ext}`;
+}
+
+function scoreCandidate(candidate: ImageCandidate): number {
+  if (candidate.bytes < MIN_IMAGE_BYTES || candidate.bytes > HARD_IMAGE_MAX_BYTES) return Number.NEGATIVE_INFINITY;
+
+  // Quality proxy: larger files generally preserve more detail up to a target budget.
+  const qualityScore = Math.min(candidate.bytes, TARGET_IMAGE_MAX_BYTES) / TARGET_IMAGE_MAX_BYTES;
+  const oversizePenalty =
+    candidate.bytes > TARGET_IMAGE_MAX_BYTES
+      ? ((candidate.bytes - TARGET_IMAGE_MAX_BYTES) / TARGET_IMAGE_MAX_BYTES) * 0.35
+      : 0;
+  const formatBonus = candidate.ext === 'webp' ? 0.08 : candidate.ext === 'png' ? 0.03 : 0;
+
+  return qualityScore - oversizePenalty + formatBonus;
+}
+
+async function fetchCandidate(url: string, ext: ImageExtension): Promise<ImageCandidate | null> {
   try {
     const res = await fetch(url);
-    if (!res.ok) return false;
+    if (!res.ok) return null;
 
-    const buf = await res.arrayBuffer();
-    if (buf.byteLength < 5_000) return false; // Likely an error page or placeholder
+    const contentType = res.headers.get('content-type') ?? '';
+    if (!contentType.includes('image')) return null;
 
-    await fs.mkdir(path.dirname(dest), { recursive: true });
-    await fs.writeFile(dest, Buffer.from(buf));
-    return true;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.byteLength < MIN_IMAGE_BYTES || buf.byteLength > HARD_IMAGE_MAX_BYTES) return null;
+
+    return {
+      url,
+      ext,
+      bytes: buf.byteLength,
+      buffer: buf,
+    };
   } catch {
-    return false;
+    return null;
   }
+}
+
+async function findLocalImage(cardArtDir: string, cardId: string): Promise<string | null> {
+  for (const ext of IMAGE_EXTENSIONS) {
+    const fullPath = path.join(cardArtDir, `${cardId}.${ext}`);
+    try {
+      await fs.access(fullPath);
+      return `/card_art/${cardId}.${ext}`;
+    } catch {
+      // continue
+    }
+  }
+  return null;
+}
+
+async function removeOtherVariants(cardArtDir: string, cardId: string, keepExt: ImageExtension): Promise<void> {
+  await Promise.all(
+    IMAGE_EXTENSIONS
+      .filter((ext) => ext !== keepExt)
+      .map(async (ext) => {
+        const fullPath = path.join(cardArtDir, `${cardId}.${ext}`);
+        try {
+          await fs.unlink(fullPath);
+        } catch {
+          // ignore missing files
+        }
+      }),
+  );
+}
+
+async function downloadBestImage(cardId: string): Promise<ImageCandidate | null> {
+  const candidates: ImageCandidate[] = [];
+
+  for (const ext of IMAGE_EXTENSIONS) {
+    const candidate = await fetchCandidate(exburstUrl(cardId, ext), ext);
+    if (candidate) candidates.push(candidate);
+  }
+
+  if (candidates.length === 0) return null;
+
+  candidates.sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
+  const best = candidates[0];
+  if (scoreCandidate(best) === Number.NEGATIVE_INFINITY) return null;
+
+  return best;
 }
 
 /**
@@ -109,7 +190,7 @@ async function main() {
   console.log(`Source     : ${EXBURST_BASE}`);
   console.log(`Concurrency: ${CONCURRENCY}\n`);
 
-  const cardsPath = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'cards.json');
+  const cardsPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
   const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
 
   let cards: CardDefinition[];
@@ -125,28 +206,36 @@ async function main() {
   let downloaded = 0;
   let skipped = 0;
   let failed = 0;
+  const downloadedByFormat: Record<ImageExtension, number> = {
+    webp: 0,
+    png: 0,
+    jpg: 0,
+    jpeg: 0,
+  };
 
   const imageTasks = cards.map((card, i) => async () => {
-    const dest = path.join(cardArtDir, `${card.id}.webp`);
-    const localPath = `/card_art/${card.id}.webp`;
     const tag = `[${String(i + 1).padStart(String(cards.length).length, ' ')}/${cards.length}]`;
 
-    // Skip if the file already exists on disk
-    try {
-      await fs.access(dest);
-      if (card.imageUrl !== localPath) card.imageUrl = localPath;
+    const existingLocalPath = await findLocalImage(cardArtDir, card.id);
+    if (existingLocalPath) {
+      if (card.imageUrl !== existingLocalPath) card.imageUrl = existingLocalPath;
       skipped++;
-      console.log(`${tag} SKIP  ${card.id}`);
+      console.log(`${tag} SKIP  ${card.id} (${existingLocalPath.split('.').pop()})`);
       return;
-    } catch {
-      // File not found — download it
     }
 
-    const ok = await downloadImage(exburstUrl(card.id), dest);
-    if (ok) {
+    const best = await downloadBestImage(card.id);
+    if (best) {
+      const dest = path.join(cardArtDir, `${card.id}.${best.ext}`);
+      await fs.mkdir(path.dirname(dest), { recursive: true });
+      await fs.writeFile(dest, best.buffer);
+      await removeOtherVariants(cardArtDir, card.id, best.ext);
+
+      const localPath = `/card_art/${card.id}.${best.ext}`;
       card.imageUrl = localPath;
       downloaded++;
-      console.log(`${tag} OK    ${card.id}`);
+      downloadedByFormat[best.ext] += 1;
+      console.log(`${tag} OK    ${card.id} (${best.ext}, ${(best.bytes / 1024).toFixed(1)}KB)`);
     } else {
       failed++;
       console.log(`${tag} FAIL  ${card.id}`);
@@ -188,6 +277,12 @@ async function main() {
   console.log(`  Downloaded ${downloaded}`);
   console.log(`  Skipped    ${skipped}`);
   console.log(`  Failed     ${failed}`);
+  if (downloaded > 0) {
+    const byFormat = IMAGE_EXTENSIONS
+      .map((ext) => `${ext}:${downloadedByFormat[ext]}`)
+      .join('  ');
+    console.log(`  Formats    ${byFormat}`);
+  }
   console.log('\nDone.');
 }
 

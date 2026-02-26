@@ -4,7 +4,7 @@
  * sync-official-decks.ts
  *
  * Scrapes all official GCG deck pages from gundam-gcg.com and regenerates:
- *   1. apps/web/src/data/officialDecks.ts  (TypeScript static data)
+ *   1. apps/web/lib/data/officialDecks.ts  (TypeScript static data)
  *   2. supabase/seed-official-decks.sql    (Supabase seed migration)
  *
  * Usage:
@@ -349,7 +349,7 @@ interface ExistingDeck {
 }
 
 const loadExistingDecks = async (): Promise<Map<string, ExistingDeck>> => {
-  const filePath = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'officialDecks.ts');
+  const filePath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'officialDecks.ts');
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const map = new Map<string, ExistingDeck>();
@@ -560,7 +560,7 @@ BEGIN
 const main = async () => {
   const deckLimit = Number(process.env.GUNDAM_GCG_DECK_LIMIT || '0');
   const usePlaywright = process.env.GUNDAM_GCG_USE_PLAYWRIGHT !== 'false';
-  const outputTsPath = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'officialDecks.ts');
+  const outputTsPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'officialDecks.ts');
   const outputSqlPath = path.join(projectRoot, 'supabase', 'seed-official-decks.sql');
 
   console.log('🔄 Syncing official decks from gundam-gcg.com');

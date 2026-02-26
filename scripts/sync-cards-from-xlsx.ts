@@ -17,7 +17,7 @@ const DEFAULT_INPUT_PATH = path.resolve(
 );
 
 const INPUT_PATH = process.env.GUNDAM_CARDS_XLSX_PATH || DEFAULT_INPUT_PATH;
-const OUTPUT_PATH = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'cards.json');
+const OUTPUT_PATH = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
 
 const COLUMN_MAP = {
   name: 'Name',

@@ -15,6 +15,7 @@
     "sync-cards-xlsx": "tsx scripts/sync-cards-from-xlsx.ts",
     "fetch-assets": "tsx scripts/fetchCardAssets.ts",
     "fetch-hq-images": "tsx scripts/fetch-hq-images.ts",
+    "validate-cards": "tsx scripts/validate-cards.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

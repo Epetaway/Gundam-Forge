@@ -12,6 +12,8 @@ const projectRoot = path.resolve(__dirname, '..');
 const DEFAULT_BASE_URL = 'https://exburst.dev';
 const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/gundam/cardlist`;
 const USE_PLAYWRIGHT = process.env.GUNDAM_GCG_USE_PLAYWRIGHT !== 'false';
+const FETCH_TIMEOUT_MS = Number(process.env.GUNDAM_GCG_FETCH_TIMEOUT_MS || '20000');
+const FETCH_RETRIES = Number(process.env.GUNDAM_GCG_FETCH_RETRIES || '2');
 
 const CARD_ID_PATTERN = /^(?:[A-Z]{2,4}\d{2}|[A-Z]{2,4})-\d{3,4}$/;
 
@@ -53,29 +55,60 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getEnv = (key: string, fallback: string): string => process.env[key] || fallback;
 
+const getOrigin = (value: string): string => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return DEFAULT_BASE_URL;
+  }
+};
+
+const fetchWithRetry = async (url: string, init: RequestInit): Promise<Response> => {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(url, { ...init, signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt < FETCH_RETRIES) {
+        await sleep(250 * (attempt + 1));
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  const reason = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new Error(`Failed to fetch ${url}: ${reason}`);
+};
+
 const fetchText = async (url: string): Promise<string> => {
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: {
       'User-Agent': 'Gundam-Forge-Sync/1.0 (+https://github.com/Epetaway/Gundam-Forge)',
       'Accept-Language': 'en-US,en;q=0.9',
     },
   });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url} (${response.status})`);
-  }
+
   return await response.text();
 };
 
 const fetchJson = async (url: string): Promise<unknown> => {
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: {
       'User-Agent': 'Gundam-Forge-Sync/1.0 (+https://github.com/Epetaway/Gundam-Forge)',
       'Accept': 'application/json,text/plain,*/*',
     },
   });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url} (${response.status})`);
-  }
+
   const text = await response.text();
   try {
     return JSON.parse(text);
@@ -139,6 +172,65 @@ interface DetailCardData {
   overview?: string;
   pairs: Array<{ label: string; value: string }>;
 }
+
+const decodeHtmlEntities = (value: string): string =>
+  value
+    .replace(/&#(\d+);/g, (_, n: string) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h: string) => String.fromCodePoint(Number.parseInt(h, 16)))
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;|&apos;/g, '\'')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+
+const cleanHtmlText = (value: string): string =>
+  decodeHtmlEntities(value.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' '))
+    .replace(/\s+\n/g, '\n')
+    .replace(/\n\s+/g, '\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+
+const extractDetailDataFromHtml = (html: string, detailUrl: string): DetailCardData | null => {
+  const detailSearch = (() => {
+    try {
+      return new URL(detailUrl).searchParams.get('detailSearch') || undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const cardNoMatch = html.match(/<div class="cardNo">\s*([\s\S]*?)\s*<\/div>/i);
+  const nameMatch = html.match(/<h1 class="cardName">\s*([\s\S]*?)\s*<\/h1>/i);
+  if (!cardNoMatch && !nameMatch) return null;
+
+  const rarityMatch = html.match(/<div class="rarity">\s*([\s\S]*?)\s*<\/div>/i);
+  const imageMatch = html.match(/<div class="cardImage">[\s\S]*?<img[^>]*src\s*=\s*["']?\s*([^"'>\s]+)/i);
+  const overviewMatch = html.match(/<div class="cardDataRow overview">[\s\S]*?<div class="dataTxt[^"]*">([\s\S]*?)<\/div>/i);
+
+  const pairs: Array<{ label: string; value: string }> = [];
+  const pairRegex = /<dt[^>]*class="[^"]*dataTit[^"]*"[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*class="[^"]*dataTxt[^"]*"[^>]*>([\s\S]*?)<\/dd>/gi;
+  let pairMatch = pairRegex.exec(html);
+  while (pairMatch) {
+    const label = cleanHtmlText(pairMatch[1]);
+    const value = cleanHtmlText(pairMatch[2]);
+    if (label.length > 0) {
+      pairs.push({ label, value });
+    }
+    pairMatch = pairRegex.exec(html);
+  }
+
+  return {
+    detailUrl,
+    detailSearch,
+    cardNo: cardNoMatch ? cleanHtmlText(cardNoMatch[1]) : undefined,
+    name: nameMatch ? cleanHtmlText(nameMatch[1]) : undefined,
+    rarity: rarityMatch ? cleanHtmlText(rarityMatch[1]) : undefined,
+    imageUrl: imageMatch ? decodeHtmlEntities(imageMatch[1]) : undefined,
+    overview: overviewMatch ? cleanHtmlText(overviewMatch[1]) : undefined,
+    pairs,
+  };
+};
 
 const normalizeDetailValue = (value?: string): string | undefined => {
   if (!value) return undefined;
@@ -220,6 +312,20 @@ const mapDetailToCard = (detail: DetailCardData): CardDefinition | null => {
     placeholderArt: buildPlaceholderArt(name),
   };
 };
+
+const detailCardToCandidate = (card: CardDefinition): OfficialCardCandidate => ({
+  id: card.id,
+  name: card.name,
+  color: card.color,
+  type: card.type,
+  cost: card.cost,
+  ap: card.ap,
+  hp: card.hp,
+  text: card.text,
+  set: card.set,
+  imageUrl: card.imageUrl,
+  traits: card.traits,
+});
 
 const fetchDetailCardsWithPlaywright = async (listUrl: string, limit?: number): Promise<CardDefinition[]> => {
   try {
@@ -438,7 +544,7 @@ const normalizeImageUrl = (value?: string, baseUrl: string = DEFAULT_BASE_URL): 
   return resolveUrl(value, baseUrl);
 };
 
-const normalizeCandidate = (raw: Record<string, unknown>): OfficialCardCandidate | null => {
+const normalizeCandidate = (raw: Record<string, unknown>, baseUrl: string): OfficialCardCandidate | null => {
   const id = firstString(raw, ID_KEYS)?.toUpperCase();
   if (!id || !CARD_ID_PATTERN.test(id)) {
     return null;
@@ -453,7 +559,7 @@ const normalizeCandidate = (raw: Record<string, unknown>): OfficialCardCandidate
   const text = firstString(raw, TEXT_KEYS);
   const setName = firstString(raw, SET_KEYS);
   const setCode = firstString(raw, SET_CODE_KEYS);
-  const imageUrl = normalizeImageUrl(firstString(raw, IMAGE_KEYS), DEFAULT_BASE_URL);
+  const imageUrl = normalizeImageUrl(firstString(raw, IMAGE_KEYS), baseUrl);
   const traits = normalizeTraits(raw[TRAITS_KEYS.find((key) => key in raw) ?? '']);
 
   return {
@@ -533,7 +639,20 @@ const extractJsonPayloads = (html: string): unknown[] => {
 };
 
 const extractCardLinksFromHtml = (html: string, baseUrl: string): DiscoveredCardLink[] => {
-  const results: DiscoveredCardLink[] = [];
+  const byId = new Map<string, DiscoveredCardLink>();
+  const addLink = (link: DiscoveredCardLink): void => {
+    const prior = byId.get(link.id);
+    if (!prior) {
+      byId.set(link.id, link);
+      return;
+    }
+    byId.set(link.id, {
+      id: link.id,
+      name: prior.name || link.name,
+      detailUrl: prior.detailUrl || link.detailUrl,
+    });
+  };
+
   const hrefRegex = /href="([^"]*?)"/gi;
   let match = hrefRegex.exec(html);
   while (match) {
@@ -549,9 +668,35 @@ const extractCardLinksFromHtml = (html: string, baseUrl: string): DiscoveredCard
       const nameWindow = html.slice(Math.max(0, match.index - 200), Math.min(html.length, match.index + 200));
       const nameMatch = nameWindow.match(/alt="([^"]+)"|data-name="([^"]+)"|data-card-name="([^"]+)"/i);
       const name = nameMatch?.[1] || nameMatch?.[2] || nameMatch?.[3];
-      results.push({ id, name, detailUrl });
+      addLink({ id, name, detailUrl });
     }
     match = hrefRegex.exec(html);
+  }
+
+  const detailSrcRegex = /data-src="([^"]*detail\.php\?detailSearch=[^"]+)"/gi;
+  match = detailSrcRegex.exec(html);
+  while (match) {
+    const detailRef = match[1];
+    const detailUrl = resolveUrl(detailRef, `${baseUrl}/en/cards/`);
+    let detailSearch = '';
+    try {
+      detailSearch = new URL(detailUrl).searchParams.get('detailSearch') || '';
+    } catch {
+      detailSearch = (detailUrl.match(/detailSearch=([^&]+)/i)?.[1] || '').trim();
+    }
+
+    const id = detailSearch.split('_')[0]?.toUpperCase();
+    if (!id || !CARD_ID_PATTERN.test(id)) {
+      match = detailSrcRegex.exec(html);
+      continue;
+    }
+
+    const nameWindow = html.slice(Math.max(0, match.index - 220), Math.min(html.length, match.index + 220));
+    const nameMatch = nameWindow.match(/alt="([^"]+)"|data-name="([^"]+)"|data-card-name="([^"]+)"/i);
+    const name = nameMatch?.[1] || nameMatch?.[2] || nameMatch?.[3];
+    addLink({ id, name, detailUrl });
+
+    match = detailSrcRegex.exec(html);
   }
 
   const dataIdRegex = /data-card-id="([A-Z0-9-]{4,})"/gi;
@@ -559,12 +704,12 @@ const extractCardLinksFromHtml = (html: string, baseUrl: string): DiscoveredCard
   while (match) {
     const id = match[1].toUpperCase();
     if (CARD_ID_PATTERN.test(id)) {
-      results.push({ id });
+      addLink({ id });
     }
     match = dataIdRegex.exec(html);
   }
 
-  return results;
+  return Array.from(byId.values());
 };
 
 const mergeCards = (existing: CardDefinition[], incoming: CardDefinition[]): CardDefinition[] => {
@@ -597,16 +742,16 @@ const buildPlaceholderArt = (name: string): string => {
   return `https://placehold.co/600x840/1f2937/f9fafb?text=${encoded}`;
 };
 
-const parseCardArray = (rawCards: Record<string, unknown>[]): OfficialCardCandidate[] => {
+const parseCardArray = (rawCards: Record<string, unknown>[], baseUrl: string): OfficialCardCandidate[] => {
   const normalized: OfficialCardCandidate[] = [];
   for (const raw of rawCards) {
-    const candidate = normalizeCandidate(raw);
+    const candidate = normalizeCandidate(raw, baseUrl);
     if (candidate) normalized.push(candidate);
   }
   return normalized;
 };
 
-const collectCardsFromJsonPayloads = (payloads: unknown[]): OfficialCardCandidate[] => {
+const collectCardsFromJsonPayloads = (payloads: unknown[], baseUrl: string): OfficialCardCandidate[] => {
   let best: Record<string, unknown>[] | null = null;
   let bestScore = 0;
 
@@ -622,7 +767,7 @@ const collectCardsFromJsonPayloads = (payloads: unknown[]): OfficialCardCandidat
   }
 
   if (!best || bestScore === 0) return [];
-  return parseCardArray(best);
+  return parseCardArray(best, baseUrl);
 };
 
 const toCardDefinition = (candidate: OfficialCardCandidate, fallback?: CardDefinition): CardDefinition | null => {
@@ -661,16 +806,26 @@ const fetchDetailCandidates = async (
 
     try {
       const html = await fetchText(url);
+      const detailData = extractDetailDataFromHtml(html, url);
+      if (detailData) {
+        const detailCard = mapDetailToCard(detailData);
+        if (detailCard) {
+          results.push(detailCardToCandidate(detailCard));
+          await sleep(delayMs);
+          continue;
+        }
+      }
+
       const payloads = extractJsonPayloads(html);
-      const candidates = collectCardsFromJsonPayloads(payloads);
+      const candidates = collectCardsFromJsonPayloads(payloads, getOrigin(url));
       if (candidates.length > 0) {
         results.push(...candidates);
       } else {
-        const name = link.name;
+        const name = link.name || link.id;
         results.push({ id: link.id, name });
       }
     } catch {
-      results.push({ id: link.id, name: link.name });
+      results.push({ id: link.id, name: link.name || link.id });
     }
 
     await sleep(delayMs);
@@ -680,34 +835,82 @@ const fetchDetailCandidates = async (
 
 const main = async () => {
   const cardsUrl = getEnv('GUNDAM_GCG_CARDS_URL', DEFAULT_CARDS_URL);
+  const sourceOrigin = getOrigin(cardsUrl);
+  const sourcePath = (() => {
+    try {
+      return new URL(cardsUrl).pathname.replace(/\/+$/, '');
+    } catch {
+      return '/en/cards';
+    }
+  })();
   if (cardsUrl.includes('#')) {
     console.warn('  ⚠️  URL hash fragments are ignored during fetch.');
   }
   const detailTemplate = process.env.GUNDAM_GCG_CARD_DETAIL_TEMPLATE;
+  const detailDelayMs = Number(process.env.GUNDAM_GCG_DETAIL_DELAY_MS || '200');
+  const explicitCardIds = (process.env.GUNDAM_GCG_CARD_IDS || '')
+    .split(',')
+    .map((value) => value.trim().toUpperCase())
+    .filter((value) => CARD_ID_PATTERN.test(value));
   const pageLimit = Number(process.env.GUNDAM_GCG_PAGE_LIMIT || '0');
   const detailLimit = Number(process.env.GUNDAM_GCG_DETAIL_LIMIT || '0');
-  const outputPath = path.join(projectRoot, 'apps', 'web', 'src', 'data', 'cards.json');
+  const outputPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
 
   console.log('🔄 Syncing official cards');
   console.log(`  Source: ${cardsUrl}`);
 
+  if (explicitCardIds.length > 0) {
+    const defaultTemplate = `${sourceOrigin}${sourcePath}/detail.php?detailSearch={id}`;
+    const template = detailTemplate || defaultTemplate;
+    const links: DiscoveredCardLink[] = explicitCardIds.map((id) => ({
+      id,
+      detailUrl: template.replace('{id}', id),
+      name: id,
+    }));
+
+    const candidates = await fetchDetailCandidates(links, template, detailDelayMs);
+    const uniqueCandidates = new Map<string, OfficialCardCandidate>();
+    for (const candidate of candidates) {
+      if (!candidate.id) continue;
+      if (!uniqueCandidates.has(candidate.id)) {
+        uniqueCandidates.set(candidate.id, candidate);
+      }
+    }
+
+    const existingRaw = await fs.readFile(outputPath, 'utf-8');
+    const existingCards = JSON.parse(existingRaw) as CardDefinition[];
+    const existingById = new Map(existingCards.map((card) => [card.id, card] as const));
+
+    const normalized: CardDefinition[] = [];
+    for (const candidate of uniqueCandidates.values()) {
+      const fallback = candidate.id ? existingById.get(candidate.id) : undefined;
+      const card = toCardDefinition(candidate, fallback);
+      if (card) normalized.push(card);
+    }
+
+    const merged = mergeCards(existingCards, normalized);
+    await fs.writeFile(outputPath, JSON.stringify(merged, null, 2) + '\n');
+    console.log(`✅ Synced ${normalized.length} cards from explicit IDs. Total now: ${merged.length}`);
+    return;
+  }
+
   const listHtml = await fetchText(cardsUrl);
   const payloads = extractJsonPayloads(listHtml);
-  let candidates = collectCardsFromJsonPayloads(payloads);
+  let candidates = collectCardsFromJsonPayloads(payloads, sourceOrigin);
 
   let discoveredLinks: DiscoveredCardLink[] = [];
   if (candidates.length === 0) {
-    discoveredLinks = extractCardLinksFromHtml(listHtml, DEFAULT_BASE_URL);
+    discoveredLinks = extractCardLinksFromHtml(listHtml, sourceOrigin);
   }
 
-  let discoveredEndpoints = extractEndpointHints(listHtml, DEFAULT_BASE_URL);
+  let discoveredEndpoints = extractEndpointHints(listHtml, sourceOrigin);
   if (candidates.length === 0 && discoveredEndpoints.length === 0) {
-    const scriptSources = extractScriptSources(listHtml, DEFAULT_BASE_URL);
+    const scriptSources = extractScriptSources(listHtml, sourceOrigin);
     for (const scriptUrl of scriptSources) {
       try {
         const scriptText = await fetchText(scriptUrl);
         discoveredEndpoints = discoveredEndpoints.concat(
-          extractFetchEndpoints(scriptText, DEFAULT_BASE_URL)
+          extractFetchEndpoints(scriptText, sourceOrigin)
         );
       } catch {
         // ignore script fetch failures
@@ -719,7 +922,7 @@ const main = async () => {
   if (candidates.length === 0 && USE_PLAYWRIGHT) {
     const renderedPayloads = await fetchRenderedPayloads(cardsUrl);
     if (renderedPayloads.length > 0) {
-      candidates = collectCardsFromJsonPayloads(renderedPayloads);
+      candidates = collectCardsFromJsonPayloads(renderedPayloads, sourceOrigin);
     }
   }
 
@@ -733,11 +936,11 @@ const main = async () => {
       try {
         const html = await fetchText(pageUrl);
         const pagePayloads = extractJsonPayloads(html);
-        const pageCandidates = collectCardsFromJsonPayloads(pagePayloads);
+        const pageCandidates = collectCardsFromJsonPayloads(pagePayloads, sourceOrigin);
         if (pageCandidates.length > 0) {
           candidates = candidates.concat(pageCandidates);
         } else {
-          discoveredLinks = discoveredLinks.concat(extractCardLinksFromHtml(html, DEFAULT_BASE_URL));
+          discoveredLinks = discoveredLinks.concat(extractCardLinksFromHtml(html, sourceOrigin));
         }
       } catch (error) {
         console.warn(`  ⚠️  Failed to fetch page ${page}: ${error}`);
@@ -750,7 +953,7 @@ const main = async () => {
     for (const endpoint of discoveredEndpoints) {
       try {
         const json = await fetchJson(endpoint);
-        const endpointCandidates = collectCardsFromJsonPayloads([json]);
+        const endpointCandidates = collectCardsFromJsonPayloads([json], sourceOrigin);
         if (endpointCandidates.length > 0) {
           candidates = candidates.concat(endpointCandidates);
           break;
@@ -763,7 +966,7 @@ const main = async () => {
   }
 
   if (candidates.length === 0 && discoveredLinks.length > 0) {
-    candidates = await fetchDetailCandidates(discoveredLinks, detailTemplate);
+    candidates = await fetchDetailCandidates(discoveredLinks, detailTemplate, detailDelayMs);
   }
 
   if (candidates.length === 0 && USE_PLAYWRIGHT) {

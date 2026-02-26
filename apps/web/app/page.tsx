@@ -1,10 +1,10 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { getCard, getCardImage } from '@/lib/data/cards';
+import { getCard } from '@/lib/data/cards';
 import { getDecks } from '@/lib/data/decks';
 
 export default function HomePage(): JSX.Element {
@@ -66,11 +66,10 @@ export default function HomePage(): JSX.Element {
                 <Card key={deck.id} className="overflow-hidden">
                   <div className="relative aspect-[4/3] overflow-hidden bg-steel-100">
                     {previewCard ? (
-                      <Image
-                        alt={previewCard.name}
+                      <CardArtImage
+                        card={previewCard}
                         className="h-full w-full object-cover"
                         height={480}
-                        src={getCardImage(previewCard)}
                         width={720}
                       />
                     ) : null}

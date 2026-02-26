@@ -4,15 +4,14 @@ import { deckCatalog } from '@/lib/data/decks';
 export function generateStaticParams() {
   return deckCatalog.map(deck => ({ id: deck.id }));
 }
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Container } from '@/components/layout/Container';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Card, CardContent } from '@/components/ui/Card';
-import { getCardImage } from '@/lib/data/cards';
 import { getDeckById, getDeckCardCount, getResolvedEntries } from '@/lib/data/decks';
 
 interface DeckViewPageProps {
@@ -77,11 +76,10 @@ export default function DeckViewPage({ params }: DeckViewPageProps): JSX.Element
           <Card className="overflow-hidden">
             {previewCard ? (
               <div className="relative aspect-[5/7] bg-steel-100">
-                <Image
-                  alt={previewCard.name}
+                <CardArtImage
+                  card={previewCard}
                   className="h-full w-full object-cover"
                   height={840}
-                  src={getCardImage(previewCard)}
                   width={600}
                 />
               </div>
