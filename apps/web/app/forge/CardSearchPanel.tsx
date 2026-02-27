@@ -49,6 +49,8 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
     } else if (results.length > 0) {
       setAllResults(prev => [...prev, ...results]);
     }
+  }, [cursor, results]);
+
   return (
     <aside className="w-80 border-r border-border bg-surface-elevated p-4 flex flex-col">
       <input
@@ -67,7 +69,7 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
               className={`px-2 py-0.5 rounded text-xs border ${filters.type === type || (type === 'All' && !filters.type) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
               onClick={() => {
                 setFilters(f => ({ ...f, type: type === 'All' ? undefined : type }));
-                setCursor(null); // Only update card results, do not clear deck
+                setCursor(null);
               }}
             >
               {type}
@@ -110,49 +112,12 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
       {/* Card results */}
       <div className="flex-1 overflow-y-auto">
         {allResults.map(card => (
-          <div key={card.id} className="mb-2 p-2 border rounded cursor-pointer hover:bg-surface-interactive" onClick={() => { onSelect(card.id); setToast(`Added ${card.name}`); }}>
+          <div key={card.id} className="mb-2 p-2 border rounded cursor-pointer hover:bg-surface-interactive" onClick={() => { onSelect(card.id); }}>
             <span className="font-semibold">{card.name}</span> <span className="text-xs text-steel-600">({card.type})</span>
           </div>
         ))}
-        {nextCursor && (
-          <button
-            className="mt-2 w-full rounded bg-cobalt-600 text-white py-2 text-sm font-semibold hover:bg-cobalt-700"
-    </aside>
-  );
-}
-              key={set}
-              className={`px-2 py-0.5 rounded text-xs border ${filters.set === set || (set === 'All' && !filters.set) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
-              onClick={() => {
-                setFilters(f => ({ ...f, set: set === 'All' ? undefined : set }));
-                setCursor(null); // Only update card results, do not clear deck
-              }}
-            >
-              {set}
-            </button>
-          ))}
-        </div>
       </div>
       {isFetching && <div className="text-xs text-steel-600">Loading...</div>}
-      {results.length > 0 && (
-        <List
-          defaultHeight={400}
-          rowCount={results.length}
-          rowHeight={56}
-          rowProps={{}}
-          rowComponent={({ index, style }) => {
-            const card = results[index];
-            return (
-              <div style={style} className="flex items-center gap-2 p-2 hover:bg-surface-interactive cursor-pointer" onClick={() => onSelect(card.id)}>
-                <img src={card.thumbnailUrl} alt={card.name} className="h-10 w-10 rounded object-cover" loading="lazy" />
-                <div>
-                  <div className="font-semibold text-sm text-foreground">{card.name}</div>
-                  <div className="text-xs text-steel-600">{card.type} • {card.faction ?? 'N/A'} • Cost {card.cost}</div>
-                </div>
-              </div>
-            );
-          }}
-        />
-      )}
     </aside>
   );
 }
