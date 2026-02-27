@@ -1,6 +1,6 @@
 import type { CardDefinition } from '@gundam-forge/shared';
 
-export type DeckViewMode = 'image' | 'stacks' | 'text';
+export type DeckViewMode = 'image' | 'stacks' | 'text' | 'table';
 export type DeckDensity = 'comfortable' | 'compact';
 export type DeckSortKey = 'name' | 'cost' | 'type';
 

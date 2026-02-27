@@ -1,59 +1,51 @@
-"use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { parseDeckList } from '@/app/forge/parseDeckList';
-import { matchDeckEntries, CardMatchResult } from '@/app/forge/cardMatching';
-import { ImportResultsSummary } from '@/app/forge/ImportResultsSummary';
-// import { createDeckApi } from '@/lib/api/decks'; // TODO: implement or adapt to your API
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import { DeckSetupProvider } from '@/components/deck/DeckSetupContext';
+import DeckSetupForm from '@/components/deck/DeckSetupForm';
+import DeckPreviewPanel from '@/components/deck/DeckPreviewPanel';
+import { cards } from '@/lib/data/cards';
 
 export default function CreateDeckPage() {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    name: '',
-    visibility: 'private',
-    archetype: '',
-    description: '',
-    pasteList: '',
-  });
-  const [importResults, setImportResults] = useState<CardMatchResult | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-    const parsed = parseDeckList(form.pasteList);
-    // TODO: fetch cardDb from API or context
-    const cardDb: any[] = [];
-    const results = matchDeckEntries(parsed, cardDb);
-    setImportResults(results);
-    // TODO: implement deck creation and navigation if all matched
-    setSubmitting(false);
-  }
-
   return (
-    <form className="max-w-xl mx-auto p-6" onSubmit={handleSubmit}>
-      <h1 className="text-2xl font-bold mb-4">Create New Deck</h1>
-      <label className="block mb-2 font-semibold">Deck Name *</label>
-      <input className="w-full mb-4 p-2 border rounded" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-      <label className="block mb-2 font-semibold">Visibility *</label>
-      <select className="w-full mb-4 p-2 border rounded" required value={form.visibility} onChange={e => setForm(f => ({ ...f, visibility: e.target.value }))}>
-        <option value="private">Private</option>
-        <option value="unlisted">Unlisted</option>
-        <option value="public">Public</option>
-      </select>
-      <label className="block mb-2 font-semibold">Archetype</label>
-      <input className="w-full mb-4 p-2 border rounded" value={form.archetype} onChange={e => setForm(f => ({ ...f, archetype: e.target.value }))} />
-      <label className="block mb-2 font-semibold">Description</label>
-      <textarea className="w-full mb-4 p-2 border rounded" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-      <label className="block mb-2 font-semibold">Paste Deck List *</label>
-      <textarea className="w-full mb-4 p-2 border rounded h-40" required value={form.pasteList} onChange={e => setForm(f => ({ ...f, pasteList: e.target.value }))} placeholder="e.g.\n4 Sinanju\n2 Zaku II" />
-      <button className="w-full bg-cobalt-600 text-white font-bold py-2 rounded" type="submit" disabled={submitting}>Create Deck</button>
-      {importResults && (
-        <div className="mt-6">
-          <h2 className="font-bold mb-2">Import Results</h2>
-          <ImportResultsSummary results={importResults} />
+    <DeckSetupProvider>
+      <div className="flex min-h-[calc(100vh-4rem)] bg-background">
+        {/* Left Panel: Form */}
+        <div className="w-full max-w-md flex-shrink-0 border-r border-border bg-surface p-8 flex flex-col justify-between">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cobalt-300 mb-1">Forge</p>
+            <h1 className="font-display text-3xl font-semibold uppercase tracking-wide text-foreground mb-6">
+              Create New Deck
+            </h1>
+            <DeckSetupForm cards={cards} />
+          </div>
+          <div className="mt-8 flex flex-col gap-2 border-t border-border pt-6">
+            <Link
+              className="text-sm text-cobalt-300 hover:text-cobalt-200 hover:underline"
+              href="/decks"
+            >
+              ← Browse existing decks
+            </Link>
+            <Link
+              className="text-sm text-steel-600 hover:text-foreground hover:underline"
+              href="/"
+            >
+              Cancel
+            </Link>
+          </div>
         </div>
-      )}
-    </form>
+
+        {/* Right Panel: Live Preview */}
+        <div className="flex flex-1 items-center justify-center p-8 bg-surface-muted">
+          <div className="flex flex-col items-center gap-6 w-full max-w-sm">
+            <DeckPreviewPanel />
+            <p className="text-xs text-steel-600 text-center">
+              Your deck will be created when you click "Create Deck &amp; Open Forge".<br />
+              You can always add more cards inside the Forge builder.
+            </p>
+          </div>
+        </div>
+      </div>
+    </DeckSetupProvider>
   );
 }
