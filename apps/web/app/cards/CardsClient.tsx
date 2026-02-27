@@ -56,10 +56,22 @@ function sortCards(cards: CardDefinition[], sortBy: SortKey): CardDefinition[] {
 }
 
 export default function CardsClient({ initialCards }: CardsClientProps): JSX.Element {
-  const [query, setQuery] = useState('');
-  const [color, setColor] = useState<CardColor | 'All'>('All');
-  const [type, setType] = useState<CardType | 'All'>('All');
-  const [setCode, setSetCode] = useState('All');
+  // Pre-apply filters from URL params if present
+  let initialColor: CardColor | 'All' = 'All';
+  let initialType: CardType | 'All' = 'All';
+  let initialSet: string = 'All';
+  let initialQuery: string = '';
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    initialColor = (urlParams.get('color') as CardColor | 'All') || 'All';
+    initialType = (urlParams.get('type') as CardType | 'All') || 'All';
+    initialSet = urlParams.get('set') || 'All';
+    initialQuery = urlParams.get('q') || '';
+  }
+  const [query, setQuery] = useState(initialQuery);
+  const [color, setColor] = useState<CardColor | 'All'>(initialColor);
+  const [type, setType] = useState<CardType | 'All'>(initialType);
+  const [setCode, setSetCode] = useState(initialSet);
   const [sortBy, setSortBy] = useState<SortKey>('name');
   const [view, setView] = useState<CatalogView>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);

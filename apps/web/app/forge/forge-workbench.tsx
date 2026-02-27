@@ -249,27 +249,32 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
               aria-label="Close import modal"
             >✕</button>
             <h2 className="text-lg font-semibold mb-2">Import Deck</h2>
+            <div className="mb-2 text-xs text-steel-700">
+              Format: <code>Quantity Card Name</code> per line (e.g. <code>3 Amuro Ray</code>)<br />
+              Unrecognized cards will be highlighted. Recognized cards will be auto-added.
+            </div>
             <textarea
               className="w-full h-32 border border-border rounded p-2 mb-2 text-sm"
               placeholder="Paste deck list here (e.g. 4 Gundam, 2 Zaku II)"
               value={importText}
               onChange={e => setImportText(e.target.value)}
             />
-            {importError && <div className="text-red-500 text-xs mb-2">{importError}</div>}
+            {importError && <div className="text-red-500 text-xs mb-2 animate-shake">{importError}</div>}
             <button
               className="bg-green-600 text-white px-4 py-2 rounded"
               onClick={async () => {
                 setImportError(null);
                 // Parse deck list: <qty> <card name>
                 const lines = importText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                const entries: { name: string; qty: number }[] = [];
+                const entries: { name: string; qty: number; line: string }[] = [];
+                let formatErrors: string[] = [];
                 for (const line of lines) {
                   const match = line.match(/^(\d+)\s+(.+)$/);
                   if (!match) {
-                    setImportError(`Invalid line: "${line}". Use format: <qty> <card name>`);
-                    return;
+                    formatErrors.push(`Invalid line: "${line}"`);
+                  } else {
+                    entries.push({ qty: parseInt(match[1], 10), name: match[2], line });
                   }
-                  entries.push({ qty: parseInt(match[1], 10), name: match[2] });
                 }
                 // Fetch card DB for name matching
                 try {
@@ -277,17 +282,25 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
                   const { cards } = await res.json();
                   const nameToId = Object.fromEntries(cards.map((c: any) => [c.name.toLowerCase(), c.id]));
                   const newDeck: Record<string, number> = {};
+                  let notFound: string[] = [];
                   for (const entry of entries) {
                     const cardId = nameToId[entry.name.toLowerCase()];
                     if (!cardId) {
-                      setImportError(`Card not found: ${entry.name}`);
-                      return;
+                      notFound.push(entry.line);
+                    } else {
+                      newDeck[cardId] = (newDeck[cardId] || 0) + entry.qty;
                     }
-                    newDeck[cardId] = (newDeck[cardId] || 0) + entry.qty;
                   }
-                  setDeck(newDeck);
-                  setImportOpen(false);
-                  setImportText('');
+                  if (formatErrors.length > 0 || notFound.length > 0) {
+                    setImportError([
+                      ...formatErrors.map(e => e + ' (use: <qty> <card name>)'),
+                      ...notFound.map(n => `Card not found: ${n}`),
+                    ].join('\n'));
+                  } else {
+                    setDeck(newDeck);
+                    setImportOpen(false);
+                    setImportText('');
+                  }
                 } catch (err) {
                   setImportError('Failed to import deck.');
                 }
