@@ -9,7 +9,17 @@ export function getCardList({ q, limit, cursor }: { q?: string; limit?: number; 
     const query = q.trim().toLowerCase();
     filtered = filtered.filter(card => `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase().includes(query));
   }
-  // TODO: add filter support
+  // Add filter support (color, type, set)
+  const args = arguments[0] || {};
+  if (args.color && args.color !== 'All') {
+    filtered = filtered.filter(card => card.color === args.color);
+  }
+  if (args.type && args.type !== 'All') {
+    filtered = filtered.filter(card => card.type === args.type);
+  }
+  if (args.set && args.set !== 'All') {
+    filtered = filtered.filter(card => card.set === args.set);
+  }
   let startIdx = 0;
   if (cursor) {
     const idx = filtered.findIndex(card => card.id === cursor);
