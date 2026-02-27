@@ -1,3 +1,82 @@
+# Gundam Forge Deck-Builder UX & Playtest Logic Research Report
+
+## 1. TCG Rules & Playtest Logic
+- **Deck size:** 50 main + 10 resource cards (60 total)
+- **Card copies:** Max 4 per card number
+- **Colors:** Max 2 non-Colorless colors per deck
+- **Unit cards:** At least 15 recommended
+- **EX Base/Resource:** Special tokens, not in main/resource deck
+- **Tournament:** Only legal cards, submit list, follow above constraints
+
+## 2. Server-Side Card Filtering
+- API supports filtering by color/type and excludes EX/Resource cards by default
+- Improvements:
+  - Always apply deck color/type filters after deck creation
+  - Multi-color filtering (show cards matching any selected color)
+  - Return only minimal card data for catalogue
+  - Pagination/infinite scroll supported
+
+## 3. Responsive Catalogue Panel
+- Panel overlays as a drawer on mobile, toggled by button
+- Main deck area uses flex/overflow to avoid compression
+- Confirmed responsive with recent CSS/layout improvements
+
+## 4. Import Format & Parser
+- Format: `<qty> <card name>` per line (e.g. `3 Amuro Ray`)
+- Parser matches names to IDs, errors on unknown/bad lines
+- Feedback for all unknown cards, summary before applying
+- Fuzzy matching/suggestions recommended
+
+## 5. Filter Alignment
+- Filters (Type, Colour, Set) now initialize to deck settings
+- Only legal colors/types shown; updates on deck changes
+
+## 6. Paginated Card List API
+- `/api/cards/search` supports `q`, `color`, `type`, `limit`, `offset`
+- Returns: minimal card data, total, pagination info
+- Always excludes EX/Resource unless requested
+
+## 7. UI/UX Recommendations
+- Document import format in UI
+- Show feedback for all import errors
+- Ensure all filters and catalogue queries honor deck settings
+- Test on multiple devices for responsiveness
+- Use server-side filtering for performance
+
+---
+
+
+# Implementation Plan (Completed)
+
+1. **Finalize API changes:**
+  - Ensure `/api/cards/search` supports multi-color/type filtering and minimal payloads
+2. **Deck-builder UI:**
+  - Confirm panel responsiveness and overlay behavior
+  - Update filter logic to always match deck settings
+  - Add import format help and error feedback
+3. **Import parser:**
+  - Improve error reporting and fuzzy matching
+4. **Testing:**
+  - Manual and automated tests for deck validation, import, and UI responsiveness
+5. **Docs:**
+  - Update user docs for import, filters, and deck-building rules
+6. **QA & Lint:**
+  - Run full lint and QA suite
+7. **Commit & Push:**
+  - Commit all changes and push to main
+
+---
+
+# Technology Choices
+- **Frontend:** Next.js, React, Tailwind CSS
+- **Backend:** Supabase (Postgres, Edge Functions)
+- **Testing:** Vitest, manual device testing
+- **Accessibility:** Use semantic HTML, ARIA labels, keyboard navigation
+
+---
+
+# Summary
+This plan ensures the Gundam Forge deck-builder is performant, legal-deck aware, and mobile-friendly, with clear import and filter UX. All changes are compatible with GitHub Pages static hosting.
 # Gundam Forge - Complete Implementation Summary
 
 **Date**: February 22, 2026  
