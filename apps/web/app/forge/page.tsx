@@ -1,22 +1,34 @@
+'use client';
+
+import * as React from 'react';
 import { Container } from '@/components/layout/Container';
-import { cards } from '@/lib/data/cards';
 import { DeckBuilderPage } from '@/app/forge/forge-workbench';
+import { cards } from '@/lib/data/cards';
+
+const forgeCards = cards.map((card) => ({
+  id: card.id,
+  name: card.name,
+  color: card.color,
+  type: card.type,
+  cost: card.cost,
+  set: card.set,
+  text: card.text,
+  imageUrl: card.imageUrl,
+  placeholderArt: card.placeholderArt,
+}));
 
 export default function ForgePage(): JSX.Element {
-  const forgeCards = cards.map((card) => ({
-    id: card.id,
-    name: card.name,
-    color: card.color,
-    type: card.type,
-    cost: card.cost,
-    set: card.set,
-    text: card.text,
-    imageUrl: card.imageUrl,
-  }));
+  const [deckId, setDeckId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('deckId');
+    if (id) setDeckId(id);
+  }, []);
 
   return (
-    <Container className="py-3 lg:py-4" wide>
-      <DeckBuilderPage cards={forgeCards} />
+    <Container className="py-0 px-0" wide>
+      <DeckBuilderPage cards={forgeCards} deckId={deckId} initialDeck={null} />
     </Container>
   );
 }
