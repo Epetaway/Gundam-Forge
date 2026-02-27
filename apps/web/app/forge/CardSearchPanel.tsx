@@ -183,9 +183,6 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
           }}
         />
       )}
-      {typeof data?.nextCursor === 'string' && (
-        <button className="mt-2 w-full rounded bg-cobalt-600 py-2 text-white" onClick={() => setCursor(data.nextCursor ?? null)}>Load More</button>
-      )}
     </aside>
   );
 }
