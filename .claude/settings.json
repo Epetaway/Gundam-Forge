@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/earlhickson/Development/Gundam-Forge stash pop)",
+      "Bash(git -C /Users/earlhickson/Development/Gundam-Forge add apps/web/app/forge/CardSearchPanel.tsx apps/web/app/forge/forge-workbench.tsx)",
+      "Bash(git -C /Users/earlhickson/Development/Gundam-Forge stash drop)",
+      "Bash(git -C:*)"
+    ]
+  }
+}
