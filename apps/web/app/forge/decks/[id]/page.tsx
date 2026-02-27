@@ -13,17 +13,6 @@ interface Props {
   params: { id: string };
 }
 
-const forgeCards = cards.map((card) => ({
-  id: card.id,
-  name: card.name,
-  color: card.color,
-  type: card.type,
-  cost: card.cost,
-  set: card.set,
-  text: card.text,
-  imageUrl: card.imageUrl,
-  placeholderArt: card.placeholderArt,
-}));
 
 export default function ForgeDeckPage({ params }: Props): JSX.Element {
   const deck = getDeckById(params.id);
@@ -37,7 +26,6 @@ export default function ForgeDeckPage({ params }: Props): JSX.Element {
   return (
     <Container className="py-0 px-0" wide>
       <DeckBuilderPage
-        cards={forgeCards}
         deckId={null}
         initialDeck={{
           id: deck.id,

@@ -1,0 +1,5 @@
+4 Gundam
+2 Zaku II
+1 EX Foo
+1 EX Base
+1 Resource Card
