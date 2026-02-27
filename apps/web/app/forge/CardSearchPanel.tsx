@@ -117,39 +117,9 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
         {nextCursor && (
           <button
             className="mt-2 w-full rounded bg-cobalt-600 text-white py-2 text-sm font-semibold hover:bg-cobalt-700"
-            onClick={() => setCursor(nextCursor)}
-            disabled={isFetching}
-          >
-            {isFetching ? 'Loading...' : 'Load more'}
-          </button>
-        )}
-        {isFetching && <div className="text-xs text-steel-600 mt-2">Loading cards...</div>}
-      </div>
-      {toast && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-cobalt-700 text-white px-4 py-2 rounded shadow-lg animate-fade-in">
-          {toast}
-        </div>
-      )}
     </aside>
   );
-                        onClick={() => setCursor(nextCursor)}
-                        disabled={isFetching}
-                      >
-                        {isFetching ? 'Loading...' : 'Load more'}
-                      </button>
-                    )}
-                    {isFetching && <div className="text-xs text-steel-600 mt-2">Loading cards...</div>}
-                  </div>
-                  {toast && (
-                    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-cobalt-700 text-white px-4 py-2 rounded shadow-lg animate-fade-in">
-                      {toast}
-                    </div>
-                  )}
-                </aside>
-              );
-          <span className="text-xs text-steel-600">Set:</span>
-          {CARD_SETS.map(set => (
-            <button
+}
               key={set}
               className={`px-2 py-0.5 rounded text-xs border ${filters.set === set || (set === 'All' && !filters.set) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
               onClick={() => {
