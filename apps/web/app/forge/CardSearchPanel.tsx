@@ -34,6 +34,16 @@ export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelPr
   // When true, restrict to deckColors (+ Colorless) only.
   const [deckColorOnly, setDeckColorOnly] = useState(false);
 
+  // Auto-enable the deck-color filter the first time the deck's colors become known.
+  // This handles the async localStorage load on mount (deckColors starts [] then updates).
+  const prevDeckColorsLenRef = React.useRef(deckColors.length);
+  React.useEffect(() => {
+    if (prevDeckColorsLenRef.current === 0 && deckColors.length > 0) {
+      setDeckColorOnly(true);
+    }
+    prevDeckColorsLenRef.current = deckColors.length;
+  }, [deckColors]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return allCards.filter((card) => {

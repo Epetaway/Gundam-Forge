@@ -585,8 +585,9 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
     [deckViewItems, query, sortBy],
   );
 
-  // Sidebar (mobile drawer) state
+  // Sidebar state: mobile overlay drawer + desktop collapse (persisted)
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [desktopPanelOpen, setDesktopPanelOpen] = useLocalStorageState('gundam-forge.forge.desktopPanelOpen', true);
 
   if (!mounted) return null;
 
@@ -613,13 +614,27 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
         Import
       </button>
 
+      {/* Desktop sidebar collapse toggle — thin strip, hidden on mobile */}
+      <button
+        type="button"
+        className="hidden md:flex items-center justify-center w-5 flex-shrink-0 border-r border-border bg-surface hover:bg-surface-interactive text-steel-500 hover:text-foreground transition-colors"
+        onClick={() => setDesktopPanelOpen((v: boolean) => !v)}
+        aria-label={desktopPanelOpen ? 'Collapse card search panel' : 'Expand card search panel'}
+        title={desktopPanelOpen ? 'Collapse' : 'Expand'}
+      >
+        <span aria-hidden="true" className="text-xs leading-none select-none">
+          {desktopPanelOpen ? '‹' : '›'}
+        </span>
+      </button>
+
       {/* Card search sidebar */}
       <div
-        className={
-          sidebarOpen
-            ? 'fixed inset-0 z-30 flex md:static md:inset-auto md:z-auto'
-            : 'hidden md:block md:relative'
-        }
+        className={cn(
+          // Mobile: full-screen overlay when sidebarOpen, otherwise hidden
+          sidebarOpen ? 'fixed inset-0 z-30 flex' : 'hidden',
+          // Desktop: respect desktopPanelOpen
+          desktopPanelOpen ? 'md:flex md:static md:inset-auto md:z-auto md:relative' : 'md:hidden',
+        )}
       >
         {/* Mobile overlay backdrop */}
         {sidebarOpen && (
