@@ -90,6 +90,17 @@ export function updateDeckEntries(id: string, entries: StoredDeckEntry[]): void 
   saveAll(all);
 }
 
+export function updateDeckMeta(
+  id: string,
+  meta: Partial<Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors'>>,
+): void {
+  const all = loadAll();
+  const idx = all.findIndex((d) => d.id === id);
+  if (idx < 0) return;
+  all[idx] = { ...all[idx], ...meta, updatedAt: new Date().toISOString() };
+  saveAll(all);
+}
+
 export function deleteStoredDeck(id: string): void {
   saveAll(loadAll().filter((d) => d.id !== id));
 }
