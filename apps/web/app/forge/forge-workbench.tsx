@@ -24,6 +24,8 @@ import type { CardMatchResult } from './cardMatching';
 import { validateDeck } from '@gundam-forge/shared';
 import type { CardDefinition, CardType } from '@gundam-forge/shared';
 import { CardSearchPanel } from './CardSearchPanel';
+import { cards as allCards, cardsById } from '@/lib/data/cards';
+import { parseDeckList } from './parseDeckList';
 
 // ---------- types ----------
 
@@ -186,6 +188,41 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
     setDeck((prev) => ({ ...prev, [cardId]: (prev[cardId] || 0) + 1 }));
   }, []);
 
+  // Remove one copy of a card (delete key when qty reaches 0)
+  const handleRemove = React.useCallback((cardId: string) => {
+    setDeck((prev) => {
+      const next = { ...prev };
+      if ((next[cardId] ?? 0) <= 1) {
+        delete next[cardId];
+      } else {
+        next[cardId] -= 1;
+      }
+      return next;
+    });
+  }, []);
+
+  // Persist deck entries to localStorage whenever deck changes
+  React.useEffect(() => {
+    if (!deckId) return;
+    const entries = Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }));
+    updateDeckEntries(deckId, entries);
+  }, [deck, deckId]);
+
+  // Build DeckViewItem list from current deck state
+  const deckViewItems = React.useMemo(
+    () =>
+      Object.entries(deck).flatMap(([cardId, qty]) => {
+        const item = toDeckViewItem({ cardId, qty, card: cardsById.get(cardId) });
+        return item ? [item] : [];
+      }),
+    [deck],
+  );
+
+  const filteredDeckItems = React.useMemo(
+    () => applyDeckFilterSort(deckViewItems, { query, sortBy }),
+    [deckViewItems, query, sortBy],
+  );
+
   // Responsive sidebar state
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -251,7 +288,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
             <h2 className="text-lg font-semibold mb-2">Import Deck</h2>
             <div className="mb-2 text-xs text-steel-700">
               Format: <code>Quantity Card Name</code> per line (e.g. <code>3 Amuro Ray</code>)<br />
-              Unrecognized cards will be highlighted. Recognized cards will be auto-added.
+              Unrecognized cards will be listed. Recognized cards will be auto-added.
             </div>
             <textarea
               className="w-full h-32 border border-border rounded p-2 mb-2 text-sm"
@@ -259,62 +296,99 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
               value={importText}
               onChange={e => setImportText(e.target.value)}
             />
-            {importError && <div className="text-red-500 text-xs mb-2 animate-shake">{importError}</div>}
+            {importError && <div className="text-red-500 text-xs mb-2 animate-shake whitespace-pre-line">{importError}</div>}
             <button
               className="bg-green-600 text-white px-4 py-2 rounded"
-              onClick={async () => {
+              onClick={() => {
                 setImportError(null);
-                // Parse deck list: <qty> <card name>
-                const lines = importText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                const entries: { name: string; qty: number; line: string }[] = [];
-                let formatErrors: string[] = [];
-                for (const line of lines) {
-                  const match = line.match(/^(\d+)\s+(.+)$/);
-                  if (!match) {
-                    formatErrors.push(`Invalid line: "${line}"`);
+                const entries = parseDeckList(importText);
+                if (entries.length === 0) {
+                  setImportError('No valid entries found. Use format: <qty> <card name>');
+                  return;
+                }
+                const newDeck: Record<string, number> = {};
+                const notFound: string[] = [];
+                for (const entry of entries) {
+                  const card = allCards.find(
+                    (c) => c.name.toLowerCase() === entry.name.toLowerCase(),
+                  );
+                  if (!card) {
+                    notFound.push(entry.name);
                   } else {
-                    entries.push({ qty: parseInt(match[1], 10), name: match[2], line });
+                    newDeck[card.id] = (newDeck[card.id] || 0) + entry.qty;
                   }
                 }
-                // Fetch card DB for name matching
-                try {
-                  const res = await fetch('/api/cards?limit=1000');
-                  const { cards } = await res.json();
-                  const nameToId = Object.fromEntries(cards.map((c: any) => [c.name.toLowerCase(), c.id]));
-                  const newDeck: Record<string, number> = {};
-                  let notFound: string[] = [];
-                  for (const entry of entries) {
-                    const cardId = nameToId[entry.name.toLowerCase()];
-                    if (!cardId) {
-                      notFound.push(entry.line);
-                    } else {
-                      newDeck[cardId] = (newDeck[cardId] || 0) + entry.qty;
-                    }
-                  }
-                  if (formatErrors.length > 0 || notFound.length > 0) {
-                    setImportError([
-                      ...formatErrors.map(e => e + ' (use: <qty> <card name>)'),
-                      ...notFound.map(n => `Card not found: ${n}`),
-                    ].join('\n'));
-                  } else {
-                    setDeck(newDeck);
-                    setImportOpen(false);
-                    setImportText('');
-                  }
-                } catch (err) {
-                  setImportError('Failed to import deck.');
+                if (notFound.length > 0) {
+                  setImportError(notFound.map((n) => `Card not found: "${n}"`).join('\n'));
+                  return;
                 }
+                setDeck(newDeck);
+                setImportOpen(false);
+                setImportText('');
               }}
             >Import</button>
           </div>
         </div>
       )}
 
-      {/* Main area placeholder: implement deck list, validation, and toolbar using deck state only */}
-      <div className="flex flex-1 flex-col items-center justify-center min-w-0 overflow-auto">
-        <p className="text-sm text-steel-600 mb-1">Your deck is empty or not rendered yet.</p>
-        <p className="text-xs text-steel-700">Use the card catalog on the left to add cards.</p>
-      </div>
+      {/* Main deck area */}
+      <main className="flex flex-1 flex-col overflow-hidden">
+        <ValidationBar
+          entries={Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }))}
+          allCards={allCards as CardDefinition[]}
+        />
+        {/* Toolbar — lives outside the scroll container so it stays visible */}
+        <div className="flex-none border-b border-border px-4">
+          <DeckToolbar
+            views={VIEW_REGISTRY.filter((v) => v.id !== 'table')}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            query={query}
+            onQueryChange={setQuery}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            density={density}
+            onDensityChange={setDensity}
+          />
+        </div>
+        {/* Scrollable deck list */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredDeckItems.length === 0 ? (
+            <div className="flex h-full flex-col items-center justify-center py-20 text-center">
+              {Object.keys(deck).length === 0 ? (
+                <>
+                  <p className="mb-1 text-sm text-steel-600">Your deck is empty.</p>
+                  <p className="text-xs text-steel-700">
+                    Use the card catalog on the left to add cards, or click Import Deck.
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-steel-600">No cards match your search.</p>
+              )}
+            </div>
+          ) : (
+            <div className="p-4">
+              <DeckListRenderer
+                viewMode={viewMode}
+                items={filteredDeckItems}
+                selection={{ activeCardId }}
+                actions={{
+                  onOpenCard: setActiveCardId,
+                  onAdd: handleAdd,
+                  onRemove: handleRemove,
+                }}
+                ui={{ density, mode: 'builder', features: { collection: false, deckEdit: true } }}
+              />
+            </div>
+          )}
+        </div>
+        <CardViewerModal
+          items={filteredDeckItems}
+          activeCardId={activeCardId}
+          onOpenChange={(open) => { if (!open) setActiveCardId(null); }}
+          onSelectCard={setActiveCardId}
+        />
+      </main>
     </div>
   );
 }
