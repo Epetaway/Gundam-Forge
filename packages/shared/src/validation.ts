@@ -130,6 +130,13 @@ export const validateDeck = (
     warnings.push(`No Resource cards in deck. The simulator will generate placeholder resources.`);
   }
 
+  // Warning: deck should include exactly 1 Base card
+  if (mainDeckCards > 0 && (typeCounts.Base ?? 0) === 0) {
+    warnings.push('Deck has no Base card. Each deck typically requires exactly 1 Base.');
+  } else if ((typeCounts.Base ?? 0) > 1) {
+    warnings.push(`Deck has ${typeCounts.Base} Base cards — only 1 is allowed.`);
+  }
+
   if (mainDeckCards > 0) {
     const avgCost = Object.entries(costCurve).reduce((sum, [cost, count]) =>
       sum + (parseInt(cost) * count), 0) / mainDeckCards;
