@@ -207,9 +207,19 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
         <label className="text-sm font-semibold text-foreground">
           Paste Deck List <span className="font-normal text-steel-600">(optional)</span>
         </label>
-        <p className="text-[11px] text-steel-600">
-          Accepts: "3 Sinanju", "Sinanju x3", "ST03-001 Sinanju x3", one card per line
-        </p>
+        <details className="text-xs text-steel-600">
+          <summary className="cursor-pointer select-none font-medium text-cobalt-400 hover:text-cobalt-300">
+            Accepted formats — click to expand
+          </summary>
+          <pre className="mt-1.5 whitespace-pre-wrap rounded bg-surface-interactive px-3 py-2 font-mono text-[11px] leading-relaxed text-steel-500">{`One card per line, quantity first:
+  3 Amuro Ray
+  Amuro Ray x3
+  ST01-001 Amuro Ray x3
+  Amuro Ray (3)
+
+Lines starting with # are ignored as comments.
+Unrecognized cards are listed as warnings after import.`}</pre>
+        </details>
         <textarea
           className="rounded-md border border-border bg-surface-interactive px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
           onChange={(e) => ctx.setDecklist(e.target.value)}
