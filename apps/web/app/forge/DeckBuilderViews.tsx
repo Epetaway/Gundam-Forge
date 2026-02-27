@@ -75,7 +75,8 @@ export function groupByTag(cards: DeckCard[]) {
 
 // GridView
 export function GridView({ cards, density, onOpenCard }: DeckViewProps) {
-  // TODO: Wire up onAdd/onRemove for builder controls if needed
+  // Add onAdd/onRemove handlers for builder controls
+  const { onAdd, onRemove } = (GridView as any).builderControls || {};
   return (
     <div className={cn(
       'grid',
@@ -102,8 +103,20 @@ export function GridView({ cards, density, onOpenCard }: DeckViewProps) {
           </button>
           {/* Builder controls: show on hover (desktop) */}
           <div className="absolute bottom-2 right-2 z-20 flex flex-col items-end opacity-0 group-hover:opacity-100 transition-opacity">
-            <button className="mb-1 rounded bg-cobalt-600 px-2 py-0.5 text-xs font-bold text-white shadow hover:bg-cobalt-700" title="Add one">+</button>
-            <button className="rounded bg-steel-700 px-2 py-0.5 text-xs font-bold text-white shadow hover:bg-steel-800" title="Remove one">–</button>
+            <button
+              className="mb-1 rounded bg-cobalt-600 px-2 py-0.5 text-xs font-bold text-white shadow hover:bg-cobalt-700"
+              title="Add one"
+              onClick={() => onAdd && onAdd(card)}
+              aria-label={`Add one ${card.name}`}
+            >+
+            </button>
+            <button
+              className="rounded bg-steel-700 px-2 py-0.5 text-xs font-bold text-white shadow hover:bg-steel-800"
+              title="Remove one"
+              onClick={() => onRemove && onRemove(card)}
+              aria-label={`Remove one ${card.name}`}
+            >–
+            </button>
           </div>
           <div className="pt-1 px-1">
             <p className="truncate text-xs font-semibold text-foreground">{card.name}</p>
