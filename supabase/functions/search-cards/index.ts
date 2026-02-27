@@ -41,12 +41,19 @@ serve(async (req: Request) => {
       dbQuery = dbQuery.textSearch('search_vector', query, { type: 'websearch' });
     }
 
+
     if (color) {
       dbQuery = dbQuery.eq('color', color);
     }
 
     if (cardType) {
       dbQuery = dbQuery.eq('type', cardType);
+    }
+
+    // Exclude EX, EX Base, and Resource cards from main deck search unless explicitly requested
+    const excludeEX = url.searchParams.get('includeEX') !== 'true';
+    if (excludeEX) {
+      dbQuery = dbQuery.not('type', 'in', ['EX', 'EX Base', 'Resource']);
     }
 
     const { data, error, count } = await dbQuery;
