@@ -49,19 +49,6 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
     } else if (results.length > 0) {
       setAllResults(prev => [...prev, ...results]);
     }
-  }, [results, cursor]);
-
-  const nextCursor = data?.nextCursor;
-
-  // Toast state
-  const [toast, setToast] = useState<string | null>(null);
-  React.useEffect(() => {
-    if (toast) {
-      const t = setTimeout(() => setToast(null), 2500);
-      return () => clearTimeout(t);
-    }
-  }, [toast]);
-
   return (
     <aside className="w-80 border-r border-border bg-surface-elevated p-4 flex flex-col">
       <input
@@ -76,31 +63,75 @@ export function CardSearchPanel({ onSelect }: { onSelect: (id: string) => void }
           <span className="text-xs text-steel-600">Type:</span>
           {CARD_TYPES.map(type => (
             <button
-                      {CARD_TYPES.map(type => (
-                        <button
-                          key={type}
-                          className={`px-2 py-0.5 rounded text-xs border ${filters.type === type || (type === 'All' && !filters.type) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
-                          onClick={() => {
-                            setFilters(f => ({ ...f, type: type === 'All' ? undefined : type }));
-                            setCursor(null); // Only update card results, do not clear deck
-                          }}
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                    {/* ...existing code... */}
-                  </div>
-                  {/* Card results */}
-                  <div className="flex-1 overflow-y-auto">
-                    {allResults.map(card => (
-                      <div key={card.id} className="mb-2 p-2 border rounded cursor-pointer hover:bg-surface-interactive" onClick={() => { onSelect(card.id); setToast(`Added ${card.name}`); }}>
-                        <span className="font-semibold">{card.name}</span> <span className="text-xs text-steel-600">({card.type})</span>
-                      </div>
-                    ))}
-                    {nextCursor && (
-                      <button
-                        className="mt-2 w-full rounded bg-cobalt-600 text-white py-2 text-sm font-semibold hover:bg-cobalt-700"
+              key={type}
+              className={`px-2 py-0.5 rounded text-xs border ${filters.type === type || (type === 'All' && !filters.type) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
+              onClick={() => {
+                setFilters(f => ({ ...f, type: type === 'All' ? undefined : type }));
+                setCursor(null); // Only update card results, do not clear deck
+              }}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+        {/* Color filter */}
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-steel-600">Color:</span>
+          {CARD_COLORS.map(color => (
+            <button
+              key={color}
+              className={`px-2 py-0.5 rounded text-xs border ${filters.color === color || (color === 'All' && !filters.color) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
+              onClick={() => {
+                setFilters(f => ({ ...f, color: color === 'All' ? undefined : color }));
+                setCursor(null);
+              }}
+            >
+              {color}
+            </button>
+          ))}
+        </div>
+        {/* Set filter */}
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-steel-600">Set:</span>
+          {CARD_SETS.map(set => (
+            <button
+              key={set}
+              className={`px-2 py-0.5 rounded text-xs border ${filters.set === set || (set === 'All' && !filters.set) ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-steel-700'}`}
+              onClick={() => {
+                setFilters(f => ({ ...f, set: set === 'All' ? undefined : set }));
+                setCursor(null);
+              }}
+            >
+              {set}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Card results */}
+      <div className="flex-1 overflow-y-auto">
+        {allResults.map(card => (
+          <div key={card.id} className="mb-2 p-2 border rounded cursor-pointer hover:bg-surface-interactive" onClick={() => { onSelect(card.id); setToast(`Added ${card.name}`); }}>
+            <span className="font-semibold">{card.name}</span> <span className="text-xs text-steel-600">({card.type})</span>
+          </div>
+        ))}
+        {nextCursor && (
+          <button
+            className="mt-2 w-full rounded bg-cobalt-600 text-white py-2 text-sm font-semibold hover:bg-cobalt-700"
+            onClick={() => setCursor(nextCursor)}
+            disabled={isFetching}
+          >
+            {isFetching ? 'Loading...' : 'Load more'}
+          </button>
+        )}
+        {isFetching && <div className="text-xs text-steel-600 mt-2">Loading cards...</div>}
+      </div>
+      {toast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-cobalt-700 text-white px-4 py-2 rounded shadow-lg animate-fade-in">
+          {toast}
+        </div>
+      )}
+    </aside>
+  );
                         onClick={() => setCursor(nextCursor)}
                         disabled={isFetching}
                       >
