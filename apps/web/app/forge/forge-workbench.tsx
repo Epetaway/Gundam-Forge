@@ -190,7 +190,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden relative">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden relative min-w-0">
       {/* Mobile toggle button */}
       <button
         className="absolute top-2 left-2 z-20 md:hidden bg-cobalt-600 text-white px-3 py-1 rounded shadow"
@@ -216,6 +216,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
             ? 'fixed inset-0 z-30 flex md:static md:inset-auto md:z-auto'
             : 'hidden md:block md:relative'
         }
+        style={{ maxWidth: sidebarOpen ? '100vw' : undefined }}
       >
         {/* Overlay for mobile */}
         {sidebarOpen && (
@@ -225,7 +226,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
             aria-label="Close card search overlay"
           />
         )}
-        <aside className="relative z-20 md:z-auto">
+        <aside className="relative z-20 md:z-auto w-80 max-w-full min-w-0">
           <CardSearchPanel onSelect={cardId => { handleAdd(cardId); setSidebarOpen(false); }} />
           {/* Close button for mobile */}
           <button
@@ -297,7 +298,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
       )}
 
       {/* Main area placeholder: implement deck list, validation, and toolbar using deck state only */}
-      <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="flex flex-1 flex-col items-center justify-center min-w-0 overflow-auto">
         <p className="text-sm text-steel-600 mb-1">Your deck is empty or not rendered yet.</p>
         <p className="text-xs text-steel-700">Use the card catalog on the left to add cards.</p>
       </div>
