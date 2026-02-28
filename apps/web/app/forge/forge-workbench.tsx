@@ -22,7 +22,7 @@ import type { CardMatchResult } from './cardMatching';
 import { validateDeck } from '@gundam-forge/shared';
 import type { CardDefinition, CardColor } from '@gundam-forge/shared';
 import { CardSearchPanel } from './CardSearchPanel';
-import { cards as allCards, cardsById } from '@/lib/data/cards';
+import { cards as allCards, cardsById, allSets } from '@/lib/data/cards';
 import { parseDeckList } from './parseDeckList';
 
 // ---------- types ----------
@@ -51,6 +51,7 @@ export interface ForgeWorkbenchProps {
     colors: string[];
     entries: { cardId: string; qty: number }[];
   } | null;
+  initialSetId?: string;
 }
 
 // ---------- view registry ----------
@@ -77,6 +78,8 @@ const ARCHETYPES = ['', 'Aggro', 'Midrange', 'Control', 'Combo', 'Ramp'];
 
 const IMPORT_FORMAT_HELP = `Accepted formats (one card per line):
   3 Amuro Ray
+  x3 Amuro Ray
+  3x Amuro Ray
   Amuro Ray x3
   ST01-001 Amuro Ray x3
   Amuro Ray (3)
@@ -150,9 +153,11 @@ interface DeckSettingsBarProps {
   name: string;
   colors: string[];
   archetype: string;
+  setId: string;
   onNameChange: (n: string) => void;
   onColorsChange: (c: CardColor[]) => void;
   onArchetypeChange: (a: string) => void;
+  onSetIdChange: (s: string) => void;
   onExport: () => void;
 }
 
@@ -161,9 +166,11 @@ function DeckSettingsBar({
   name,
   colors,
   archetype,
+  setId,
   onNameChange,
   onColorsChange,
   onArchetypeChange,
+  onSetIdChange,
   onExport,
 }: DeckSettingsBarProps) {
   const [open, setOpen] = React.useState(false);
@@ -208,6 +215,7 @@ function DeckSettingsBar({
           <Settings className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="max-w-[180px] truncate font-semibold text-foreground">{name}</span>
           {archetype && <span className="text-steel-500">· {archetype}</span>}
+          {setId && <span className="text-steel-500 hidden sm:inline">· {setId}</span>}
         </button>
 
         {/* Color pills (read-only in collapsed view) */}
@@ -292,6 +300,24 @@ function DeckSettingsBar({
                   );
                 })}
               </div>
+            </div>
+
+            {/* Set / Format */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-steel-500" htmlFor="settings-set-select">
+                Set / Format
+              </label>
+              <select
+                id="settings-set-select"
+                className="h-7 rounded border border-border bg-surface px-2 text-sm outline-none focus-visible:border-ring"
+                value={setId}
+                onChange={(e) => onSetIdChange(e.target.value)}
+              >
+                <option value="">All Sets</option>
+                {allSets.filter((s) => s !== 'Token').map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
             </div>
 
             {/* Archetype */}
@@ -432,7 +458,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
 // ---------- main DeckBuilderPage ----------
 
-export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProps, 'cards'>): JSX.Element | null {
+export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<ForgeWorkbenchProps, 'cards'>): JSX.Element | null {
   const [importOpen, setImportOpen] = React.useState(false);
 
   const [mounted, setMounted] = React.useState(false);
@@ -444,6 +470,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
     archetype: '',
     owner: 'You',
     colors: [] as string[],
+    setId: initialSetId ?? '',
   });
   const [deck, setDeck] = React.useState<Record<string, number>>({});
   const [importResults, setImportResults] = React.useState<CardMatchResult | null>(null);
@@ -459,12 +486,26 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
     const loaded = deckId ? getStoredDeck(deckId) : null;
 
     if (loaded) {
-      setDeckMeta({ name: loaded.name, description: loaded.description, archetype: loaded.archetype, owner: 'You', colors: loaded.colors });
+      setDeckMeta({
+        name: loaded.name,
+        description: loaded.description,
+        archetype: loaded.archetype,
+        owner: 'You',
+        colors: loaded.colors,
+        setId: loaded.setId ?? initialSetId ?? '',
+      });
       const e: Record<string, number> = {};
       for (const { cardId, qty } of loaded.entries) e[cardId] = qty;
       setDeck(e);
     } else if (initialDeck) {
-      setDeckMeta({ name: initialDeck.name, description: initialDeck.description, archetype: initialDeck.archetype, owner: initialDeck.owner, colors: initialDeck.colors });
+      setDeckMeta({
+        name: initialDeck.name,
+        description: initialDeck.description,
+        archetype: initialDeck.archetype,
+        owner: initialDeck.owner,
+        colors: initialDeck.colors,
+        setId: initialSetId ?? '',
+      });
       const e: Record<string, number> = {};
       for (const { cardId, qty } of initialDeck.entries) e[cardId] = qty;
       setDeck(e);
@@ -474,7 +515,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
       const raw = sessionStorage.getItem('gundam-forge.pendingImport');
       if (raw) { setImportResults(JSON.parse(raw)); sessionStorage.removeItem('gundam-forge.pendingImport'); }
     } catch { /* ignore */ }
-  }, [deckId, initialDeck]);
+  }, [deckId, initialDeck, initialSetId]);
 
   const showToast = React.useCallback((msg: string, kind: 'success' | 'warn' = 'success') => {
     setToast({ msg, kind });
@@ -520,6 +561,11 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
   const handleArchetypeChange = React.useCallback((a: string) => {
     setDeckMeta((prev) => ({ ...prev, archetype: a }));
     if (deckId) updateDeckMeta(deckId, { archetype: a });
+  }, [deckId]);
+
+  const handleSetIdChange = React.useCallback((s: string) => {
+    setDeckMeta((prev) => ({ ...prev, setId: s }));
+    if (deckId) updateDeckMeta(deckId, { setId: s || undefined });
   }, [deckId]);
 
   // Export
@@ -593,27 +639,6 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden relative min-w-0">
-      {/* Mobile: open card search button */}
-      <button
-        type="button"
-        className="absolute top-2 left-2 z-20 md:hidden rounded bg-cobalt-600 px-3 py-1 text-sm text-white shadow"
-        onClick={() => setSidebarOpen(true)}
-        aria-label="Open card search panel"
-        aria-expanded={sidebarOpen}
-      >
-        Search Cards
-      </button>
-
-      {/* Mobile: open import button */}
-      <button
-        type="button"
-        className="absolute top-2 right-2 z-20 md:hidden rounded bg-green-700 px-3 py-1 text-sm text-white shadow"
-        onClick={() => setImportOpen(true)}
-        aria-label="Import deck list"
-      >
-        Import
-      </button>
-
       {/* Desktop sidebar collapse toggle — thin strip, hidden on mobile */}
       <button
         type="button"
@@ -648,6 +673,7 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
           <CardSearchPanel
             onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}
             deckColors={deckMeta.colors}
+            initialSetId={deckMeta.setId}
           />
           {/* Mobile: close button inside sidebar */}
           <button
@@ -697,11 +723,34 @@ export function DeckBuilderPage({ deckId, initialDeck }: Omit<ForgeWorkbenchProp
           name={deckMeta.name}
           colors={deckMeta.colors}
           archetype={deckMeta.archetype}
+          setId={deckMeta.setId}
           onNameChange={handleNameChange}
           onColorsChange={handleColorsChange}
           onArchetypeChange={handleArchetypeChange}
+          onSetIdChange={handleSetIdChange}
           onExport={handleExport}
         />
+
+        {/* Mobile action bar — replaces absolute positioned buttons */}
+        <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-3 py-1.5">
+          <button
+            type="button"
+            className="rounded bg-cobalt-600 px-3 py-1 text-xs font-semibold text-white hover:bg-cobalt-500 transition-colors"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open card search panel"
+            aria-expanded={sidebarOpen}
+          >
+            Cards
+          </button>
+          <button
+            type="button"
+            className="ml-auto rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 hover:text-foreground transition-colors"
+            onClick={() => setImportOpen(true)}
+            aria-label="Import deck list"
+          >
+            Import Deck
+          </button>
+        </div>
 
         {/* Import button (desktop — inside main area header) */}
         <div className="hidden md:flex flex-shrink-0 items-center justify-end border-b border-border px-4 py-1">

@@ -5,14 +5,14 @@ import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 
 const CARD_TYPES = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 const CARD_COLORS = ['All', 'Red', 'Blue', 'Green', 'White', 'Purple', 'Colorless'];
-const SETS_LIST = ['All', ...allSets];
+const SETS_LIST = ['All', ...allSets.filter((s) => s !== 'Token')];
 
 // EX tokens are generated at game time and are never in the catalog,
 // but exclude any stray token-set cards from deck search.
 const EXCLUDED_SETS = new Set(['Token']);
 
 // EX Base (EXB-xxx, EXBP-xxx) and EX Resource (EXR-xxx) cards are placed in
-// separate game zones — they must NOT appear in the main deck card search.
+// separate game zones — they must NOT appear in the main deck card search by default.
 function isExCard(card: { id: string }): boolean {
   return card.id.startsWith('EXB') || card.id.startsWith('EXR');
 }
@@ -23,16 +23,24 @@ export interface CardSearchPanelProps {
   onSelect: (id: string) => void;
   /** Colors chosen for this deck — shown as a quick-filter toggle. */
   deckColors?: string[];
+  /** Set to pre-filter by (from deck creation). */
+  initialSetId?: string;
 }
 
-export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelProps) {
+export function CardSearchPanel({ onSelect, deckColors = [], initialSetId }: CardSearchPanelProps) {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [colorFilter, setColorFilter] = useState('All');
-  const [setFilter, setSetFilter] = useState('All');
+  const [setFilter, setSetFilter] = useState(() => {
+    // Pre-apply set filter from deck creation if provided
+    if (initialSetId && SETS_LIST.includes(initialSetId)) return initialSetId;
+    return 'All';
+  });
   const [page, setPage] = useState(0);
   // When true, restrict to deckColors (+ Colorless) only.
   const [deckColorOnly, setDeckColorOnly] = useState(false);
+  // When true, include EX cards in results.
+  const [includeEX, setIncludeEX] = useState(false);
 
   // Auto-enable the deck-color filter the first time the deck's colors become known.
   // This handles the async localStorage load on mount (deckColors starts [] then updates).
@@ -48,7 +56,7 @@ export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelPr
     const q = query.trim().toLowerCase();
     return allCards.filter((card) => {
       if (EXCLUDED_SETS.has(card.set)) return false;
-      if (isExCard(card)) return false;
+      if (!includeEX && isExCard(card)) return false;
       if (typeFilter !== 'All' && card.type !== typeFilter) return false;
       if (colorFilter !== 'All' && card.color !== colorFilter) return false;
       if (setFilter !== 'All' && card.set !== setFilter) return false;
@@ -63,12 +71,12 @@ export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelPr
       }
       return true;
     });
-  }, [query, typeFilter, colorFilter, setFilter, deckColorOnly, deckColors]);
+  }, [query, typeFilter, colorFilter, setFilter, deckColorOnly, deckColors, includeEX]);
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(0);
-  }, [query, typeFilter, colorFilter, setFilter, deckColorOnly]);
+  }, [query, typeFilter, colorFilter, setFilter, deckColorOnly, includeEX]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const visible = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -106,6 +114,21 @@ export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelPr
             {deckColorOnly ? '✓ Deck colors only' : 'Show deck colors only'}
           </button>
         )}
+
+        {/* Include EX toggle */}
+        <button
+          type="button"
+          className={`w-full rounded border px-2 py-1 text-xs font-semibold transition-colors ${
+            includeEX
+              ? 'border-amber-600 bg-amber-600/20 text-amber-300'
+              : 'border-border bg-surface-interactive text-steel-700 hover:bg-surface'
+          }`}
+          onClick={() => setIncludeEX((v) => !v)}
+          aria-pressed={includeEX}
+          title="Include EX Base and EX Resource cards in search results"
+        >
+          {includeEX ? '✓ EX cards shown' : 'Include EX cards'}
+        </button>
 
         {/* Type filter */}
         <div>
@@ -200,6 +223,7 @@ export function CardSearchPanel({ onSelect, deckColors = [] }: CardSearchPanelPr
                 <div className="truncate text-sm font-medium text-foreground">{card.name}</div>
                 <div className="text-xs text-steel-500">
                   {card.type} · {card.color} · Cost {card.cost ?? '–'}
+                  {isExCard(card) && <span className="ml-1 rounded bg-amber-500/20 px-1 text-[10px] text-amber-400">EX</span>}
                 </div>
               </div>
             </button>

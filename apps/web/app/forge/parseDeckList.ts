@@ -21,8 +21,16 @@ export function parseDeckList(text: string): ParsedDeckEntry[] {
       let setId: string | undefined;
       let match: RegExpMatchArray | null;
 
-      // Patterns: "3 Sinanju", "Sinanju x3", "Sinanju (3)", "ST03-001 Sinanju x3"
-      if ((match = line.match(/^(\d+)\s+(.+)$/))) {
+      // Patterns: "x3 Sinanju", "3x Sinanju", "3 Sinanju", "Sinanju x3", "Sinanju (3)", "ST03-001 Sinanju x3"
+      if ((match = line.match(/^x(\d+)\s+(.+)$/i))) {
+        // "x3 Sinanju" — x-prefix quantity
+        qty = parseInt(match[1], 10);
+        name = match[2];
+      } else if ((match = line.match(/^(\d+)x\s+(.+)$/i))) {
+        // "3x Sinanju" — digit+x prefix
+        qty = parseInt(match[1], 10);
+        name = match[2];
+      } else if ((match = line.match(/^(\d+)\s+(.+)$/))) {
         qty = parseInt(match[1], 10);
         name = match[2];
       } else if ((match = line.match(/^(.+)\s+x(\d+)$/i))) {
