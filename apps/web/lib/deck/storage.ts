@@ -12,6 +12,7 @@ export interface StoredDeck {
   visibility: 'private' | 'unlisted' | 'public';
   archetype: string;
   colors: CardColor[];
+  setId?: string;
   entries: StoredDeckEntry[];
   createdAt: string;
   updatedAt: string;
@@ -41,7 +42,7 @@ function saveAll(decks: StoredDeck[]): void {
 }
 
 export function createStoredDeck(
-  meta: Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors'>,
+  meta: Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors' | 'setId'>,
   entries: StoredDeckEntry[] = [],
 ): StoredDeck {
   const now = new Date().toISOString();
@@ -52,6 +53,7 @@ export function createStoredDeck(
     visibility: meta.visibility,
     archetype: meta.archetype,
     colors: meta.colors,
+    setId: meta.setId,
     entries,
     createdAt: now,
     updatedAt: now,
@@ -92,7 +94,7 @@ export function updateDeckEntries(id: string, entries: StoredDeckEntry[]): void 
 
 export function updateDeckMeta(
   id: string,
-  meta: Partial<Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors'>>,
+  meta: Partial<Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors' | 'setId'>>,
 ): void {
   const all = loadAll();
   const idx = all.findIndex((d) => d.id === id);

@@ -11,12 +11,14 @@ type DeckSetupContextType = {
   description: string;
   colors: CardColor[];
   decklist: string;
+  setId: string;
   setName: Dispatch<SetStateAction<string>>;
   setVisibility: Dispatch<SetStateAction<DeckVisibility>>;
   setArchetype: Dispatch<SetStateAction<string>>;
   setDescription: Dispatch<SetStateAction<string>>;
   setColors: Dispatch<SetStateAction<CardColor[]>>;
   setDecklist: Dispatch<SetStateAction<string>>;
+  setSetId: Dispatch<SetStateAction<string>>;
 };
 
 const defaultContext: DeckSetupContextType = {
@@ -26,12 +28,14 @@ const defaultContext: DeckSetupContextType = {
   description: '',
   colors: [],
   decklist: '',
+  setId: '',
   setName: () => {},
   setVisibility: () => {},
   setArchetype: () => {},
   setDescription: () => {},
   setColors: () => {},
   setDecklist: () => {},
+  setSetId: () => {},
 };
 
 export const DeckSetupContext = createContext<DeckSetupContextType>(defaultContext);
@@ -43,6 +47,7 @@ export function DeckSetupProvider({ children }: { children: ReactNode }) {
   const [description, setDescription] = useState('');
   const [colors, setColors] = useState<CardColor[]>([]);
   const [decklist, setDecklist] = useState('');
+  const [setId, setSetId] = useState('');
 
   return (
     <DeckSetupContext.Provider
@@ -53,6 +58,7 @@ export function DeckSetupProvider({ children }: { children: ReactNode }) {
         description, setDescription,
         colors, setColors,
         decklist, setDecklist,
+        setId, setSetId,
       }}
     >
       {children}

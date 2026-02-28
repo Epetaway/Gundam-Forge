@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils/cn';
 import { parseDeckList } from '@/app/forge/parseDeckList';
 import { matchDeckEntries } from '@/app/forge/cardMatching';
 import { createStoredDeck } from '@/lib/deck/storage';
+import { allSets } from '@/lib/data/cards';
 import { useDeckSetupContext } from './DeckSetupContext';
 
 const GUNDAM_COLORS: { value: CardColor; label: string; bg: string; text: string; border: string }[] = [
@@ -80,6 +81,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
           visibility: ctx.visibility,
           archetype: ctx.archetype,
           colors: ctx.colors,
+          setId: ctx.setId || undefined,
         },
         initialEntries,
       );
@@ -91,7 +93,10 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
         );
       }
 
-      router.push(`/forge?deckId=${newDeck.id}`);
+      const forgeUrl = ctx.setId
+        ? `/forge?deckId=${newDeck.id}&setId=${encodeURIComponent(ctx.setId)}`
+        : `/forge?deckId=${newDeck.id}`;
+      router.push(forgeUrl);
     } catch {
       setError('Something went wrong. Please try again.');
       setSubmitting(false);
@@ -168,6 +173,24 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
             );
           })}
         </div>
+      </div>
+
+      {/* Set / Format */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-semibold text-foreground" htmlFor="deck-set-select">
+          Set / Format <span className="font-normal text-steel-600">(filters catalog)</span>
+        </label>
+        <select
+          id="deck-set-select"
+          className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+          onChange={(e) => ctx.setSetId(e.target.value)}
+          value={ctx.setId}
+        >
+          <option value="">All Sets</option>
+          {allSets.filter((s) => s !== 'Token').map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
       </div>
 
       {/* Archetype */}
