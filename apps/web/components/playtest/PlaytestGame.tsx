@@ -371,6 +371,7 @@ export function PlaytestGame({
                 <div className="text-sm text-slate-400 mb-2">Hand ({playerState.hand.length}/7)</div>
                 <PlayerHand
                   cards={playerState.hand}
+                  cardDatabase={cardDatabase}
                   selectedCard={selectedCard}
                   onSelectCard={handleSelectCard}
                   onPlayCard={handlePlayCard}
