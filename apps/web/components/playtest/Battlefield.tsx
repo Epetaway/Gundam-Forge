@@ -124,6 +124,7 @@ export function Battlefield({
           <div className="col-span-1">
             <ShieldArea
               shields={opponentState.shields}
+              cardDatabase={cardDatabase}
               isOpponent={true}
               baseHealth={opponentState.baseHealth}
               maxBaseHealth={opponentState.maxBaseHealth}
@@ -134,6 +135,7 @@ export function Battlefield({
           {/* Base */}
           <BaseArea
             baseCard={opponentState.base}
+            cardDatabase={cardDatabase}
             baseHealth={opponentState.baseHealth}
             maxBaseHealth={opponentState.maxBaseHealth}
             isOpponent={true}
@@ -143,6 +145,7 @@ export function Battlefield({
           <div className="col-span-1 row-span-2">
             <BattleAreaZone
               units={opponentState.battleArea}
+              cardDatabase={cardDatabase}
               isOpponent={true}
               onUnitSelected={(unit) => onUnitSelected?.(unit, true)}
             />
@@ -152,6 +155,7 @@ export function Battlefield({
           <div className="col-span-1">
             <ResourceAreaZone
               resources={opponentState.resources}
+              cardDatabase={cardDatabase}
               isOpponent={true}
             />
           </div>
@@ -176,6 +180,7 @@ export function Battlefield({
             </div>
             <ShieldArea
               shields={playerState.shields}
+              cardDatabase={cardDatabase}
               isOpponent={false}
               baseHealth={playerState.baseHealth}
               maxBaseHealth={playerState.maxBaseHealth}
@@ -190,6 +195,7 @@ export function Battlefield({
             </div>
             <BaseArea
               baseCard={playerState.base}
+              cardDatabase={cardDatabase}
               baseHealth={playerState.baseHealth}
               maxBaseHealth={playerState.maxBaseHealth}
               isOpponent={false}
@@ -214,6 +220,7 @@ export function Battlefield({
             </div>
             <TrashArea
               trash={playerState.discardPile}
+              cardDatabase={cardDatabase}
               isOpponent={false}
             />
           </div>
@@ -227,6 +234,7 @@ export function Battlefield({
           <div className="flex-1 overflow-auto">
             <BattleAreaZone
               units={playerState.battleArea}
+              cardDatabase={cardDatabase}
               isOpponent={false}
               onUnitSelected={(unit) => onUnitSelected?.(unit, false)}
             />
@@ -242,6 +250,7 @@ export function Battlefield({
             </div>
             <ResourceAreaZone
               resources={playerState.resources}
+              cardDatabase={cardDatabase}
               isOpponent={false}
             />
           </div>

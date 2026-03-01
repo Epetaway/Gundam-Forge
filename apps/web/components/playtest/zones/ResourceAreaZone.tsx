@@ -9,14 +9,17 @@
 import React, { useState } from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
+import { CardStack } from '../CardStack';
 
 interface ResourceAreaZoneProps {
   resources: CardInstance[];
+  cardDatabase: Record<string, any>;
   isOpponent: boolean;
 }
 
 export function ResourceAreaZone({
   resources,
+  cardDatabase,
   isOpponent,
 }: ResourceAreaZoneProps) {
   const [selectedResource, setSelectedResource] = useState<string | null>(null);
@@ -31,36 +34,27 @@ export function ResourceAreaZone({
       <div className="grid grid-cols-2 gap-2 mb-3">
         {resources.length > 0 ? (
           resources.map((resource) => {
-            const cardDef = getCardById(resource.cardId);
             const isResting = resource.state === 'rest';
-
             return (
               <div
                 key={resource.instanceId}
-                className={`
-                  p-2 rounded border-2 cursor-pointer transition-all duration-200
-                  bg-gradient-to-b from-cyan-600/70 to-cyan-800/70
-                  border-cyan-500 hover:border-cyan-300
-                  text-xs text-center
-                  ${isResting ? 'opacity-60' : 'opacity-100'}
-                  ${selectedResource === resource.instanceId ? 'ring-2 ring-yellow-400' : ''}
-                `}
+                className={`flex justify-center transition-all duration-200 ${isResting ? 'opacity-60' : 'opacity-100'} ${selectedResource === resource.instanceId ? 'ring-2 ring-yellow-400 rounded' : ''}`}
                 style={{
                   transform: isResting ? 'rotate(90deg)' : 'rotate(0deg)',
                 }}
                 onClick={() => setSelectedResource(resource.instanceId)}
               >
-                <div className="font-bold text-cyan-200 truncate text-[10px]">
-                  {cardDef?.name || resource.cardId}
-                </div>
-                {isResting && (
-                  <div className="text-[8px] text-slate-400 mt-0.5">Resting</div>
-                )}
+                <CardStack
+                  cards={resource}
+                  cardDatabase={cardDatabase}
+                  variant="compact"
+                  showCount={false}
+                />
               </div>
             );
           })
         ) : (
-          <div className="col-span-2 text-slate-600 text-xs italic py-2">
+          <div className="col-span-2 text-slate-600 text-xs italic py-2 text-center">
             No resources in play
           </div>
         )}

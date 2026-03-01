@@ -7,9 +7,11 @@
 
 import React from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
+import { CardStack } from '../CardStack';
 
 interface ShieldAreaProps {
   shields: CardInstance[];
+  cardDatabase: Record<string, any>;
   isOpponent: boolean;
   baseHealth: number;
   maxBaseHealth: number;
@@ -18,6 +20,7 @@ interface ShieldAreaProps {
 
 export function ShieldArea({
   shields,
+  cardDatabase,
   isOpponent,
   baseHealth,
   maxBaseHealth,
@@ -33,26 +36,18 @@ export function ShieldArea({
         {isOpponent ? 'Opponent' : 'Your'} Shields
       </div>
 
-      {/* Shield Stack Visual */}
-      <div className="relative h-24 mb-3 flex items-center justify-center">
+      {/* Shield Stack Visual - Using CardStack component */}
+      <div className="mb-3 flex items-center justify-center">
         {shields.length > 0 ? (
-          <div className="relative w-16">
-            {/* Stack effect - multiple offset rectangles */}
-            {[0, 1, 2].map(
-              (i) =>
-                i < shields.length && (
-                  <div
-                    key={i}
-                    className="absolute w-full h-14 bg-gradient-to-b from-blue-600 to-blue-800 rounded border-2 border-blue-400 shadow-lg"
-                    style={{
-                      transform: `translateY(${i * 4}px)`,
-                    }}
-                  />
-                ),
-            )}
-          </div>
+          <CardStack
+            cards={shields}
+            cardDatabase={cardDatabase}
+            variant="compact"
+            showCount={true}
+            className="flex justify-center"
+          />
         ) : (
-          <div className="text-slate-600 text-sm italic">No shields</div>
+          <div className="text-slate-600 text-sm italic py-4">No shields</div>
         )}
       </div>
 

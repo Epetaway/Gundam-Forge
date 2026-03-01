@@ -1,7 +1,7 @@
 /**
  * Battle Area Zone Component
  * Largest zone where units fight during battle phase
- * Supports 5+ units per row with attack/defense animation
+ * Supports 5+ units per row with attack/defense display
  */
 
 'use client';
@@ -9,15 +9,18 @@
 import React from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
+import { CardStack } from '../CardStack';
 
 interface BattleAreaZoneProps {
   units: CardInstance[];
+  cardDatabase: Record<string, any>;
   isOpponent: boolean;
   onUnitSelected?: (unit: CardInstance) => void;
 }
 
 export function BattleAreaZone({
   units,
+  cardDatabase,
   isOpponent,
   onUnitSelected,
 }: BattleAreaZoneProps) {
@@ -30,58 +33,39 @@ export function BattleAreaZone({
       </div>
 
       {/* Battle Grid */}
-      <div className="flex-1 grid gap-3 overflow-y-auto">
+      <div className="flex-1 grid gap-3 overflow-y-auto max-h-96">
         {units.length > 0 ? (
-          units.map((unit, index) => {
-            const cardDef = getCardById(unit.cardId);
-            const ap = cardDef?.ap ?? 0;
-            const hp = cardDef?.hp ?? 0;
-            const row = Math.floor(index / 5);
-
-            return (
-              <div
-                key={unit.instanceId}
-                className={`
-                  flex flex-col items-center justify-center p-3 rounded-lg
-                  border-2 border-slate-600 bg-gradient-to-b from-slate-700 to-slate-800
-                  cursor-pointer transition-all duration-200
-                  hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/50
-                  ${unit.state === 'rest' ? 'opacity-60 rotate-6' : ''}
-                `}
-                onClick={() => onUnitSelected?.(unit)}
-                style={{
-                  minHeight: '120px',
-                  gridColumn: `span ${Math.ceil((index % 5) + 1)}`,
-                }}
-              >
-                {/* Unit Card Display */}
-                <div className="text-xs font-bold text-slate-300 text-center truncate w-full">
-                  {cardDef?.name || unit.cardId}
-                </div>
-
-                {/* Stats Row */}
-                <div className="flex gap-4 mt-2 text-sm font-bold">
-                  <div className="text-red-400">⚔️ {ap}</div>
-                  <div className="text-blue-400">🛡️ {hp}</div>
-                </div>
-
-                {/* Damage Markers */}
-                {unit.damageMarkers > 0 && (
-                  <div className="mt-2 text-xs text-red-400 font-bold">
-                    Damage: {unit.damageMarkers}
-                  </div>
-                )}
-
-                {/* State Indicator */}
-                {unit.state === 'rest' && (
-                  <div className="mt-2 text-xs text-slate-400 italic">RESTING</div>
-                )}
-
-                {/* Select Indicator */}
-                <div className="absolute inset-0 border-4 border-yellow-400 rounded-lg opacity-0 hover:opacity-100 transition-opacity" />
+          units.map((unit) => (
+            <div
+              key={unit.instanceId}
+              className="flex items-center gap-3 p-3 rounded-lg border-2 border-slate-600 bg-gradient-to-b from-slate-700 to-slate-800 hover:border-purple-500 transition-all duration-200 cursor-pointer"
+              onClick={() => onUnitSelected?.(unit)}
+            >
+              <div className="flex-shrink-0">
+                <CardStack
+                  cards={unit}
+                  cardDatabase={cardDatabase}
+                  variant="compact"
+                  showCount={false}
+                />
               </div>
-            );
-          })
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-slate-300 truncate">
+                  {getCardById(unit.cardId)?.name || unit.cardId}
+                </div>
+                <div className="flex gap-4 mt-1 text-sm font-bold">
+                  <div className="text-red-400">⚔️ {(getCardById(unit.cardId) as any)?.ap ?? 0}</div>
+                  <div className="text-blue-400">🛡️ {(getCardById(unit.cardId) as any)?.hp ?? 0}</div>
+                </div>
+                {unit.damageMarkers > 0 && (
+                  <div className="mt-1 text-xs text-red-400 font-bold">Damage: {unit.damageMarkers}</div>
+                )}
+                {unit.state === 'rest' && (
+                  <div className="mt-1 text-xs text-slate-400 italic">RESTING</div>
+                )}
+              </div>
+            </div>
+          ))
         ) : (
           <div className="flex items-center justify-center h-32 text-slate-600 italic">
             Battle area empty

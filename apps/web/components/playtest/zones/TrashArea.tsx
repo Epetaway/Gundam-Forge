@@ -9,14 +9,17 @@
 import React, { useState } from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
+import { CardStack } from '../CardStack';
 
 interface TrashAreaProps {
   trash: CardInstance[];
+  cardDatabase: Record<string, any>;
   isOpponent: boolean;
 }
 
 export function TrashArea({
   trash,
+  cardDatabase,
   isOpponent,
 }: TrashAreaProps) {
   const [showDetails, setShowDetails] = useState(false);
@@ -27,25 +30,18 @@ export function TrashArea({
         Trash ({trash.length})
       </div>
 
-      {/* Trash Stack Visual */}
-      <div className="relative h-16 mb-3 flex items-center justify-center">
+      {/* Trash Stack Visual - Using CardStack */}
+      <div className="mb-3 flex items-center justify-center">
         {trash.length > 0 ? (
-          <div className="relative w-12">
-            {[0, 1, 2].map(
-              (i) =>
-                i < Math.min(trash.length, 3) && (
-                  <div
-                    key={i}
-                    className="absolute w-full h-10 bg-gradient-to-b from-red-600/70 to-red-800/70 rounded border-2 border-red-500 shadow-md"
-                    style={{
-                      transform: `translateY(${i * 2}px) rotate(${i * 5}deg)`,
-                    }}
-                  />
-                ),
-            )}
-          </div>
+          <CardStack
+            cards={trash}
+            cardDatabase={cardDatabase}
+            variant="compact"
+            showCount={true}
+            className="flex justify-center"
+          />
         ) : (
-          <div className="text-slate-600 text-xs italic">Empty</div>
+          <div className="text-slate-600 text-xs italic py-4">Empty</div>
         )}
       </div>
 

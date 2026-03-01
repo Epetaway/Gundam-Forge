@@ -7,9 +7,11 @@
 
 import React from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
+import { CardStack } from '../CardStack';
 
 interface BaseAreaProps {
   baseCard: CardInstance | null;
+  cardDatabase: Record<string, any>;
   baseHealth: number;
   maxBaseHealth: number;
   isOpponent: boolean;
@@ -17,6 +19,7 @@ interface BaseAreaProps {
 
 export function BaseArea({
   baseCard,
+  cardDatabase,
   baseHealth,
   maxBaseHealth,
   isOpponent,
@@ -33,10 +36,14 @@ export function BaseArea({
 
       {baseCard ? (
         <>
-          {/* Base Card Placeholder */}
-          <div className="bg-gradient-to-b from-amber-700/50 to-amber-900/50 border-2 border-amber-600 rounded-lg p-3 mb-3">
-            <div className="text-xs font-bold text-amber-200">{baseCard.cardId}</div>
-            <div className="text-[10px] text-amber-300 mt-1">Base (Permanent)</div>
+          {/* Base Card Display - Using CardStack */}
+          <div className="mb-3 flex justify-center">
+            <CardStack
+              cards={baseCard}
+              cardDatabase={cardDatabase}
+              variant="normal"
+              showCount={false}
+            />
           </div>
 
           {/* Base Health Display */}
