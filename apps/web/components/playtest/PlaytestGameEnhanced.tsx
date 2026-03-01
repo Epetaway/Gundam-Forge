@@ -135,10 +135,10 @@ export function PlaytestGameEnhanced({
     }
   };
 
-  // Auto-advance 'setup' phase during normal turns (turn 2+)
+  // Auto-advance 'start' phase during normal turns (turn 2+)
   useEffect(() => {
     if (!engine || !gameState || !gameReady) return;
-    if (gameState.phase !== 'setup') return;
+    if (gameState.phase !== 'start') return;
 
     const timeout = setTimeout(() => {
       engine.executeAction({
@@ -158,7 +158,7 @@ export function PlaytestGameEnhanced({
   useEffect(() => {
     if (!engine || !gameState) return;
     if (gameState.activePlayerId !== 'player2') return;
-    if (gameState.phase === 'setup' || gameState.phase === 'gameOver') return;
+    if (gameState.phase === 'start' || gameState.phase === 'gameOver') return;
 
     const timeout = setTimeout(() => {
       const currentState = engine.getState();

@@ -26,11 +26,11 @@ const createMockDeck = (targetCardCount: number = 50): DeckDefinition => {
   };
 };
 
-// Mock card database
+// Mock card database — uses official stat names: ap (Attack Points), hp (Hit Points)
 const mockCardDb: Record<string, any> = {
-  'card-0': { id: 'card-0', name: 'Unit Alpha', type: 'Unit', atk: 5, def: 5 },
-  'card-1': { id: 'card-1', name: 'Unit Beta', type: 'Unit', atk: 4, def: 6 },
-  'card-2': { id: 'card-2', name: 'Command Card', type: 'Command', atk: 0, def: 0 },
+  'card-0': { id: 'card-0', name: 'Unit Alpha', type: 'Unit', ap: 5, hp: 5 },
+  'card-1': { id: 'card-1', name: 'Unit Beta', type: 'Unit', ap: 4, hp: 6 },
+  'card-2': { id: 'card-2', name: 'Command Card', type: 'Command', ap: 0, hp: 0 },
 };
 
 describe('GameEngine - Core Functionality', () => {
@@ -41,7 +41,7 @@ describe('GameEngine - Core Functionality', () => {
 
     expect(state.players['player1']).toBeDefined();
     expect(state.players['player2']).toBeDefined();
-    expect(state.phase).toBe('setup');
+    expect(state.phase).toBe('start');
     expect(state.turnNumber).toBe(1);
   });
 
@@ -82,7 +82,9 @@ describe('GameEngine - Core Functionality', () => {
 });
 
 describe('GameEngine - Combat Resolution', () => {
-  it('should apply shield damage correctly', () => {
+  it('should apply shield damage correctly — any AP≥1 destroys exactly 1 shield', () => {
+    // Official GCG rule: any attack with AP ≥ 1 destroys exactly ONE shield.
+    // It is not a numeric subtraction — 1 attack = 1 shield destroyed.
     const deck = createMockDeck();
     const engine = new GameEngine('deck-1', deck, mockCardDb);
     const state = engine.getState();
@@ -91,25 +93,28 @@ describe('GameEngine - Combat Resolution', () => {
     const initialShields = defender.shields.length;
     const initialHealth = defender.baseHealth;
 
+    // One attack (AP=2) → destroys exactly 1 shield
     engine.resolveDamage(defender, 2);
 
-    expect(defender.shields.length).toBe(initialShields - 2);
-    expect(defender.baseHealth).toBe(initialHealth); // No overflow
+    expect(defender.shields.length).toBe(initialShields - 1);
+    expect(defender.baseHealth).toBe(initialHealth); // No base damage while shields remain
   });
 
-  it('should overflow damage to base health', () => {
+  it('should deal damage to base when shields are empty', () => {
+    // Official GCG: when no shields remain, damage goes to base directly
     const deck = createMockDeck();
     const engine = new GameEngine('deck-1', deck, mockCardDb);
     const state = engine.getState();
 
     const defender = state.players['player2'];
+    defender.shields = []; // Clear all shields
     const initialHealth = defender.baseHealth;
 
-    // 8 damage = 6 shields + 2 base health
-    engine.resolveDamage(defender, 8);
+    // Attack with AP=5 hits base directly (no shields)
+    engine.resolveDamage(defender, 5);
 
     expect(defender.shields.length).toBe(0);
-    expect(defender.baseHealth).toBe(initialHealth - 2);
+    expect(defender.baseHealth).toBe(initialHealth - 5);
   });
 
   it('should end game when base health reaches 0 or below', () => {
@@ -247,7 +252,7 @@ describe('GameEngine - End-to-End', () => {
     expect(result.valid).toBe(true);
 
     const updatedState = engine.getState();
-    expect(updatedState.phase).not.toBe('setup');
+    expect(updatedState.phase).not.toBe('start');
   });
 
   it('should track game progression through log', () => {
@@ -278,24 +283,24 @@ describe('GameEngine - Milestone 3 Triggers & Buffs', () => {
       id: 'supportUnit',
       name: 'Support Unit',
       type: 'Unit',
-      atk: 2,
-      def: 3,
+      ap: 2,
+      hp: 3,
       keywords: ['support'],
     },
     attackerUnit: {
       id: 'attackerUnit',
       name: 'Attacker Unit',
       type: 'Unit',
-      atk: 4,
-      def: 4,
+      ap: 4,
+      hp: 4,
       keywords: [],
     },
     breachUnit: {
       id: 'breachUnit',
       name: 'Breach Unit',
       type: 'Unit',
-      atk: 3,
-      def: 3,
+      ap: 3,
+      hp: 3,
       keywords: ['breach'],
     },
   };
@@ -310,22 +315,18 @@ describe('GameEngine - Milestone 3 Triggers & Buffs', () => {
     ],
   });
 
+  // Advance through: start → draw → (DRAW) → resource → (PLACE_RESOURCE) → main
   const advanceToMainPhase = (engine: GameEngine) => {
-    engine.executeAction({
-      type: 'ADVANCE_PHASE',
-      playerId: 'player1',
-      timestamp: Date.now(),
-    });
-    engine.executeAction({
-      type: 'DRAW',
-      playerId: 'player1',
-      timestamp: Date.now(),
-    });
-    engine.executeAction({
-      type: 'ADVANCE_PHASE',
-      playerId: 'player1',
-      timestamp: Date.now(),
-    });
+    // start → draw
+    engine.executeAction({ type: 'ADVANCE_PHASE', playerId: 'player1', timestamp: Date.now() });
+    // draw card
+    engine.executeAction({ type: 'DRAW', playerId: 'player1', timestamp: Date.now() });
+    // draw → resource
+    engine.executeAction({ type: 'ADVANCE_PHASE', playerId: 'player1', timestamp: Date.now() });
+    // place resource (or skip if empty)
+    engine.executeAction({ type: 'PLACE_RESOURCE', playerId: 'player1', timestamp: Date.now() });
+    // resource → main
+    engine.executeAction({ type: 'ADVANCE_PHASE', playerId: 'player1', timestamp: Date.now() });
   };
 
   it('should enforce once-per-turn support ability usage', () => {

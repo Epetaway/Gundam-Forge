@@ -90,7 +90,7 @@ describe('Draw Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { hand, remainingDeck } = drawCards(deck, 5);
@@ -108,7 +108,7 @@ describe('Draw Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { hand } = drawCards(deck, 3);
@@ -127,7 +127,7 @@ describe('Draw Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { hand, remainingDeck } = drawCards(deck, 7);
@@ -145,7 +145,7 @@ describe('Draw Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const originalLength = deck.length;
@@ -190,7 +190,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const deck = Array.from({ length: 53 }, (_, i) => ({
@@ -201,7 +201,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { newDeck } = processMulligan(hand, [0, 1, 2], deck);
@@ -219,7 +219,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const deck = Array.from({ length: 53 }, (_, i) => ({
@@ -230,7 +230,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { newHand } = processMulligan(hand, [0, 1, 2], deck);
@@ -247,7 +247,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const deck = Array.from({ length: 53 }, (_, i) => ({
@@ -258,7 +258,7 @@ describe('Mulligan Phase', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     const { newHand } = processMulligan(hand, [], deck);
@@ -343,7 +343,7 @@ describe('Card Stack Rendering', () => {
       damageMarkers: 0,
       attachments: { linked: [] },
       counters: {},
-      usedAbilities: new Set(),
+      usedAbilities: new Set<string>(),
     }));
 
     expect(stack).toHaveLength(3);
@@ -360,7 +360,7 @@ describe('Card Stack Rendering', () => {
         damageMarkers: 0,
         attachments: { linked: [] },
         counters: {},
-        usedAbilities: new Set(),
+        usedAbilities: new Set<string>(),
       },
     ];
 

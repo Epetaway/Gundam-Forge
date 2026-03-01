@@ -12,17 +12,19 @@ export type ZoneType =
   | 'shields'
   | 'base'
   | 'resources'
+  | 'resourceDeck'   // separate 10-card resource deck (feeds Resource Phase)
   | 'trash'
   | 'exResource'
   | 'exBase';
 
 export type CardState = 'ready' | 'rest';
+// Official GCG phases: start → draw → resource → main → end
+// 'action' and 'battle' are card timing keywords, NOT phases
 export type Phase =
-  | 'setup'
+  | 'start'
   | 'draw'
+  | 'resource'
   | 'main'
-  | 'action'
-  | 'battle'
   | 'end'
   | 'gameOver';
 
@@ -45,6 +47,7 @@ export type ActionType =
   | 'DECLARE_ATTACK'
   | 'DECLARE_BLOCK'
   | 'RESOLVE_COMBAT'
+  | 'PLACE_RESOURCE'   // Resource Phase: take top of resource deck → resource area (active)
   | 'END_PHASE'
   | 'ADVANCE_PHASE'
   | 'SPEND_RESOURCE'
@@ -89,6 +92,7 @@ export interface PlayerState {
   shields: CardInstance[];
   base: CardInstance | null;
   resources: CardInstance[];
+  resourceDeck: CardInstance[];   // separate 10-card resource deck (feeds Resource Phase)
   exZone: {
     exBase?: CardInstance;
     exResources: CardInstance[];
@@ -125,6 +129,7 @@ export interface GameState {
   isGameOver: boolean;
   winner?: string;
   hasDrawnThisTurn: boolean;
+  hasResourcePlacedThisTurn: boolean;
   hasMainPhaseActions: number;
 }
 
@@ -146,8 +151,8 @@ export interface CardDefinition {
   name: string;
   type: 'Unit' | 'Pilot' | 'Command' | 'Base' | 'Resource' | 'EX';
   cost?: number;
-  atk?: number;
-  def?: number;
+  ap?: number;   // Attack Points — official GCG stat name
+  hp?: number;   // Hit Points — official GCG stat name
   traits: string[];
   keywords: string[];
   imageUrl: string;
@@ -195,8 +200,8 @@ export class GameEngine {
         name: tokenCard.name,
         type: tokenCard.type,
         cost: tokenCard.type === 'Resource' ? 0 : 1,
-        atk: tokenCard.atk,
-        def: tokenCard.def,
+        ap: (tokenCard as any).ap ?? (tokenCard as any).atk,
+        hp: (tokenCard as any).hp ?? (tokenCard as any).def,
         traits: ['Token'],
         keywords: tokenCard.keywords ?? [],
         imageUrl: '',
@@ -218,7 +223,7 @@ export class GameEngine {
       deckId,
       turnNumber: 1,
       activePlayerId: 'player1',
-      phase: 'setup',
+      phase: 'start',
       priorityPlayer: 'player1',
       players: {
         player1,
@@ -229,10 +234,11 @@ export class GameEngine {
       rngSeed,
       isGameOver: false,
       hasDrawnThisTurn: false,
+      hasResourcePlacedThisTurn: false,
       hasMainPhaseActions: 0,
     };
 
-    this.log('GAME_START', 'player1', 'setup', 'Game initialized', 'Starting new playtest session');
+    this.log('GAME_START', 'player1', 'start', 'Game initialized', 'Starting new playtest session');
 
     return game;
   }
@@ -275,6 +281,28 @@ export class GameEngine {
         usedAbilities: new Set<string>(),
       }));
 
+    // Build resource deck from deck definition (zone: 'resource' cards)
+    const resourceDeckCards: CardInstance[] = [];
+    let resourceCounter = 0;
+    for (const deckCard of deck.cards.filter((c) => c.zone === 'resource')) {
+      for (let i = 0; i < deckCard.count; i++) {
+        const card = this.cardDb[deckCard.cardId];
+        if (card) {
+          resourceDeckCards.push({
+            instanceId: `${playerId}-res-${resourceCounter++}`,
+            cardId: deckCard.cardId,
+            zone: 'resourceDeck',
+            state: 'ready',
+            damageMarkers: 0,
+            attachments: { linked: [] },
+            counters: {},
+            usedAbilities: new Set(),
+          });
+        }
+      }
+    }
+    this.shuffleDeck(resourceDeckCards, rngSeed + 1);
+
     const player: PlayerState = {
       playerId,
       name: playerId === 'player1' ? 'You' : 'Opponent',
@@ -285,6 +313,7 @@ export class GameEngine {
       shields,
       base: null,
       resources: [],
+      resourceDeck: resourceDeckCards,
       exZone: { exResources: [] },
       baseHealth: 20,
       maxBaseHealth: 20,
@@ -368,6 +397,7 @@ export class GameEngine {
         usedAbilities: new Set(),
       },
       resources: resourcePool,
+      resourceDeck: [],
       exZone: { exResources: [] },
       baseHealth: 20,
       maxBaseHealth: 20,
@@ -442,6 +472,9 @@ export class GameEngine {
       case 'RESOLVE_ALL_TRIGGERS':
         result = this.handleResolveAllTriggers(action);
         break;
+      case 'PLACE_RESOURCE':
+        result = this.handlePlaceResource(action);
+        break;
       case 'END_PHASE':
         result = this.handleEndPhase(action);
         break;
@@ -486,22 +519,24 @@ export class GameEngine {
   }
 
   private getPhaseGate(action: ActionType, phase: Phase): { allowed: boolean; reason?: string } {
+    // Official GCG: combat (DECLARE_ATTACK, DECLARE_BLOCK, RESOLVE_COMBAT) happens during Main Phase
     const gates: Record<ActionType, Phase[]> = {
       DRAW: ['draw'],
       MULLIGAN: ['draw'],
+      PLACE_RESOURCE: ['resource'],
       PLAY_CARD: ['main'],
-      ACTIVATE_ABILITY: ['main', 'action'],
+      ACTIVATE_ABILITY: ['main'],
       PAIR_PILOT: ['main'],
       DECLARE_ATTACK: ['main'],
-      DECLARE_BLOCK: ['battle'],
-      RESOLVE_COMBAT: ['battle'],
-      END_PHASE: ['main', 'action', 'battle'],
-      ADVANCE_PHASE: ['setup', 'draw', 'main', 'action', 'battle', 'end'],
-      SPEND_RESOURCE: ['main', 'action'],
+      DECLARE_BLOCK: ['main'],
+      RESOLVE_COMBAT: ['main'],
+      END_PHASE: ['main'],
+      ADVANCE_PHASE: ['start', 'draw', 'resource', 'main', 'end'],
+      SPEND_RESOURCE: ['main'],
       REST_UNIT: ['main'],
-      READY_ZONE: ['setup'],
-      RESOLVE_TRIGGER: ['main', 'action', 'battle', 'end'],
-      RESOLVE_ALL_TRIGGERS: ['main', 'action', 'battle', 'end'],
+      READY_ZONE: ['start'],
+      RESOLVE_TRIGGER: ['main', 'end'],
+      RESOLVE_ALL_TRIGGERS: ['main', 'end'],
     };
 
     const allowed = gates[action]?.includes(phase);
@@ -579,14 +614,13 @@ export class GameEngine {
   }
 
   private handleAdvancePhase(action: GameAction): ActionValidation {
-    const phaseSequence: Phase[] = ['setup', 'draw', 'main', 'action', 'battle', 'end'];
-    const currentPhaseIndex = phaseSequence.indexOf(this.state.phase);
+    // Official GCG phase sequence: start → draw → resource → main → end → (next player's start)
+    const phaseSequence: Phase[] = ['start', 'draw', 'resource', 'main', 'end'];
+    const currentPhaseIndex = phaseSequence.indexOf(this.state.phase as any);
 
     if (currentPhaseIndex === -1) {
       return { valid: false, error: 'Invalid current phase' };
     }
-
-    const nextPhase = phaseSequence[(currentPhaseIndex + 1) % phaseSequence.length];
 
     if (this.state.phase === 'draw' && !this.state.hasDrawnThisTurn) {
       return {
@@ -596,15 +630,28 @@ export class GameEngine {
       };
     }
 
-    if (nextPhase === 'setup') {
-      this.state.turnNumber++;
-      this.state.activePlayerId = this.state.activePlayerId === 'player1' ? 'player2' : 'player1';
-      this.readyZone(this.state.activePlayerId);
-      this.state.hasDrawnThisTurn = false;
-    }
+    const isLastPhase = currentPhaseIndex === phaseSequence.length - 1;
+    const nextPhase: Phase = isLastPhase ? 'start' : phaseSequence[currentPhaseIndex + 1];
 
+    // End phase: enforce hand limit, then switch turns
     if (this.state.phase === 'end') {
       this.enforceHandLimit(action.playerId);
+      this.triggerRepair(action.playerId);
+      this.state.activePlayerId = this.state.activePlayerId === 'player1' ? 'player2' : 'player1';
+      this.state.turnNumber++;
+    }
+
+    // Start phase: ready all cards for the active player
+    if (nextPhase === 'start') {
+      this.readyZone(this.state.activePlayerId);
+    }
+
+    // Reset per-turn flags
+    if (nextPhase === 'draw') {
+      this.state.hasDrawnThisTurn = false;
+    }
+    if (nextPhase === 'resource') {
+      this.state.hasResourcePlacedThisTurn = false;
     }
 
     this.state.phase = nextPhase;
@@ -658,16 +705,23 @@ export class GameEngine {
     card.zone = targetZone;
 
     switch (targetZone) {
-      case 'battle':
-        if (player.battleArea.length >= 3) {
+      case 'battle': {
+        // Official GCG: max 6 units in battle area
+        if (player.battleArea.length >= 6) {
           return {
             valid: false,
             error: 'Battle area full',
-            rulesTrace: 'Cannot exceed 3 units',
+            rulesTrace: 'Cannot exceed 6 units in battle area.',
           };
         }
+        // Official GCG: units enter RESTED unless they have Rush keyword
+        const hasRush = (cardDef.keywords ?? []).some(
+          (k: string) => k.toLowerCase() === 'rush',
+        );
+        card.state = hasRush ? 'ready' : 'rest';
         player.battleArea.push(card);
         break;
+      }
       case 'base':
         if (player.base) {
           return {
@@ -854,8 +908,7 @@ export class GameEngine {
       result: null,
     };
 
-    this.state.phase = 'battle';
-
+    // Combat remains in Main Phase — do NOT switch phase to 'battle'
     this.log(
       'DECLARE_ATTACK',
       action.playerId,
@@ -1059,33 +1112,28 @@ export class GameEngine {
     defender: PlayerState,
     damageAmount: number,
   ): { revealedShieldIds: string[]; baseDamage: number } {
-    let remainingDamage = damageAmount;
     const revealedShieldIds: string[] = [];
     const baseBefore = defender.baseHealth;
 
-    // Shields protect base
-    if (defender.shields.length > 0) {
-      const shieldsDestroyed = Math.min(remainingDamage, defender.shields.length);
-      const destroyed = defender.shields.splice(0, shieldsDestroyed);
-      destroyed.forEach((shield) => {
-        this.enqueueTrigger({
-          type: 'BURST',
-          sourceInstanceId: shield.instanceId,
-          ownerPlayerId: defender.playerId,
-          optionalChoice: true,
-          description: `Burst check for shield ${shield.cardId}`,
-          payload: { shieldCardId: shield.cardId },
-        });
-        shield.zone = 'trash';
-        defender.discardPile.push(shield);
-        revealedShieldIds.push(shield.cardId);
+    // Official GCG shield rule: any attack with AP ≥ 1 destroys exactly ONE shield.
+    // The shield card's stats are irrelevant — it is not a HP comparison.
+    // If no shields remain, damage goes directly to the base.
+    if (damageAmount >= 1 && defender.shields.length > 0) {
+      const shield = defender.shields.splice(0, 1)[0];
+      this.enqueueTrigger({
+        type: 'BURST',
+        sourceInstanceId: shield.instanceId,
+        ownerPlayerId: defender.playerId,
+        optionalChoice: true,
+        description: `Burst check for shield ${shield.cardId}`,
+        payload: { shieldCardId: shield.cardId },
       });
-      remainingDamage -= shieldsDestroyed;
-    }
-
-    // Remaining damage to base
-    if (remainingDamage > 0) {
-      defender.baseHealth -= remainingDamage;
+      shield.zone = 'trash';
+      defender.discardPile.push(shield);
+      revealedShieldIds.push(shield.cardId);
+    } else if (damageAmount >= 1 && defender.shields.length === 0) {
+      // No shields remain — damage hits the base directly
+      defender.baseHealth -= damageAmount;
     }
 
     // Check win condition
@@ -1379,8 +1427,49 @@ export class GameEngine {
     }
   }
 
+  private handlePlaceResource(action: GameAction): ActionValidation {
+    const player = this.state.players[action.playerId];
+
+    if (this.state.hasResourcePlacedThisTurn) {
+      return {
+        valid: false,
+        error: 'Resource already placed this turn',
+        rulesTrace: 'Only one resource card may be placed per Resource Phase.',
+      };
+    }
+
+    if (player.resourceDeck.length === 0) {
+      // Resource Deck exhausted — skip (not a loss condition)
+      this.state.hasResourcePlacedThisTurn = true;
+      this.log(
+        'PLACE_RESOURCE',
+        action.playerId,
+        this.state.phase,
+        'Resource Deck empty — Resource Phase skipped',
+        'No cards in Resource Deck; phase skipped per official rules.',
+      );
+      return { valid: true };
+    }
+
+    // Take top of resource deck → place into resource area as ACTIVE
+    const resourceCard = player.resourceDeck.shift()!;
+    resourceCard.zone = 'resources';
+    resourceCard.state = 'ready'; // enters active — can be spent immediately
+    player.resources.push(resourceCard);
+    this.state.hasResourcePlacedThisTurn = true;
+
+    this.log(
+      'PLACE_RESOURCE',
+      action.playerId,
+      this.state.phase,
+      `Placed resource ${resourceCard.cardId} from Resource Deck`,
+      'Top of Resource Deck moved to Resource Area (enters active).',
+    );
+
+    return { valid: true };
+  }
+
   private handleEndPhase(action: GameAction): ActionValidation {
-    this.triggerRepair(action.playerId);
     this.state.phase = 'end';
     this.log('END_PHASE', action.playerId, this.state.phase, 'Phase ended', 'Cleanup.');
     return { valid: true };

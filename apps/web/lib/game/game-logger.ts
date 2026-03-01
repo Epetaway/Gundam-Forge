@@ -275,17 +275,17 @@ export function analyzeLog(log: GameLogEntry[]): {
     }
   }
 
-  // Check for phase order violations
-  const validPhaseOrder = ['setup', 'draw', 'main', 'action', 'battle', 'end'];
+  // Check for phase order violations (official GCG: start → draw → resource → main → end)
+  const validPhaseOrder = ['start', 'draw', 'resource', 'main', 'end'];
   let lastPhaseIndex = -1;
   for (const entry of log) {
     const currentIndex = validPhaseOrder.indexOf(entry.phase);
     if (currentIndex !== -1 && lastPhaseIndex !== -1) {
-      // Allow wrap-around (end -> setup)
+      // Allow wrap-around (end -> start)
       const isValidTransition =
         currentIndex === (lastPhaseIndex + 1) % validPhaseOrder.length ||
         currentIndex === lastPhaseIndex; // Same phase ok
-      if (!isValidTransition && entry.phase !== 'setup') {
+      if (!isValidTransition && entry.phase !== 'start') {
         warnings.push(`Potential phase order issue: ${entry.phase} after ${validPhaseOrder[lastPhaseIndex]}`);
       }
     }

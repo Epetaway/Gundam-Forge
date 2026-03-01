@@ -1,8 +1,18 @@
-# Gundam Forge - Official Game Rules
+> **⚠️ NOTICE — CUSTOM HOMEBREW FORMAT**
+>
+> This document describes the **Gundam Forge custom homebrew** format (60-card deck, 20 life points, 7-card hand, MTG-style combat with Red/White/Blue/Green/Black colors).
+>
+> It is **NOT** the official Bandai Gundam Card Game (GCG) ruleset.
+>
+> For the official GCG rules implemented in the playtester engine, see:
+> - [`docs/playtest_rules_map.md`](./playtest_rules_map.md) — official rules reference used by the engine
+> - [Official GCG Rules — gundam-gcg.com](https://www.gundam-tcg.com/en/rules/) — Comprehensive Rules Ver. 1.5.0
 
-**Version**: 1.0  
-**Last Updated**: February 22, 2026  
-**Status**: Official Beta Rules
+# Gundam Forge - Custom Homebrew Game Rules
+
+**Version**: 1.0
+**Last Updated**: February 22, 2026
+**Status**: Custom Format (Not Official GCG)
 
 ---
 

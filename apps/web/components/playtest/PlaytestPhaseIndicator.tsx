@@ -7,19 +7,19 @@ interface PlaytestPhaseIndicatorProps {
   turnNumber: number;
 }
 
-const phaseSequence: Phase[] = ['setup', 'draw', 'main', 'action', 'battle', 'end'];
+// Official GCG phase sequence: start → draw → resource → main → end
+const phaseSequence: Phase[] = ['start', 'draw', 'resource', 'main', 'end'];
 
 export default function PlaytestPhaseIndicator({
   currentPhase,
   turnNumber,
 }: PlaytestPhaseIndicatorProps) {
   const phaseDescriptions: Record<Phase, string> = {
-    setup: 'Ready units and resources',
-    draw: 'Draw one card from deck',
-    main: 'Play units and non-attack abilities',
-    action: 'Declare attacks, activate abilities',
-    battle: 'Block and resolve combat',
-    end: 'End turn',
+    start: 'Ready all rested cards. Start-of-turn effects fire.',
+    draw: 'Draw one card from main deck.',
+    resource: 'Place top of Resource Deck into Resource Area (enters active).',
+    main: 'Play cards, activate abilities, declare attacks.',
+    end: 'Discard to 10. End-of-turn effects. Pass turn.',
     gameOver: 'Game Over',
   };
 
@@ -88,30 +88,25 @@ export default function PlaytestPhaseIndicator({
                   <li>Use resources for abilities</li>
                 </>
               )}
-              {currentPhase === 'action' && (
+              {currentPhase === 'start' && (
                 <>
-                  <li>Declare attacking units</li>
-                  <li>Opponent declares blockers</li>
-                  <li>Activate attack abilities</li>
+                  <li>All rested cards become active (untap)</li>
+                  <li>Once-per-turn abilities reset</li>
+                  <li>Start-of-turn effects fire</li>
                 </>
               )}
-              {currentPhase === 'battle' && (
+              {currentPhase === 'resource' && (
                 <>
-                  <li>Resolve combat damage</li>
-                  <li>Trigger destroyed effects</li>
+                  <li>Take top card of Resource Deck</li>
+                  <li>Place it into Resource Area (enters active)</li>
+                  <li>Skip if Resource Deck is empty</li>
                 </>
               )}
               {currentPhase === 'end' && (
                 <>
                   <li>Discard down to 10 cards</li>
-                  <li>Reset once-per-turn abilities</li>
-                </>
-              )}
-              {currentPhase === 'setup' && (
-                <>
-                  <li>Ready all units and resources</li>
-                  <li>Reset once-per-turn abilities</li>
-                  <li>Draw shield if deck available</li>
+                  <li>End-of-turn effects resolve (e.g. Repair X)</li>
+                  <li>Pass turn to opponent</li>
                 </>
               )}
             </ul>
