@@ -8,7 +8,7 @@
  * 3. Main Phase - play cards, activate abilities, declare attacks
  * 4. (Optional) Action Phase - action window
  * 5. (Optional) Battle Phase - declare blockers, resolve combat
- * 6. End Phase - discard down to 7, resolve end-of-turn effects
+ * 6. End Phase - discard down to 10, resolve end-of-turn effects
  */
 
 import { PHASE_RULES, PHASE_SEQUENCE } from './rules-constants';

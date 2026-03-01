@@ -55,20 +55,20 @@ describe('GameEngine - Core Functionality', () => {
     expect(state.players['player1'].deck.length).toBeLessThanOrEqual(50);
   });
 
-  it('should initialize player1 with 5 shields', () => {
+  it('should initialize player1 with 6 shields', () => {
     const deck = createMockDeck();
     const engine = new GameEngine('deck-1', deck, mockCardDb);
     const state = engine.getState();
 
-    expect(state.players['player1'].shields.length).toBe(5);
+    expect(state.players['player1'].shields.length).toBe(6);
   });
 
-  it('should initialize player2 with 4 shields', () => {
+  it('should initialize player2 with 6 shields', () => {
     const deck = createMockDeck();
     const engine = new GameEngine('deck-1', deck, mockCardDb);
     const state = engine.getState();
 
-    expect(state.players['player2'].shields.length).toBe(4);
+    expect(state.players['player2'].shields.length).toBe(6);
   });
 
   it('should have both players with 20 base health', () => {
@@ -105,8 +105,8 @@ describe('GameEngine - Combat Resolution', () => {
     const defender = state.players['player2'];
     const initialHealth = defender.baseHealth;
 
-    // 6 damage = 4 shields + 2 base health
-    engine.resolveDamage(defender, 6);
+    // 8 damage = 6 shields + 2 base health
+    engine.resolveDamage(defender, 8);
 
     expect(defender.shields.length).toBe(0);
     expect(defender.baseHealth).toBe(initialHealth - 2);
@@ -155,7 +155,7 @@ describe('GameEngine - Hand Management', () => {
 
     engine.enforceHandLimit('player1');
 
-    expect(player.hand.length).toBeLessThanOrEqual(7);
+    expect(player.hand.length).toBeLessThanOrEqual(10);
   });
 });
 

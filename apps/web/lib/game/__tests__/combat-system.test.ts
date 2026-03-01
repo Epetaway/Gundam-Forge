@@ -349,7 +349,7 @@ describe('Combat Resolution System', () => {
     const mockGameState: GameState = {
       players: {
         player1: {
-          shields: Array(5).fill({ zone: 'shields' } as CardInstance),
+          shields: Array(6).fill({ zone: 'shields' } as CardInstance),
           discardPile: [],
         } as any,
       },
@@ -359,7 +359,7 @@ describe('Combat Resolution System', () => {
 
     expect(result.shieldsDestroyed).toBe(3);
     expect(result.remainingDamage).toBe(0);
-    expect(mockGameState.players['player1'].shields).toHaveLength(2);
+    expect(mockGameState.players['player1'].shields).toHaveLength(3);
   });
 
   it('applyDamageToShields: damage exceeds shields', () => {

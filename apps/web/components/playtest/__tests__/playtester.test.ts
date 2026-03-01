@@ -81,8 +81,8 @@ describe('Draw Phase', () => {
     return { hand, remainingDeck };
   }
 
-  it('should draw 7 cards for opening hand', () => {
-    const deck = Array.from({ length: 60 }, (_, i) => ({
+  it('should draw 5 cards for opening hand', () => {
+    const deck = Array.from({ length: 50 }, (_, i) => ({
       instanceId: `inst-${i}`,
       cardId: `card-${i}`,
       zone: 'deck' as const,
@@ -93,10 +93,10 @@ describe('Draw Phase', () => {
       usedAbilities: new Set(),
     }));
 
-    const { hand, remainingDeck } = drawCards(deck, 7);
+    const { hand, remainingDeck } = drawCards(deck, 5);
     
-    expect(hand).toHaveLength(7);
-    expect(remainingDeck).toHaveLength(53);
+    expect(hand).toHaveLength(5);
+    expect(remainingDeck).toHaveLength(45);
   });
 
   it('should draw cards from top of deck', () => {

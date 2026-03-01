@@ -12,7 +12,7 @@ export default function ShieldsRow({ shields, player }: ShieldsRowProps) {
     <div className={`flex gap-2 ${player === 'opponent' ? 'justify-end' : ''}`}>
       <div className="flex gap-2 bg-slate-800 rounded-lg p-3 border border-slate-700">
         <div className="text-xs font-semibold text-slate-300 self-center mr-2">
-          {shields.length}/5 Shields
+          {shields.length}/6 Shields
         </div>
         <div className="flex gap-2">
           {shields.map((shield, idx) => (
@@ -27,7 +27,7 @@ export default function ShieldsRow({ shields, player }: ShieldsRowProps) {
             </div>
           ))}
           {/* Empty slots */}
-          {Array.from({ length: Math.max(0, 5 - shields.length) }).map((_, idx) => (
+          {Array.from({ length: Math.max(0, 6 - shields.length) }).map((_, idx) => (
             <div
               key={`empty-${idx}`}
               className="w-16 h-20 bg-slate-800 border-2 border-dashed border-slate-600 rounded flex items-center justify-center"

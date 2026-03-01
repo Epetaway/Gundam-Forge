@@ -1425,13 +1425,22 @@ export class GameEngine {
       phase,
       description,
       rulesTrace,
-      state: { ...this.state },
+      state: {
+        turnNumber: this.state.turnNumber,
+        activePlayerId: this.state.activePlayerId,
+        phase: this.state.phase,
+        priorityPlayer: this.state.priorityPlayer,
+        hasDrawnThisTurn: this.state.hasDrawnThisTurn,
+        hasMainPhaseActions: this.state.hasMainPhaseActions,
+        isGameOver: this.state.isGameOver,
+        winner: this.state.winner,
+      },
     };
     this.state.log.push(entry);
   }
 
   public getState(): GameState {
-    return { ...this.state };
+    return structuredClone(this.state);
   }
 
   /**
@@ -1443,7 +1452,7 @@ export class GameEngine {
     this.stateHistory = this.stateHistory.slice(0, this.historyIndex + 1);
 
     // Add current state
-    this.stateHistory.push(JSON.parse(JSON.stringify(this.state)));
+    this.stateHistory.push(structuredClone(this.state));
     this.historyIndex++;
 
     // Keep history size under limit (keep most recent states)
@@ -1463,7 +1472,7 @@ export class GameEngine {
     }
 
     this.historyIndex--;
-    this.state = JSON.parse(JSON.stringify(this.stateHistory[this.historyIndex]));
+    this.state = structuredClone(this.stateHistory[this.historyIndex]);
     return true;
   }
 
@@ -1477,7 +1486,7 @@ export class GameEngine {
     }
 
     this.historyIndex++;
-    this.state = JSON.parse(JSON.stringify(this.stateHistory[this.historyIndex]));
+    this.state = structuredClone(this.stateHistory[this.historyIndex]);
     return true;
   }
 
