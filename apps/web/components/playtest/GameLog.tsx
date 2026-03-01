@@ -48,7 +48,7 @@ export function GameLog({ entries }: GameLogProps) {
           <div key={i} className="text-xs border-l border-slate-600 pl-2 py-1">
             <div className="flex gap-2">
               <span className="text-slate-500 min-w-fit">
-                T{entry.turnNumber} {entry.phase}
+                T{entry.state?.turnNumber || '?'} {entry.phase}
               </span>
               <span className={`font-semibold ${getActionColor(entry.actionType)}`}>
                 {entry.actionType}

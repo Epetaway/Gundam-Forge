@@ -10,7 +10,7 @@
  */
 
 import { AUTOPLAYER_CONFIG } from './rules-constants';
-import type { CardInstance, PlayerState, GameState, GameAction } from './game-engine';
+import type { CardInstance, PlayerState, GameState, GameAction, CardDefinition } from './game-engine';
 
 export interface AutoplayerDecision {
   actions: GameAction[];
@@ -23,18 +23,25 @@ export interface AutoplayerDecision {
 export class Autoplayer {
   private playerId: string = 'player2';
   private gameState: GameState | null = null;
+  private cardDatabase: Record<string, CardDefinition> = {};
 
   /**
    * Initialize autoplayer
    */
-  initialize(playerId: string = 'player2'): void {
+  initialize(playerId: string = 'player2', cardDatabase?: Record<string, CardDefinition>): void {
     this.playerId = playerId;
+    if (cardDatabase) {
+      this.cardDatabase = cardDatabase;
+    }
   }
 
   /**
    * Get next actions for autoplayer
    */
-  decideActions(gameState: GameState): AutoplayerDecision {
+  decideActions(gameState: GameState, cardDatabase?: Record<string, CardDefinition>): AutoplayerDecision {
+    if (cardDatabase) {
+      this.cardDatabase = cardDatabase;
+    }
     this.gameState = gameState;
     const actions: GameAction[] = [];
     let reasoning = '';
@@ -95,14 +102,18 @@ export class Autoplayer {
     const unitsInPlay = player.battleArea.length;
     if (unitsInPlay < 3) {
       const playableUnit = this.findPlayableUnit(player);
-      if (playableUnit && player.resources.length >= (playableUnit.cost || 1)) {
-        actions.push({
-          type: 'PLAY_CARD',
-          playerId: this.playerId,
-          timestamp: Date.now(),
-          payload: { cardInstanceId: playableUnit.instanceId },
-        });
-        reasoning += `Played unit (cost ${playableUnit.cost}). `;
+      if (playableUnit) {
+        const cardDef = this.cardDatabase[playableUnit.cardId];
+        const cost = cardDef?.cost ?? 1;
+        if (player.resources.length >= cost) {
+          actions.push({
+            type: 'PLAY_CARD',
+            playerId: this.playerId,
+            timestamp: Date.now(),
+            payload: { cardInstanceId: playableUnit.instanceId },
+          });
+          reasoning += `Played unit (cost ${cost}). `;
+        }
       }
     }
 
@@ -149,14 +160,14 @@ export class Autoplayer {
    */
   private findPlayableUnit(player: PlayerState): CardInstance | null {
     const units = player.hand.filter((c) => {
-      const def = this.gameState?.cardDb?.[c.cardId];
+      const def = this.cardDatabase[c.cardId];
       return def && def.type === 'Unit';
     });
 
     // Sort by cost (lowest first)
     units.sort((a, b) => {
-      const costA = this.gameState?.cardDb?.[a.cardId]?.cost ?? 0;
-      const costB = this.gameState?.cardDb?.[b.cardId]?.cost ?? 0;
+      const costA = this.cardDatabase[a.cardId]?.cost ?? 0;
+      const costB = this.cardDatabase[b.cardId]?.cost ?? 0;
       return costA - costB;
     });
 

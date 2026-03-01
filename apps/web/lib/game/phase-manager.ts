@@ -65,7 +65,7 @@ export class PhaseManager {
     reason?: string;
   } {
     // Get allowed actions for current phase from constants
-    const phaseConfig = PHASE_RULES[this.currentPhase];
+    const phaseConfig = PHASE_RULES[this.currentPhase as keyof typeof PHASE_RULES];
     if (!phaseConfig) {
       return { allowed: false, reason: `Unknown phase: ${this.currentPhase}` };
     }
@@ -282,7 +282,8 @@ export function isValidPhaseTransition(
  * Get actions available in specific phase
  */
 export function getAvailableActions(phase: Phase): ActionType[] {
-  const config = PHASE_RULES[phase];
+  const config = PHASE_RULES[phase as keyof typeof PHASE_RULES];
   if (!config) return [];
   return [...(config.allowedActions as readonly ActionType[])] as ActionType[];
 }
+

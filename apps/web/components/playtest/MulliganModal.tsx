@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import { CardInstance } from '@/lib/game/game-engine';
+import { getCardById } from '@/lib/data/cards';
 
 interface MulliganModalProps {
   hand: CardInstance[];
@@ -48,21 +49,24 @@ export function MulliganModal({
         <div className="mb-8">
           <p className="text-sm text-slate-400 mb-3">Your opening hand (7 cards):</p>
           <div className="grid grid-cols-7 gap-2 max-h-24 overflow-y-auto">
-            {hand.map((card) => (
-              <div
-                key={card.instanceId}
-                className="flex flex-col items-center gap-1 p-2 bg-slate-700/50 rounded border border-slate-600 hover:border-slate-400 transition"
-              >
-                <img
-                  src={card.definition.imageUrl}
-                  alt={card.definition.name}
-                  className="w-full h-16 object-cover rounded"
-                />
-                <span className="text-xs text-slate-300 text-center truncate w-full">
-                  {card.definition.name}
-                </span>
-              </div>
-            ))}
+            {hand.map((card) => {
+              const cardDef = getCardById(card.cardId);
+              return (
+                <div
+                  key={card.instanceId}
+                  className="flex flex-col items-center gap-1 p-2 bg-slate-700/50 rounded border border-slate-600 hover:border-slate-400 transition"
+                >
+                  <img
+                    src={cardDef?.imageUrl || '/images/placeholder.png'}
+                    alt={cardDef?.name || card.cardId}
+                    className="w-full h-16 object-cover rounded"
+                  />
+                  <span className="text-xs text-slate-300 text-center truncate w-full">
+                    {cardDef?.name || card.cardId}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

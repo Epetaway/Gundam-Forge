@@ -89,7 +89,7 @@ export class CombatResolver {
     cardDatabase: Record<string, any>,
   ): CombatResult {
     const attackerDef = cardDatabase[combat.attackerCardId];
-    const defenderDef = defender ? cardDatabase[combat.defenderCardId] : null;
+    const defenderDef = defender && combat.defenderCardId ? cardDatabase[combat.defenderCardId] : null;
 
     // Get base power values
     const attackerAttack = attackerDef?.atk ?? 0;
@@ -191,13 +191,14 @@ export class CombatResolver {
       this.destroyUnit(defender, gameState);
 
       // Add DESTROYED trigger for defender
+      const defendingPlayerId =
+        Object.entries(gameState.players).find(([_, p]) =>
+          p.battleArea.some((u) => u.instanceId === defender.instanceId),
+        )?.[0] || gameState.activePlayerId;
+
       const destroyedTrigger = createDestroyedTrigger(
         defender,
-        gameState.players[
-          Object.values(gameState.players).find((p) =>
-            p.battleArea.some((u) => u.instanceId === defender.instanceId),
-          )?.playerId || gameState.activePlayerId
-        ],
+        defendingPlayerId,
         `${defender.cardId} destroyed in combat`,
         () => {
           // Trigger callback would go here
@@ -322,5 +323,3 @@ export function formatCombatResult(result: CombatResult): string {
   return text;
 }
 
-// Import for compatibility
-import { createDestroyedTrigger } from './trigger-queue';

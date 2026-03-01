@@ -104,9 +104,9 @@ export function AnimatedCard({
         )}
 
         {/* State Indicator */}
-        {card.state === 'exhausted' && (
+        {card.state === 'rest' && (
           <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-            <div className="text-xs font-bold text-slate-300">EXHAUSTED</div>
+            <div className="text-xs font-bold text-slate-300">RESTING</div>
           </div>
         )}
       </div>

@@ -9,7 +9,7 @@ import {
   resolveCardIds,
   DeckValidationResult,
 } from './deck-validation';
-import { DeckDefinition } from '@gundam-forge/shared';
+import type { DeckDefinition } from './game-engine';
 
 export interface DeckLoadOptions {
   loadImages: boolean;
