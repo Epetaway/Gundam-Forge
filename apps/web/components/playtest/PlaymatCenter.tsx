@@ -9,6 +9,10 @@ interface PlaymatCenterProps {
   selectedCardId?: string;
   onCardSelect?: (instanceId: string) => void;
   onCardRest?: (instanceId: string) => void;
+  onCardHoverStart?: (instanceId: string) => void;
+  onCardHoverEnd?: () => void;
+  onCardContextMenu?: (instanceId: string, x: number, y: number) => void;
+  cardScale?: number;
 }
 
 export default function PlaymatCenter({
@@ -16,6 +20,10 @@ export default function PlaymatCenter({
   selectedCardId,
   onCardSelect,
   onCardRest,
+  onCardHoverStart,
+  onCardHoverEnd,
+  onCardContextMenu,
+  cardScale = 1,
 }: PlaymatCenterProps) {
   const opponent = gameState.players[gameState.activePlayerId === 'player1' ? 'player2' : 'player1'];
   const player = gameState.players[gameState.activePlayerId];
@@ -61,6 +69,10 @@ export default function PlaymatCenter({
                   selected={selectedCardId === card.instanceId}
                   onSelect={onCardSelect}
                   onToggleRest={onCardRest}
+                  onHoverStart={onCardHoverStart}
+                  onHoverEnd={onCardHoverEnd}
+                  onContextMenuAction={onCardContextMenu}
+                  scale={cardScale}
                 />
               ))
             ) : (
@@ -87,6 +99,10 @@ export default function PlaymatCenter({
                   selected={selectedCardId === card.instanceId}
                   onSelect={onCardSelect}
                   onToggleRest={onCardRest}
+                  onHoverStart={onCardHoverStart}
+                  onHoverEnd={onCardHoverEnd}
+                  onContextMenuAction={onCardContextMenu}
+                  scale={cardScale}
                 />
               ))
             ) : (
