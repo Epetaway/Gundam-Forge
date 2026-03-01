@@ -965,12 +965,19 @@ export class GameEngine {
 
   private getUnitAttack(unit: CardInstance): number {
     const definition = this.cardDb[unit.cardId] as any;
-    return definition?.ap ?? definition?.atk ?? definition?.power ?? 5;
+    const baseAttack = definition?.ap ?? definition?.atk ?? definition?.power ?? 5;
+    const supportBuff = unit.counters.tempApBuff ?? 0;
+    const pairBonus = unit.attachments.pilot ? 1 : 0;
+    const linkBonus = unit.attachments.linked?.length ?? 0;
+    return baseAttack + supportBuff + pairBonus + linkBonus;
   }
 
   private getUnitHealth(unit: CardInstance): number {
     const definition = this.cardDb[unit.cardId] as any;
-    return definition?.hp ?? definition?.def ?? definition?.power ?? 5;
+    const baseHealth = definition?.hp ?? definition?.def ?? definition?.power ?? 5;
+    const pairBonus = unit.attachments.pilot ? 1 : 0;
+    const linkBonus = unit.attachments.linked?.length ?? 0;
+    return baseHealth + pairBonus + linkBonus;
   }
 
   private hasKeyword(unit: CardInstance, candidates: string[]): boolean {
@@ -1058,6 +1065,16 @@ export class GameEngine {
     this.state.stack.push(event);
   }
 
+  private drawTopCardToHand(playerId: string): CardInstance | null {
+    const player = this.state.players[playerId];
+    if (!player || player.deck.length === 0) return null;
+
+    const card = player.deck.pop()!;
+    card.zone = 'hand';
+    player.hand.push(card);
+    return card;
+  }
+
   private handleResolveTrigger(action: GameAction): ActionValidation {
     const { triggerId, chooseResolve = true } = action.payload || {};
     if (!triggerId) {
@@ -1114,11 +1131,98 @@ export class GameEngine {
 
   private applyTriggerEffect(trigger: TriggerEvent): void {
     switch (trigger.type) {
-      case 'DEPLOY':
-      case 'ATTACK':
-      case 'DESTROYED':
-      case 'BURST':
-      case 'BREACH':
+      case 'DEPLOY': {
+        const playerId = trigger.ownerPlayerId;
+        const unitId = trigger.sourceInstanceId;
+        if (!playerId || !unitId) break;
+
+        const player = this.state.players[playerId];
+        const unit = player.battleArea.find((u) => u.instanceId === unitId);
+        if (!unit) break;
+
+        if (this.hasKeyword(unit, ['draw_on_deploy', 'deploy_draw', 'deploy-draw'])) {
+          const drawn = this.drawTopCardToHand(playerId);
+          if (drawn) {
+            this.log(
+              'RESOLVE_TRIGGER',
+              playerId,
+              this.state.phase,
+              `Deploy drew ${drawn.cardId}`,
+              'Deploy trigger resolved and drew one card.',
+            );
+          }
+        }
+        break;
+      }
+      case 'ATTACK': {
+        const sourceInstanceId = trigger.sourceInstanceId;
+        const ownerPlayerId = trigger.ownerPlayerId;
+        const defenderPlayerId = trigger.payload?.defenderPlayerId as string | undefined;
+        if (!sourceInstanceId || !ownerPlayerId || !defenderPlayerId) break;
+
+        const owner = this.state.players[ownerPlayerId];
+        const attacker = owner.battleArea.find((u) => u.instanceId === sourceInstanceId);
+        if (!attacker) break;
+
+        if (this.hasKeyword(attacker, ['breach', 'shield_break', 'shield-break'])) {
+          this.triggerBreach(ownerPlayerId, sourceInstanceId, {
+            defenderPlayerId,
+            via: 'attack-trigger',
+          });
+        }
+        break;
+      }
+      case 'DESTROYED': {
+        const playerId = trigger.ownerPlayerId;
+        const sourceInstanceId = trigger.sourceInstanceId;
+        if (!playerId || !sourceInstanceId) break;
+
+        const owner = this.state.players[playerId];
+        const destroyedHost = owner.discardPile.find((u) => u.instanceId === sourceInstanceId);
+        if (!destroyedHost) break;
+
+        const attachedCards: CardInstance[] = [];
+        if (destroyedHost.attachments.pilot) {
+          attachedCards.push(destroyedHost.attachments.pilot);
+          delete destroyedHost.attachments.pilot;
+        }
+        if (destroyedHost.attachments.linked && destroyedHost.attachments.linked.length > 0) {
+          attachedCards.push(...destroyedHost.attachments.linked);
+          destroyedHost.attachments.linked = [];
+        }
+
+        attachedCards.forEach((attached) => {
+          attached.zone = 'trash';
+          owner.discardPile.push(attached);
+        });
+        break;
+      }
+      case 'BURST': {
+        const playerId = trigger.ownerPlayerId;
+        if (!playerId) break;
+
+        const drawn = this.drawTopCardToHand(playerId);
+        if (drawn) {
+          this.log(
+            'RESOLVE_TRIGGER',
+            playerId,
+            this.state.phase,
+            `Burst drew ${drawn.cardId}`,
+            'Burst trigger resolved and drew one card.',
+          );
+        }
+        break;
+      }
+      case 'BREACH': {
+        const defenderPlayerId = trigger.payload?.defenderPlayerId as string | undefined;
+        if (!defenderPlayerId) break;
+
+        const defender = this.state.players[defenderPlayerId];
+        if (!defender) break;
+
+        this.resolveDamage(defender, 1);
+        break;
+      }
       case 'PAIR':
       case 'LINK':
         break;

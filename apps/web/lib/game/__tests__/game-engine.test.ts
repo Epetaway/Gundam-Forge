@@ -271,3 +271,210 @@ describe('GameEngine - End-to-End', () => {
     expect(lastEntry.actionType).toBe('ADVANCE_PHASE');
   });
 });
+
+describe('GameEngine - Milestone 3 Triggers & Buffs', () => {
+  const triggerCardDb: Record<string, any> = {
+    supportUnit: {
+      id: 'supportUnit',
+      name: 'Support Unit',
+      type: 'Unit',
+      atk: 2,
+      def: 3,
+      keywords: ['support'],
+    },
+    attackerUnit: {
+      id: 'attackerUnit',
+      name: 'Attacker Unit',
+      type: 'Unit',
+      atk: 4,
+      def: 4,
+      keywords: [],
+    },
+    breachUnit: {
+      id: 'breachUnit',
+      name: 'Breach Unit',
+      type: 'Unit',
+      atk: 3,
+      def: 3,
+      keywords: ['breach'],
+    },
+  };
+
+  const makeDeck = (): DeckDefinition => ({
+    id: 'trigger-deck',
+    name: 'Trigger Deck',
+    cards: [
+      { cardId: 'supportUnit', count: 4, zone: 'main' },
+      { cardId: 'attackerUnit', count: 4, zone: 'main' },
+      { cardId: 'breachUnit', count: 4, zone: 'main' },
+    ],
+  });
+
+  const advanceToMainPhase = (engine: GameEngine) => {
+    engine.executeAction({
+      type: 'ADVANCE_PHASE',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+    engine.executeAction({
+      type: 'DRAW',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+    engine.executeAction({
+      type: 'ADVANCE_PHASE',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+  };
+
+  it('should enforce once-per-turn support ability usage', () => {
+    const engine = new GameEngine('deck-triggers', makeDeck(), triggerCardDb);
+    advanceToMainPhase(engine);
+    const state = engine.getState();
+
+    const support = {
+      instanceId: 'p1-support',
+      cardId: 'supportUnit',
+      zone: 'battle' as const,
+      state: 'ready' as const,
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set<string>(),
+    };
+
+    const target = {
+      instanceId: 'p1-target',
+      cardId: 'attackerUnit',
+      zone: 'battle' as const,
+      state: 'ready' as const,
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set<string>(),
+    };
+
+    state.players['player1'].battleArea = [support, target];
+
+    const firstUse = engine.executeAction({
+      type: 'ACTIVATE_ABILITY',
+      playerId: 'player1',
+      timestamp: Date.now(),
+      payload: {
+        sourceInstanceId: support.instanceId,
+        targetInstanceId: target.instanceId,
+        abilityId: 'SUPPORT_MAIN',
+      },
+    });
+
+    const secondUse = engine.executeAction({
+      type: 'ACTIVATE_ABILITY',
+      playerId: 'player1',
+      timestamp: Date.now(),
+      payload: {
+        sourceInstanceId: support.instanceId,
+        targetInstanceId: target.instanceId,
+        abilityId: 'SUPPORT_MAIN',
+      },
+    });
+
+    expect(firstUse.valid).toBe(true);
+    expect(state.players['player1'].battleArea[1].counters.tempApBuff).toBe(1);
+    expect(secondUse.valid).toBe(false);
+    expect(secondUse.error).toMatch(/exhausted|already used this turn/i);
+  });
+
+  it('should resolve BREACH trigger as shield pop', () => {
+    const engine = new GameEngine('deck-triggers', makeDeck(), triggerCardDb);
+    advanceToMainPhase(engine);
+    const state = engine.getState();
+
+    const before = state.players['player2'].shields.length;
+    state.stack.push({
+      id: 'trg-breach-1',
+      type: 'BREACH',
+      sourceInstanceId: 'p1-breach',
+      ownerPlayerId: 'player1',
+      payload: { defenderPlayerId: 'player2' },
+      optionalChoice: false,
+      description: 'Breach trigger test',
+      createdAt: Date.now(),
+    });
+
+    const result = engine.executeAction({
+      type: 'RESOLVE_TRIGGER',
+      playerId: 'player1',
+      timestamp: Date.now(),
+      payload: { triggerId: 'trg-breach-1', chooseResolve: true },
+    });
+
+    expect(result.valid).toBe(true);
+    expect(state.players['player2'].shields.length).toBe(before - 1);
+  });
+
+  it('should move paired/linked cards to discard when host is destroyed', () => {
+    const engine = new GameEngine('deck-triggers', makeDeck(), triggerCardDb);
+    advanceToMainPhase(engine);
+    const state = engine.getState();
+
+    const pilotAttachment = {
+      instanceId: 'pilot-1',
+      cardId: 'attackerUnit',
+      zone: 'battle' as const,
+      state: 'ready' as const,
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set<string>(),
+    };
+
+    const linkedAttachment = {
+      instanceId: 'linked-1',
+      cardId: 'attackerUnit',
+      zone: 'battle' as const,
+      state: 'ready' as const,
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set<string>(),
+    };
+
+    const destroyedHost = {
+      instanceId: 'host-1',
+      cardId: 'breachUnit',
+      zone: 'trash' as const,
+      state: 'ready' as const,
+      damageMarkers: 99,
+      attachments: {
+        pilot: pilotAttachment,
+        linked: [linkedAttachment],
+      },
+      counters: {},
+      usedAbilities: new Set<string>(),
+    };
+
+    state.players['player1'].discardPile = [destroyedHost];
+    state.stack.push({
+      id: 'trg-destroyed-1',
+      type: 'DESTROYED',
+      sourceInstanceId: 'host-1',
+      ownerPlayerId: 'player1',
+      optionalChoice: false,
+      description: 'Destroyed cleanup test',
+      createdAt: Date.now(),
+    });
+
+    const result = engine.executeAction({
+      type: 'RESOLVE_TRIGGER',
+      playerId: 'player1',
+      timestamp: Date.now(),
+      payload: { triggerId: 'trg-destroyed-1', chooseResolve: true },
+    });
+
+    expect(result.valid).toBe(true);
+    expect(state.players['player1'].discardPile.length).toBe(3);
+    expect(state.players['player1'].discardPile.some((card) => card.instanceId === 'pilot-1')).toBe(true);
+    expect(state.players['player1'].discardPile.some((card) => card.instanceId === 'linked-1')).toBe(true);
+  });
+});
