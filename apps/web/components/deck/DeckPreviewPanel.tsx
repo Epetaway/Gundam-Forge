@@ -13,13 +13,15 @@ const COLOR_STYLES: Record<CardColor, { bg: string; text: string; label: string 
 };
 
 export default function DeckPreviewPanel() {
-  const { name, visibility, archetype, description, colors, decklist } = useDeckSetupContext();
+  const { name, visibility, deckIntent, description, decklist } = useDeckSetupContext();
+  const { colors, packages } = deckIntent;
 
   const lineCount = decklist.trim()
     ? decklist.split('\n').filter((l) => l.trim()).length
     : 0;
 
   const displayName = name.trim() || 'New Deck';
+  const packageLabel = packages.length > 0 ? `${packages.length} package${packages.length === 1 ? '' : 's'}` : '';
 
   return (
     <div className="panel-level-2 w-full max-w-sm rounded-lg border border-border p-6 space-y-4">
@@ -53,9 +55,9 @@ export default function DeckPreviewPanel() {
 
       {/* Meta row */}
       <div className="flex flex-wrap gap-3 text-xs text-steel-600">
-        {archetype && (
+        {packageLabel && (
           <span className="rounded border border-cobalt-400/30 bg-cobalt-400/10 px-2 py-0.5 font-medium text-cobalt-300">
-            {archetype}
+            {packageLabel}
           </span>
         )}
         <span className="capitalize">{visibility}</span>
@@ -74,7 +76,7 @@ export default function DeckPreviewPanel() {
       )}
 
       {/* Hint */}
-      {!name.trim() && colors.length === 0 && !archetype && (
+      {!name.trim() && colors.length === 0 && !packageLabel && (
         <p className="text-xs text-steel-700 italic">
           Fill in the form to see your deck preview here.
         </p>

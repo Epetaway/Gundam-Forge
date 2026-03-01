@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, ExternalLink, Share2 } from 'lucide-react';
+import { Download, ExternalLink, Share2, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 
@@ -12,6 +12,7 @@ interface DeckHeaderProps {
   archetype: string;
   owner: string;
   totalCards: number;
+  deckId: string;
   onShare: () => void;
   onExport: () => void;
   feedback: string;
@@ -27,6 +28,7 @@ export function DeckHeader({
   archetype,
   owner,
   totalCards,
+  deckId,
   onShare,
   onExport,
   feedback,
@@ -78,6 +80,12 @@ export function DeckHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           {children}
+          <Button asChild size="sm" variant="secondary">
+            <Link href={`/decks/${deckId}/playtest`}>
+              <Play className="mr-1.5 h-3.5 w-3.5" />
+              Playtest
+            </Link>
+          </Button>
           <Button onClick={onShare} size="sm" variant="secondary">
             <Share2 className="mr-1.5 h-3.5 w-3.5" />
             Share
