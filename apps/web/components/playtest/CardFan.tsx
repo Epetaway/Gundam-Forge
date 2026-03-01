@@ -6,9 +6,10 @@ import { cardsById } from '@/lib/data/cards';
 interface CardFanProps {
   hand: CardInstance[];
   onCardClick?: (card: CardInstance) => void;
+  scale?: number;
 }
 
-export default function CardFan({ hand, onCardClick }: CardFanProps) {
+export default function CardFan({ hand, onCardClick, scale = 1 }: CardFanProps) {
   return (
     <div className="relative w-full h-48 mb-4">
       {/* Background */}
@@ -39,11 +40,11 @@ export default function CardFan({ hand, onCardClick }: CardFanProps) {
               return (
                 <div
                   key={card.instanceId}
-                  className="absolute transform transition-all duration-200 hover:scale-125 hover:-translate-y-16 hover:z-50 cursor-pointer group"
+                  className="absolute transform transition-all duration-200 hover:scale-125 hover:-translate-y-16 hover:z-50 cursor-pointer group will-change-transform"
                   style={{
                     left: `calc(50% + ${x}px)`,
                     top: `${y}px`,
-                    transform: `translateX(-50%) rotateZ(${rotation}deg)`,
+                    transform: `translateX(-50%) rotateZ(${rotation}deg) scale(${scale})`,
                     opacity: visibility,
                   }}
                   onClick={() => onCardClick?.(card)}

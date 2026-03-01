@@ -7,14 +7,22 @@ interface CardInstanceDisplayProps {
   cardInstance: CardInstance;
   onToggleRest?: (instanceId: string) => void;
   onSelect?: (instanceId: string) => void;
+  onHoverStart?: (instanceId: string) => void;
+  onHoverEnd?: () => void;
+  onContextMenuAction?: (instanceId: string, x: number, y: number) => void;
   selected?: boolean;
+  scale?: number;
 }
 
 export default function CardInstanceDisplay({
   cardInstance,
   onToggleRest,
   onSelect,
+  onHoverStart,
+  onHoverEnd,
+  onContextMenuAction,
   selected,
+  scale = 1,
 }: CardInstanceDisplayProps) {
   const card = cardsById.get(cardInstance.cardId);
 
@@ -22,18 +30,22 @@ export default function CardInstanceDisplay({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    onContextMenuAction?.(cardInstance.instanceId, e.clientX, e.clientY);
     onToggleRest?.(cardInstance.instanceId);
   };
 
   return (
     <div
       onClick={() => onSelect?.(cardInstance.instanceId)}
+      onMouseEnter={() => onHoverStart?.(cardInstance.instanceId)}
+      onMouseLeave={() => onHoverEnd?.()}
       onContextMenu={handleContextMenu}
       className={`relative w-24 h-32 rounded border-2 transition cursor-pointer transform
         ${selected ? 'ring-2 ring-yellow-400' : ''}
         ${cardInstance.state === 'rest' ? 'rotate-90 opacity-75' : ''}
         ${card.imageUrl ? 'border-slate-600' : 'border-slate-700'}
-        hover:border-slate-500 hover:scale-105`}
+        hover:border-slate-500 hover:scale-105 will-change-transform`}
+      style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}
     >
       {/* Card Image */}
       {card.imageUrl ? (
