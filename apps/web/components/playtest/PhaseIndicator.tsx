@@ -15,16 +15,15 @@ interface PhaseIndicatorProps {
 }
 
 const PHASE_LABELS: Record<Phase, string> = {
-  setup: 'Setup',
+  start: 'Start',
   draw: 'Draw',
+  resource: 'Resource',
   main: 'Main',
-  action: 'Action',
-  battle: 'Battle',
   end: 'End',
   gameOver: 'Game Over',
 };
 
-const PHASE_ORDER: Phase[] = ['setup', 'draw', 'main', 'action', 'battle', 'end'];
+const PHASE_ORDER: Phase[] = ['start', 'draw', 'resource', 'main', 'end'];
 
 export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: PhaseIndicatorProps) {
   const currentIndex = PHASE_ORDER.indexOf(currentPhase);

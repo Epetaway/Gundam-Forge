@@ -139,10 +139,10 @@ export class AdvancedAutoplayer {
 
     if (playableCards.length === 0) return null;
 
-    // Sort by attack value (descending) - prefer stronger units
+    // Sort by AP (descending) - prefer stronger units
     playableCards.sort((a, b) => {
-      const atkA = this.cardDatabase[a.cardId]?.atk ?? 0;
-      const atkB = this.cardDatabase[b.cardId]?.atk ?? 0;
+      const atkA = this.cardDatabase[a.cardId]?.ap ?? 0;
+      const atkB = this.cardDatabase[b.cardId]?.ap ?? 0;
       return atkB - atkA;
     });
 
@@ -197,14 +197,10 @@ export class AdvancedAutoplayer {
       reasoning += this.decideMainPhase(player, opponent, gameState, strategy, actions);
     }
 
-    // BATTLE PHASE
-    if (phase === 'battle') {
-      reasoning += this.decideBattlePhase(player, opponent, actions, strategy);
-    }
-
     // ADVANCE TO NEXT PHASE
+    // Combat happens during Main Phase — no separate battle phase
     if (
-      (phase === 'main' || phase === 'battle' || phase === 'end') &&
+      (phase === 'main' || phase === 'end') &&
       actions.length > 0
     ) {
       actions.push({

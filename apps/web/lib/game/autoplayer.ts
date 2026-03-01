@@ -54,6 +54,16 @@ export class Autoplayer {
     const player = gameState.players[this.playerId];
     const phase = gameState.phase;
 
+    // START PHASE — advance immediately (readying cards is handled by engine)
+    if (phase === 'start') {
+      actions.push({
+        type: 'ADVANCE_PHASE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Start Phase: Advanced. ';
+    }
+
     // DRAW PHASE
     if (phase === 'draw' && !gameState.hasDrawnThisTurn) {
       actions.push({
@@ -64,14 +74,19 @@ export class Autoplayer {
       reasoning += 'Draw Phase: Drew 1 card. ';
     }
 
+    // RESOURCE PHASE — place resource if available, then advance
+    if (phase === 'resource') {
+      actions.push({
+        type: 'PLACE_RESOURCE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Resource Phase: Placed resource. ';
+    }
+
     // MAIN PHASE
     if (phase === 'main') {
       reasoning += this.decideMainPhaseActions(player, actions);
-    }
-
-    // BATTLE PHASE
-    if (phase === 'battle') {
-      reasoning += this.decideBattlePhaseActions(player, actions);
     }
 
     // END PHASE
@@ -141,20 +156,6 @@ export class Autoplayer {
   }
 
   /**
-   * Decide battle phase actions
-   * Strategies: Don't block (basic), just take damage
-   */
-  private decideBattlePhaseActions(player: PlayerState, actions: GameAction[]): string {
-    let reasoning = 'Battle Phase: ';
-
-    // Basic strategy: Don't block, just take the damage
-    // (More advanced: evaluate blocking value)
-    reasoning += 'Opponent is attacking. No blockers assigned. ';
-
-    return reasoning;
-  }
-
-  /**
    * Find a playable unit in hand
    * Prefers lowest cost first
    */
@@ -186,12 +187,11 @@ export class Autoplayer {
   }
 
   /**
-   * Evaluate if attack is worthwhile
-   * (Future: more complex evaluation)
+   * Evaluate if attack is worthwhile by attacker's AP
    */
   private evaluateAttack(attacker: CardInstance, targetShields: number): number {
-    const damage = attacker.damageMarkers; // Damage already dealt
-    return damage;
+    const cardDef = this.cardDatabase[attacker.cardId];
+    return cardDef?.ap ?? 0;
   }
 }
 
@@ -208,8 +208,8 @@ export const AUTOPLAYER_TOKEN_DECK = {
       name: 'Colorless Token Unit 1',
       type: 'Unit' as const,
       cost: 1,
-      atk: 2,
-      def: 1,
+      ap: 2,
+      hp: 1,
       keywords: [],
       text: 'Basic token unit',
     },
@@ -218,8 +218,8 @@ export const AUTOPLAYER_TOKEN_DECK = {
       name: 'Colorless Token Unit 2',
       type: 'Unit' as const,
       cost: 2,
-      atk: 3,
-      def: 2,
+      ap: 3,
+      hp: 2,
       keywords: [],
       text: 'Basic token unit',
     },
@@ -228,8 +228,8 @@ export const AUTOPLAYER_TOKEN_DECK = {
       name: 'Colorless Token Unit 3',
       type: 'Unit' as const,
       cost: 3,
-      atk: 4,
-      def: 3,
+      ap: 4,
+      hp: 3,
       keywords: [],
       text: 'Basic token unit',
     },

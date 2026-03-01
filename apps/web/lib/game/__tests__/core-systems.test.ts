@@ -215,14 +215,26 @@ describe('Deck Validation', () => {
   });
 
   it('validateDeck detects copy limit violations', () => {
+    // Official GCG: max 4 copies per card. 5 copies should be an error.
     const cards = [
-      { cardId: 'GD01-001', name: 'RX-78-2 Gundam', count: 4, imageUrl: '' },
+      { cardId: 'GD01-001', name: 'RX-78-2 Gundam', count: 5, imageUrl: '' },
     ];
 
     const result = validateDeck(cards, mockCardDatabase);
 
     expect(result.valid).toBe(false);
     expect(result.errors.some((e) => e.message.toLowerCase().includes('cop'))).toBe(true);
+  });
+
+  it('validateDeck allows up to 4 copies (official GCG limit)', () => {
+    const cards = [
+      { cardId: 'GD01-001', name: 'RX-78-2 Gundam', count: 4, imageUrl: 'some-url' },
+    ];
+
+    const result = validateDeck(cards, mockCardDatabase);
+
+    // 4 copies should be valid per official rules
+    expect(result.errors.some((e) => e.message.toLowerCase().includes('cop'))).toBe(false);
   });
 
   it('validateDeck detects missing images', () => {
@@ -294,7 +306,7 @@ describe('Phase Manager', () => {
     const manager = new PhaseManager();
     manager.initialize('player1', 1);
 
-    expect(manager.getPhase()).toBe('setup');
+    expect(manager.getPhase()).toBe('start');
     expect(manager.getTurnNumber()).toBe(1);
     expect(manager.getActivePlayer()).toBe('player1');
   });
@@ -326,10 +338,12 @@ describe('Phase Manager', () => {
     const manager = new PhaseManager();
     manager.initialize('player1', 1);
 
-    expect(manager.getPhase()).toBe('setup');
+    expect(manager.getPhase()).toBe('start');
 
-    // Can't advance without draw in draw phase, but let's test the sequence idea
+    // Official GCG phase sequence: start → draw → resource → main → end
+    expect(manager.getPhaseProgress().order).toContain('start');
     expect(manager.getPhaseProgress().order).toContain('draw');
+    expect(manager.getPhaseProgress().order).toContain('resource');
     expect(manager.getPhaseProgress().order).toContain('main');
     expect(manager.getPhaseProgress().order).toContain('end');
   });

@@ -211,24 +211,24 @@ describe('Combat Resolution System', () => {
       id: 'GD01-001',
       name: 'RX-78-2 Gundam',
       type: 'Unit',
-      atk: 5,
-      def: 4,
+      ap: 5,
+      hp: 4,
       keywords: [],
     },
     'GD01-002': {
       id: 'GD01-002',
       name: 'Zaku II',
       type: 'Unit',
-      atk: 3,
-      def: 2,
+      ap: 3,
+      hp: 2,
       keywords: ['Blocker'],
     },
     'GD01-003': {
       id: 'GD01-003',
       name: 'First Strike Unit',
       type: 'Unit',
-      atk: 2,
-      def: 2,
+      ap: 2,
+      hp: 2,
       keywords: ['First Strike'],
     },
   };
@@ -485,8 +485,8 @@ describe('Integration: Combat with Triggers', () => {
     };
 
     const mockCardDatabase = {
-      'GD01-001': { atk: 10, def: 1, keywords: [] },
-      'GD01-002': { atk: 1, def: 1, keywords: [] },
+      'GD01-001': { ap: 10, hp: 1, keywords: [] },
+      'GD01-002': { ap: 1, hp: 1, keywords: [] },
     };
 
     const mockGameState = {

@@ -52,7 +52,7 @@ export class PlaytestEngine {
       deckId,
       turnNumber: 1,
       activePlayerId: 'player1',
-      phase: 'setup',
+      phase: 'start',
       priorityPlayer: 'player1',
       players: {
         player1: this.createPlayerState('player1', playerName, playerDeck),
@@ -63,6 +63,7 @@ export class PlaytestEngine {
       rngSeed: 0,
       isGameOver: false,
       hasDrawnThisTurn: false,
+      hasResourcePlacedThisTurn: false,
       hasMainPhaseActions: 0,
     };
 
@@ -159,7 +160,7 @@ export class PlaytestEngine {
     this.logger.logAction(
       Date.now(),
       1,
-      'setup',
+      'start',
       firstPlayerId,
       'ADVANCE_PHASE',
       `Setup complete. Coin flip: ${coinFlip.face.toUpperCase()}. ${firstPlayerId} goes first.`,

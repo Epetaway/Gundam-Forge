@@ -1,14 +1,16 @@
 /**
  * Phase Management System
- * Enforces official turn structure and action gating
+ * Enforces official Gundam TCG turn structure and action gating.
  *
- * OFFICIAL PHASE ORDER:
- * 1. Setup Phase - untap units, refresh resources, refresh once-per-turn
- * 2. Draw Phase - draw 1 card
- * 3. Main Phase - play cards, activate abilities, declare attacks
- * 4. (Optional) Action Phase - action window
- * 5. (Optional) Battle Phase - declare blockers, resolve combat
- * 6. End Phase - discard down to 10, resolve end-of-turn effects
+ * OFFICIAL PHASE ORDER (Comprehensive Rules Ver. 1.5.0):
+ * 1. Start Phase   — Ready all rested cards. "Start of turn" effects fire.
+ * 2. Draw Phase    — Draw 1 card from main deck. Empty deck = loss.
+ * 3. Resource Phase — Take top of Resource Deck → Resource Area (active). Skip if empty.
+ * 4. Main Phase    — Play cards, activate abilities, declare attacks (any order, any times).
+ * 5. End Phase     — Discard to 10. End-of-turn effects. Pass turn.
+ *
+ * NOTE: 'action' and 'battle' are card timing keywords, NOT separate phases.
+ * Combat (DECLARE_ATTACK, DECLARE_BLOCK, RESOLVE_COMBAT) happens during Main Phase.
  */
 
 import { PHASE_RULES, PHASE_SEQUENCE } from './rules-constants';
@@ -19,20 +21,22 @@ import type { ActionType } from './game-engine';
  * Phase manager tracks current phase and validates actions
  */
 export class PhaseManager {
-  private currentPhase: Phase = 'setup';
+  private currentPhase: Phase = 'start';
   private turnNumber: number = 1;
   private activePlayerId: string = 'player1';
   private drawedThisTurn: boolean = false;
+  private resourcePlacedThisTurn: boolean = false;
   private mainPhaseActionCount: number = 0;
 
   /**
    * Initialize for start of game
    */
   initialize(activePlayerId: string = 'player1', turnNumber: number = 1): void {
-    this.currentPhase = 'setup';
+    this.currentPhase = 'start';
     this.turnNumber = turnNumber;
     this.activePlayerId = activePlayerId;
     this.drawedThisTurn = false;
+    this.resourcePlacedThisTurn = false;
     this.mainPhaseActionCount = 0;
   }
 
@@ -64,7 +68,6 @@ export class PhaseManager {
     allowed: boolean;
     reason?: string;
   } {
-    // Get allowed actions for current phase from constants
     const phaseConfig = PHASE_RULES[this.currentPhase as keyof typeof PHASE_RULES];
     if (!phaseConfig) {
       return { allowed: false, reason: `Unknown phase: ${this.currentPhase}` };
@@ -90,8 +93,16 @@ export class PhaseManager {
         }
         break;
 
+      case 'PLACE_RESOURCE':
+        if (this.resourcePlacedThisTurn) {
+          return { allowed: false, reason: 'Resource already placed this turn' };
+        }
+        if (this.currentPhase !== 'resource') {
+          return { allowed: false, reason: 'Can only place resource in Resource Phase' };
+        }
+        break;
+
       case 'ADVANCE_PHASE':
-        // Validate preconditions for advancing
         if (this.currentPhase === 'draw' && !this.drawedThisTurn) {
           return { allowed: false, reason: 'Must draw before advancing from Draw Phase' };
         }
@@ -105,13 +116,7 @@ export class PhaseManager {
 
       case 'DECLARE_ATTACK':
         if (this.currentPhase !== 'main') {
-          return { allowed: false, reason: 'Must declare attacks from Main Phase' };
-        }
-        break;
-
-      case 'DECLARE_BLOCK':
-        if (this.currentPhase !== 'battle') {
-          return { allowed: false, reason: 'Can only declare blocks in Battle Phase' };
+          return { allowed: false, reason: 'Must declare attacks during Main Phase' };
         }
         break;
     }
@@ -120,27 +125,27 @@ export class PhaseManager {
   }
 
   /**
-   * Advance to next phase in sequence
+   * Advance to next phase in sequence.
+   * end → start triggers a turn switch to the other player.
    */
   advancePhase(): { phase: Phase; log: string } {
-    const previousPhase = this.currentPhase;
+    const phaseSequence = [...PHASE_SEQUENCE] as Phase[];
+    const currentIndex = phaseSequence.indexOf(this.currentPhase as any);
+    const isLastPhase = currentIndex === phaseSequence.length - 1;
+    const nextPhase: Phase = isLastPhase ? 'start' : phaseSequence[currentIndex + 1];
 
-    // Get next phase in sequence
-    const currentIndex = PHASE_SEQUENCE.indexOf(this.currentPhase as any);
-    let nextIndex = (currentIndex + 1) % PHASE_SEQUENCE.length;
-    const nextPhase = PHASE_SEQUENCE[nextIndex];
-
-    // Handle turn transition
-    if (nextPhase === 'setup') {
+    // Turn transition happens when end phase completes
+    if (isLastPhase) {
       this.turnNumber++;
       this.switchActivePlayer();
-      this.drawedThisTurn = false;
-      this.mainPhaseActionCount = 0;
     }
 
     // Reset per-phase flags
     if (nextPhase === 'draw') {
       this.drawedThisTurn = false;
+    }
+    if (nextPhase === 'resource') {
+      this.resourcePlacedThisTurn = false;
     }
     if (nextPhase === 'main') {
       this.mainPhaseActionCount = 0;
@@ -164,6 +169,13 @@ export class PhaseManager {
    */
   markDrawn(): void {
     this.drawedThisTurn = true;
+  }
+
+  /**
+   * Mark resource placed this turn (Resource Phase)
+   */
+  markResourcePlaced(playerId: string): void {
+    this.resourcePlacedThisTurn = true;
   }
 
   /**
@@ -191,25 +203,27 @@ export class PhaseManager {
   }
 
   /**
-   * Reset for new turn (called at Setup Phase)
+   * Reset for new turn (called at Start Phase)
    */
   resetForNewTurn(): void {
     this.drawedThisTurn = false;
+    this.resourcePlacedThisTurn = false;
     this.mainPhaseActionCount = 0;
   }
 
   /**
-   * Check if in combat-related phase
+   * Check if currently in a phase where combat is legal.
+   * Official GCG: combat happens during Main Phase only.
    */
   isInCombatPhase(): boolean {
-    return this.currentPhase === 'battle' || this.currentPhase === 'main';
+    return this.currentPhase === 'main';
   }
 
   /**
-   * Check if in main action phase
+   * Check if currently in a phase where card play and abilities are legal.
    */
   isInMainActionPhase(): boolean {
-    return this.currentPhase === 'main' || this.currentPhase === 'action';
+    return this.currentPhase === 'main';
   }
 }
 
@@ -218,11 +232,10 @@ export class PhaseManager {
  */
 export function getPhaseName(phase: Phase): string {
   const names: Record<Phase, string> = {
-    setup: 'Setup Phase',
+    start: 'Start Phase',
     draw: 'Draw Phase',
+    resource: 'Resource Phase',
     main: 'Main Phase',
-    action: 'Action Window',
-    battle: 'Battle Phase',
     end: 'End Phase',
     gameOver: 'Game Over',
   };
@@ -244,13 +257,14 @@ export function getUpcomingPhases(
   currentPhase: Phase,
   count: number = 3,
 ): Phase[] {
-  const index = PHASE_SEQUENCE.indexOf(currentPhase as any);
+  const sequence = [...PHASE_SEQUENCE] as Phase[];
+  const index = sequence.indexOf(currentPhase as any);
   if (index === -1) return [];
 
   const upcoming: Phase[] = [];
   for (let i = 1; i <= count; i++) {
-    const nextIndex = (index + i) % PHASE_SEQUENCE.length;
-    upcoming.push(PHASE_SEQUENCE[nextIndex]);
+    const nextIndex = (index + i) % sequence.length;
+    upcoming.push(sequence[nextIndex]);
   }
 
   return upcoming;
@@ -263,17 +277,17 @@ export function isValidPhaseTransition(
   from: Phase,
   to: Phase,
 ): boolean {
-  const allPhases = PHASE_SEQUENCE;
+  const allPhases = [...PHASE_SEQUENCE] as Phase[];
   const fromIndex = allPhases.indexOf(from as any);
   const toIndex = allPhases.indexOf(to as any);
 
   if (fromIndex === -1 || toIndex === -1) return false;
 
-  // Can advance to next phase
+  // Can advance to next phase in sequence
   if ((fromIndex + 1) % allPhases.length === toIndex) return true;
 
-  // Can wrap around at end of turn
-  if (from === 'end' && to === 'setup') return true;
+  // Can wrap around: end → start (turn transition)
+  if (from === 'end' && to === 'start') return true;
 
   return false;
 }
@@ -286,4 +300,3 @@ export function getAvailableActions(phase: Phase): ActionType[] {
   if (!config) return [];
   return [...(config.allowedActions as readonly ActionType[])] as ActionType[];
 }
-

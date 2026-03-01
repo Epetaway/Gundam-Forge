@@ -250,7 +250,7 @@ export function applySetupToGameState(
   gameState.activePlayerId = coinFlipResult;
 
   // Set starting phase
-  gameState.phase = 'setup';
+  gameState.phase = 'start';
   gameState.turnNumber = 1;
 
   // Log setup completion
@@ -258,7 +258,7 @@ export function applySetupToGameState(
     timestamp: Date.now(),
     actionType: 'ADVANCE_PHASE',
     activePlayer: coinFlipResult,
-    phase: 'setup',
+    phase: 'start',
     description: `Setup complete. ${coinFlipResult} goes first. Starting Turn 1.`,
     rulesTrace: 'Setup sequence finished per official rules.',
     state: {},

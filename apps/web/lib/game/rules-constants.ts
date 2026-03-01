@@ -16,11 +16,11 @@ export const DECK_RULES = {
   minMainDeckSize: 50,
   maxMainDeckSize: 50,
 
-  // Resource deck size (exact)
-  resourceDeckSize: 0, // Gundam TCG uses main deck only (no dedicated resource deck)
+  // Resource deck size (exact) — separate 10-card deck, outside the 50-card main deck
+  resourceDeckSize: 10,
 
-  // Copy limits per card
-  maxCopiesPerCard: 3,
+  // Copy limits per card — official GCG allows 4 copies
+  maxCopiesPerCard: 4,
 
   // Colorless cards don't count toward color limit
   maxColorsPerDeck: 2,
@@ -57,13 +57,15 @@ export const SETUP_RULES = {
  * TURN STRUCTURE & PHASES
  * Official turn sequence per playtest_rules_map.md
  */
+// Official GCG Phase Sequence: start → draw → resource → main → end
+// NOTE: 'action' and 'battle' are NOT phases — they are card timing keywords.
+// Combat (DECLARE_ATTACK, DECLARE_BLOCK, RESOLVE_COMBAT) happens during Main Phase.
 export const PHASE_SEQUENCE = [
-  'setup',   // Phase 1: Ready all units, refresh resources, refresh once-per-turn
-  'draw',    // Phase 2: Draw 1 card
-  'main',    // Phase 3: Play cards, activate abilities, declare attacks
-  'action',  // Phase 3b: Action window (optional, some card effects)
-  'battle',  // Phase 3c: Battle resolution (sub-phase of main)
-  'end',     // Phase 4: Discard down to 10, resolve end-of-turn effects
+  'start',    // Phase 1: Ready (untap) all cards. "Start of turn" effects fire.
+  'draw',     // Phase 2: Draw 1 card from main deck. Empty deck = loss.
+  'resource', // Phase 3: Take top of Resource Deck → Resource Area (enters active). Skip if empty.
+  'main',     // Phase 4: Play cards, activate abilities, declare attacks (any order, any times).
+  'end',      // Phase 5: Discard to 10. End-of-turn effects. Pass turn.
 ] as const;
 
 export type GamePhase = (typeof PHASE_SEQUENCE)[number];
@@ -72,43 +74,40 @@ export type GamePhase = (typeof PHASE_SEQUENCE)[number];
  * PHASE RULES & CONSTRAINTS
  */
 export const PHASE_RULES = {
-  setup: {
-    name: 'Setup Phase',
-    actions: ['ready all units', 'refresh resources', 'refresh once-per-turn abilities'],
+  start: {
+    name: 'Start Phase',
+    actions: ['ready all rested cards', 'resolve start-of-turn effects', 'reset once-per-turn abilities'],
     allowedActions: ['READY_ZONE', 'ADVANCE_PHASE'] as const,
   },
   draw: {
     name: 'Draw Phase',
-    actions: ['draw 1 card'],
-    allowedActions: ['DRAW', 'MULLIGAN', 'ADVANCE_PHASE'] as const,
+    actions: ['draw 1 card from main deck'],
+    allowedActions: ['DRAW', 'ADVANCE_PHASE'] as const,
+  },
+  resource: {
+    name: 'Resource Phase',
+    actions: ['place top card of resource deck into resource area (enters active)'],
+    allowedActions: ['PLACE_RESOURCE', 'ADVANCE_PHASE'] as const,
   },
   main: {
     name: 'Main Phase',
-    actions: ['play cards', 'activate abilities', 'spend resources', 'declare attacks'],
+    actions: ['play cards', 'activate abilities', 'spend resources', 'declare attacks', 'declare blockers', 'resolve combat'],
     allowedActions: [
       'PLAY_CARD',
       'ACTIVATE_ABILITY',
       'PAIR_PILOT',
       'DECLARE_ATTACK',
+      'DECLARE_BLOCK',
+      'RESOLVE_COMBAT',
       'SPEND_RESOURCE',
       'REST_UNIT',
       'END_PHASE',
       'ADVANCE_PHASE',
     ] as const,
   },
-  action: {
-    name: 'Action Phase',
-    actions: ['action window for triggered effects'],
-    allowedActions: ['ACTIVATE_ABILITY', 'SPEND_RESOURCE', 'END_PHASE', 'ADVANCE_PHASE'] as const,
-  },
-  battle: {
-    name: 'Battle Phase',
-    actions: ['declare blockers', 'resolve combat'],
-    allowedActions: ['DECLARE_BLOCK', 'RESOLVE_COMBAT', 'END_PHASE', 'ADVANCE_PHASE'] as const,
-  },
   end: {
     name: 'End Phase',
-    actions: ['discard down to 10', 'resolve end-of-turn effects'],
+    actions: ['discard down to 10', 'resolve end-of-turn effects', 'pass turn'],
     allowedActions: ['ADVANCE_PHASE'] as const,
   },
 } as const;
@@ -126,8 +125,10 @@ export const RESOURCE_RULES = {
   // Resource states
   states: ['ready', 'rest'] as const,
 
-  // Resource zone size limit (unlimited)
-  maxResources: Infinity,
+  // Resource zone size limit: 10 from Resource Deck + 5 EX Resources = 15 max
+  maxResources: 15,
+  maxNormalResources: 10,
+  maxExResources: 5,
 };
 
 /**
@@ -190,7 +191,7 @@ export const HAND_RULES = {
  */
 export const ONCE_PER_TURN_RULES = {
   // Reset timing
-  resetAt: 'setup', // Refreshes at Setup Phase
+  resetAt: 'start', // Refreshes at Start Phase (Active Step)
 
   // Cannot be bypassed
   bypassable: false,
@@ -213,7 +214,7 @@ export const WIN_CONDITIONS = {
  */
 export const VALIDATION_ERRORS = {
   DECK_SIZE_INVALID: 'Deck must be exactly 50 cards',
-  COPY_LIMIT_EXCEEDED: 'Cannot exceed 3 copies of any card',
+  COPY_LIMIT_EXCEEDED: 'Cannot exceed 4 copies of any card',
   CARD_NOT_FOUND: 'Card not found in database',
   IMAGE_URL_MISSING: 'Card image URL is missing - cannot display card',
   INVALID_ZONE_PLACEMENT: 'Card cannot be placed in that zone',
