@@ -22,7 +22,7 @@ export default function PlaytestPage({ params }: PlaytestPageProps) {
 
   return (
     <PlaytestGameEnhanced
-      playerDeckId={params.id}
+      playerDeck={deck}
       opponentDeckId="ai-deck-default"
       cardDatabase={cardsById}
     />

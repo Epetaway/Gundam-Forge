@@ -25,6 +25,7 @@ import { ResourceAreaZone } from './zones/ResourceAreaZone';
 import { TrashArea } from './zones/TrashArea';
 import { DeckArea } from './zones/DeckArea';
 import { GameLog } from './GameLog';
+import { PlayerHand } from './PlayerHand';
 
 interface BattlefieldProps {
   playerState: {
@@ -59,9 +60,13 @@ interface BattlefieldProps {
   };
   isPlayerTurn: boolean;
   gameLog: any[];
+  gamePhase: string;
+  cardDatabase: Record<string, any>;
+  selectedCard: CardInstance | null;
   onUnitSelected?: (unit: CardInstance, isOpponent: boolean) => void;
   onCardPlayRequested?: (card: CardInstance) => void;
   onShieldDamaged?: (shieldCount: number) => void;
+  onSelectCard?: (card: CardInstance) => void;
 }
 
 /**
@@ -73,9 +78,13 @@ export function Battlefield({
   opponentState,
   isPlayerTurn,
   gameLog,
+  gamePhase,
+  cardDatabase,
+  selectedCard,
   onUnitSelected,
   onCardPlayRequested,
   onShieldDamaged,
+  onSelectCard,
 }: BattlefieldProps) {
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   const [draggedCard, setDraggedCard] = useState<CardInstance | null>(null);
@@ -218,51 +227,15 @@ export function Battlefield({
           Your Hand ({playerState.hand.length}/7)
         </div>
         
-        {/* Hand Display - Horizontal fan/tray layout */}
-        <div className="flex gap-2 overflow-x-auto pb-2 items-end h-28">
-          {playerState.hand.length > 0 ? (
-            playerState.hand.map((card, index) => (
-              <div
-                key={card.instanceId}
-                className="flex-shrink-0 h-full cursor-pointer group relative"
-                style={{
-                  transform: `translateY(${Math.abs(Math.floor(playerState.hand.length / 2) - index) * 4}px)`,
-                }}
-              >
-                {/* Card Placeholder */}
-                <div
-                  className={`
-                    w-20 h-28 rounded border-2 transition-all duration-200
-                    bg-gradient-to-b from-slate-700 to-slate-800
-                    hover:from-purple-700 hover:to-purple-800
-                    hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/50
-                    border-slate-600
-                    flex flex-col items-center justify-center p-1
-                    group-hover:scale-110 group-hover:z-50
-                  `}
-                  onClick={() => onCardPlayRequested?.(card)}
-                >
-                  <div className="text-[8px] font-bold text-slate-300 text-center truncate w-full">
-                    {card.cardId.substring(0, 5)}
-                  </div>
-                </div>
-
-                {/* Hover Tooltip */}
-                <div className="absolute -top-32 left-1/2 transform -translate-x-1/2 hidden group-hover:block z-50 bg-slate-800 border border-slate-600 rounded p-2 w-32 text-xs text-slate-300">
-                  <div className="font-bold">{card.cardId}</div>
-                  <div className="text-slate-500 text-[9px] mt-1">Click to play</div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-slate-500 text-sm italic">Draw cards to play</div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile notice */}
-      <div className="fixed bottom-4 left-4 text-xs text-slate-500 max-w-xs hidden sm:block">
-        ⌄ Scroll hand left/right • Click cards to play • No horizontal page scroll ✓
+        <PlayerHand
+          cards={playerState.hand}
+          cardDatabase={cardDatabase}
+          selectedCard={selectedCard || null}
+          onSelectCard={onSelectCard || (() => {})}
+          onPlayCard={onCardPlayRequested || (() => {})}
+          gamePhase={gamePhase}
+          isPlayerTurn={isPlayerTurn}
+        />
       </div>
     </div>
   );

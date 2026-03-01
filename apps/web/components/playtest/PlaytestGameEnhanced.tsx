@@ -19,10 +19,11 @@ import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { useSoundEffects } from '@/lib/hooks/useSoundEffects';
 import { PhaseIndicator } from './PhaseIndicator';
 import { KeyboardShortcutsLegend } from './KeyboardShortcutsLegend';
-import type { GameState, GameAction, CardInstance } from '@/lib/game/game-engine';
+import type { GameState, GameAction, CardInstance, DeckDefinition } from '@/lib/game/game-engine';
+import type { DeckRecord } from '@/lib/data/decks';
 
 interface PlaytestGameEnhancedProps {
-  playerDeckId: string;
+  playerDeck: DeckRecord;
   opponentDeckId: string;
   cardDatabase: Record<string, any>;
   onGameEnd?: (winner: string, reason: string) => void;
@@ -33,7 +34,7 @@ interface PlaytestGameEnhancedProps {
  * Full Phase 1-4 implementation matching master prompt specifications
  */
 export function PlaytestGameEnhanced({
-  playerDeckId,
+  playerDeck,
   opponentDeckId,
   cardDatabase,
   onGameEnd,
@@ -66,17 +67,19 @@ export function PlaytestGameEnhanced({
   // Initialize Game Engine
   useEffect(() => {
     try {
-      const playerDeck = {
-        id: playerDeckId,
-        name: 'Player Deck',
-        cards: Array.from({ length: 60 }, (_, i) => ({
-          cardId: `GD01-${String(i + 1).padStart(3, '0')}`,
-          count: 1,
-          zone: 'main' as const,
+      // Convert DeckRecord to DeckDefinition
+      const deckDefinition: DeckDefinition = {
+        id: playerDeck.id,
+        name: playerDeck.name,
+        description: playerDeck.description,
+        cards: playerDeck.entries.map((entry) => ({
+          cardId: entry.cardId,
+          count: entry.qty,
+          zone: 'main' as const, // Default to main zone for all cards
         })),
       };
 
-      const engine = new GameEngine(playerDeckId, playerDeck, cardDatabase);
+      const engine = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
       setEngine(engine);
       setGameState(engine.getState());
       setIsLoading(false);
@@ -84,7 +87,7 @@ export function PlaytestGameEnhanced({
       setError(err instanceof Error ? err.message : 'Failed to initialize game');
       setIsLoading(false);
     }
-  }, [playerDeckId, opponentDeckId, cardDatabase]);
+  }, [playerDeck, cardDatabase]);
 
   // Phase 2: Game Action Handler
   const handleAction = (action: GameAction) => {
@@ -180,7 +183,7 @@ export function PlaytestGameEnhanced({
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="text-center">
-          <p className="text-xl font-bold text-red-500">⚠️ Error</p>
+          <p className="text-xl font-bold text-red-500">Error</p>
           <p className="text-slate-300 mt-2">{error || 'Failed to load game'}</p>
         </div>
       </div>
@@ -197,7 +200,7 @@ export function PlaytestGameEnhanced({
       {/* HEADER: Phase Indicator + Controls */}
       <header className="border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white">⚔️ Gundam TCG Playtester</h1>
+          <h1 className="text-2xl font-bold text-white">Gundam TCG Playtester</h1>
 
           <div className="flex gap-4 items-center">
             {/* Sound Toggle */}
@@ -211,7 +214,7 @@ export function PlaytestGameEnhanced({
               title={isMuted ? 'Sound muted' : 'Sound on'}
               aria-label={isMuted ? 'Enable sound' : 'Disable sound'}
             >
-              {isMuted ? '🔇 Mute' : '🔊 Sound'}
+              {isMuted ? 'Mute' : 'Sound'}
             </button>
 
             {/* Help Button */}
@@ -221,7 +224,7 @@ export function PlaytestGameEnhanced({
               title="Show keyboard shortcuts (Press ?)"
               aria-label="Show help"
             >
-              ⌨️ Help
+              Help
             </button>
 
             {/* Undo/Redo Buttons (Phase 2) */}
@@ -289,11 +292,17 @@ export function PlaytestGameEnhanced({
             playerState={playerState}
             opponentState={opponentState}
             isPlayerTurn={isPlayerTurn}
+            gamePhase={gameState.phase}
+            cardDatabase={cardDatabase}
+            selectedCard={selectedCard}
             gameLog={engine.getLog().slice(-20)}
             onUnitSelected={(unit, isOpponent) => {
               if (!isOpponent) {
                 setSelectedCard(unit);
               }
+            }}
+            onSelectCard={(card) => {
+              setSelectedCard(card);
             }}
             onCardPlayRequested={(card) => {
               handleAction({
@@ -321,7 +330,7 @@ export function PlaytestGameEnhanced({
       {/* Error Toast (Phase 3: Visual Feedback) */}
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
