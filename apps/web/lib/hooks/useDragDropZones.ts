@@ -24,8 +24,8 @@ export interface ZoneRules {
 const ZONE_RULES: ZoneRules = {
   shields: {
     allowedCardTypes: ['Unit', 'Support', 'Modifier'],
-    maxCards: 5,
-    description: 'Shield Zone - Max 5 shields',
+    maxCards: 6,
+    description: 'Shield Zone - Max 6 shields',
   },
   base: {
     allowedCardTypes: ['Base'],

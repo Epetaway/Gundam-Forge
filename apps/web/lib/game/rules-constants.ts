@@ -12,9 +12,9 @@
  */
 export const DECK_RULES = {
   // Main deck size (exact)
-  mainDeckSize: 60,
-  minMainDeckSize: 60,
-  maxMainDeckSize: 60,
+  mainDeckSize: 50,
+  minMainDeckSize: 50,
+  maxMainDeckSize: 50,
 
   // Resource deck size (exact)
   resourceDeckSize: 0, // Gundam TCG uses main deck only (no dedicated resource deck)
@@ -63,7 +63,7 @@ export const PHASE_SEQUENCE = [
   'main',    // Phase 3: Play cards, activate abilities, declare attacks
   'action',  // Phase 3b: Action window (optional, some card effects)
   'battle',  // Phase 3c: Battle resolution (sub-phase of main)
-  'end',     // Phase 4: Discard down to 7, resolve end-of-turn effects
+  'end',     // Phase 4: Discard down to 10, resolve end-of-turn effects
 ] as const;
 
 export type GamePhase = (typeof PHASE_SEQUENCE)[number];
@@ -108,7 +108,7 @@ export const PHASE_RULES = {
   },
   end: {
     name: 'End Phase',
-    actions: ['discard down to 7', 'resolve end-of-turn effects'],
+    actions: ['discard down to 10', 'resolve end-of-turn effects'],
     allowedActions: ['ADVANCE_PHASE'] as const,
   },
 } as const;
@@ -153,7 +153,7 @@ export const COMBAT_RULES = {
  */
 export const SHIELD_RULES = {
   // Shield count at start
-  startingShields: 5,
+  startingShields: 6,
 
   // Shields are face-down (hidden until destroyed)
   shieldsFaceDown: true,
@@ -212,7 +212,7 @@ export const WIN_CONDITIONS = {
  * VALIDATION ERRORS
  */
 export const VALIDATION_ERRORS = {
-  DECK_SIZE_INVALID: 'Deck must be exactly 60 cards',
+  DECK_SIZE_INVALID: 'Deck must be exactly 50 cards',
   COPY_LIMIT_EXCEEDED: 'Cannot exceed 3 copies of any card',
   CARD_NOT_FOUND: 'Card not found in database',
   IMAGE_URL_MISSING: 'Card image URL is missing - cannot display card',

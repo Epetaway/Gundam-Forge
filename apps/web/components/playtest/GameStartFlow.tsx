@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, ShuffleIcon, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/Dialog';
+import { MulliganModal as SharedMulliganModal } from './MulliganModal';
 import type { CardInstance } from '@/lib/game/game-engine';
 
 export type GameStartPhase = 'coinFlip' | 'shuffle' | 'draw' | 'mulligan' | 'shields' | 'ready';
@@ -59,7 +60,6 @@ export function GameStartFlow({
   disableAnimations = false,
 }: GameStartFlowProps) {
   const [coinResult, setCoinResult] = useState<'heads' | 'tails' | null>(null);
-  const [selectedMulliganCards, setSelectedMulliganCards] = useState<Set<number>>(new Set());
   const [gameStarted, setGameStarted] = useState(false);
 
   return (
@@ -100,25 +100,12 @@ export function GameStartFlow({
 
         {/* PHASE 4: Mulligan Option */}
         {phase === 'mulligan' && (
-          <MulliganModal
+          <SharedMulliganModal
             key="mulligan"
-            handCards={handCards}
+            hand={handCards}
             cardDatabase={cardDatabase}
-            selectedCards={selectedMulliganCards}
-            onSelectCard={(index) => {
-              const newSet = new Set(selectedMulliganCards);
-              if (newSet.has(index)) {
-                newSet.delete(index);
-              } else {
-                newSet.add(index);
-              }
-              setSelectedMulliganCards(newSet);
-            }}
-            onConfirm={() => {
-              onMulliganCards?.(Array.from(selectedMulliganCards));
-              setSelectedMulliganCards(new Set());
-            }}
-            onSkip={() => onMulliganSkip?.()}
+            onMulliganAccept={() => onMulliganCards?.(handCards.map((_, index) => index))}
+            onMulliganReject={() => onMulliganSkip?.()}
           />
         )}
 
@@ -405,93 +392,6 @@ function DrawPhaseModal({
         </p>
       </div>
     </motion.div>
-  );
-}
-
-/**
- * Mulligan Modal
- */
-function MulliganModal({
-  handCards,
-  cardDatabase,
-  selectedCards,
-  onSelectCard,
-  onConfirm,
-  onSkip,
-}: {
-  handCards: CardInstance[];
-  cardDatabase: Record<string, any>;
-  selectedCards: Set<number>;
-  onSelectCard: (index: number) => void;
-  onConfirm: () => void;
-  onSkip: () => void;
-}) {
-  return (
-    <Dialog open={true}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Mulligan Option</DialogTitle>
-          <DialogDescription>
-            Select cards to put back (shuffle back into deck and redraw). Leave blank to keep opening hand.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid grid-cols-7 gap-3 my-6">
-          {handCards.map((card, index) => {
-            const cardData = cardDatabase[card.cardId];
-            const isSelected = selectedCards.has(index);
-
-            return (
-              <motion.button
-                key={index}
-                onClick={() => onSelectCard(index)}
-                className={`aspect-[5/7] rounded-lg overflow-hidden border-2 transition-all ${
-                  isSelected
-                    ? 'border-red-500 ring-2 ring-red-400 scale-105'
-                    : 'border-slate-600 hover:border-slate-400'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {cardData ? (
-                  <img
-                    src={cardData.imageUrl || cardData.placeholderArt}
-                    alt={cardData.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-slate-700 flex items-center justify-center text-slate-400">
-                    ?
-                  </div>
-                )}
-                {isSelected && (
-                  <div className="absolute inset-0 bg-red-500/30 flex items-center justify-center">
-                    <span className="text-white font-bold">×</span>
-                  </div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-
-        <div className="flex gap-3">
-          <Button
-            onClick={onSkip}
-            variant="secondary"
-            className="flex-1"
-          >
-            Keep Hand
-          </Button>
-          <Button
-            onClick={onConfirm}
-            disabled={selectedCards.size === 0}
-            className="flex-1"
-          >
-            Mulligan {selectedCards.size} Card{selectedCards.size !== 1 ? 's' : ''}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 

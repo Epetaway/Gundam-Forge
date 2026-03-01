@@ -36,18 +36,21 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
     // CRITICAL: Execute DRAW actions during draw phase (step 1)
     if (currentStep === 1) {
       setIsAnimating(true);
+
+      // Must advance to draw phase first (game starts in setup phase)
+      if (engine.getState().phase === 'setup') {
+        engine.executeAction({
+          type: 'ADVANCE_PHASE',
+          playerId: 'player1',
+          timestamp: Date.now(),
+        });
+      }
       
       // Official 2025 Gundam TCG: Draw 5 cards for opening hand
       for (let i = 0; i < 5; i++) {
         engine.executeAction({
           type: 'DRAW',
           playerId: 'player1',
-          timestamp: Date.now(),
-        });
-        // Also draw for opponent (auto-player)
-        engine.executeAction({
-          type: 'DRAW',
-          playerId: 'player2',
           timestamp: Date.now(),
         });
       }
@@ -85,12 +88,17 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
 
   const handleMulliganAccept = () => {
     setMulliganInProgress(true);
-    const player1 = engine.getState().players['player1'];
-    engine.executeAction({
+    const result = engine.executeAction({
       type: 'MULLIGAN',
       playerId: 'player1',
       timestamp: Date.now(),
     });
+
+    if (!result.valid) {
+      setMulliganInProgress(false);
+      onError(result.error || 'Mulligan failed');
+      return;
+    }
 
     setTimeout(() => {
       setShowMulliganModal(false);

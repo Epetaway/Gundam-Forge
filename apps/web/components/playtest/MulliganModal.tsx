@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { CardInstance } from '@/lib/game/game-engine';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { SETUP_RULES } from '@/lib/game/rules-constants';
 
 interface MulliganModalProps {
   hand: CardInstance[];
@@ -26,14 +27,15 @@ export function MulliganModal({
 }: MulliganModalProps) {
   const [choice, setChoice] = useState<'keep' | 'mulligan' | null>(null);
 
-  const handleKeep = () => {
-    setChoice('keep');
-    setTimeout(() => onMulliganReject(), 500);
-  };
+  const handleConfirm = () => {
+    if (choice === 'keep') {
+      onMulliganReject();
+      return;
+    }
 
-  const handleMulligan = () => {
-    setChoice('mulligan');
-    setTimeout(() => onMulliganAccept(), 500);
+    if (choice === 'mulligan') {
+      onMulliganAccept();
+    }
   };
 
   return (
@@ -94,43 +96,60 @@ export function MulliganModal({
           <div className="p-4 bg-slate-700/50 rounded border border-slate-600">
             <div className="text-sm font-semibold text-slate-300 mb-2">Mulligan (Redraw)</div>
             <p className="text-xs text-slate-400">
-              Shuffle all cards back into your deck and draw 5 new cards. This is your only mulligan.
+              Shuffle all cards back into your deck and draw {SETUP_RULES.openingHandSize} new cards. This is your only mulligan.
             </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Selection Buttons */}
         <div className="flex gap-4">
           <button
-            onClick={handleKeep}
-            disabled={isLoading || choice !== null}
+            onClick={() => setChoice('keep')}
+            disabled={isLoading}
             className={`flex-1 py-3 px-4 rounded font-semibold transition ${
-              choice === 'keep' || isLoading
+              choice === 'keep'
                 ? 'bg-green-600 text-white'
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600 border border-slate-600'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            {choice === 'keep' && isLoading ? 'Keeping hand...' : 'Keep This Hand'}
+            Keep This Hand
           </button>
 
           <button
-            onClick={handleMulligan}
-            disabled={isLoading || choice !== null}
+            onClick={() => setChoice('mulligan')}
+            disabled={isLoading}
             className={`flex-1 py-3 px-4 rounded font-semibold transition ${
-              choice === 'mulligan' || isLoading
+              choice === 'mulligan'
                 ? 'bg-purple-600 text-white'
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600 border border-slate-600'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            {choice === 'mulligan' && isLoading ? 'Redrawing hand...' : 'Mulligan (Redraw)'}
+            Mulligan (Redraw)
+          </button>
+        </div>
+
+        {/* Confirm Action */}
+        <div className="mt-4">
+          <button
+            onClick={handleConfirm}
+            disabled={isLoading || choice === null}
+            className="w-full py-3 px-4 rounded font-semibold transition bg-cobalt-600 text-white hover:bg-cobalt-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading
+              ? 'Applying choice...'
+              : choice === 'mulligan'
+                ? `Confirm Mulligan (${SETUP_RULES.openingHandSize} card redraw)`
+                : choice === 'keep'
+                  ? 'Confirm Keep Hand'
+                  : 'Choose an option to continue'}
           </button>
         </div>
 
         {/* Rules Reference */}
         <div className="mt-8 pt-6 border-t border-slate-700">
           <p className="text-xs text-slate-500">
-            Official Mulligan Rule: Each player may mulligan (redraw) their opening hand once.
-            Mulligan is performed by shuffling all 5 cards back into your deck and drawing 5 new cards.
+            Official Mulligan Rule: Each player may mulligan their opening hand only once.
+            A mulligan reshuffles the entire opening hand and redraws {SETUP_RULES.openingHandSize} cards.
           </p>
         </div>
       </div>
