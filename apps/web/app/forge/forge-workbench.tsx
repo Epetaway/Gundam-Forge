@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search } from 'lucide-react';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -97,52 +97,306 @@ interface ValidationBarProps {
 function ValidationBar({ entries, allCards }: ValidationBarProps) {
   const result = React.useMemo(() => validateDeck(entries, allCards), [entries, allCards]);
   const { metrics, errors, warnings, isValid } = result;
+  const [issuesOpen, setIssuesOpen] = React.useState(false);
 
   const mainPct = Math.min((metrics.mainDeckCards / 50) * 100, 100);
-  const resPct = Math.min((metrics.resourceDeckCards / 10) * 100, 100);
+  const resPct  = Math.min((metrics.resourceDeckCards / 10) * 100, 100);
+  const issueCount = errors.length + warnings.length;
 
   return (
-    <div
-      className="flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-4 py-2 text-xs"
-      role="status"
-      aria-label="Deck validation status"
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-steel-600">Main:</span>
-        <div className="h-1.5 w-14 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
-          <div
-            className={cn('h-full rounded-full transition-all', metrics.mainDeckCards === 50 ? 'bg-green-500' : 'bg-cobalt-500')}
-            style={{ width: `${mainPct}%` }}
-          />
+    <>
+      {/*
+       * Compact single-row bar: progress chips + issues/valid pill.
+       * Errors are NOT shown inline; they open a bottom sheet to save vertical space.
+       */}
+      <div
+        className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-surface/80 px-3 py-1.5 text-xs"
+        role="status"
+        aria-label="Deck validation status"
+      >
+        {/* Main deck progress */}
+        <div className="flex items-center gap-1.5">
+          <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
+            <div
+              className={cn('h-full rounded-full transition-all', metrics.mainDeckCards === 50 ? 'bg-green-500' : 'bg-cobalt-500')}
+              style={{ width: `${mainPct}%` }}
+            />
+          </div>
+          <span className={cn('font-mono font-semibold tabular-nums', metrics.mainDeckCards === 50 ? 'text-green-400' : 'text-cobalt-300')}>
+            {metrics.mainDeckCards}/50
+          </span>
         </div>
-        <span className={cn('font-mono font-semibold tabular-nums', metrics.mainDeckCards === 50 ? 'text-green-400' : 'text-cobalt-300')}>
-          {metrics.mainDeckCards}/50
-        </span>
+
+        <span className="text-steel-700" aria-hidden="true">·</span>
+
+        {/* Resource deck progress */}
+        <div className="flex items-center gap-1.5">
+          <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
+            <div
+              className={cn('h-full rounded-full transition-all', metrics.resourceDeckCards === 10 ? 'bg-green-500' : 'bg-cobalt-500')}
+              style={{ width: `${resPct}%` }}
+            />
+          </div>
+          <span className={cn('font-mono font-semibold tabular-nums', metrics.resourceDeckCards === 10 ? 'text-green-400' : 'text-cobalt-300')}>
+            {metrics.resourceDeckCards}/10
+          </span>
+        </div>
+
+        {/* Issues button / valid badge */}
+        <div className="ml-auto flex items-center">
+          {issueCount > 0 ? (
+            <button
+              type="button"
+              className="rounded bg-red-500/10 px-2 py-0.5 text-red-400 transition-colors hover:bg-red-500/20"
+              onClick={() => setIssuesOpen(true)}
+              aria-label={`${issueCount} deck issue${issueCount !== 1 ? 's' : ''}. Tap to view.`}
+            >
+              Issues ({issueCount})
+            </button>
+          ) : isValid ? (
+            <span className="rounded bg-green-500/10 px-2 py-0.5 font-semibold text-green-400">✓ Valid</span>
+          ) : null}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-steel-600">Resource:</span>
-        <div className="h-1.5 w-14 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
-          <div
-            className={cn('h-full rounded-full transition-all', metrics.resourceDeckCards === 10 ? 'bg-green-500' : 'bg-cobalt-500')}
-            style={{ width: `${resPct}%` }}
-          />
+      {/* Issues bottom sheet */}
+      {issuesOpen && (
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="issues-sheet-title"
+        >
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIssuesOpen(false)} aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 rounded-t-xl bg-surface px-4 pb-[env(safe-area-inset-bottom,16px)] pt-4 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 id="issues-sheet-title" className="text-sm font-semibold">Deck Issues</h2>
+              <button
+                type="button"
+                className="rounded p-1 text-steel-500 hover:bg-surface-interactive"
+                onClick={() => setIssuesOpen(false)}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+            <ul className="space-y-1 pb-2" role="list">
+              {errors.map((e) => (
+                <li key={e} className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-400">{e}</li>
+              ))}
+              {warnings.map((w) => (
+                <li key={w} className="rounded bg-amber-500/10 px-3 py-2 text-sm text-amber-300">{w}</li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <span className={cn('font-mono font-semibold tabular-nums', metrics.resourceDeckCards === 10 ? 'text-green-400' : 'text-cobalt-300')}>
-          {metrics.resourceDeckCards}/10
-        </span>
-      </div>
-
-      {errors.slice(0, 2).map((err) => (
-        <span className="rounded bg-red-500/10 px-2 py-0.5 text-red-400" key={err}>{err}</span>
-      ))}
-      {!errors.length && warnings.slice(0, 1).map((w) => (
-        <span className="rounded bg-amber-500/10 px-2 py-0.5 text-amber-300" key={w}>{w}</span>
-      ))}
-      {isValid && (
-        <span className="rounded bg-green-500/10 px-2 py-0.5 font-semibold text-green-400">✓ Valid</span>
       )}
-    </div>
+    </>
+  );
+}
+
+// ---------- mobile toolbar ----------
+// Replaces the separate mobile action bar + DeckToolbar on small screens.
+// Single compact row: Cards | view tabs | search icon | ⋮ (options sheet)
+
+interface MobileToolbarProps {
+  onCardsOpen: () => void;
+  onImportOpen: () => void;
+  viewMode: DeckViewMode;
+  onViewModeChange: (m: DeckViewMode) => void;
+  query: string;
+  onQueryChange: (q: string) => void;
+  sortBy: DeckSortKey;
+  onSortByChange: (k: DeckSortKey) => void;
+  density: DeckDensity;
+  onDensityChange: (d: DeckDensity) => void;
+}
+
+function MobileToolbar({
+  onCardsOpen,
+  onImportOpen,
+  viewMode,
+  onViewModeChange,
+  query,
+  onQueryChange,
+  sortBy,
+  onSortByChange,
+  density,
+  onDensityChange,
+}: MobileToolbarProps): JSX.Element {
+  const [optionsOpen, setOptionsOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen]   = React.useState(false);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  const mobileViews = VIEW_REGISTRY.filter((v) => v.id !== 'table');
+
+  // Focus the search input when it opens
+  React.useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  return (
+    <>
+      {/* ── Compact single row ── */}
+      <div className="flex md:hidden flex-shrink-0 items-center gap-1.5 border-b border-border bg-surface px-2 py-1.5">
+        {/* Open catalog drawer */}
+        <button
+          type="button"
+          className="rounded bg-cobalt-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-cobalt-500"
+          onClick={onCardsOpen}
+          aria-label="Open card catalog"
+        >
+          Cards
+        </button>
+
+        {/* View mode tabs — icon-only on mobile */}
+        <div className="inline-flex items-center rounded border border-border bg-surface-interactive p-0.5">
+          {mobileViews.map((view) => {
+            const Icon = view.icon;
+            return (
+              <button
+                key={view.id}
+                type="button"
+                className={cn(
+                  'flex items-center rounded p-1.5 transition-colors',
+                  viewMode === view.id ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                )}
+                onClick={() => onViewModeChange(view.id)}
+                aria-label={view.label}
+                aria-pressed={viewMode === view.id}
+                title={view.label}
+              >
+                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search toggle — highlights when active */}
+        <button
+          type="button"
+          className={cn(
+            'rounded p-1.5 transition-colors',
+            searchOpen || query ? 'bg-cobalt-600/20 text-cobalt-400' : 'text-steel-600 hover:text-foreground',
+          )}
+          onClick={() => setSearchOpen((v) => !v)}
+          aria-label="Search deck"
+          aria-pressed={searchOpen}
+        >
+          <Search className="h-4 w-4" aria-hidden="true" />
+        </button>
+
+        {/* View options overflow — opens bottom sheet */}
+        <button
+          type="button"
+          className="ml-auto rounded border border-border bg-surface-interactive p-1.5 text-steel-600 transition-colors hover:text-foreground"
+          onClick={() => setOptionsOpen(true)}
+          aria-label="View options"
+          title="Sort, density, import"
+        >
+          <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* ── Inline search expand ── */}
+      {searchOpen && (
+        <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-2 py-1.5">
+          <label className="relative flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" aria-hidden="true" />
+            <input
+              ref={searchInputRef}
+              className="h-8 w-full rounded border border-border bg-surface-interactive pl-8 pr-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+              placeholder="Search this deck…"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              aria-label="Search this deck"
+            />
+          </label>
+          {query && (
+            <button
+              type="button"
+              className="shrink-0 text-steel-600 hover:text-foreground"
+              onClick={() => onQueryChange('')}
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── View options bottom sheet ── */}
+      {optionsOpen && (
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="view-options-title"
+        >
+          <div className="absolute inset-0 bg-black/50" onClick={() => setOptionsOpen(false)} aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 rounded-t-xl bg-surface px-4 pb-[env(safe-area-inset-bottom,16px)] pt-4 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 id="view-options-title" className="text-sm font-semibold">View Options</h2>
+              <button
+                type="button"
+                className="rounded p-1 text-steel-500 hover:bg-surface-interactive"
+                onClick={() => setOptionsOpen(false)}
+                aria-label="Close view options"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="space-y-4 pb-2">
+              {/* Sort */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">Sort by</span>
+                <select
+                  className="rounded border border-border bg-surface-interactive px-2 py-1.5 text-sm outline-none focus-visible:border-ring"
+                  value={sortBy}
+                  onChange={(e) => onSortByChange(e.target.value as DeckSortKey)}
+                  aria-label="Sort cards"
+                >
+                  <option value="name">Name</option>
+                  <option value="cost">Cost</option>
+                  <option value="type">Type</option>
+                </select>
+              </div>
+
+              {/* Density */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">Density</span>
+                <div className="inline-flex rounded border border-border bg-surface-interactive p-0.5">
+                  {(['comfortable', 'compact'] as const).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      className={cn(
+                        'rounded px-2.5 py-1 text-xs font-semibold capitalize transition-colors',
+                        density === d ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                      )}
+                      onClick={() => onDensityChange(d)}
+                      aria-pressed={density === d}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Import */}
+              <button
+                type="button"
+                className="w-full rounded border border-border bg-surface-interactive py-2.5 text-sm text-steel-600 transition-colors hover:text-foreground"
+                onClick={() => { setOptionsOpen(false); onImportOpen(); }}
+              >
+                Import Deck
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -206,7 +460,7 @@ function DeckSettingsBar({
       <div className="flex items-center gap-3 px-4 py-1.5">
         <button
           type="button"
-          className="flex items-center gap-1.5 text-xs text-steel-500 hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-xs text-steel-500 transition-colors hover:text-foreground"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="deck-settings-panel"
@@ -215,7 +469,7 @@ function DeckSettingsBar({
           <Settings className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="max-w-[180px] truncate font-semibold text-foreground">{name}</span>
           {archetype && <span className="text-steel-500">· {archetype}</span>}
-          {setId && <span className="text-steel-500 hidden sm:inline">· {setId}</span>}
+          {setId && <span className="hidden text-steel-500 sm:inline">· {setId}</span>}
         </button>
 
         {/* Color pills (read-only in collapsed view) */}
@@ -238,7 +492,7 @@ function DeckSettingsBar({
         <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
-            className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 hover:text-foreground transition-colors"
+            className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 transition-colors hover:text-foreground"
             onClick={onExport}
             aria-label="Export deck list as text"
             title="Export deck list"
@@ -257,7 +511,7 @@ function DeckSettingsBar({
         >
           <div className="flex flex-wrap items-start gap-4">
             {/* Name */}
-            <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex min-w-0 flex-col gap-1">
               <label className="text-xs font-semibold text-steel-500" htmlFor="deck-name-input">Name</label>
               <input
                 id="deck-name-input"
@@ -285,9 +539,9 @@ function DeckSettingsBar({
                       key={value}
                       type="button"
                       className={cn(
-                        'h-6 w-6 rounded-full text-[10px] font-bold border transition-all',
+                        'h-6 w-6 rounded-full border text-[10px] font-bold transition-all',
                         active ? cn(cls, 'ring-2 ring-cobalt-400/60') : 'border-border bg-surface-interactive text-steel-600 hover:border-cobalt-400/40',
-                        atMax ? 'opacity-40 cursor-not-allowed' : '',
+                        atMax ? 'cursor-not-allowed opacity-40' : '',
                       )}
                       onClick={() => !atMax && handleColorToggle(value)}
                       disabled={atMax}
@@ -337,7 +591,7 @@ function DeckSettingsBar({
 
             <button
               type="button"
-              className="mt-auto ml-auto self-end rounded border border-border px-2 py-0.5 text-xs text-steel-500 hover:text-foreground"
+              className="ml-auto mt-auto self-end rounded border border-border px-2 py-0.5 text-xs text-steel-500 hover:text-foreground"
               onClick={() => setOpen(false)}
               aria-label="Close deck settings"
             >
@@ -390,7 +644,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
           </button>
         </div>
 
-        <div className="px-4 py-3 space-y-3">
+        <div className="space-y-3 px-4 py-3">
           {/* Format help */}
           <details className="text-xs text-steel-600">
             <summary className="cursor-pointer font-medium text-cobalt-400 hover:text-cobalt-300">
@@ -405,7 +659,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
             <label htmlFor="deck-import-textarea" className="sr-only">Paste deck list</label>
             <textarea
               id="deck-import-textarea"
-              className="w-full h-36 rounded border border-border bg-surface-interactive px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+              className="h-36 w-full rounded border border-border bg-surface-interactive px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
               placeholder={`4 Gundam\n3 Amuro Ray\n2 Mega Particle Cannon\n...`}
               value={text}
               onChange={(e) => { setText(e.target.value); setResult(null); }}
@@ -434,7 +688,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
           <div className="flex gap-2">
             <button
               type="button"
-              className="flex-1 rounded bg-cobalt-600 py-2 text-sm font-semibold text-white hover:bg-cobalt-500 disabled:opacity-50 transition-colors"
+              className="flex-1 rounded bg-cobalt-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-cobalt-500 disabled:opacity-50"
               onClick={handleImport}
               disabled={!text.trim()}
             >
@@ -443,7 +697,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
             {result && result.notFound.length > 0 && (
               <button
                 type="button"
-                className="rounded border border-border px-3 py-2 text-sm text-steel-600 hover:text-foreground transition-colors"
+                className="rounded border border-border px-3 py-2 text-sm text-steel-600 transition-colors hover:text-foreground"
                 onClick={onClose}
               >
                 Continue anyway
@@ -635,57 +889,120 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [desktopPanelOpen, setDesktopPanelOpen] = useLocalStorageState('gundam-forge.forge.desktopPanelOpen', true);
 
+  // Scroll-lock: prevent page scroll (and any horizontal drift) while the catalog overlay is open.
+  React.useEffect(() => {
+    if (!sidebarOpen) return;
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const html = document.documentElement;
+    body.style.overflow = 'hidden';
+    html.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+    return () => {
+      body.style.overflow = '';
+      html.style.overflow = '';
+      body.style.position = '';
+      body.style.top = '';
+      body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, [sidebarOpen]);
+
   if (!mounted) return null;
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden relative min-w-0">
+    <div className="relative flex h-[calc(100vh-4rem)] min-w-0 overflow-hidden">
       {/* Desktop sidebar collapse toggle — thin strip, hidden on mobile */}
       <button
         type="button"
-        className="hidden md:flex items-center justify-center w-5 flex-shrink-0 border-r border-border bg-surface hover:bg-surface-interactive text-steel-500 hover:text-foreground transition-colors"
+        className="hidden w-5 flex-shrink-0 items-center justify-center border-r border-border bg-surface text-steel-500 transition-colors hover:bg-surface-interactive hover:text-foreground md:flex"
         onClick={() => setDesktopPanelOpen((v: boolean) => !v)}
         aria-label={desktopPanelOpen ? 'Collapse card search panel' : 'Expand card search panel'}
         title={desktopPanelOpen ? 'Collapse' : 'Expand'}
       >
-        <span aria-hidden="true" className="text-xs leading-none select-none">
+        <span aria-hidden="true" className="select-none text-xs leading-none">
           {desktopPanelOpen ? '‹' : '›'}
         </span>
       </button>
 
-      {/* Card search sidebar */}
-      <div
-        className={cn(
-          // Mobile: full-screen overlay when sidebarOpen, otherwise hidden
-          sidebarOpen ? 'fixed inset-0 z-30 flex' : 'hidden',
-          // Desktop: respect desktopPanelOpen
-          desktopPanelOpen ? 'md:flex md:static md:inset-auto md:z-auto md:relative' : 'md:hidden',
-        )}
-      >
-        {/* Mobile overlay backdrop */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-10 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-            aria-hidden="true"
-          />
-        )}
-        <div className="relative z-20 md:z-auto w-80 max-w-full min-w-0 h-full">
+      {/*
+       * Desktop persistent sidebar — always visible on md+, collapsible via the toggle strip.
+       */}
+      {desktopPanelOpen && (
+        <div className="hidden md:flex md:h-full md:w-72 md:flex-shrink-0 md:flex-col">
           <CardSearchPanel
-            onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}
+            onSelect={(cardId) => handleAdd(cardId)}
             deckColors={deckMeta.colors}
             initialSetId={deckMeta.setId}
           />
-          {/* Mobile: close button inside sidebar */}
-          <button
-            type="button"
-            className="absolute top-2 right-2 md:hidden rounded bg-surface-interactive px-2 py-1 text-xs text-steel-700"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close card search panel"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
         </div>
-      </div>
+      )}
+
+      {/*
+       * Card catalog overlay modal.
+       * Mobile  : slide-up bottom sheet (h-[92dvh], rounded-t-xl)
+       * Desktop : centered modal (min(820px,90vh) × min(1100px,92vw), rounded-xl)
+       * Opened by the "Cards" button in MobileToolbar (mobile) or the desktop toolbar (collapsed).
+       */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end overflow-hidden md:items-center md:justify-center"
+          style={{ width: '100dvw', height: '100dvh' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Card Catalog"
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Sheet — mobile: bottom sheet | desktop: centered modal */}
+          <div
+            className="relative z-10 flex flex-col overflow-hidden rounded-t-xl bg-surface shadow-2xl md:rounded-xl"
+            style={{
+              width: '100dvw',
+              maxWidth: '100dvw',
+              maxHeight: '100dvh',
+              padding: '0.5rem',
+              alignItems: 'center',
+            }}
+          >
+            {/* Header — fixed 56px */}
+            <div className="flex h-14 flex-shrink-0 items-center justify-between border-b border-border px-3" style={{
+              width: '100dvw',
+              maxWidth: '100dvvw',
+            }}>
+              <div className="h-1 w-8 rounded-full bg-border md:hidden" aria-hidden="true" />
+              <span className="text-sm font-semibold">Card Catalog</span>
+              <button
+                type="button"
+                className="rounded p-1 text-steel-500 hover:bg-surface-interactive"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close card catalog"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Body — fills remaining height, scrolls vertically only */}
+            <div
+              className="flex flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
+              style={{ maxWidth: '100dvw' }}
+            >
+              <CardSearchPanel
+                onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}
+                deckColors={deckMeta.colors}
+                initialSetId={deckMeta.setId}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Import modal */}
       {importOpen && (
@@ -716,7 +1033,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       )}
 
       {/* Main deck area */}
-      <main className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Deck settings bar */}
         <DeckSettingsBar
           deckId={deckId}
@@ -731,38 +1048,29 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           onExport={handleExport}
         />
 
-        {/* Mobile action bar — replaces absolute positioned buttons */}
-        <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-3 py-1.5">
-          <button
-            type="button"
-            className="rounded bg-cobalt-600 px-3 py-1 text-xs font-semibold text-white hover:bg-cobalt-500 transition-colors"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open card search panel"
-            aria-expanded={sidebarOpen}
-          >
-            Cards
-          </button>
-          <button
-            type="button"
-            className="ml-auto rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 hover:text-foreground transition-colors"
-            onClick={() => setImportOpen(true)}
-            aria-label="Import deck list"
-          >
-            Import Deck
-          </button>
-        </div>
+        {/* Validation bar (compact, single row) */}
+        <ValidationBar
+          entries={Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }))}
+          allCards={allCards as CardDefinition[]}
+        />
 
-        {/* Import button (desktop — inside main area header) */}
-        <div className="hidden md:flex flex-shrink-0 items-center justify-end border-b border-border px-4 py-1">
-          <button
-            type="button"
-            className="rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 hover:bg-surface hover:text-foreground transition-colors"
-            onClick={() => setImportOpen(true)}
-            aria-label="Import deck list"
-          >
-            Import Deck
-          </button>
-        </div>
+        {/*
+         * Mobile toolbar — single compact row replacing the old mobile action bar.
+         * Visible only on mobile (md:hidden).
+         * Desktop keeps the DeckToolbar below.
+         */}
+        <MobileToolbar
+          onCardsOpen={() => setSidebarOpen(true)}
+          onImportOpen={() => setImportOpen(true)}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          query={query}
+          onQueryChange={setQuery}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+          density={density}
+          onDensityChange={setDensity}
+        />
 
         {/* Pending import results banner (from deck-creation flow) */}
         {importResults && (
@@ -781,24 +1089,41 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           </div>
         )}
 
-        <ValidationBar
-          entries={Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }))}
-          allCards={allCards as CardDefinition[]}
-        />
-
-        {/* Toolbar */}
-        <div className="flex-none border-b border-border px-4">
-          <DeckToolbar
-            views={VIEW_REGISTRY.filter((v) => v.id !== 'table')}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            query={query}
-            onQueryChange={setQuery}
-            sortBy={sortBy}
-            onSortByChange={setSortBy}
-            density={density}
-            onDensityChange={setDensity}
-          />
+        {/* Desktop: cards + import buttons + full toolbar */}
+        <div className="hidden flex-shrink-0 flex-col md:flex">
+          <div className="flex items-center justify-end gap-2 border-b border-border px-4 py-1">
+            {!desktopPanelOpen && (
+              <button
+                type="button"
+                className="rounded border border-cobalt-600 bg-cobalt-600/10 px-3 py-1 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open card catalog"
+              >
+                Cards
+              </button>
+            )}
+            <button
+              type="button"
+              className="rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
+              onClick={() => setImportOpen(true)}
+              aria-label="Import deck list"
+            >
+              Import Deck
+            </button>
+          </div>
+          <div className="flex-none px-4">
+            <DeckToolbar
+              views={VIEW_REGISTRY.filter((v) => v.id !== 'table')}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              query={query}
+              onQueryChange={setQuery}
+              sortBy={sortBy}
+              onSortByChange={setSortBy}
+              density={density}
+              onDensityChange={setDensity}
+            />
+          </div>
         </div>
 
         {/* Scrollable deck list */}
@@ -809,7 +1134,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
                 <>
                   <p className="mb-1 text-sm text-steel-600">Your deck is empty.</p>
                   <p className="text-xs text-steel-700">
-                    Use the card catalog on the left to add cards, or click{' '}
+                    Use the card catalog on the left to add cards, or tap{' '}
                     <button
                       type="button"
                       className="text-cobalt-400 underline hover:text-cobalt-300"

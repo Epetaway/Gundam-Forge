@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 
 const CARD_TYPES = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
@@ -17,7 +21,8 @@ function isExCard(card: { id: string }): boolean {
   return card.id.startsWith('EXB') || card.id.startsWith('EXR');
 }
 
-const PAGE_SIZE = 40;
+// Number of cards shown per swiper slide (2 columns × 2 rows)
+const SLIDE_SIZE = 4;
 
 export interface CardSearchPanelProps {
   onSelect: (id: string) => void;
@@ -36,7 +41,6 @@ export function CardSearchPanel({ onSelect, deckColors = [], initialSetId }: Car
     if (initialSetId && SETS_LIST.includes(initialSetId)) return initialSetId;
     return 'All';
   });
-  const [page, setPage] = useState(0);
   // When true, restrict to deckColors (+ Colorless) only.
   const [deckColorOnly, setDeckColorOnly] = useState(false);
   // When true, include EX cards in results.
@@ -73,21 +77,27 @@ export function CardSearchPanel({ onSelect, deckColors = [], initialSetId }: Car
     });
   }, [query, typeFilter, colorFilter, setFilter, deckColorOnly, deckColors, includeEX]);
 
-  // Reset page when filters change
-  React.useEffect(() => {
-    setPage(0);
-  }, [query, typeFilter, colorFilter, setFilter, deckColorOnly, includeEX]);
+  // Group filtered results into slides of SLIDE_SIZE cards each
+  const slides = useMemo(() => {
+    const result: (typeof filtered)[] = [];
+    for (let i = 0; i < filtered.length; i += SLIDE_SIZE) {
+      result.push(filtered.slice(i, i + SLIDE_SIZE));
+    }
+    return result;
+  }, [filtered]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const visible = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  // Build a key from all active filters — forces Swiper to remount and reset to slide 0
+  // whenever any filter changes.
+  const filterKey = `${query}|${typeFilter}|${colorFilter}|${setFilter}|${deckColorOnly}|${includeEX}`;
 
   return (
     <aside
-      className="flex h-full w-72 flex-shrink-0 flex-col overflow-hidden border-r border-border bg-surface-elevated"
+      className="flex h-full w-full max-w-full flex-shrink-0 flex-col overflow-hidden border-r border-border bg-surface-elevated"
+      style={{ minWidth: 0 }}
       aria-label="Card search panel"
     >
       {/* Search + filters */}
-      <div className="flex-shrink-0 space-y-2 border-b border-border p-3">
+      <div className="flex-shrink-0 space-y-2 overflow-x-hidden border-b border-border p-3" style={{ maxWidth: '100%' }}>
         <label className="sr-only" htmlFor="card-search-input">Search cards</label>
         <input
           id="card-search-input"
@@ -196,67 +206,46 @@ export function CardSearchPanel({ onSelect, deckColors = [], initialSetId }: Car
         </p>
       </div>
 
-      {/* Card list */}
-      <div className="flex-1 overflow-y-auto" role="list" aria-label="Card results">
-        {visible.length === 0 ? (
+      {/* Card grid swiper */}
+      <div className="flex-1 min-h-0 overflow-hidden" style={{ minWidth: 0 }} aria-label="Card results">
+        {slides.length === 0 ? (
           <p className="p-4 text-center text-xs text-steel-600">
             No cards match your filters.
           </p>
         ) : (
-          visible.map((card) => (
-            <button
-              key={card.id}
-              type="button"
-              role="listitem"
-              className="flex w-full cursor-pointer items-center gap-2 border-b border-border/50 p-2 text-left transition-colors hover:bg-surface-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cobalt-500"
-              onClick={() => onSelect(card.id)}
-              aria-label={`Add ${card.name} (${card.type}, ${card.color}, cost ${card.cost ?? '–'}) to deck`}
-            >
-              <img
-                src={getCardImage(card)}
-                alt=""
-                aria-hidden="true"
-                className="h-10 w-8 flex-shrink-0 rounded object-cover"
-                loading="lazy"
-              />
-              <div className="min-w-0">
-                <div className="truncate text-sm font-medium text-foreground">{card.name}</div>
-                <div className="text-xs text-steel-500">
-                  {card.type} · {card.color} · Cost {card.cost ?? '–'}
-                  {isExCard(card) && <span className="ml-1 rounded bg-amber-500/20 px-1 text-[10px] text-amber-400">EX</span>}
+          <Swiper
+            key={filterKey}
+            modules={[Pagination]}
+            pagination={{ type: 'progressbar' }}
+            className="h-full w-full"
+            style={{ maxWidth: '100%', overflowX: 'hidden' }}
+          >
+            {slides.map((slideCards, slideIdx) => (
+              <SwiperSlide key={slideIdx}>
+                <div className="grid grid-cols-2 gap-1.5 p-1.5" style={{ maxWidth: '100%' }}>
+                  {slideCards.map((card) => (
+                    <button
+                      key={card.id}
+                      type="button"
+                      className="aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500"
+                      onClick={() => onSelect(card.id)}
+                      aria-label={`Add ${card.name} to deck`}
+                      title={card.name}
+                    >
+                      <img
+                        src={getCardImage(card)}
+                        alt={card.name}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
                 </div>
-              </div>
-            </button>
-          ))
+              </SwiperSlide>
+            ))}
+          </Swiper>
         )}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex flex-shrink-0 items-center justify-between border-t border-border px-3 py-2">
-          <button
-            type="button"
-            className="text-xs text-cobalt-400 disabled:opacity-40"
-            disabled={page === 0}
-            onClick={() => setPage((p) => p - 1)}
-            aria-label="Previous page"
-          >
-            ← Prev
-          </button>
-          <span className="text-xs text-steel-500" aria-live="polite">
-            {page + 1} / {totalPages}
-          </span>
-          <button
-            type="button"
-            className="text-xs text-cobalt-400 disabled:opacity-40"
-            disabled={page >= totalPages - 1}
-            onClick={() => setPage((p) => p + 1)}
-            aria-label="Next page"
-          >
-            Next →
-          </button>
-        </div>
-      )}
     </aside>
   );
 }
