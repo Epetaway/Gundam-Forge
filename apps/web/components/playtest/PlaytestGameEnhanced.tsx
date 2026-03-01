@@ -19,6 +19,7 @@ import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { useSoundEffects } from '@/lib/hooks/useSoundEffects';
 import { PhaseIndicator } from './PhaseIndicator';
 import { KeyboardShortcutsLegend } from './KeyboardShortcutsLegend';
+import { DragDropProvider } from '@/lib/hooks/DragDropContext';
 import type { GameState, GameAction, CardInstance, DeckDefinition } from '@/lib/game/game-engine';
 import type { DeckRecord } from '@/lib/data/decks';
 
@@ -287,38 +288,40 @@ export function PlaytestGameEnhanced({
 
       {/* MAIN GAME AREA: Battlefield (Phase 1) */}
       {!isSetupPhase && (
-        <main className="flex-1 overflow-hidden">
-          <Battlefield
-            playerState={playerState}
-            opponentState={opponentState}
-            isPlayerTurn={isPlayerTurn}
-            gamePhase={gameState.phase}
-            cardDatabase={cardDatabase}
-            selectedCard={selectedCard}
-            gameLog={engine.getLog().slice(-20)}
-            onUnitSelected={(unit, isOpponent) => {
-              if (!isOpponent) {
-                setSelectedCard(unit);
-              }
-            }}
-            onSelectCard={(card) => {
-              setSelectedCard(card);
-            }}
-            onCardPlayRequested={(card) => {
-              handleAction({
-                type: 'PLAY_CARD',
-                playerId: 'player1',
-                timestamp: Date.now(),
-                payload: { cardInstanceId: card.instanceId },
-              });
-            }}
-            onShieldDamaged={(remaining) => {
-              if (remaining === 0) {
-                playShieldBreak();
-              }
-            }}
-          />
-        </main>
+        <DragDropProvider>
+          <main className="flex-1 overflow-hidden">
+            <Battlefield
+              playerState={playerState}
+              opponentState={opponentState}
+              isPlayerTurn={isPlayerTurn}
+              gamePhase={gameState.phase}
+              cardDatabase={cardDatabase}
+              selectedCard={selectedCard}
+              gameLog={engine.getLog().slice(-20)}
+              onUnitSelected={(unit, isOpponent) => {
+                if (!isOpponent) {
+                  setSelectedCard(unit);
+                }
+              }}
+              onSelectCard={(card) => {
+                setSelectedCard(card);
+              }}
+              onCardPlayRequested={(card) => {
+                handleAction({
+                  type: 'PLAY_CARD',
+                  playerId: 'player1',
+                  timestamp: Date.now(),
+                  payload: { cardInstanceId: card.instanceId },
+                });
+              }}
+              onShieldDamaged={(remaining) => {
+                if (remaining === 0) {
+                  playShieldBreak();
+                }
+              }}
+            />
+          </main>
+        </DragDropProvider>
       )}
 
       {/* Keyboard Shortcuts Legend Modal (Phase 2) */}
