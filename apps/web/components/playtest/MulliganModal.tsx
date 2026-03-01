@@ -7,10 +7,11 @@
 
 import React, { useState } from 'react';
 import { CardInstance } from '@/lib/game/game-engine';
-import { getCardById } from '@/lib/data/cards';
+import { CardArtImage } from '@/components/ui/CardArtImage';
 
 interface MulliganModalProps {
   hand: CardInstance[];
+  cardDatabase: Record<string, any>;
   onMulliganAccept: () => void;
   onMulliganReject: () => void;
   isLoading?: boolean;
@@ -18,6 +19,7 @@ interface MulliganModalProps {
 
 export function MulliganModal({
   hand,
+  cardDatabase,
   onMulliganAccept,
   onMulliganReject,
   isLoading = false,
@@ -47,21 +49,32 @@ export function MulliganModal({
 
         {/* Hand Display */}
         <div className="mb-8">
-          <p className="text-sm text-slate-400 mb-3">Your opening hand (7 cards):</p>
-          <div className="grid grid-cols-7 gap-2 max-h-24 overflow-y-auto">
+          <p className="text-sm text-slate-400 mb-3">Your opening hand ({hand.length} cards):</p>
+          <div className="flex gap-2 overflow-x-auto pb-2 max-h-48">
             {hand.map((card) => {
-              const cardDef = getCardById(card.cardId);
+              const cardDef = cardDatabase[card.cardId];
               return (
                 <div
                   key={card.instanceId}
-                  className="flex flex-col items-center gap-1 p-2 bg-slate-700/50 rounded border border-slate-600 hover:border-slate-400 transition"
+                  className="flex-shrink-0 flex flex-col items-center gap-2"
                 >
-                  <img
-                    src={cardDef?.imageUrl || '/images/placeholder.png'}
-                    alt={cardDef?.name || card.cardId}
-                    className="w-full h-16 object-cover rounded"
-                  />
-                  <span className="text-xs text-slate-300 text-center truncate w-full">
+                  <div className="relative w-24 h-32 rounded border-2 border-slate-600 overflow-hidden hover:border-slate-400 transition shadow-md">
+                    {cardDef ? (
+                      <CardArtImage
+                        card={cardDef}
+                        alt={cardDef.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+                        <span className="text-xs text-slate-400 text-center px-1">
+                          {card.cardId}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-300 text-center w-24 truncate">
                     {cardDef?.name || card.cardId}
                   </span>
                 </div>
@@ -116,7 +129,7 @@ export function MulliganModal({
         {/* Rules Reference */}
         <div className="mt-8 pt-6 border-t border-slate-700">
           <p className="text-xs text-slate-500">
-            📋 Official Mulligan Rule: Each player may mulligan (redraw) their opening hand once.
+            Official Mulligan Rule: Each player may mulligan (redraw) their opening hand once.
             Mulligan is performed by shuffling all 7 cards back into your deck and drawing 7 new cards.
           </p>
         </div>

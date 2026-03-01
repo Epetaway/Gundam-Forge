@@ -290,6 +290,7 @@ export function PlaytestGame({
       {isSetupPhase && (
         <SetupPhase
           engine={engine}
+          cardDatabase={cardDatabase}
           onSetupComplete={() => setGameState(engine.getState())}
           onError={setError}
         />
