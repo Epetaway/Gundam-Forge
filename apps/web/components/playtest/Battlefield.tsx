@@ -30,7 +30,7 @@ import { ResourceAreaZone } from './zones/ResourceAreaZone';
 import { TrashArea } from './zones/TrashArea';
 import { DeckArea } from './zones/DeckArea';
 import { GameLog } from './GameLog';
-import { PlayerHand } from './PlayerHand';
+import { HandTray } from './HandTray';
 
 interface BattlefieldProps {
   playerState: {
@@ -278,21 +278,15 @@ export function Battlefield({
 
       {/* PLAYER HAND - Fixed at bottom with responsive sizing */}
       <div className="flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/60 p-2 md:p-4">
-        <div className="text-xs md:text-sm text-slate-400 mb-2 uppercase tracking-wider font-semibold">
-          Your Hand ({playerState.hand.length}/7)
-        </div>
-        
-        <div className="h-32 md:h-40 overflow-y-auto md:overflow-y-visible">
-          <PlayerHand
-            cards={playerState.hand}
-            cardDatabase={cardDatabase}
-            selectedCard={selectedCard || null}
-            onSelectCard={onSelectCard || (() => {})}
-            onPlayCard={onCardPlayRequested || (() => {})}
-            gamePhase={gamePhase}
-            isPlayerTurn={isPlayerTurn}
-          />
-        </div>
+        <HandTray
+          cards={playerState.hand}
+          cardDatabase={cardDatabase}
+          selectedCard={selectedCard || null}
+          onSelectCard={onSelectCard || (() => {})}
+          onPlayCard={onCardPlayRequested || (() => {})}
+          gamePhase={gamePhase}
+          isPlayerTurn={isPlayerTurn}
+        />
       </div>
     </div>
   );
