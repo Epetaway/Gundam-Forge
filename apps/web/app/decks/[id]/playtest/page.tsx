@@ -1,11 +1,9 @@
-import { deckCatalog, getDeckById } from '@/lib/data/decks';
+'use client';
+
+import { getDeckById } from '@/lib/data/decks';
 import { cardsById } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
-
-export function generateStaticParams() {
-  return deckCatalog.map((deck) => ({ id: deck.id }));
-}
 
 interface PlaytestPageProps {
   params: {
@@ -24,9 +22,6 @@ export default function PlaytestPage({ params }: PlaytestPageProps) {
       playerDeckId={params.id}
       opponentDeckId="ai-deck-default"
       cardDatabase={cardsById}
-      onGameEnd={(winner, reason) => {
-        console.log(`Game ended: ${winner} wins - ${reason}`);
-      }}
     />
   );
 }
