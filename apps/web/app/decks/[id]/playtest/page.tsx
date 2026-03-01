@@ -1,9 +1,12 @@
-'use client';
-
-import { getDeckById } from '@/lib/data/decks';
+import { deckCatalog, getDeckById } from '@/lib/data/decks';
 import { cardsById } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
+
+// Required for static export with dynamic routes
+export function generateStaticParams() {
+  return deckCatalog.map((deck) => ({ id: deck.id }));
+}
 
 interface PlaytestPageProps {
   params: {
