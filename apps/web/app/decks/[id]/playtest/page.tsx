@@ -1,7 +1,7 @@
 import { deckCatalog, getDeckById } from '@/lib/data/decks';
+import { cardsById } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
-import type { DeckDefinition } from '@/lib/game/game-engine';
-import PlaytestClient from './PlaytestClient';
+import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
 
 export function generateStaticParams() {
   return deckCatalog.map((deck) => ({ id: deck.id }));
@@ -13,27 +13,20 @@ interface PlaytestPageProps {
   };
 }
 
-function toDeckDefinition(deckId: string): DeckDefinition | null {
-  const deckRecord = getDeckById(deckId);
-  if (!deckRecord) return null;
-
-  return {
-    id: deckRecord.id,
-    name: deckRecord.name,
-    description: deckRecord.description,
-    cards: deckRecord.entries.map((entry) => ({
-      cardId: entry.cardId,
-      count: entry.qty,
-      zone: 'main' as const,
-    })),
-  };
-}
-
 export default function PlaytestPage({ params }: PlaytestPageProps) {
-  const deck = toDeckDefinition(params.id);
+  const deck = getDeckById(params.id);
   if (!deck) {
     notFound();
   }
 
-  return <PlaytestClient deckId={params.id} deck={deck} />;
+  return (
+    <PlaytestGameEnhanced
+      playerDeckId={params.id}
+      opponentDeckId="ai-deck-default"
+      cardDatabase={cardsById}
+      onGameEnd={(winner, reason) => {
+        console.log(`Game ended: ${winner} wins - ${reason}`);
+      }}
+    />
+  );
 }
