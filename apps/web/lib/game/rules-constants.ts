@@ -32,16 +32,17 @@ export const DECK_RULES = {
 
 /**
  * GAME START & SETUP RULES
+ * Official 2025 Gundam TCG rules
  */
 export const SETUP_RULES = {
   // Starting life total
   startingLife: 20,
 
-  // Opening hand size
-  openingHandSize: 7,
+  // Opening hand size - Official 2025: 5 cards
+  openingHandSize: 5,
 
-  // Number of shields at start
-  initialShields: 5,
+  // Number of shields at start - Official 2025: 6 shields
+  initialShields: 6,
 
   // Mulligan configuration
   mulliganAllowed: true,
@@ -171,8 +172,8 @@ export const SHIELD_RULES = {
  * HAND & DECK RULES
  */
 export const HAND_RULES = {
-  // Maximum hand size at end of turn
-  maxHandSize: 7,
+  // Maximum hand size at end of turn - Official 2025: 10 cards
+  maxHandSize: 10,
 
   // Discard excess over hand limit
   enforceHandLimit: true,

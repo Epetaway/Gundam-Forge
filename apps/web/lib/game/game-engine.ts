@@ -261,7 +261,8 @@ export class GameEngine {
 
     this.shuffleDeck(deckCards, rngSeed);
 
-    const shields = Array(5)
+    // Official 2025 Gundam TCG: 6 shields face-down
+    const shields = Array(6)
       .fill(null)
       .map((_, i) => ({
         instanceId: `${playerId}-shield-${i}`,
@@ -343,7 +344,8 @@ export class GameEngine {
       hand: openingHand,
       discardPile: [],
       battleArea: [],
-      shields: Array(4)
+      // Official 2025 Gundam TCG: 6 shields face-down
+      shields: Array(6)
         .fill(null)
         .map((_, i) => ({
           instanceId: `${playerId}-shield-${i}`,
@@ -555,8 +557,8 @@ export class GameEngine {
     // Reshuffle deck with same seed (deterministic)
     this.shuffleDeck(player.deck, player.deckShuffleSeed);
 
-    // Draw 7 new cards
-    for (let i = 0; i < 7 && player.deck.length > 0; i++) {
+    // Official 2025 Gundam TCG: Redraw 5 cards after mulligan
+    for (let i = 0; i < 5 && player.deck.length > 0; i++) {
       const card = player.deck.pop()!;
       card.zone = 'hand';
       player.hand.push(card);
@@ -570,7 +572,7 @@ export class GameEngine {
       action.playerId,
       this.state.phase,
       'Hand reshuffled and redrawn',
-      'Mulligan taken: 7 cards redrawn from deck.',
+      'Mulligan taken: 5 cards redrawn from deck.',
     );
 
     return { valid: true };
@@ -1396,7 +1398,8 @@ export class GameEngine {
 
   public enforceHandLimit(playerId: string): void {
     const player = this.state.players[playerId];
-    while (player.hand.length > 7) {
+    // Official 2025 Gundam TCG: Maximum hand limit is 10 cards
+    while (player.hand.length > 10) {
       const discard = player.hand.shift();
       if (discard) {
         discard.zone = 'trash';

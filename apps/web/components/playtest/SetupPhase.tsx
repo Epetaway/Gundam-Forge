@@ -18,9 +18,9 @@ interface SetupPhaseProps {
 
 const SETUP_STEPS = [
   { id: 'shuffle', label: 'Shuffling decks...', description: 'Randomizing cards with deterministic seed' },
-  { id: 'draw', label: 'Drawing opening hand...', description: '7 cards drawn for each player' },
+  { id: 'draw', label: 'Drawing opening hand...', description: '5 cards drawn for each player' },
   { id: 'mulligan', label: 'Mulligan option...', description: 'Option to redraw hand one time' },
-  { id: 'shields', label: 'Placing shields...', description: '5 shield cards placed face-down' },
+  { id: 'shields', label: 'Placing shields...', description: '6 shield cards placed face-down' },
   { id: 'base', label: 'Setting base...', description: 'Base health set to 20' },
   { id: 'coinflip', label: 'Coin flip...', description: 'Determining first player' },
   { id: 'ready', label: 'Game ready!', description: 'Ready to begin' },
@@ -33,6 +33,34 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
   const [mulliganInProgress, setMulliganInProgress] = useState(false);
 
   useEffect(() => {
+    // CRITICAL: Execute DRAW actions during draw phase (step 1)
+    if (currentStep === 1) {
+      setIsAnimating(true);
+      
+      // Official 2025 Gundam TCG: Draw 5 cards for opening hand
+      for (let i = 0; i < 5; i++) {
+        engine.executeAction({
+          type: 'DRAW',
+          playerId: 'player1',
+          timestamp: Date.now(),
+        });
+        // Also draw for opponent (auto-player)
+        engine.executeAction({
+          type: 'DRAW',
+          playerId: 'player2',
+          timestamp: Date.now(),
+        });
+      }
+
+      // Auto-advance after draw is complete
+      const timer = setTimeout(() => {
+        setCurrentStep((prev) => prev + 1);
+        setIsAnimating(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+
     // Pause on mulligan step
     if (currentStep === 2 && !showMulliganModal) {
       setShowMulliganModal(true);
@@ -40,7 +68,7 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
     }
 
     // Auto-advance through other steps
-    if (currentStep < SETUP_STEPS.length && !showMulliganModal) {
+    if (currentStep < SETUP_STEPS.length && !showMulliganModal && currentStep !== 1) {
       setIsAnimating(true);
       const timer = setTimeout(() => {
         setCurrentStep((prev) => prev + 1);
@@ -53,7 +81,7 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
 
       return () => clearTimeout(timer);
     }
-  }, [currentStep, onSetupComplete, showMulliganModal]);
+  }, [currentStep, onSetupComplete, showMulliganModal, engine]);
 
   const handleMulliganAccept = () => {
     setMulliganInProgress(true);

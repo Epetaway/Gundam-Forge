@@ -163,7 +163,7 @@ export function Battlefield({
           {/* Hand count indicator */}
           <div className="col-span-3 bg-slate-800/40 border border-dashed border-slate-600 rounded-lg p-1 md:p-2 text-center">
             <div className="text-[10px] md:text-xs text-slate-400">
-              Hand: {opponentState.hand.length}/7
+              Hand: {opponentState.hand.length}/10
             </div>
           </div>
         </div>

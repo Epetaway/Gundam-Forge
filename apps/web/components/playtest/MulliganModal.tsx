@@ -94,7 +94,7 @@ export function MulliganModal({
           <div className="p-4 bg-slate-700/50 rounded border border-slate-600">
             <div className="text-sm font-semibold text-slate-300 mb-2">Mulligan (Redraw)</div>
             <p className="text-xs text-slate-400">
-              Shuffle all cards back into your deck and draw 7 new cards. This is your only mulligan.
+              Shuffle all cards back into your deck and draw 5 new cards. This is your only mulligan.
             </p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export function MulliganModal({
         <div className="mt-8 pt-6 border-t border-slate-700">
           <p className="text-xs text-slate-500">
             Official Mulligan Rule: Each player may mulligan (redraw) their opening hand once.
-            Mulligan is performed by shuffling all 7 cards back into your deck and drawing 7 new cards.
+            Mulligan is performed by shuffling all 5 cards back into your deck and drawing 5 new cards.
           </p>
         </div>
       </div>

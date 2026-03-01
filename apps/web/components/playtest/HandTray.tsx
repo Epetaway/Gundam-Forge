@@ -260,7 +260,7 @@ function MobileDrawer({
       >
         <div className="flex flex-col items-center gap-1">
           <div className="text-xs font-bold text-slate-300 uppercase">
-            Hand ({cards.length}/7)
+            Hand ({cards.length}/10)
           </div>
           <motion.div animate={{ rotate: drawerOpen ? 180 : 0 }}>
             {drawerOpen ? (

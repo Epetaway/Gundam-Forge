@@ -393,8 +393,8 @@ export class PlaytestEngine {
   private handleEndPhase(action: GameAction): { success: boolean; message: string } {
     const player = this.gameState.players[action.playerId];
 
-    // Enforce hand limit
-    while (player.hand.length > 7) {
+    // Enforce hand limit - Official 2025 Gundam TCG: Maximum 10 cards
+    while (player.hand.length > 10) {
       player.hand.pop(); // Simplified - should let player choose
     }
 
