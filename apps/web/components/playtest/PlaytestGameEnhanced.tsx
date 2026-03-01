@@ -275,11 +275,11 @@ export function PlaytestGameEnhanced({
           </div>
         </div>
       </header>
-
       {/* SETUP PHASE */}
       {isSetupPhase && (
         <SetupPhase
           engine={engine}
+          cardDatabase={cardDatabase}
           onSetupComplete={() => setGameState(engine.getState())}
           onError={setError}
         />

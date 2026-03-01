@@ -11,6 +11,7 @@ import { MulliganModal } from './MulliganModal';
 
 interface SetupPhaseProps {
   engine: GameEngine;
+  cardDatabase: Record<string, any>;
   onSetupComplete: () => void;
   onError: (error: string) => void;
 }
@@ -25,7 +26,7 @@ const SETUP_STEPS = [
   { id: 'ready', label: 'Game ready!', description: 'Ready to begin' },
 ];
 
-export function SetupPhase({ engine, onSetupComplete, onError }: SetupPhaseProps) {
+export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: SetupPhaseProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showMulliganModal, setShowMulliganModal] = useState(false);
@@ -85,6 +86,7 @@ export function SetupPhase({ engine, onSetupComplete, onError }: SetupPhaseProps
       {showMulliganModal && (
         <MulliganModal
           hand={engine.getState().players['player1'].hand}
+          cardDatabase={cardDatabase}
           onMulliganAccept={handleMulliganAccept}
           onMulliganReject={handleMulliganReject}
           isLoading={mulliganInProgress}

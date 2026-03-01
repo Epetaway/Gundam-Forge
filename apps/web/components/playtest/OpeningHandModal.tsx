@@ -1,11 +1,12 @@
 'use client';
 
 import { CardInstance } from '@/lib/game/game-engine';
-import { cardsById } from '@/lib/data/cards';
+import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Button } from '@/components/ui/Button';
 
 interface OpeningHandModalProps {
   hand: CardInstance[];
+  cardDatabase: Record<string, any>;
   onKeep: () => void;
   onMulligan: () => void;
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface OpeningHandModalProps {
 
 export default function OpeningHandModal({
   hand,
+  cardDatabase,
   onKeep,
   onMulligan,
   isOpen,
@@ -33,7 +35,7 @@ export default function OpeningHandModal({
           <div className="grid grid-cols-7 gap-4">
             {hand.length > 0 ? (
               hand.map((card) => {
-                const cardDef = cardsById.get(card.cardId);
+                const cardDef = cardDatabase[card.cardId];
                 
                 return (
                   <div
@@ -43,16 +45,19 @@ export default function OpeningHandModal({
                     {/* Card */}
                     <div className="w-32 h-44 bg-gradient-to-b from-slate-600 to-slate-900 rounded-lg border-2 border-amber-600 shadow-xl overflow-hidden group-hover:shadow-2xl group-hover:border-amber-400 transition-all flex flex-col">
                       {/* Card Image */}
-                      {cardDef?.imageUrl ? (
-                        <img
-                          src={cardDef.imageUrl}
-                          alt={cardDef.name}
-                          className="w-full h-28 object-cover"
-                        />
+                      {cardDef ? (
+                        <div className="w-full h-28 relative">
+                          <CardArtImage
+                            card={cardDef}
+                            alt={cardDef.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-28 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-b border-slate-500">
                           <span className="text-xs text-white text-center px-2 font-bold">
-                            {cardDef?.name || card.cardId}
+                            {card.cardId}
                           </span>
                         </div>
                       )}
@@ -73,17 +78,17 @@ export default function OpeningHandModal({
                           <div className="flex gap-1 justify-center text-[9px] font-bold">
                             {cardDef?.cost && (
                               <div className="bg-amber-700 text-white px-1.5 py-0.5 rounded">
-                                ◇{cardDef.cost}
+                                {cardDef.cost}
                               </div>
                             )}
                             {cardDef?.ap && (
                               <div className="bg-red-700 text-white px-1.5 py-0.5 rounded">
-                                ⚔{cardDef.ap}
+                                ATK {cardDef.ap}
                               </div>
                             )}
                             {cardDef?.hp && (
                               <div className="bg-blue-700 text-white px-1.5 py-0.5 rounded">
-                                ❤{cardDef.hp}
+                                HP {cardDef.hp}
                               </div>
                             )}
                           </div>
