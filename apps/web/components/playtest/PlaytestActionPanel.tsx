@@ -175,6 +175,24 @@ export default function PlaytestActionPanel({ gameState, onAction }: PlaytestAct
           Activate Ability
         </button>
 
+        {/* Pair Pilot */}
+        <button
+          onClick={() => handleAction('PAIR_PILOT', { mode: 'pair' })}
+          disabled={gameState.phase !== 'main' || currentPlayer.battleArea.length < 2}
+          className="px-4 py-2 bg-cyan-700 hover:bg-cyan-600 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
+        >
+          Pair Pilot
+        </button>
+
+        {/* Link Pilot */}
+        <button
+          onClick={() => handleAction('PAIR_PILOT', { mode: 'link' })}
+          disabled={gameState.phase !== 'main' || currentPlayer.battleArea.length < 2}
+          className="px-4 py-2 bg-teal-700 hover:bg-teal-600 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
+        >
+          Link Pilot
+        </button>
+
         {/* Declare Block */}
         <button
           onClick={handleDeclareBlock}
@@ -191,6 +209,27 @@ export default function PlaytestActionPanel({ gameState, onAction }: PlaytestAct
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
         >
           Resolve Combat
+        </button>
+
+        {/* Resolve Trigger */}
+        <button
+          onClick={() =>
+            gameState.stack.length > 0 &&
+            handleAction('RESOLVE_TRIGGER', { triggerId: gameState.stack[0].id, chooseResolve: true })
+          }
+          disabled={gameState.stack.length === 0}
+          className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
+        >
+          Resolve Trigger
+        </button>
+
+        {/* Resolve All Triggers */}
+        <button
+          onClick={() => handleAction('RESOLVE_ALL_TRIGGERS')}
+          disabled={gameState.stack.length === 0}
+          className="px-4 py-2 bg-emerald-900 hover:bg-emerald-800 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
+        >
+          Resolve All Triggers
         </button>
 
         {/* End Phase */}

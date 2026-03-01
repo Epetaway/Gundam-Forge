@@ -12,6 +12,7 @@ import PlaytestLog from '@/components/playtest/PlaytestLog';
 import PlaytestPhaseIndicator from '@/components/playtest/PlaytestPhaseIndicator';
 import PlaymatCenter from '@/components/playtest/PlaymatCenter';
 import CardInspector from '@/components/playtest/CardInspector';
+import PlaytestTriggerQueue from '@/components/playtest/PlaytestTriggerQueue';
 
 interface PlaytestPageState {
   gameState?: GameState;
@@ -221,11 +222,53 @@ export default function PlaytestPage() {
       if (!prev.engine || !prev.gameState) return prev;
 
       try {
+        let computedPayload = payload ? { ...payload } : undefined;
+        const activePlayer = prev.gameState.players[prev.gameState.activePlayerId];
+
+        if (actionType === 'ACTIVATE_ABILITY' && !computedPayload) {
+          const supportSource = activePlayer.battleArea.find((unit) => {
+            const def = cardsById.get(unit.cardId) as any;
+            const keywords: string[] = def?.keywords || [];
+            return keywords.map((k) => String(k).toLowerCase()).includes('support');
+          });
+
+          const supportTarget =
+            activePlayer.battleArea.find((unit) => unit.instanceId !== supportSource?.instanceId) ||
+            activePlayer.battleArea[0];
+
+          if (supportSource && supportTarget) {
+            computedPayload = {
+              sourceInstanceId: supportSource.instanceId,
+              targetInstanceId: supportTarget.instanceId,
+              abilityId: 'SUPPORT_MAIN',
+            };
+          }
+        }
+
+        if (actionType === 'PAIR_PILOT' && !computedPayload) {
+          const pilot = activePlayer.battleArea.find((unit) => {
+            const def = cardsById.get(unit.cardId) as any;
+            return def?.type === 'Pilot';
+          });
+          const hostUnit = activePlayer.battleArea.find((unit) => {
+            const def = cardsById.get(unit.cardId) as any;
+            return def?.type === 'Unit';
+          });
+
+          if (pilot && hostUnit) {
+            computedPayload = {
+              pilotInstanceId: pilot.instanceId,
+              unitInstanceId: hostUnit.instanceId,
+              mode: 'pair',
+            };
+          }
+        }
+
         const action = {
           type: actionType as any,
           playerId: prev.gameState.activePlayerId,
           timestamp: Date.now(),
-          payload,
+          payload: computedPayload,
         };
 
         const validation = prev.engine.executeAction(action);
@@ -352,6 +395,14 @@ export default function PlaytestPage() {
           {/* LEFT: Zones Panel + Game Log */}
           <div className="lg:col-span-1 space-y-6">
             <ZonesPanel player={currentPlayer} />
+
+            <PlaytestTriggerQueue
+              stack={gameState.stack}
+              onResolveTrigger={(triggerId, chooseResolve) =>
+                executeAction('RESOLVE_TRIGGER', { triggerId, chooseResolve })
+              }
+              onResolveAll={() => executeAction('RESOLVE_ALL_TRIGGERS')}
+            />
             
             {/* Game Log */}
             <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
