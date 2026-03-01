@@ -11,7 +11,7 @@
  * - Adaptive based on game situation
  */
 
-import type { CardInstance, PlayerState, GameState, GameAction } from './game-engine';
+import type { CardInstance, PlayerState, GameState, GameAction, CardDefinition } from './game-engine';
 
 export interface BoardEvaluation {
   unitCount: number;
@@ -33,9 +33,13 @@ export interface StrategyDecision {
  */
 export class AdvancedAutoplayer {
   private playerId: string = 'player2';
+  private cardDatabase: Record<string, CardDefinition> = {};
 
-  constructor(playerId: string = 'player2') {
+  constructor(playerId: string = 'player2', cardDatabase?: Record<string, CardDefinition>) {
     this.playerId = playerId;
+    if (cardDatabase) {
+      this.cardDatabase = cardDatabase;
+    }
   }
 
   /**
@@ -117,7 +121,7 @@ export class AdvancedAutoplayer {
     availableResources: number,
   ): CardInstance | null {
     const hand = player.hand.filter((c) => {
-      const def = gameState.cardDb?.[c.cardId];
+      const def = this.cardDatabase[c.cardId];
       return def && def.type === 'Unit';
     });
 
@@ -126,7 +130,7 @@ export class AdvancedAutoplayer {
     // Strategy: Play mid-cost units that balance board presence with resources
     // Prefer to play units that don't exceed current resources
     const playableCards = hand.filter((c) => {
-      const cost = gameState.cardDb?.[c.cardId]?.cost ?? 0;
+      const cost = this.cardDatabase[c.cardId]?.cost ?? 0;
       return cost <= availableResources && cost > 0;
     });
 
@@ -134,8 +138,8 @@ export class AdvancedAutoplayer {
 
     // Sort by attack value (descending) - prefer stronger units
     playableCards.sort((a, b) => {
-      const atkA = gameState.cardDb?.[a.cardId]?.atk ?? 0;
-      const atkB = gameState.cardDb?.[b.cardId]?.atk ?? 0;
+      const atkA = this.cardDatabase[a.cardId]?.atk ?? 0;
+      const atkB = this.cardDatabase[b.cardId]?.atk ?? 0;
       return atkB - atkA;
     });
 
@@ -145,7 +149,10 @@ export class AdvancedAutoplayer {
   /**
    * Get strategic decision for current turn
    */
-  decideActions(gameState: GameState): StrategyDecision {
+  decideActions(gameState: GameState, cardDatabase?: Record<string, CardDefinition>): StrategyDecision {
+    if (cardDatabase) {
+      this.cardDatabase = cardDatabase;
+    }
     const player = gameState.players[this.playerId];
     const opponent = gameState.players['player1'];
     const actions: GameAction[] = [];

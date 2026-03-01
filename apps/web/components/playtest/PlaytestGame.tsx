@@ -64,7 +64,7 @@ export function PlaytestGame({
         cards: Array.from({ length: 60 }, (_, i) => ({
           cardId: `GD01-${String(i + 1).padStart(3, '0')}`,
           count: 1,
-          zone: 'main',
+          zone: 'main' as const,
         })),
       };
 

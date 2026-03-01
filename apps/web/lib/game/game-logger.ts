@@ -265,12 +265,13 @@ export function analyzeLog(log: GameLogEntry[]): {
   const warnings: string[] = [];
 
   // Check for duplicate draws per turn
-  const drawsByTurn: Record<number, number> = {};
+  const drawsByTurn: Record<string, number> = {};
   for (const entry of log.filter((e) => e.actionType === 'DRAW')) {
-    const key = `${entry.turnNumber}-${entry.activePlayer}`;
+    const turnNumber = entry.turnNumber;
+    const key = `${turnNumber}-${entry.activePlayer}`;
     drawsByTurn[key] = (drawsByTurn[key] ?? 0) + 1;
     if (drawsByTurn[key] > 1) {
-      violations.push(`Turn ${entry.turnNumber}: Player drew ${drawsByTurn[key]} cards (max 1)`);
+      violations.push(`Turn ${turnNumber}: Player drew ${drawsByTurn[key]} cards (max 1)`);
     }
   }
 

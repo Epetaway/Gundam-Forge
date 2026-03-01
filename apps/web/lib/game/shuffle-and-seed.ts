@@ -125,7 +125,7 @@ export function moveToBottom<T>(deck: T[], card: T): void {
  * Reshuffle portion of deck (e.g., mulligan)
  * Combines cards back into deck and reshuffles with new seed
  */
-export function reshuffleDeck<T>(
+export function reshuffleDeck<T extends { instanceId: string }>(
   deck: T[],
   cardsToShuffle: T[],
   newSeed: number,
