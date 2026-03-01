@@ -7,7 +7,6 @@ import { cardsById } from '@/lib/data/cards';
 import OpeningHandModal from '@/components/playtest/OpeningHandModal';
 import CardFan from '@/components/playtest/CardFan';
 import ZonesPanel from '@/components/playtest/ZonesPanel';
-import PlaytestBoard from '@/components/playtest/PlaytestBoard';
 import PlaytestActionPanel from '@/components/playtest/PlaytestActionPanel';
 import PlaytestLog from '@/components/playtest/PlaytestLog';
 import PlaytestPhaseIndicator from '@/components/playtest/PlaytestPhaseIndicator';
@@ -67,6 +66,8 @@ export default function PlaytestPage() {
           gameState,
           engine,
           showOpeningHand: true, // Show opening hand modal
+          history: [gameState],
+          historyIndex: 0,
         }));
       } catch (error) {
         console.error('Error loading deck for playtest:', error);
@@ -86,20 +87,6 @@ export default function PlaytestPage() {
       ...prev,
       showOpeningHand: false,
     }));
-  };
-
-  // Save current state to history
-  const saveToHistory = (gameState: GameState) => {
-    setState((prev) => {
-      // Remove any redo history when a new action is taken
-      const newHistory = prev.history.slice(0, prev.historyIndex + 1);
-      newHistory.push(gameState);
-      return {
-        ...prev,
-        history: newHistory,
-        historyIndex: newHistory.length - 1,
-      };
-    });
   };
 
   // Undo last action
@@ -161,6 +148,8 @@ export default function PlaytestPage() {
       return {
         ...prev,
         gameState: { ...prev.gameState },
+        history: [...prev.history, { ...prev.gameState }],
+        historyIndex: prev.history.length,
         mulliganCount: newCount,
       };
     });
@@ -188,10 +177,14 @@ export default function PlaytestPage() {
       }
 
       const newGameState = { ...prev.gameState };
-      saveToHistory(newGameState);
+      const newHistory = prev.history.slice(0, prev.historyIndex + 1);
+      newHistory.push(newGameState);
+
       return {
         ...prev,
         gameState: newGameState,
+        history: newHistory,
+        historyIndex: newHistory.length - 1,
       };
     });
   };
@@ -223,7 +216,7 @@ export default function PlaytestPage() {
   };
 
   // Execute game action
-  const executeAction = (actionType: string) => {
+  const executeAction = (actionType: string, payload?: Record<string, unknown>) => {
     setState((prev) => {
       if (!prev.engine || !prev.gameState) return prev;
 
@@ -232,6 +225,7 @@ export default function PlaytestPage() {
           type: actionType as any,
           playerId: prev.gameState.activePlayerId,
           timestamp: Date.now(),
+          payload,
         };
 
         const validation = prev.engine.executeAction(action);
@@ -295,9 +289,6 @@ export default function PlaytestPage() {
 
   const gameState = state.gameState;
   const currentPlayer = gameState.players[gameState.activePlayerId];
-  const opponentId = Object.keys(gameState.players).find((id) => id !== gameState.activePlayerId);
-  const opponent = opponentId ? gameState.players[opponentId] : null;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-white">
       {/* Opening Hand Modal */}
