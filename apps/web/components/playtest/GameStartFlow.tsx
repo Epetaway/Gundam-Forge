@@ -3,7 +3,7 @@
  * Orchestrates the full game initialization sequence:
  * 1. Coin flip (heads/tails for first player)
  * 2. Shuffle deck with animation
- * 3. Draw opening hand (7 cards)
+ * 3. Draw opening hand (5 cards)
  * 4. Mulligan option
  * 5. Shield placement (face-down)
  * 6. Game ready to play
@@ -126,7 +126,7 @@ export function GameStartFlow({
         {phase === 'shields' && (
           <ShieldSetupModal
             key="shields"
-            onComplete={onShieldsPlaced}
+            onComplete={onShieldsPlaced || (() => {})}
             disableAnimations={disableAnimations}
           />
         )}
@@ -218,7 +218,7 @@ function CoinFlipModal({
           disabled={isFlipping}
           size="lg"
           className="mb-6 w-full"
-          variant={isFlipping ? 'outline' : 'default'}
+          variant={isFlipping ? 'secondary' : 'primary'}
         >
           {isFlipping ? 'Flipping...' : 'Flip Coin'}
         </Button>
@@ -240,14 +240,14 @@ function CoinFlipModal({
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={() => handleResults(result === 'heads')}
-                  variant="default"
+                  variant="primary"
                   size="sm"
                 >
                   Continue
                 </Button>
                 <Button
                   onClick={handleFlip}
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                 >
                   Flip Again
@@ -477,7 +477,7 @@ function MulliganModal({
         <div className="flex gap-3">
           <Button
             onClick={onSkip}
-            variant="outline"
+            variant="secondary"
             className="flex-1"
           >
             Keep Hand
@@ -506,7 +506,7 @@ function ShieldSetupModal({
   disableAnimations: boolean;
 }) {
   const [shieldsPlaced, setShieldsPlaced] = useState(0);
-  const targetShields = 5;
+  const targetShields = 6; // Official 2025 Gundam TCG: 6 shields face-down
 
   useEffect(() => {
     let count = 0;

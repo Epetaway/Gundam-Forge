@@ -51,6 +51,7 @@ type CardImageRef = Pick<CardDefinition, 'id' | 'imageUrl' | 'placeholderArt'>;
 
 export const cards = cardsCatalogJson as CardDefinition[];
 export const cardsById = new Map(cards.map((card) => [card.id, card]));
+export const cardsRecord = Object.fromEntries(cards.map((card) => [card.id, card])) as Record<string, CardDefinition>;
 export const allSets = Array.from(new Set(cards.map((card) => card.set))).sort();
 
 export function getCards(filters: CatalogFilters = {}): CardDefinition[] {

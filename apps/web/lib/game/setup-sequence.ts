@@ -119,7 +119,7 @@ export class SetupController {
    * STEP 2: Draw opening hand
    */
   private stepDrawOpening(): string {
-    // Draw 7 cards
+    // Draw 5 cards for opening hand (Official 2025 Gundam TCG)
     this.hasDrawnOpening = true;
     this.phase = 'mulligan';
     return `Drew ${SETUP_RULES.openingHandSize} cards into opening hand.`;
@@ -172,7 +172,7 @@ export class SetupController {
    */
   private stepPlaceShields(): string {
     // Take top N cards from deck and place in shields zone
-    // N = SETUP_RULES.initialShields (5)
+    // N = SETUP_RULES.initialShields (6)
     this.hasPlacedShields = true;
     this.phase = 'base-setup';
     return `Placed ${SETUP_RULES.initialShields} shields face-down from top of deck.`;

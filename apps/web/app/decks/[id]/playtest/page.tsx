@@ -1,5 +1,5 @@
 import { deckCatalog, getDeckById } from '@/lib/data/decks';
-import { cardsById } from '@/lib/data/cards';
+import { cardsRecord } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
 
@@ -24,7 +24,7 @@ export default function PlaytestPage({ params }: PlaytestPageProps) {
     <PlaytestGameEnhanced
       playerDeck={deck}
       opponentDeckId="ai-deck-default"
-      cardDatabase={cardsById}
+      cardDatabase={cardsRecord}
     />
   );
 }

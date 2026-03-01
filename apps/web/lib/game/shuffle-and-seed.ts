@@ -224,12 +224,13 @@ export function testDeterministicShuffle(): void {
   // Draw from shuffled deck
   const drawn: typeof testDeck = [];
   const deckCopy = [...shuffled1];
-  for (let i = 0; i < 7; i++) {
+  // Official 2025 Gundam TCG: Draw 5 cards for opening hand
+  for (let i = 0; i < 5; i++) {
     const card = drawTopCard(deckCopy);
     if (card) drawn.push(card);
   }
-  console.log('Drew 7 cards:', drawn.map((c) => c.instanceId));
-  console.log('Deck after draw:', deckCopy.length); // Should be 53
+  console.log('Drew 5 cards:', drawn.map((c) => c.instanceId));
+  console.log('Deck after draw:', deckCopy.length); // Should be 55
 
   // Different seed produces different shuffle
   const differentSeed = createSeed('different-deck');

@@ -103,7 +103,7 @@ export default function PlaytestPhaseIndicator({
               )}
               {currentPhase === 'end' && (
                 <>
-                  <li>Discard down to 7 cards</li>
+                  <li>Discard down to 10 cards</li>
                   <li>Reset once-per-turn abilities</li>
                 </>
               )}
