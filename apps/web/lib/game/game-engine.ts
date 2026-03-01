@@ -3,6 +3,8 @@
  * Deterministic, rules-accurate game simulation
  */
 
+import { COLORLESS_TOKEN_DECK } from './token-decks';
+
 export type ZoneType =
   | 'deck'
   | 'hand'
@@ -175,7 +177,29 @@ export class GameEngine {
     cardDatabase: Record<string, CardDefinition>,
   ) {
     this.cardDb = cardDatabase;
+    this.registerTokenDeckDefinitions();
     this.state = this.initializeGame(deckId, deck);
+  }
+
+  private registerTokenDeckDefinitions(): void {
+    for (const tokenCard of COLORLESS_TOKEN_DECK.cards) {
+      if (this.cardDb[tokenCard.id]) continue;
+      this.cardDb[tokenCard.id] = {
+        id: tokenCard.id,
+        name: tokenCard.name,
+        type: tokenCard.type,
+        cost: tokenCard.type === 'Resource' ? 0 : 1,
+        atk: tokenCard.atk,
+        def: tokenCard.def,
+        traits: ['Token'],
+        keywords: tokenCard.keywords ?? [],
+        imageUrl: '',
+        text: tokenCard.text ?? 'Token card',
+        abilities: [],
+        set: 'Token',
+        number: tokenCard.id,
+      };
+    }
   }
 
   private initializeGame(deckId: string, deck: DeckDefinition): GameState {
@@ -265,11 +289,51 @@ export class GameEngine {
   }
 
   private createPlayerStateOpponent(playerId: string, rngSeed: number): PlayerState {
+    const deckCards: CardInstance[] = [];
+    let instanceCounter = 0;
+
+    for (const tokenCard of COLORLESS_TOKEN_DECK.cards.filter((c) => c.zone === 'main')) {
+      for (let i = 0; i < tokenCard.count; i++) {
+        deckCards.push({
+          instanceId: `${playerId}-token-${instanceCounter++}`,
+          cardId: tokenCard.id,
+          zone: 'deck',
+          state: 'ready',
+          damageMarkers: 0,
+          attachments: { linked: [] },
+          counters: {},
+          usedAbilities: new Set(),
+        });
+      }
+    }
+
+    this.shuffleDeck(deckCards, rngSeed);
+
+    const resourcePool: CardInstance[] = COLORLESS_TOKEN_DECK.cards
+      .filter((c) => c.zone === 'resource')
+      .flatMap((resourceCard, resourceIndex) =>
+        Array.from({ length: resourceCard.count }, (_, copyIndex) => ({
+          instanceId: `${playerId}-resource-${resourceIndex}-${copyIndex}`,
+          cardId: resourceCard.id,
+          zone: 'resources' as const,
+          state: 'ready' as const,
+          damageMarkers: 0,
+          attachments: { linked: [] },
+          counters: {},
+          usedAbilities: new Set<string>(),
+        })),
+      );
+
+    const openingHand = deckCards.splice(Math.max(deckCards.length - 5, 0), 5);
+    openingHand.forEach((card) => {
+      card.zone = 'hand';
+    });
+
     return {
       playerId,
       name: 'Opponent',
-      deck: [],
-      hand: [],
+      deck: deckCards,
+      hand: openingHand,
       discardPile: [],
       battleArea: [],
       shields: Array(4)
@@ -294,7 +358,7 @@ export class GameEngine {
         counters: {},
         usedAbilities: new Set(),
       },
-      resources: [],
+      resources: resourcePool,
       exZone: { exResources: [] },
       baseHealth: 20,
       maxBaseHealth: 20,

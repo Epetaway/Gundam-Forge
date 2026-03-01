@@ -6,9 +6,20 @@ import { GameState } from '@/lib/game/game-engine';
 interface PlaytestActionPanelProps {
   gameState: GameState;
   onAction?: (actionType: string, payload?: Record<string, unknown>) => void;
+  botAutoplay?: boolean;
+  onToggleBotAutoplay?: () => void;
+  onBotStep?: () => void;
+  canBotStep?: boolean;
 }
 
-export default function PlaytestActionPanel({ gameState, onAction }: PlaytestActionPanelProps) {
+export default function PlaytestActionPanel({
+  gameState,
+  onAction,
+  botAutoplay = false,
+  onToggleBotAutoplay,
+  onBotStep,
+  canBotStep = false,
+}: PlaytestActionPanelProps) {
   const currentPlayer = gameState.players[gameState.activePlayerId];
   const opponentId = useMemo(
     () => Object.keys(gameState.players).find((id) => id !== gameState.activePlayerId),
@@ -230,6 +241,21 @@ export default function PlaytestActionPanel({ gameState, onAction }: PlaytestAct
           className="px-4 py-2 bg-emerald-900 hover:bg-emerald-800 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
         >
           Resolve All Triggers
+        </button>
+
+        <button
+          onClick={() => onBotStep?.()}
+          disabled={!canBotStep}
+          className="px-4 py-2 bg-fuchsia-700 hover:bg-fuchsia-600 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded font-medium transition"
+        >
+          Bot Step
+        </button>
+
+        <button
+          onClick={onToggleBotAutoplay}
+          className="px-4 py-2 bg-fuchsia-900 hover:bg-fuchsia-800 text-white rounded font-medium transition"
+        >
+          {botAutoplay ? 'Autoplay: On' : 'Autoplay: Off'}
         </button>
 
         {/* End Phase */}
