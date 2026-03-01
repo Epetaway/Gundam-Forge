@@ -117,6 +117,7 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
         onShare={handleShare}
         owner={deck.owner}
         totalCards={initialItems.reduce((sum, item) => sum + item.qty, 0)}
+        deckId={deck.id}
       />
 
       <DeckToolbar

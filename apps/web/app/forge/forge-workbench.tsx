@@ -20,7 +20,7 @@ import { useLocalStorageState } from '@/lib/useLocalStorageState';
 import { ImportResultsSummary } from './ImportResultsSummary';
 import type { CardMatchResult } from './cardMatching';
 import { validateDeck } from '@gundam-forge/shared';
-import type { CardDefinition, CardColor } from '@gundam-forge/shared';
+import type { CardDefinition, CardColor, DeckIntent } from '@gundam-forge/shared';
 import { CardSearchPanel } from './CardSearchPanel';
 import { cards as allCards, cardsById, allSets } from '@/lib/data/cards';
 import { parseDeckList } from './parseDeckList';
@@ -721,9 +721,13 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
   const [deckMeta, setDeckMeta] = React.useState({
     name: 'Untitled Deck',
     description: '',
-    archetype: '',
+    deckIntent: {
+      clans: [],
+      colors: [],
+      packages: [],
+      includeEX: false,
+    } as DeckIntent,
     owner: 'You',
-    colors: [] as string[],
     setId: initialSetId ?? '',
   });
   const [deck, setDeck] = React.useState<Record<string, number>>({});
@@ -743,21 +747,26 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       setDeckMeta({
         name: loaded.name,
         description: loaded.description,
-        archetype: loaded.archetype,
+        deckIntent: loaded.deckIntent,
         owner: 'You',
-        colors: loaded.colors,
         setId: loaded.setId ?? initialSetId ?? '',
       });
       const e: Record<string, number> = {};
       for (const { cardId, qty } of loaded.entries) e[cardId] = qty;
       setDeck(e);
     } else if (initialDeck) {
+      // For legacy initial deck objects (from Supabase), construct deckIntent from available data
+      const deckIntent: DeckIntent = {
+        clans: [],
+        colors: (initialDeck.colors ?? []) as CardColor[],
+        packages: [],
+        includeEX: false,
+      };
       setDeckMeta({
         name: initialDeck.name,
         description: initialDeck.description,
-        archetype: initialDeck.archetype,
+        deckIntent,
         owner: initialDeck.owner,
-        colors: initialDeck.colors,
         setId: initialSetId ?? '',
       });
       const e: Record<string, number> = {};
@@ -807,14 +816,9 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     if (deckId) updateDeckMeta(deckId, { name: n });
   }, [deckId]);
 
-  const handleColorsChange = React.useCallback((c: CardColor[]) => {
-    setDeckMeta((prev) => ({ ...prev, colors: c }));
-    if (deckId) updateDeckMeta(deckId, { colors: c });
-  }, [deckId]);
-
-  const handleArchetypeChange = React.useCallback((a: string) => {
-    setDeckMeta((prev) => ({ ...prev, archetype: a }));
-    if (deckId) updateDeckMeta(deckId, { archetype: a });
+  const handleDeckIntentChange = React.useCallback((intent: DeckIntent) => {
+    setDeckMeta((prev) => ({ ...prev, deckIntent: intent }));
+    if (deckId) updateDeckMeta(deckId, { deckIntent: intent });
   }, [deckId]);
 
   const handleSetIdChange = React.useCallback((s: string) => {
@@ -934,7 +938,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         <div className="hidden md:flex md:h-full md:w-72 md:flex-shrink-0 md:flex-col">
           <CardSearchPanel
             onSelect={(cardId) => handleAdd(cardId)}
-            deckColors={deckMeta.colors}
+            deckIntent={deckMeta.deckIntent ?? undefined}
             initialSetId={deckMeta.setId}
           />
         </div>
@@ -996,7 +1000,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             >
               <CardSearchPanel
                 onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}
-                deckColors={deckMeta.colors}
+                deckIntent={deckMeta.deckIntent ?? undefined}
                 initialSetId={deckMeta.setId}
               />
             </div>
@@ -1038,12 +1042,12 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         <DeckSettingsBar
           deckId={deckId}
           name={deckMeta.name}
-          colors={deckMeta.colors}
-          archetype={deckMeta.archetype}
+          colors={deckMeta.deckIntent?.colors ?? []}
+          archetype={(deckMeta.deckIntent?.packages?.length ?? 0) > 0 ? `${deckMeta.deckIntent.packages.length} packages` : ''}
           setId={deckMeta.setId}
           onNameChange={handleNameChange}
-          onColorsChange={handleColorsChange}
-          onArchetypeChange={handleArchetypeChange}
+          onColorsChange={(colors) => handleDeckIntentChange({ ...(deckMeta.deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors })}
+          onArchetypeChange={() => {}} // Deprecated: packages now selected in DeckIntentBuilder
           onSetIdChange={handleSetIdChange}
           onExport={handleExport}
         />

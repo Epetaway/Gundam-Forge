@@ -1,24 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { CardColor, CardDefinition } from '@gundam-forge/shared';
+import type { CardDefinition } from '@gundam-forge/shared';
 import { cn } from '@/lib/utils/cn';
 import { parseDeckList } from '@/app/forge/parseDeckList';
 import { matchDeckEntries } from '@/app/forge/cardMatching';
 import { createStoredDeck } from '@/lib/deck/storage';
 import { allSets } from '@/lib/data/cards';
 import { useDeckSetupContext } from './DeckSetupContext';
+import DeckIntentBuilder from './DeckIntentBuilder';
 
-const GUNDAM_COLORS: { value: CardColor; label: string; bg: string; text: string; border: string }[] = [
-  { value: 'Blue',      label: 'Blue',      bg: 'bg-blue-600',    text: 'text-white',      border: 'border-blue-500' },
-  { value: 'Green',     label: 'Green',     bg: 'bg-green-600',   text: 'text-white',      border: 'border-green-500' },
-  { value: 'Red',       label: 'Red',       bg: 'bg-red-600',     text: 'text-white',      border: 'border-red-500' },
-  { value: 'White',     label: 'White',     bg: 'bg-white',       text: 'text-steel-900',  border: 'border-steel-300' },
-  { value: 'Purple',    label: 'Purple',    bg: 'bg-purple-600',  text: 'text-white',      border: 'border-purple-500' },
-  { value: 'Colorless', label: 'Colorless', bg: 'bg-steel-600',   text: 'text-white',      border: 'border-steel-500' },
-];
-
-const ARCHETYPES = ['Aggro', 'Midrange', 'Control', 'Combo', 'Ramp'];
 const VISIBILITIES: { value: 'private' | 'unlisted' | 'public'; label: string; desc: string }[] = [
   { value: 'private',  label: 'Private',  desc: 'Only you' },
   { value: 'unlisted', label: 'Unlisted', desc: 'Link only' },
@@ -34,28 +25,23 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
   const ctx = useDeckSetupContext();
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  const nonColorlessColors = ctx.colors.filter((c) => c !== 'Colorless');
-
-  const handleColorToggle = (color: CardColor) => {
-    ctx.setColors((prev) => {
-      if (prev.includes(color)) return prev.filter((c) => c !== color);
-      const nonColorless = prev.filter((c) => c !== 'Colorless');
-      if (color !== 'Colorless' && nonColorless.length >= 2) return prev;
-      return [...prev, color];
-    });
-  };
+  const [intentErrors, setIntentErrors] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIntentErrors(false);
 
     if (!ctx.name.trim()) {
       setError('Deck name is required.');
       return;
     }
-    if (nonColorlessColors.length > 2) {
-      setError('Maximum 2 non-Colorless colors allowed.');
+
+    // Validate deckIntent colors
+    const nonColorlessColors = ctx.deckIntent.colors.filter((c) => c !== 'Colorless');
+    if (nonColorlessColors.length < 1 || nonColorlessColors.length > 2) {
+      setIntentErrors(true);
+      setError('Please select 1–2 non-Colorless colors in Deck Intent.');
       return;
     }
 
@@ -79,8 +65,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
           name: ctx.name.trim(),
           description: ctx.description.trim(),
           visibility: ctx.visibility,
-          archetype: ctx.archetype,
-          colors: ctx.colors,
+          deckIntent: ctx.deckIntent,
           setId: ctx.setId || undefined,
         },
         initialEntries,
@@ -145,35 +130,11 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
       </div>
 
       {/* Colors */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-semibold text-foreground">
-          Colors{' '}
-          <span className="font-normal text-steel-600">(max 2 non-Colorless)</span>
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {GUNDAM_COLORS.map((c) => {
-            const active = ctx.colors.includes(c.value);
-            const nonColorlessAtMax = nonColorlessColors.length >= 2 && c.value !== 'Colorless' && !active;
-            return (
-              <button
-                className={cn(
-                  'rounded-full border px-3 py-1 text-xs font-semibold transition-all',
-                  active
-                    ? `${c.bg} ${c.text} ${c.border} ring-2 ring-cobalt-400/60`
-                    : 'border-border bg-surface-interactive text-steel-600 hover:border-cobalt-400/40 hover:text-foreground',
-                  nonColorlessAtMax ? 'opacity-40 cursor-not-allowed' : '',
-                )}
-                disabled={nonColorlessAtMax}
-                key={c.value}
-                onClick={() => handleColorToggle(c.value)}
-                type="button"
-              >
-                {c.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <DeckIntentBuilder
+        initialIntent={ctx.deckIntent}
+        onIntentChange={(intent) => ctx.setDeckIntent(intent)}
+        showErrors={intentErrors}
+      />
 
       {/* Set / Format */}
       <div className="flex flex-col gap-1.5">
@@ -189,23 +150,6 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
           <option value="">All Sets</option>
           {allSets.filter((s) => s !== 'Token').map((s) => (
             <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Archetype */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-semibold text-foreground">
-          Archetype <span className="font-normal text-steel-600">(optional)</span>
-        </label>
-        <select
-          className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-          onChange={(e) => ctx.setArchetype(e.target.value)}
-          value={ctx.archetype}
-        >
-          <option value="">Select archetype</option>
-          {ARCHETYPES.map((a) => (
-            <option key={a} value={a}>{a}</option>
           ))}
         </select>
       </div>

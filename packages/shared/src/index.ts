@@ -2,6 +2,9 @@ export * from './types';
 export * from './playmat-zones';
 export * from './validation';
 export * from './game-engine';
+export * from './deckIntentPackages';
+export * from './mechanics-card-mapping';
+export * from './synergyScoring';
 export {
   GundamPlaytestEngine,
   createSeededRng,

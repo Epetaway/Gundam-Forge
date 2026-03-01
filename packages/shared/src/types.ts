@@ -33,6 +33,22 @@ export interface CardDefinition {
   apModifier?: number;   // AP bonus when paired with a Unit
   hpModifier?: number;   // HP bonus when paired with a Unit
 
+  // TCG Mechanics keywords for filtering and synergy detection (enriched)
+  keywords?: string[];   // e.g., ["repair", "blocker", "high_maneuver"]
+  triggers?: string[];   // e.g., ["burst", "deploy", "when_paired"]
+  
+  // Legacy field (deprecated - use keywords + triggers)
+  mechanics?: string[];  // @deprecated Use keywords/triggers instead
+
+  // Enriched metadata for filtering and matching
+  normalizedName?: string; // Normalized name for reliable import matching
+  clans?: string[];        // Clan/Faction tags extracted from traits, e.g., ["Earth Federation", "Zeon", "AEUG"]
+  
+  // Zone legality flags (enriched)
+  isMainDeck?: boolean;   // Can be included in main deck (Units, Pilots, Commands not marked as EX)
+  isResource?: boolean;   // Can be included in resource zone (Resources, Commands, EX cards)
+  isExCard?: boolean;     // Is an EX Base or EX Resource card
+
   // Legacy compatibility
   power?: number;        // Fallback for AP if ap not specified
 
@@ -53,3 +69,30 @@ export const getCardHP = (card: CardDefinition): number =>
 /** Helper to get a card's effective level (defaults to cost) */
 export const getCardLevel = (card: CardDefinition): number =>
   card.level ?? card.cost;
+
+/**
+ * DeckIntent: The strategic choices made during deck creation
+ * Maps directly to the 8 mechanics packages from deckIntentPackages config
+ * 
+ * Used to:
+ * - Support initial card catalog filtering in the deck builder
+ * - Seed synergy suggestions and deck recommendations
+ * - Track player intent for analytics and feature improvements
+ */
+export interface DeckIntent {
+  /** Clan/Faction preference: e.g., ["Earth Federation", "Zeon"] or empty for "Any Clan" */
+  clans: string[];
+
+  /** Color selection: exactly 1–2 non-Colorless colors */
+  colors: CardColor[];
+
+  /** Selected mechanics packages: e.g., ["hangar-attrition", "shield-pressure"] */
+  packages: string[];
+
+  /** Whether to include EX Resource/Base cards (normally excluded from main deck search) */
+  includeEX: boolean;
+
+  /** Optional set/format constraint */
+  setOrFormatId?: string;
+}
+

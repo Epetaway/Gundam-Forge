@@ -1,4 +1,4 @@
-import type { CardColor } from '@gundam-forge/shared';
+import type { CardColor, DeckIntent } from '@gundam-forge/shared';
 
 export interface StoredDeckEntry {
   cardId: string;
@@ -10,8 +10,7 @@ export interface StoredDeck {
   name: string;
   description: string;
   visibility: 'private' | 'unlisted' | 'public';
-  archetype: string;
-  colors: CardColor[];
+  deckIntent: DeckIntent;
   setId?: string;
   entries: StoredDeckEntry[];
   createdAt: string;
@@ -42,7 +41,7 @@ function saveAll(decks: StoredDeck[]): void {
 }
 
 export function createStoredDeck(
-  meta: Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors' | 'setId'>,
+  meta: Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'deckIntent' | 'setId'>,
   entries: StoredDeckEntry[] = [],
 ): StoredDeck {
   const now = new Date().toISOString();
@@ -51,8 +50,7 @@ export function createStoredDeck(
     name: meta.name,
     description: meta.description,
     visibility: meta.visibility,
-    archetype: meta.archetype,
-    colors: meta.colors,
+    deckIntent: meta.deckIntent,
     setId: meta.setId,
     entries,
     createdAt: now,
@@ -94,7 +92,7 @@ export function updateDeckEntries(id: string, entries: StoredDeckEntry[]): void 
 
 export function updateDeckMeta(
   id: string,
-  meta: Partial<Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'archetype' | 'colors' | 'setId'>>,
+  meta: Partial<Pick<StoredDeck, 'name' | 'description' | 'visibility' | 'deckIntent' | 'setId'>>,
 ): void {
   const all = loadAll();
   const idx = all.findIndex((d) => d.id === id);

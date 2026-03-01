@@ -24,6 +24,16 @@ export type Phase =
   | 'end'
   | 'gameOver';
 
+export type TriggerType =
+  | 'DEPLOY'
+  | 'ATTACK'
+  | 'DESTROYED'
+  | 'BURST'
+  | 'BREACH'
+  | 'REPAIR'
+  | 'PAIR'
+  | 'LINK';
+
 export type ActionType =
   | 'DRAW'
   | 'MULLIGAN'
@@ -37,7 +47,20 @@ export type ActionType =
   | 'ADVANCE_PHASE'
   | 'SPEND_RESOURCE'
   | 'REST_UNIT'
-  | 'READY_ZONE';
+  | 'READY_ZONE'
+  | 'RESOLVE_TRIGGER'
+  | 'RESOLVE_ALL_TRIGGERS';
+
+export interface TriggerEvent {
+  id: string;
+  type: TriggerType;
+  sourceInstanceId?: string;
+  ownerPlayerId?: string;
+  payload?: Record<string, any>;
+  optionalChoice: boolean;
+  description: string;
+  createdAt: number;
+}
 
 export interface CardInstance {
   instanceId: string;
@@ -92,7 +115,7 @@ export interface GameState {
   phase: Phase;
   priorityPlayer: string;
   players: Record<string, PlayerState>;
-  stack: any[];
+  stack: TriggerEvent[];
   currentCombat?: any;
   log: GameLogEntry[];
   rngSeed: number;
@@ -316,12 +339,20 @@ export class GameEngine {
         return this.handleAdvancePhase(action);
       case 'PLAY_CARD':
         return this.handlePlayCard(action);
+      case 'ACTIVATE_ABILITY':
+        return this.handleActivateAbility(action);
+      case 'PAIR_PILOT':
+        return this.handlePairPilot(action);
       case 'DECLARE_ATTACK':
         return this.handleDeclareAttack(action);
       case 'DECLARE_BLOCK':
         return this.handleDeclareBlock(action);
       case 'RESOLVE_COMBAT':
         return this.handleResolveCombat(action);
+      case 'RESOLVE_TRIGGER':
+        return this.handleResolveTrigger(action);
+      case 'RESOLVE_ALL_TRIGGERS':
+        return this.handleResolveAllTriggers(action);
       case 'END_PHASE':
         return this.handleEndPhase(action);
       default:
@@ -372,6 +403,8 @@ export class GameEngine {
       SPEND_RESOURCE: ['main', 'action'],
       REST_UNIT: ['main'],
       READY_ZONE: ['setup'],
+      RESOLVE_TRIGGER: ['main', 'action', 'battle', 'end'],
+      RESOLVE_ALL_TRIGGERS: ['main', 'action', 'battle', 'end'],
     };
 
     const allowed = gates[action]?.includes(phase);
@@ -523,6 +556,123 @@ export class GameEngine {
       `Card deployed to ${targetZone}.`,
     );
 
+    if (targetZone === 'battle') {
+      this.triggerDeploy(action.playerId, card);
+    }
+
+    return { valid: true };
+  }
+
+  private handleActivateAbility(action: GameAction): ActionValidation {
+    const { sourceInstanceId, targetInstanceId, abilityId = 'SUPPORT_MAIN' } = action.payload || {};
+    if (!sourceInstanceId || !targetInstanceId) {
+      return { valid: false, error: 'Missing sourceInstanceId or targetInstanceId' };
+    }
+
+    const player = this.state.players[action.playerId];
+    const source = player.battleArea.find((u) => u.instanceId === sourceInstanceId);
+    const target = player.battleArea.find((u) => u.instanceId === targetInstanceId);
+
+    if (!source || !target) {
+      return { valid: false, error: 'Source/target unit not found in battle area' };
+    }
+
+    if (source.state === 'rest') {
+      return { valid: false, error: 'Source unit is exhausted' };
+    }
+
+    if (source.usedAbilities.has(abilityId)) {
+      return {
+        valid: false,
+        error: 'Ability already used this turn',
+        rulesTrace: 'Once-per-turn limit prevents repeated activation.',
+      };
+    }
+
+    const sourceHasSupport = this.hasKeyword(source, ['support']);
+    if (!sourceHasSupport) {
+      return {
+        valid: false,
+        error: 'Source unit has no support ability',
+        rulesTrace: 'Only support units can activate this ability in MVP.',
+      };
+    }
+
+    source.state = 'rest';
+    source.usedAbilities.add(abilityId);
+
+    const currentBuff = target.counters.tempApBuff ?? 0;
+    target.counters.tempApBuff = currentBuff + 1;
+
+    this.log(
+      'ACTIVATE_ABILITY',
+      action.playerId,
+      this.state.phase,
+      `${source.cardId} supported ${target.cardId}`,
+      'Support unit rested and granted +1 temporary AP for this turn.',
+    );
+
+    return { valid: true };
+  }
+
+  private handlePairPilot(action: GameAction): ActionValidation {
+    const { pilotInstanceId, unitInstanceId, mode = 'pair' } = action.payload || {};
+    if (!pilotInstanceId || !unitInstanceId) {
+      return { valid: false, error: 'Missing pilotInstanceId or unitInstanceId' };
+    }
+
+    const player = this.state.players[action.playerId];
+    const pilot = player.battleArea.find((u) => u.instanceId === pilotInstanceId);
+    const unit = player.battleArea.find((u) => u.instanceId === unitInstanceId);
+
+    if (!pilot || !unit) {
+      return { valid: false, error: 'Pilot or unit not found in battle area' };
+    }
+
+    const pilotDef = this.cardDb[pilot.cardId] as any;
+    const unitDef = this.cardDb[unit.cardId] as any;
+
+    if (pilotDef?.type !== 'Pilot') {
+      return { valid: false, error: 'Selected pilot card is not a Pilot type' };
+    }
+
+    if (unitDef?.type !== 'Unit') {
+      return { valid: false, error: 'Selected target card is not a Unit type' };
+    }
+
+    if (mode === 'pair') {
+      unit.attachments.pilot = pilot;
+      player.battleArea = player.battleArea.filter((u) => u.instanceId !== pilotInstanceId);
+      this.enqueueTrigger({
+        type: 'PAIR',
+        sourceInstanceId: unit.instanceId,
+        ownerPlayerId: action.playerId,
+        optionalChoice: false,
+        description: `${pilot.cardId} paired with ${unit.cardId}`,
+        payload: { pilotInstanceId, unitInstanceId },
+      });
+    } else {
+      unit.attachments.linked = unit.attachments.linked || [];
+      unit.attachments.linked.push(pilot);
+      player.battleArea = player.battleArea.filter((u) => u.instanceId !== pilotInstanceId);
+      this.enqueueTrigger({
+        type: 'LINK',
+        sourceInstanceId: unit.instanceId,
+        ownerPlayerId: action.playerId,
+        optionalChoice: false,
+        description: `${pilot.cardId} linked to ${unit.cardId}`,
+        payload: { pilotInstanceId, unitInstanceId },
+      });
+    }
+
+    this.log(
+      'PAIR_PILOT',
+      action.playerId,
+      this.state.phase,
+      `${mode === 'pair' ? 'Paired' : 'Linked'} ${pilot.cardId} to ${unit.cardId}`,
+      'Pilot attachment completed and trigger queued.',
+    );
+
     return { valid: true };
   }
 
@@ -576,6 +726,21 @@ export class GameEngine {
       `${attackerInstanceIds.length} attacker(s) declared`,
       `Units exhausted. Target: ${target || 'shield'}.`,
     );
+
+    attackerInstanceIds.forEach((instanceId: string) => {
+      this.enqueueTrigger({
+        type: 'ATTACK',
+        sourceInstanceId: instanceId,
+        ownerPlayerId: action.playerId,
+        optionalChoice: false,
+        description: `Attack trigger from ${instanceId}`,
+        payload: {
+          attackerPlayerId: action.playerId,
+          defenderPlayerId: opponentId,
+          target: target || 'shield',
+        },
+      });
+    });
 
     return { valid: true };
   }
@@ -682,12 +847,10 @@ export class GameEngine {
       targetUnit.damageMarkers += damage;
       const unitHp = this.getUnitHealth(targetUnit);
       if (targetUnit.damageMarkers >= unitHp) {
-        targetUnit.zone = 'trash';
-        const idx = targetPlayer.battleArea.findIndex((u) => u.instanceId === targetUnit.instanceId);
-        if (idx >= 0) {
-          targetPlayer.battleArea.splice(idx, 1);
-          targetPlayer.discardPile.push(targetUnit);
-        }
+        this.triggerDestroyed(targetPlayer.playerId, targetUnit, {
+          reason: 'battle',
+          sourceInstanceId: resolvedAttackerInstanceId,
+        });
         return true;
       }
       return false;
@@ -745,6 +908,13 @@ export class GameEngine {
       `First Strike (attacker/blocker): ${attackerHasFirstStrike}/${blockerHasFirstStrike}; High-Maneuver: ${attackerHasHighManeuver}.`
     );
 
+    if (blockerDestroyed) {
+      this.triggerBreach(resolvedAttackerPlayerId, resolvedAttackerInstanceId, {
+        defenderPlayerId: resolvedDefenderPlayerId,
+        destroyedUnitId: resolvedBlockerInstanceIds[0],
+      });
+    }
+
     return { valid: true };
   }
 
@@ -761,6 +931,14 @@ export class GameEngine {
       const shieldsDestroyed = Math.min(remainingDamage, defender.shields.length);
       const destroyed = defender.shields.splice(0, shieldsDestroyed);
       destroyed.forEach((shield) => {
+        this.enqueueTrigger({
+          type: 'BURST',
+          sourceInstanceId: shield.instanceId,
+          ownerPlayerId: defender.playerId,
+          optionalChoice: true,
+          description: `Burst check for shield ${shield.cardId}`,
+          payload: { shieldCardId: shield.cardId },
+        });
         shield.zone = 'trash';
         defender.discardPile.push(shield);
         revealedShieldIds.push(shield.cardId);
@@ -802,22 +980,166 @@ export class GameEngine {
     return candidates.some((candidate) => normalized.includes(candidate.toLowerCase()));
   }
 
-  private triggerDestroyed(unit: CardInstance): void {
-    // Destroyed triggers would be resolved here
-    // For now, just mark zone as trash
+  private triggerDestroyed(
+    ownerPlayerId: string,
+    unit: CardInstance,
+    meta?: { reason?: string; sourceInstanceId?: string },
+  ): void {
+    const owner = this.state.players[ownerPlayerId];
+    const idx = owner.battleArea.findIndex((u) => u.instanceId === unit.instanceId);
+    if (idx >= 0) {
+      owner.battleArea.splice(idx, 1);
+    }
     unit.zone = 'trash';
+    owner.discardPile.push(unit);
+
+    this.enqueueTrigger({
+      type: 'DESTROYED',
+      sourceInstanceId: unit.instanceId,
+      ownerPlayerId,
+      optionalChoice: false,
+      description: `Destroyed trigger from ${unit.cardId}`,
+      payload: {
+        reason: meta?.reason || 'effect',
+        sourceInstanceId: meta?.sourceInstanceId,
+      },
+    });
   }
 
-  private triggerBreach(): void {
-    // Breach triggers only during attacker's turn when battle damage destroys defender
+  private triggerBreach(
+    attackerPlayerId: string,
+    attackerInstanceId: string,
+    payload?: Record<string, unknown>,
+  ): void {
+    this.enqueueTrigger({
+      type: 'BREACH',
+      sourceInstanceId: attackerInstanceId,
+      ownerPlayerId: attackerPlayerId,
+      optionalChoice: false,
+      description: `Breach trigger from ${attackerInstanceId}`,
+      payload,
+    });
   }
 
-  private triggerDeploy(instance: CardInstance): void {
-    // Deploy triggers resolve after unit enters battle area
-    instance.zone = 'battle';
+  private triggerDeploy(playerId: string, instance: CardInstance): void {
+    this.enqueueTrigger({
+      type: 'DEPLOY',
+      sourceInstanceId: instance.instanceId,
+      ownerPlayerId: playerId,
+      optionalChoice: false,
+      description: `Deploy trigger from ${instance.cardId}`,
+      payload: { cardId: instance.cardId },
+    });
+  }
+
+  private triggerRepair(playerId: string): void {
+    const player = this.state.players[playerId];
+    player.battleArea.forEach((unit) => {
+      if (!this.hasKeyword(unit, ['repair'])) return;
+      this.enqueueTrigger({
+        type: 'REPAIR',
+        sourceInstanceId: unit.instanceId,
+        ownerPlayerId: playerId,
+        optionalChoice: false,
+        description: `Repair trigger from ${unit.cardId}`,
+        payload: { unitInstanceId: unit.instanceId },
+      });
+    });
+  }
+
+  private enqueueTrigger(
+    trigger: Omit<TriggerEvent, 'id' | 'createdAt'>,
+  ): void {
+    const event: TriggerEvent = {
+      id: `trg-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      createdAt: Date.now(),
+      ...trigger,
+    };
+    this.state.stack.push(event);
+  }
+
+  private handleResolveTrigger(action: GameAction): ActionValidation {
+    const { triggerId, chooseResolve = true } = action.payload || {};
+    if (!triggerId) {
+      return { valid: false, error: 'Missing triggerId' };
+    }
+
+    const idx = this.state.stack.findIndex((trigger) => trigger.id === triggerId);
+    if (idx === -1) {
+      return { valid: false, error: 'Trigger not found' };
+    }
+
+    const trigger = this.state.stack[idx];
+    this.state.stack.splice(idx, 1);
+
+    if (trigger.optionalChoice && !chooseResolve) {
+      this.log(
+        'RESOLVE_TRIGGER',
+        action.playerId,
+        this.state.phase,
+        `Skipped trigger ${trigger.type}`,
+        `Optional trigger ${trigger.id} was declined.`,
+      );
+      return { valid: true };
+    }
+
+    this.applyTriggerEffect(trigger);
+    this.log(
+      'RESOLVE_TRIGGER',
+      action.playerId,
+      this.state.phase,
+      `Resolved trigger ${trigger.type}`,
+      trigger.description,
+    );
+
+    return { valid: true };
+  }
+
+  private handleResolveAllTriggers(action: GameAction): ActionValidation {
+    while (this.state.stack.length > 0) {
+      const trigger = this.state.stack.shift()!;
+      this.applyTriggerEffect(trigger);
+    }
+
+    this.log(
+      'RESOLVE_ALL_TRIGGERS',
+      action.playerId,
+      this.state.phase,
+      'Resolved all pending triggers',
+      'Trigger queue fully processed.',
+    );
+
+    return { valid: true };
+  }
+
+  private applyTriggerEffect(trigger: TriggerEvent): void {
+    switch (trigger.type) {
+      case 'DEPLOY':
+      case 'ATTACK':
+      case 'DESTROYED':
+      case 'BURST':
+      case 'BREACH':
+      case 'PAIR':
+      case 'LINK':
+        break;
+      case 'REPAIR': {
+        const playerId = trigger.ownerPlayerId;
+        const unitId = trigger.payload?.unitInstanceId as string | undefined;
+        if (!playerId || !unitId) break;
+        const player = this.state.players[playerId];
+        const unit = player.battleArea.find((u) => u.instanceId === unitId);
+        if (unit && unit.damageMarkers > 0) {
+          unit.damageMarkers -= 1;
+        }
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   private handleEndPhase(action: GameAction): ActionValidation {
+    this.triggerRepair(action.playerId);
     this.state.phase = 'end';
     this.log('END_PHASE', action.playerId, this.state.phase, 'Phase ended', 'Cleanup.');
     return { valid: true };
@@ -827,6 +1149,10 @@ export class GameEngine {
     const player = this.state.players[playerId];
     player.battleArea.forEach((u) => (u.state = 'ready'));
     player.resources.forEach((r) => (r.state = 'ready'));
+    player.battleArea.forEach((u) => {
+      u.usedAbilities.clear();
+      delete u.counters.tempApBuff;
+    });
   }
 
   public enforceHandLimit(playerId: string): void {
