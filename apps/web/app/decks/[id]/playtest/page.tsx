@@ -3,8 +3,9 @@ import { cardsRecord } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
 
-// Required for static export with dynamic routes
+// Only generate playtest pages in development — hidden in production builds
 export function generateStaticParams() {
+  if (process.env.NODE_ENV === 'production') return [];
   return deckCatalog.map((deck) => ({ id: deck.id }));
 }
 
@@ -15,6 +16,10 @@ interface PlaytestPageProps {
 }
 
 export default function PlaytestPage({ params }: PlaytestPageProps) {
+  if (process.env.NODE_ENV === 'production') {
+    notFound();
+  }
+
   const deck = getDeckById(params.id);
   if (!deck) {
     notFound();

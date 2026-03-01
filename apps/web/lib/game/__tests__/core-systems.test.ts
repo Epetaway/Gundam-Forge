@@ -430,6 +430,73 @@ describe('Game Logger', () => {
 });
 
 /**
+ * DETERMINISTIC SHUFFLE VERIFICATION
+ */
+describe('Deterministic Shuffle Verification', () => {
+  it('same seed produces identical shuffle for 60-card deck', () => {
+    const testDeck: CardInstance[] = Array.from({ length: 60 }, (_, i) => ({
+      instanceId: `card-${i}`,
+      cardId: `TEST-${i}`,
+      zone: 'deck',
+      state: 'ready',
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set(),
+    }));
+
+    const seed = createSeed('test-deck-001');
+    const shuffled1 = shuffleDeck(testDeck, seed.value);
+    const shuffled2 = shuffleDeck(testDeck, seed.value);
+
+    expect(shuffled1).toHaveLength(60);
+    expect(shuffled2).toHaveLength(60);
+    expect(shuffled1.every((c, i) => c.instanceId === shuffled2[i].instanceId)).toBe(true);
+  });
+
+  it('draws 5 cards from shuffled deck leaving 55', () => {
+    const testDeck: CardInstance[] = Array.from({ length: 60 }, (_, i) => ({
+      instanceId: `card-${i}`,
+      cardId: `TEST-${i}`,
+      zone: 'deck',
+      state: 'ready',
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set(),
+    }));
+
+    const seed = createSeed('test-deck-001');
+    const deckCopy = shuffleDeck(testDeck, seed.value);
+    const drawn = drawMultipleCards(deckCopy, 5);
+
+    expect(drawn).toHaveLength(5);
+    expect(deckCopy).toHaveLength(55);
+  });
+
+  it('different seeds produce different shuffle orders', () => {
+    const testDeck: CardInstance[] = Array.from({ length: 60 }, (_, i) => ({
+      instanceId: `card-${i}`,
+      cardId: `TEST-${i}`,
+      zone: 'deck',
+      state: 'ready',
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set(),
+    }));
+
+    const seed1 = createSeed('deck-a');
+    const seed2 = createSeed('different-deck');
+    const shuffled1 = shuffleDeck(testDeck, seed1.value);
+    const shuffled2 = shuffleDeck(testDeck, seed2.value);
+
+    const different = shuffled1.some((c, i) => c.instanceId !== shuffled2[i].instanceId);
+    expect(different).toBe(true);
+  });
+});
+
+/**
  * INTEGRATION TESTS
  */
 describe('Integration: Full Setup Sequence', () => {

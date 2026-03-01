@@ -7,6 +7,7 @@
 'use client';
 
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
@@ -24,10 +25,18 @@ export function BattleAreaZone({
   isOpponent,
   onUnitSelected,
 }: BattleAreaZoneProps) {
-  const rows = Math.ceil(units.length / 5);
+  const { setNodeRef, isOver } = useDroppable({
+    id: isOpponent ? 'opponent-battle' : 'battle',
+    data: { zone: isOpponent ? 'opponent-battle' : 'battle' },
+  });
 
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-4 h-full flex flex-col">
+    <div
+      ref={isOpponent ? undefined : setNodeRef}
+      className={`border-2 rounded-lg bg-slate-800/70 p-4 h-full flex flex-col transition-colors ${
+        !isOpponent && isOver ? 'border-green-500 bg-green-900/20' : 'border-slate-700'
+      }`}
+    >
       <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Battle Area
       </div>

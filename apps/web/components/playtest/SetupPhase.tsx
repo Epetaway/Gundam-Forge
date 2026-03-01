@@ -37,23 +37,9 @@ export function SetupPhase({ engine, cardDatabase, onSetupComplete, onError }: S
     if (currentStep === 1) {
       setIsAnimating(true);
 
-      // Must advance to draw phase first (game starts in setup phase)
-      if (engine.getState().phase === 'setup') {
-        engine.executeAction({
-          type: 'ADVANCE_PHASE',
-          playerId: 'player1',
-          timestamp: Date.now(),
-        });
-      }
-      
       // Official 2025 Gundam TCG: Draw 5 cards for opening hand
-      for (let i = 0; i < 5; i++) {
-        engine.executeAction({
-          type: 'DRAW',
-          playerId: 'player1',
-          timestamp: Date.now(),
-        });
-      }
+      // Uses setupDraw to bypass the per-turn phase gate
+      engine.setupDraw('player1', 5);
 
       // Auto-advance after draw is complete
       const timer = setTimeout(() => {

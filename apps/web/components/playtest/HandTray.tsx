@@ -8,6 +8,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDraggable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { CardArtImage } from '@/components/ui/CardArtImage';
 import { cn } from '@/lib/utils/cn';
@@ -91,6 +92,33 @@ export function HandTray({
 }
 
 /**
+ * Thin wrapper that makes a single hand card draggable via dnd-kit
+ */
+function DraggableHandCard({
+  card,
+  children,
+}: {
+  card: CardInstance;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: card.instanceId,
+    data: { card, fromZone: 'hand' },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{ opacity: isDragging ? 0.5 : 1, touchAction: 'none' }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
  * Desktop Arc Fan Layout
  * Cards arranged in arc with hover zoom effect
  */
@@ -132,8 +160,8 @@ function DesktopArcFan({
           const isHovered = hoveredCard === card.instanceId;
 
           return (
+            <DraggableHandCard key={card.instanceId} card={card}>
             <motion.div
-              key={card.instanceId}
               className="absolute"
               style={{
                 bottom: '10px',
@@ -175,6 +203,7 @@ function DesktopArcFan({
                     <CardArtImage
                       card={cardData}
                       alt={cardData.name}
+                      fill
                       priority={false}
                       loading="lazy"
                     />
@@ -209,6 +238,7 @@ function DesktopArcFan({
                 )}
               </button>
             </motion.div>
+            </DraggableHandCard>
           );
         })}
       </div>
@@ -288,8 +318,8 @@ function MobileDrawer({
                 const isSelected = selectedCard?.instanceId === card.instanceId;
 
                 return (
+                  <DraggableHandCard key={card.instanceId} card={card}>
                   <button
-                    key={card.instanceId}
                     onClick={() => onSelectCard(card)}
                     onMouseEnter={() => setHoveredCard(card.instanceId)}
                     onMouseLeave={() => setHoveredCard(null)}
@@ -306,6 +336,7 @@ function MobileDrawer({
                       <CardArtImage
                         card={cardData}
                         alt={cardData.name}
+                        fill
                         priority={false}
                         loading="lazy"
                       />
@@ -322,6 +353,7 @@ function MobileDrawer({
                       </div>
                     )}
                   </button>
+                  </DraggableHandCard>
                 );
               })}
             </div>
