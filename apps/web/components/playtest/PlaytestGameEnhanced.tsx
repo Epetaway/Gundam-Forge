@@ -240,7 +240,7 @@ export function PlaytestGameEnhanced({
   // Loading State
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="text-center">
           <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-lg text-white">Initializing Gundam TCG Playtester...</p>
@@ -252,7 +252,7 @@ export function PlaytestGameEnhanced({
   // Error State
   if (error || !gameState || !engine) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="text-center">
           <p className="text-xl font-bold text-red-500">Error</p>
           <p className="text-slate-300 mt-2">{error || 'Failed to load game'}</p>
@@ -269,7 +269,7 @@ export function PlaytestGameEnhanced({
   const opponentState = gameState.players['player2'];
 
   return (
-    <div className="w-full h-screen bg-slate-900 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
       <header className="border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-3">
         <div className="flex justify-between items-center gap-2 flex-wrap">

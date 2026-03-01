@@ -54,7 +54,7 @@ export function ShieldArea({
       {/* Shield Count Badge */}
       <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-2 text-center mb-3">
         <div className="text-sm font-bold text-blue-300">Shields: {shields.length}</div>
-        <div className="text-xs text-slate-400">Max: 5</div>
+        <div className="text-xs text-slate-400">Max: 6</div>
       </div>
 
       {/* Health Bar */}
