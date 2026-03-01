@@ -72,6 +72,7 @@ export function CardStack({
   const topCard = cardArray[0];
   const topCardData = cardDatabase[topCard.cardId];
   const stackSize = cardArray.length;
+  const isFaceDown = topCard.faceDown || topCard.zone === 'shields';
 
   // Determine which cards to show visually (max 3 visible layers)
   const visibleCards = cardArray.slice(0, Math.min(3, cardArray.length));
@@ -113,7 +114,14 @@ export function CardStack({
                 zIndex: visibleCards.length - index,
               }}
             >
-              {cardData ? (
+              {isFaceDown ? (
+                <div className="w-full h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center border-2 border-purple-500/30">
+                  <div className="text-center">
+                    <div className="text-4xl opacity-30">🛡️</div>
+                    <div className="text-[10px] text-purple-300/50 font-bold uppercase tracking-wider mt-1">Shield</div>
+                  </div>
+                </div>
+              ) : cardData ? (
                 <CardArtImage
                   card={cardData}
                   alt={cardData.name}

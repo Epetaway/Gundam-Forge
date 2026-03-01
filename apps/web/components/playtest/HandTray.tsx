@@ -119,8 +119,9 @@ function DraggableHandCard({
 }
 
 /**
- * Desktop Arc Fan Layout
- * Cards arranged in arc with hover zoom effect
+ * Desktop Hand Layout
+ * Horizontal scrollable row of cards with hover zoom.
+ * Replaces the arc-fan which overflowed into the battle area.
  */
 function DesktopArcFan({
   cards,
@@ -141,72 +142,40 @@ function DesktopArcFan({
   hoveredCard: string | null;
   setHoveredCard: (id: string | null) => void;
 }) {
-  const cardCount = cards.length;
-  const radius = 220;
-  const startAngle = -90 + (cardCount - 1) * 4;
-  const angleStep = cardCount > 1 ? 160 / (cardCount - 1) : 0;
-
   return (
-    <div className="relative w-full h-32 flex justify-center items-end px-4">
-      <div className="relative w-full h-full max-w-5xl">
-        {cards.map((card, index) => {
-          const angle = startAngle + index * angleStep;
-          const radians = (angle * Math.PI) / 180;
-          const x = radius * Math.cos(radians);
-          const y = radius * Math.sin(radians);
+    <div className="flex gap-2 justify-center items-end px-4 pb-1 overflow-x-auto max-h-[150px] overflow-y-visible">
+      {cards.map((card) => {
+        const cardData = cardDatabase[card.cardId];
+        const isSelected = selectedCard?.instanceId === card.instanceId;
+        const isHovered = hoveredCard === card.instanceId;
 
-          const cardData = cardDatabase[card.cardId];
-          const isSelected = selectedCard?.instanceId === card.instanceId;
-          const isHovered = hoveredCard === card.instanceId;
-
-          return (
-            <DraggableHandCard key={card.instanceId} card={card}>
-            <motion.div
-              className="absolute"
-              style={{
-                bottom: '10px',
-                left: '50%',
-              }}
-              animate={{
-                x: `calc(-50% + ${x}px)`,
-                y: `${y}px`,
-                zIndex: isSelected ? 50 : isHovered ? 30 : 10 + index,
-              }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            >
+        return (
+          <DraggableHandCard key={card.instanceId} card={card}>
+            <div className="relative flex-shrink-0">
               <button
                 onClick={() => onSelectCard(card)}
                 onMouseEnter={() => setHoveredCard(card.instanceId)}
                 onMouseLeave={() => setHoveredCard(null)}
                 className={cn(
-                  'relative group transition-all duration-150 ease-out',
-                  'flex flex-col items-center',
-                  isSelected && 'scale-110',
-                  isHovered && !isSelected && 'scale-105 -translate-y-6',
+                  'relative group transition-all duration-150 ease-out flex flex-col items-center',
+                  isSelected && '-translate-y-2 scale-105',
+                  isHovered && !isSelected && '-translate-y-1 scale-102',
                 )}
                 title={cardData?.name || card.cardId}
               >
-                {/* Card Image */}
                 <div
                   className={cn(
                     'relative aspect-[5/7] rounded-lg overflow-hidden',
-                    'border-2 shadow-lg transition-all',
-                    'w-20 sm:w-24',
+                    'border-2 shadow-lg transition-all w-16 sm:w-20',
                     isSelected
                       ? 'border-yellow-400 shadow-yellow-500/50 ring-2 ring-yellow-300'
                       : isHovered
-                        ? 'border-slate-400 shadow-slate-600/50'
+                        ? 'border-slate-400 shadow-slate-500/50'
                         : 'border-slate-600 shadow-slate-900/50',
                   )}
                 >
                   {cardData ? (
-                    <CardArtImage
-                      card={cardData}
-                      alt={cardData.name}
-                      fill
-                      priority={false}
-                      loading="lazy"
-                    />
+                    <CardArtImage card={cardData} alt={cardData.name} fill priority={false} loading="lazy" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-b from-slate-700 to-slate-800 flex items-center justify-center">
                       <span className="text-xs text-slate-400">?</span>
@@ -214,34 +183,34 @@ function DesktopArcFan({
                   )}
                 </div>
 
-                {/* Cost Badge */}
+                {/* Cost badge */}
                 {cardData && (
-                  <div className="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border border-cyan-300 shadow-lg">
+                  <div className="absolute -top-1.5 -left-1.5 w-5 h-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-cyan-300 shadow">
                     {cardData.cost || 0}
                   </div>
                 )}
 
-                {/* Play Button on Hover (if in main phase) */}
-                {canPlayCards && isHovered && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPlayCard(card);
-                    }}
-                    className="absolute bottom-2 left-2 right-2 px-2 py-1 bg-green-600/80 hover:bg-green-500 text-white text-xs font-bold rounded opacity-100 transition-colors"
-                  >
-                    Play
-                  </motion.button>
+                {/* Card name on hover */}
+                {isHovered && (
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded border border-slate-600 z-50 pointer-events-none">
+                    {cardData?.name || card.cardId}
+                  </div>
                 )}
               </button>
-            </motion.div>
-            </DraggableHandCard>
-          );
-        })}
-      </div>
+
+              {/* Play button (main phase only) */}
+              {canPlayCards && (isSelected || isHovered) && (
+                <button
+                  onClick={() => onPlayCard(card)}
+                  className="absolute -bottom-4 left-0 right-0 mx-auto w-fit px-2 py-0.5 bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold rounded transition-colors z-[60]"
+                >
+                  Play
+                </button>
+              )}
+            </div>
+          </DraggableHandCard>
+        );
+      })}
     </div>
   );
 }
@@ -279,7 +248,7 @@ function MobileDrawer({
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t-2 border-purple-600/30 z-40 touch-pan-y"
+      className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t-2 border-purple-600/30 z-50 touch-pan-y"
       animate={{ height: drawerHeight }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >

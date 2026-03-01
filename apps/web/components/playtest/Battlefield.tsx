@@ -43,6 +43,7 @@ interface BattlefieldProps {
     shields: CardInstance[];
     base: CardInstance | null;
     resources: CardInstance[];
+    resourceDeck: CardInstance[];
     exZone: {
       exBase?: CardInstance;
       exResources: CardInstance[];
@@ -105,72 +106,44 @@ export function Battlefield({
   }, []);
 
   return (
-    <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-      {/* OPPONENT SIDE - Responsive header */}
-      <div className="flex-shrink-0 border-b-2 border-purple-600/30 bg-slate-900/60 p-2 md:p-4 overflow-y-auto max-h-32 md:max-h-40">
-        <div className="text-xs md:text-sm text-slate-400 mb-2 uppercase tracking-wider font-semibold">
-          {opponentState.name}'s Field
-        </div>
-        
-        {/* Opponent Playmat - Responsive compact grid */}
-        <div
-          className="grid gap-2 md:gap-3"
-          style={{
-            gridTemplateColumns: 'minmax(80px, 1fr) minmax(80px, 1fr) minmax(120px, 2fr) minmax(80px, 1fr)',
-            gridTemplateRows: 'auto auto',
-          }}
-        >
-          {/* Shields */}
-          <div className="col-span-1">
-            <ShieldArea
-              shields={opponentState.shields}
-              cardDatabase={cardDatabase}
-              isOpponent={true}
-              baseHealth={opponentState.baseHealth}
-              maxBaseHealth={opponentState.maxBaseHealth}
-              onDamaged={onShieldDamaged}
-            />
+    <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 relative">
+      {/* OPPONENT STATUS - Compact strip (player POV only) */}
+      <div className="flex-shrink-0 border-b-2 border-purple-600/30 bg-slate-900/60 px-4 py-2 relative z-10">
+        <div className="flex items-center gap-6 flex-wrap">
+          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            {opponentState.name}'s Field
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-purple-400 inline-block" />
+            <span className="text-white font-bold text-sm">{opponentState.shields.length}</span>
+            <span className="text-slate-500 text-xs">shields</span>
           </div>
-
-          {/* Base */}
-          <BaseArea
-            baseCard={opponentState.base}
-            cardDatabase={cardDatabase}
-            baseHealth={opponentState.baseHealth}
-            maxBaseHealth={opponentState.maxBaseHealth}
-            isOpponent={true}
-          />
-
-          {/* Battle Area - spans 1 row, 2 cols */}
-          <div className="col-span-1 row-span-2">
-            <BattleAreaZone
-              units={opponentState.battleArea}
-              cardDatabase={cardDatabase}
-              isOpponent={true}
-              onUnitSelected={(unit) => onUnitSelected?.(unit, true)}
-            />
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />
+            <span className="text-white font-bold text-sm">{opponentState.battleArea.length}</span>
+            <span className="text-slate-500 text-xs">units</span>
           </div>
-
-          {/* Resources */}
-          <div className="col-span-1">
-            <ResourceAreaZone
-              resources={opponentState.resources}
-              cardDatabase={cardDatabase}
-              isOpponent={true}
-            />
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+            <span className="text-white font-bold text-sm">{opponentState.resources.length}</span>
+            <span className="text-slate-500 text-xs">resources</span>
           </div>
-
-          {/* Hand count indicator */}
-          <div className="col-span-3 bg-slate-800/40 border border-dashed border-slate-600 rounded-lg p-1 md:p-2 text-center">
-            <div className="text-[10px] md:text-xs text-slate-400">
-              Hand: {opponentState.hand.length}/10
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-slate-500 inline-block" />
+            <span className="text-white font-bold text-sm">{opponentState.hand.length}</span>
+            <span className="text-slate-500 text-xs">in hand</span>
+          </div>
+          <div className="ml-auto flex items-center gap-1.5">
+            <span className="text-slate-500 text-xs">HP</span>
+            <span className="text-red-400 font-bold text-sm">
+              {opponentState.baseHealth}/{opponentState.maxBaseHealth}
+            </span>
           </div>
         </div>
       </div>
 
       {/* MAIN GAME AREA - Responsive CSS Grid playmat */}
-      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4">
+      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 relative z-10">
         {/* LEFT COLUMN - Player zones (Shields, Base, Resources, Trash) */}
         <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto md:overflow-y-auto pb-2">
           {/* Shield Area */}
@@ -208,7 +181,7 @@ export function Battlefield({
               Resource Deck
             </div>
             <ResourceDeckArea
-              resourceDeck={playerState.exZone.exResources || []}
+              resourceDeck={playerState.resourceDeck || []}
               isOpponent={false}
             />
           </div>
@@ -285,8 +258,8 @@ export function Battlefield({
         </div>
       </div>
 
-      {/* PLAYER HAND - Fixed at bottom with responsive sizing */}
-      <div className="flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/60 p-2 md:p-4">
+      {/* PLAYER HAND - Fixed at bottom with proper overflow constraints */}
+      <div className="flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/60 px-2 py-3 max-h-[180px] overflow-hidden relative z-30">
         <HandTray
           cards={playerState.hand}
           cardDatabase={cardDatabase}

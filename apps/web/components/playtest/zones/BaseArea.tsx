@@ -60,8 +60,8 @@ export function BaseArea({
         </>
       ) : (
         <div className="bg-slate-700/40 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center">
-          <div className="text-xs text-slate-500 italic">No base played yet</div>
-          <div className="text-[10px] text-slate-600 mt-1">Play a Base card to start</div>
+          <div className="text-xs text-slate-400 font-medium">No base played yet</div>
+          <div className="text-[10px] text-slate-500 mt-1">Play a Base card to start</div>
         </div>
       )}
     </div>

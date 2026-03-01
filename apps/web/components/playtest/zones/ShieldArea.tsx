@@ -47,7 +47,7 @@ export function ShieldArea({
             className="flex justify-center"
           />
         ) : (
-          <div className="text-slate-600 text-sm italic py-4">No shields</div>
+          <div className="text-slate-400 text-sm font-medium py-4">No shields</div>
         )}
       </div>
 

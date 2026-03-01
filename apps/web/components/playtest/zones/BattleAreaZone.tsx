@@ -76,7 +76,7 @@ export function BattleAreaZone({
             </div>
           ))
         ) : (
-          <div className="flex items-center justify-center h-32 text-slate-600 italic">
+          <div className="flex items-center justify-center h-32 text-slate-400 text-sm font-medium">
             Battle area empty
           </div>
         )}
