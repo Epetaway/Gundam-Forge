@@ -7,6 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
@@ -23,9 +24,18 @@ export function TrashArea({
   isOpponent,
 }: TrashAreaProps) {
   const [showDetails, setShowDetails] = useState(false);
+  const { setNodeRef, isOver } = useDroppable({
+    id: isOpponent ? 'opponent-trash' : 'trash',
+    data: { zone: isOpponent ? 'opponent-trash' : 'trash' },
+  });
 
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-3">
+    <div
+      ref={isOpponent ? undefined : setNodeRef}
+      className={`border-2 rounded-lg bg-slate-800/70 p-3 transition-colors ${
+        !isOpponent && isOver ? 'border-red-500 bg-red-900/20' : 'border-slate-700'
+      }`}
+    >
       <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
         Trash ({trash.length})
       </div>

@@ -51,7 +51,10 @@ export class AdvancedAutoplayer {
   } {
     const evaluateState = (player: PlayerState): BoardEvaluation => {
       const units = player.battleArea;
-      const totalAttack = units.reduce((sum, u) => sum + (u.damageMarkers || 0), 0);
+      const totalAttack = units.reduce((sum, u) => {
+        const def = this.cardDatabase[u.cardId] as any;
+        return sum + (def?.ap ?? def?.atk ?? 0);
+      }, 0);
       const unitCount = units.length;
 
       // Calculate average power per unit

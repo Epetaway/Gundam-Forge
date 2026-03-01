@@ -1520,6 +1520,37 @@ export class GameEngine {
     }));
   }
 
+  /**
+   * Draw cards during setup without going through the phase gate.
+   * Used for opening hand draw (setup is not a regular turn draw).
+   */
+  public setupDraw(playerId: string, count: number): void {
+    const player = this.state.players[playerId];
+    if (!player) return;
+    const drawn = Math.min(count, player.deck.length);
+    for (let i = 0; i < drawn; i++) {
+      const card = player.deck.pop()!;
+      card.zone = 'hand';
+      player.hand.push(card);
+    }
+    // Opening hand counts as the turn-1 draw so draw phase is instantly skippable
+    this.state.hasDrawnThisTurn = true;
+    this.log(
+      'DRAW',
+      playerId,
+      this.state.phase,
+      `Setup draw: ${drawn} cards`,
+      `Opening hand draw bypasses phase gate.`,
+    );
+    this.saveStateToHistory();
+  }
+
+  /** Set which player acts first (call before game starts, while still in setup phase). */
+  public setFirstPlayer(playerId: string): void {
+    this.state.activePlayerId = playerId;
+    this.state.priorityPlayer = playerId;
+  }
+
   public getLog(): GameLogEntry[] {
     return [...this.state.log];
   }

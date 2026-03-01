@@ -2,7 +2,7 @@ export function getCardById(id: string) {
   return cardsById.get(id);
 }
 
-export function getCardList({ q, limit, cursor }: { q?: string; limit?: number; cursor?: string }) {
+export function getCardList({ q, limit, cursor, color, type, set }: { q?: string; limit?: number; cursor?: string; color?: string; type?: string; set?: string }) {
   // Simple cursor pagination: cursor is card id, returns next N after
   let filtered = cards;
   if (q) {
@@ -10,15 +10,14 @@ export function getCardList({ q, limit, cursor }: { q?: string; limit?: number; 
     filtered = filtered.filter(card => `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase().includes(query));
   }
   // Add filter support (color, type, set)
-  const args = arguments[0] || {};
-  if (args.color && args.color !== 'All') {
-    filtered = filtered.filter(card => card.color === args.color);
+  if (color && color !== 'All') {
+    filtered = filtered.filter(card => card.color === color);
   }
-  if (args.type && args.type !== 'All') {
-    filtered = filtered.filter(card => card.type === args.type);
+  if (type && type !== 'All') {
+    filtered = filtered.filter(card => card.type === type);
   }
-  if (args.set && args.set !== 'All') {
-    filtered = filtered.filter(card => card.set === args.set);
+  if (set && set !== 'All') {
+    filtered = filtered.filter(card => card.set === set);
   }
   let startIdx = 0;
   if (cursor) {

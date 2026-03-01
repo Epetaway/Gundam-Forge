@@ -7,6 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
@@ -23,9 +24,18 @@ export function ResourceAreaZone({
   isOpponent,
 }: ResourceAreaZoneProps) {
   const [selectedResource, setSelectedResource] = useState<string | null>(null);
+  const { setNodeRef, isOver } = useDroppable({
+    id: isOpponent ? 'opponent-resources' : 'resources',
+    data: { zone: isOpponent ? 'opponent-resources' : 'resources' },
+  });
 
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-3">
+    <div
+      ref={isOpponent ? undefined : setNodeRef}
+      className={`border-2 rounded-lg bg-slate-800/70 p-3 transition-colors ${
+        !isOpponent && isOver ? 'border-cyan-500 bg-cyan-900/20' : 'border-slate-700'
+      }`}
+    >
       <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
         Resources In Play
       </div>

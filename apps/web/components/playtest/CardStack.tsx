@@ -117,6 +117,7 @@ export function CardStack({
                 <CardArtImage
                   card={cardData}
                   alt={cardData.name}
+                  fill
                   priority={false}
                   loading="lazy"
                   quality={75}

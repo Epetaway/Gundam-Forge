@@ -1,7 +1,7 @@
 /**
  * Enhanced PlaytestGame Component
  * PHASE 1-4 COMPLETE INTEGRATION
- * 
+ *
  * Integrates:
  * - Phase 1: Official Gundam TCG Battlefield Layout
  * - Phase 2: Interactive Gameplay Systems (Undo/Redo, Mulligan, Keyboard Shortcuts)
@@ -11,10 +11,12 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GameEngine } from '@/lib/game/game-engine';
+import { Autoplayer } from '@/lib/game/autoplayer';
 import { Battlefield } from './Battlefield';
-import { SetupPhase } from './SetupPhase';
+import { GameStartFlow } from './GameStartFlow';
+import type { GameStartPhase } from './GameStartFlow';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { useSoundEffects } from '@/lib/hooks/useSoundEffects';
 import { PhaseIndicator } from './PhaseIndicator';
@@ -46,6 +48,15 @@ export function PlaytestGameEnhanced({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Autoplayer
+  const autoplayerRef = useRef(new Autoplayer());
+
+  // GameStartFlow phase state (only shown once at game start)
+  const [startPhase, setStartPhase] = useState<GameStartPhase>('coinFlip');
+  const [gameReady, setGameReady] = useState(false);
+  // Track which player goes first (set by coin flip choice)
+  const [playerGoesFirst, setPlayerGoesFirst] = useState(true);
+
   // UI State
   const [selectedCard, setSelectedCard] = useState<CardInstance | null>(null);
   const [showHelpModal, setShowHelpModal] = useState(false);
@@ -58,7 +69,6 @@ export function PlaytestGameEnhanced({
     playCardPlay,
     playAttack,
     playShieldBreak,
-    playDestroyed,
     playVictory,
     playDefeat,
     toggleMute,
@@ -76,13 +86,14 @@ export function PlaytestGameEnhanced({
         cards: playerDeck.entries.map((entry) => ({
           cardId: entry.cardId,
           count: entry.qty,
-          zone: 'main' as const, // Default to main zone for all cards
+          zone: 'main' as const,
         })),
       };
 
-      const engine = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
-      setEngine(engine);
-      setGameState(engine.getState());
+      const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
+      autoplayerRef.current.initialize('player2', cardDatabase);
+      setEngine(eng);
+      setGameState(eng.getState());
       setIsLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initialize game');
@@ -90,13 +101,12 @@ export function PlaytestGameEnhanced({
     }
   }, [playerDeck, cardDatabase]);
 
-  // Phase 2: Game Action Handler
+  // Game Action Handler
   const handleAction = (action: GameAction) => {
     if (!engine) return;
 
     const validation = engine.executeAction(action);
     if (validation.valid) {
-      // Phase 3: Sound Effects Triggers
       switch (action.type) {
         case 'PLAY_CARD':
           playCardPlay();
@@ -104,8 +114,6 @@ export function PlaytestGameEnhanced({
         case 'DECLARE_ATTACK':
           playAttack();
           break;
-        case 'END_PHASE':
-          break; // Silent
       }
 
       setGameState(engine.getState());
@@ -127,7 +135,59 @@ export function PlaytestGameEnhanced({
     }
   };
 
-  // Phase 2: Undo/Redo Handlers
+  // Auto-advance 'setup' phase during normal turns (turn 2+)
+  useEffect(() => {
+    if (!engine || !gameState || !gameReady) return;
+    if (gameState.phase !== 'setup') return;
+
+    const timeout = setTimeout(() => {
+      engine.executeAction({
+        type: 'ADVANCE_PHASE',
+        playerId: gameState.activePlayerId,
+        timestamp: Date.now(),
+        payload: {},
+      });
+      setGameState(engine.getState());
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState?.phase, gameReady]);
+
+  // Opponent turn: fire autoplayer when it's player2's turn
+  useEffect(() => {
+    if (!engine || !gameState) return;
+    if (gameState.activePlayerId !== 'player2') return;
+    if (gameState.phase === 'setup' || gameState.phase === 'gameOver') return;
+
+    const timeout = setTimeout(() => {
+      const currentState = engine.getState();
+      if (currentState.activePlayerId !== 'player2') return;
+
+      const decision = autoplayerRef.current.decideActions(currentState, cardDatabase);
+      for (const action of decision.actions) {
+        engine.executeAction(action);
+      }
+
+      // If phase hasn't fully cycled back to player1 after autoplayer, advance it
+      const afterState = engine.getState();
+      if (afterState.activePlayerId === 'player2' && afterState.phase !== 'gameOver') {
+        engine.executeAction({
+          type: 'ADVANCE_PHASE',
+          playerId: 'player2',
+          timestamp: Date.now(),
+          payload: {},
+        });
+      }
+
+      setGameState(engine.getState());
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState?.activePlayerId, gameState?.phase]);
+
+  // Undo/Redo Handlers
   const handleUndo = () => {
     if (!engine) return;
     if (engine.undo()) {
@@ -144,7 +204,7 @@ export function PlaytestGameEnhanced({
     }
   };
 
-  // Phase 2: Phase Advance
+  // Phase Advance
   const handleAdvancePhase = () => {
     if (!gameState?.activePlayerId) return;
     handleAction({
@@ -155,7 +215,17 @@ export function PlaytestGameEnhanced({
     });
   };
 
-  // Phase 2: Keyboard Shortcuts Integration
+  // Draw Card (draw phase)
+  const handleDraw = () => {
+    if (!gameState?.activePlayerId) return;
+    handleAction({
+      type: 'DRAW',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+  };
+
+  // Keyboard Shortcuts
   useKeyboardShortcuts({
     onNextPhase: handleAdvancePhase,
     onUndo: handleUndo,
@@ -191,23 +261,25 @@ export function PlaytestGameEnhanced({
     );
   }
 
-  const isSetupPhase = gameState.phase === 'setup';
+  const isSetupPhase = !gameReady;
   const isPlayerTurn = gameState.activePlayerId === 'player1';
+  const isDrawPhase = gameState.phase === 'draw';
+  const needsToDraw = isDrawPhase && isPlayerTurn && !gameState.hasDrawnThisTurn;
   const playerState = gameState.players['player1'];
   const opponentState = gameState.players['player2'];
 
   return (
     <div className="w-full h-screen bg-slate-900 flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
-      <header className="border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white">Gundam TCG Playtester</h1>
+      <header className="border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-3">
+        <div className="flex justify-between items-center gap-2 flex-wrap">
+          <h1 className="text-xl font-bold text-white whitespace-nowrap">Gundam TCG Playtester</h1>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center flex-wrap">
             {/* Sound Toggle */}
             <button
               onClick={toggleMute}
-              className={`px-3 py-2 rounded transition text-sm font-semibold ${
+              className={`px-3 py-1.5 rounded transition text-sm font-semibold ${
                 isMuted
                   ? 'bg-slate-700 text-slate-400 hover:bg-slate-600'
                   : 'bg-blue-700 text-white hover:bg-blue-600'
@@ -215,39 +287,37 @@ export function PlaytestGameEnhanced({
               title={isMuted ? 'Sound muted' : 'Sound on'}
               aria-label={isMuted ? 'Enable sound' : 'Disable sound'}
             >
-              {isMuted ? 'Mute' : 'Sound'}
+              {isMuted ? '🔇' : '🔊'}
             </button>
 
             {/* Help Button */}
             <button
               onClick={() => setShowHelpModal(true)}
-              className="px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition text-sm"
-              title="Show keyboard shortcuts (Press ?)"
+              className="px-3 py-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition text-sm"
+              title="Show keyboard shortcuts (?)"
               aria-label="Show help"
             >
               Help
             </button>
 
-            {/* Undo/Redo Buttons (Phase 2) */}
+            {/* Undo/Redo */}
             {!isSetupPhase && (
-              <div className="flex gap-1 border-l border-r border-slate-600 px-3">
+              <div className="flex gap-1 border-l border-r border-slate-600 px-2">
                 <button
                   onClick={handleUndo}
                   disabled={!engine?.canUndo()}
-                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded font-semibold text-sm transition"
-                  title="Undo last action (Ctrl+Z)"
-                  aria-label="Undo"
+                  className="px-2 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-sm transition"
+                  title="Undo (Ctrl+Z)"
                 >
-                  ↶ Undo
+                  ↶
                 </button>
                 <button
                   onClick={handleRedo}
                   disabled={!engine?.canRedo()}
-                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded font-semibold text-sm transition"
-                  title="Redo last undone action (Ctrl+Y)"
-                  aria-label="Redo"
+                  className="px-2 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-sm transition"
+                  title="Redo (Ctrl+Y)"
                 >
-                  ↷ Redo
+                  ↷
                 </button>
               </div>
             )}
@@ -261,35 +331,102 @@ export function PlaytestGameEnhanced({
               />
             )}
 
+            {/* Draw Card button — only shown when player must draw */}
+            {!isSetupPhase && needsToDraw && (
+              <button
+                onClick={handleDraw}
+                className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-semibold text-sm transition animate-pulse"
+                title="Draw a card (draw phase)"
+              >
+                Draw Card
+              </button>
+            )}
+
             {/* Next Phase Button */}
             {!isSetupPhase && (
               <button
                 onClick={handleAdvancePhase}
-                disabled={!isPlayerTurn}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 rounded-lg font-semibold transition"
-                title="Advance to next phase (Press Enter)"
+                disabled={!isPlayerTurn || needsToDraw}
+                className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm transition"
+                title={needsToDraw ? 'Draw a card first' : 'Next phase (Enter)'}
                 aria-label="Next phase"
               >
-                Next Phase
+                {needsToDraw ? 'Draw First' : 'Next Phase →'}
               </button>
             )}
           </div>
         </div>
       </header>
-      {/* SETUP PHASE */}
+
+      {/* SETUP PHASE — GameStartFlow */}
       {isSetupPhase && (
-        <SetupPhase
-          engine={engine}
+        <GameStartFlow
+          phase={startPhase}
+          playerId="player1"
+          opponentId="player2"
+          handCards={engine.getState().players['player1'].hand}
           cardDatabase={cardDatabase}
-          onSetupComplete={() => setGameState(engine.getState())}
-          onError={setError}
+          onCoinFlipResult={(_isHeads, goesFirst) => {
+            setPlayerGoesFirst(goesFirst);
+            setStartPhase('shuffle');
+          }}
+          onShuffleComplete={() => {
+            engine.setupDraw('player1', 5);
+            setGameState(engine.getState());
+            setStartPhase('draw');
+          }}
+          onDrawComplete={() => {
+            setStartPhase('mulligan');
+          }}
+          onMulliganCards={() => {
+            engine.executeAction({
+              type: 'MULLIGAN',
+              playerId: 'player1',
+              timestamp: Date.now(),
+            });
+            setGameState(engine.getState());
+            setStartPhase('shields');
+          }}
+          onMulliganSkip={() => {
+            setStartPhase('shields');
+          }}
+          onShieldsPlaced={() => {
+            setStartPhase('ready');
+          }}
+          onGameReady={() => {
+            // Apply the coin flip choice: set which player goes first
+            const firstPlayerId = playerGoesFirst ? 'player1' : 'player2';
+            engine.setFirstPlayer(firstPlayerId);
+            // Advance engine out of setup phase
+            engine.executeAction({
+              type: 'ADVANCE_PHASE',
+              playerId: firstPlayerId,
+              timestamp: Date.now(),
+            });
+            setGameState(engine.getState());
+            setGameReady(true);
+          }}
         />
       )}
 
-      {/* MAIN GAME AREA: Battlefield (Phase 1) */}
+      {/* MAIN GAME AREA: Battlefield */}
       {!isSetupPhase && (
-        <DragDropProvider>
-          <main className="flex-1 overflow-hidden">
+        <DragDropProvider
+          cardDatabase={cardDatabase}
+          onCardPlayRequested={(card) =>
+            handleAction({
+              type: 'PLAY_CARD',
+              playerId: 'player1',
+              timestamp: Date.now(),
+              payload: { cardInstanceId: card.instanceId },
+            })
+          }
+          onDropError={(msg) => {
+            setError(msg);
+            setTimeout(() => setError(null), 3000);
+          }}
+        >
+          <main className="flex-1 overflow-hidden" id="main-content">
             <Battlefield
               playerState={playerState}
               opponentState={opponentState}
@@ -324,20 +461,20 @@ export function PlaytestGameEnhanced({
         </DragDropProvider>
       )}
 
-      {/* Keyboard Shortcuts Legend Modal (Phase 2) */}
+      {/* Keyboard Shortcuts Legend */}
       <KeyboardShortcutsLegend
         isOpen={showHelpModal}
         onClose={() => setShowHelpModal(false)}
       />
 
-      {/* Error Toast (Phase 3: Visual Feedback) */}
+      {/* Error Toast */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs">
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs z-50">
           {error}
         </div>
       )}
 
-      {/* Accessibility: Skip to main content link */}
+      {/* Accessibility */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded"
