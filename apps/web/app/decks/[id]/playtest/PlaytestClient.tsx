@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GameState, GameEngine, DeckDefinition } from '@/lib/game/game-engine';
 import { cardsById } from '@/lib/data/cards';
 import OpeningHandModal from '@/components/playtest/OpeningHandModal';
@@ -31,6 +31,9 @@ interface PlaytestPageState {
 }
 
 export default function PlaytestClient({ deckId, deck }: PlaytestClientProps) {
+  const [botAutoplay, setBotAutoplay] = useState(false);
+  const [botDecisionLog, setBotDecisionLog] = useState<string[]>([]);
+
   const [state, setState] = useState<PlaytestPageState>(() => {
     try {
       const cardDatabase = Object.fromEntries(cardsById) as unknown as Record<string, any>;
@@ -264,6 +267,120 @@ export default function PlaytestClient({ deckId, deck }: PlaytestClientProps) {
     });
   };
 
+  const appendBotDecision = (entry: string) => {
+    setBotDecisionLog((prev) => [...prev.slice(-11), `[T${state.gameState?.turnNumber ?? 0}] ${entry}`]);
+  };
+
+  const runBotStep = () => {
+    if (!state.gameState) return;
+
+    const gameState = state.gameState;
+    const botPlayer = gameState.players['player2'];
+    const humanPlayer = gameState.players['player1'];
+    const combat = gameState.currentCombat;
+
+    if (gameState.phase === 'battle' && combat?.defenderPlayerId === 'player2') {
+      const blockerChoices = botPlayer.battleArea.filter((unit) => unit.state === 'ready');
+      const attackerInstanceId = combat.attackerInstanceIds?.[0];
+      if (attackerInstanceId && blockerChoices.length > 0 && !combat.blockerInstanceIds?.length) {
+        appendBotDecision(`Bot blocks with ${blockerChoices[0].cardId}`);
+        executeAction('DECLARE_BLOCK', {
+          defenderId: 'player2',
+          attackerPlayerId: combat.attackerPlayerId,
+          attackerInstanceId,
+          blockerId: blockerChoices[0].instanceId,
+        });
+        return;
+      }
+
+      appendBotDecision('Bot resolves combat while defending');
+      executeAction('RESOLVE_COMBAT', {
+        attackerPlayerId: combat.attackerPlayerId,
+        defenderPlayerId: combat.defenderPlayerId,
+        attackerInstanceId: attackerInstanceId,
+        blockerInstanceIds: combat.blockerInstanceIds || [],
+        target: combat.target || 'shield',
+      });
+      return;
+    }
+
+    if (gameState.activePlayerId !== 'player2') {
+      return;
+    }
+
+    if (gameState.phase === 'setup') {
+      appendBotDecision('Bot advances from setup to draw');
+      executeAction('ADVANCE_PHASE');
+      return;
+    }
+
+    if (gameState.phase === 'draw') {
+      if (!gameState.hasDrawnThisTurn && botPlayer.deck.length > 0) {
+        appendBotDecision('Bot draws for turn');
+        executeAction('DRAW');
+      } else {
+        appendBotDecision('Bot advances to main phase');
+        executeAction('ADVANCE_PHASE');
+      }
+      return;
+    }
+
+    if (gameState.phase === 'main') {
+      if (botPlayer.hand.length > 0) {
+        appendBotDecision(`Bot deploys ${botPlayer.hand[0].cardId}`);
+        executeAction('PLAY_CARD', { cardInstanceId: botPlayer.hand[0].instanceId });
+        return;
+      }
+
+      const readyAttackers = botPlayer.battleArea.filter((unit) => unit.state === 'ready');
+      if (readyAttackers.length > 0) {
+        appendBotDecision(`Bot attacks with ${readyAttackers[0].cardId}`);
+        executeAction('DECLARE_ATTACK', {
+          attackerInstanceIds: [readyAttackers[0].instanceId],
+          attackerInstanceId: readyAttackers[0].instanceId,
+          attackerPlayerId: 'player2',
+          defenderPlayerId: 'player1',
+          target: humanPlayer.shields.length > 0 ? 'shield' : 'base',
+        });
+        return;
+      }
+
+      appendBotDecision('Bot has no play in main; advancing phase');
+      executeAction('ADVANCE_PHASE');
+      return;
+    }
+
+    if (gameState.phase === 'battle') {
+      const attackerInstanceId = combat?.attackerInstanceIds?.[0];
+      appendBotDecision('Bot resolves combat');
+      executeAction('RESOLVE_COMBAT', {
+        attackerPlayerId: combat?.attackerPlayerId ?? 'player2',
+        defenderPlayerId: combat?.defenderPlayerId ?? 'player1',
+        attackerInstanceId,
+        blockerInstanceIds: combat?.blockerInstanceIds || [],
+        target: combat?.target || 'shield',
+      });
+      return;
+    }
+
+    appendBotDecision(`Bot advances from ${gameState.phase}`);
+    executeAction('ADVANCE_PHASE');
+  };
+
+  useEffect(() => {
+    if (!botAutoplay || state.showOpeningHand || !state.gameState) return;
+
+    const gameState = state.gameState;
+    const botShouldAct =
+      gameState.activePlayerId === 'player2' ||
+      (gameState.phase === 'battle' && gameState.currentCombat?.defenderPlayerId === 'player2');
+
+    if (!botShouldAct) return;
+
+    const timer = setTimeout(() => runBotStep(), 250);
+    return () => clearTimeout(timer);
+  }, [botAutoplay, state.showOpeningHand, state.gameState]);
+
   if (state.loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
@@ -295,6 +412,9 @@ export default function PlaytestClient({ deckId, deck }: PlaytestClientProps) {
 
   const gameState = state.gameState;
   const currentPlayer = gameState.players[gameState.activePlayerId];
+  const canBotStep =
+    gameState.activePlayerId === 'player2' ||
+    (gameState.phase === 'battle' && gameState.currentCombat?.defenderPlayerId === 'player2');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-white">
@@ -361,6 +481,19 @@ export default function PlaytestClient({ deckId, deck }: PlaytestClientProps) {
               <h3 className="font-semibold text-slate-300 mb-3 text-sm">Log</h3>
               <PlaytestLog log={gameState.log.slice(-8)} compact />
             </div>
+
+            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
+              <h3 className="font-semibold text-slate-300 mb-3 text-sm">Bot Decisions</h3>
+              {botDecisionLog.length === 0 ? (
+                <p className="text-xs text-slate-500">No bot decisions yet.</p>
+              ) : (
+                <ul className="space-y-1 text-xs text-slate-300 max-h-36 overflow-y-auto pr-1">
+                  {botDecisionLog.slice(-8).map((entry, index) => (
+                    <li key={`${entry}-${index}`}>{entry}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           <div className="lg:col-span-3">
@@ -375,7 +508,14 @@ export default function PlaytestClient({ deckId, deck }: PlaytestClientProps) {
           <div className="lg:col-span-1 space-y-6">
             <CardInspector cardId={getSelectedCardId()} />
             <div>
-              <PlaytestActionPanel gameState={gameState} onAction={executeAction} />
+              <PlaytestActionPanel
+                gameState={gameState}
+                onAction={executeAction}
+                botAutoplay={botAutoplay}
+                onToggleBotAutoplay={() => setBotAutoplay((prev) => !prev)}
+                onBotStep={runBotStep}
+                canBotStep={canBotStep}
+              />
             </div>
           </div>
         </div>
