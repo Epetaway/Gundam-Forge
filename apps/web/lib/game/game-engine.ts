@@ -97,6 +97,7 @@ export interface PlayerState {
   maxBaseHealth: number;
   shieldsDrawnThisTurn: number;
   deckShuffleSeed: number;
+  mulliganTaken: boolean;
 }
 
 export interface GameLogEntry {
@@ -170,6 +171,9 @@ export interface DeckDefinition {
 export class GameEngine {
   private state: GameState;
   private cardDb: Record<string, CardDefinition> = {};
+  private stateHistory: GameState[] = [];
+  private historyIndex: number = -1;
+  private readonly MAX_HISTORY = 100;
 
   constructor(
     deckId: string,
@@ -179,6 +183,8 @@ export class GameEngine {
     this.cardDb = cardDatabase;
     this.registerTokenDeckDefinitions();
     this.state = this.initializeGame(deckId, deck);
+    // Save initial state
+    this.saveStateToHistory();
   }
 
   private registerTokenDeckDefinitions(): void {
@@ -283,6 +289,7 @@ export class GameEngine {
       maxBaseHealth: 20,
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
+      mulliganTaken: false,
     };
 
     return player;
@@ -364,6 +371,7 @@ export class GameEngine {
       maxBaseHealth: 20,
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
+      mulliganTaken: false,
     };
   }
 
@@ -396,32 +404,55 @@ export class GameEngine {
       return validation;
     }
 
+    let result: ActionValidation;
+
     switch (action.type) {
       case 'DRAW':
-        return this.handleDraw(action);
+        result = this.handleDraw(action);
+        break;
+      case 'MULLIGAN':
+        result = this.handleMulligan(action);
+        break;
       case 'ADVANCE_PHASE':
-        return this.handleAdvancePhase(action);
+        result = this.handleAdvancePhase(action);
+        break;
       case 'PLAY_CARD':
-        return this.handlePlayCard(action);
+        result = this.handlePlayCard(action);
+        break;
       case 'ACTIVATE_ABILITY':
-        return this.handleActivateAbility(action);
+        result = this.handleActivateAbility(action);
+        break;
       case 'PAIR_PILOT':
-        return this.handlePairPilot(action);
+        result = this.handlePairPilot(action);
+        break;
       case 'DECLARE_ATTACK':
-        return this.handleDeclareAttack(action);
+        result = this.handleDeclareAttack(action);
+        break;
       case 'DECLARE_BLOCK':
-        return this.handleDeclareBlock(action);
+        result = this.handleDeclareBlock(action);
+        break;
       case 'RESOLVE_COMBAT':
-        return this.handleResolveCombat(action);
+        result = this.handleResolveCombat(action);
+        break;
       case 'RESOLVE_TRIGGER':
-        return this.handleResolveTrigger(action);
+        result = this.handleResolveTrigger(action);
+        break;
       case 'RESOLVE_ALL_TRIGGERS':
-        return this.handleResolveAllTriggers(action);
+        result = this.handleResolveAllTriggers(action);
+        break;
       case 'END_PHASE':
-        return this.handleEndPhase(action);
+        result = this.handleEndPhase(action);
+        break;
       default:
-        return { valid: false, error: `Unknown action: ${action.type}` };
+        result = { valid: false, error: `Unknown action: ${action.type}` };
     }
+
+    // Save state after successful action
+    if (result.valid) {
+      this.saveStateToHistory();
+    }
+
+    return result;
   }
 
   public validateAction(
@@ -500,6 +531,46 @@ export class GameEngine {
       this.state.phase,
       `Drew ${card.cardId}`,
       'Card moved from deck to hand.',
+    );
+
+    return { valid: true };
+  }
+
+  private handleMulligan(action: GameAction): ActionValidation {
+    const player = this.state.players[action.playerId];
+
+    // Check if they've already taken a mulligan
+    if (player.mulliganTaken) {
+      return {
+        valid: false,
+        error: 'Mulligan already taken',
+        rulesTrace: 'Each player can only mulligan (redraw) their opening hand once.',
+      };
+    }
+
+    // Shuffle hand back into deck
+    player.deck.push(...player.hand);
+    player.hand = [];
+
+    // Reshuffle deck with same seed (deterministic)
+    this.shuffleDeck(player.deck, player.deckShuffleSeed);
+
+    // Draw 7 new cards
+    for (let i = 0; i < 7 && player.deck.length > 0; i++) {
+      const card = player.deck.pop()!;
+      card.zone = 'hand';
+      player.hand.push(card);
+    }
+
+    // Mark mulligan as taken
+    player.mulliganTaken = true;
+
+    this.log(
+      'MULLIGAN',
+      action.playerId,
+      this.state.phase,
+      'Hand reshuffled and redrawn',
+      'Mulligan taken: 7 cards redrawn from deck.',
     );
 
     return { valid: true };
@@ -1358,6 +1429,67 @@ export class GameEngine {
 
   public getState(): GameState {
     return { ...this.state };
+  }
+
+  /**
+   * Save current game state to history
+   * Removes any states after current index (if we've undone and then taken new action)
+   */
+  private saveStateToHistory(): void {
+    // Remove states after current index
+    this.stateHistory = this.stateHistory.slice(0, this.historyIndex + 1);
+
+    // Add current state
+    this.stateHistory.push(JSON.parse(JSON.stringify(this.state)));
+    this.historyIndex++;
+
+    // Keep history size under limit (keep most recent states)
+    if (this.stateHistory.length > this.MAX_HISTORY) {
+      this.stateHistory.shift();
+      this.historyIndex--;
+    }
+  }
+
+  /**
+   * Undo last action
+   * @returns true if undo was successful, false if already at start
+   */
+  public undo(): boolean {
+    if (this.historyIndex <= 0) {
+      return false; // Can't undo before start
+    }
+
+    this.historyIndex--;
+    this.state = JSON.parse(JSON.stringify(this.stateHistory[this.historyIndex]));
+    return true;
+  }
+
+  /**
+   * Redo last undone action
+   * @returns true if redo was successful, false if already at latest state
+   */
+  public redo(): boolean {
+    if (this.historyIndex >= this.stateHistory.length - 1) {
+      return false; // Can't redo beyond latest state
+    }
+
+    this.historyIndex++;
+    this.state = JSON.parse(JSON.stringify(this.stateHistory[this.historyIndex]));
+    return true;
+  }
+
+  /**
+   * Check if undo is available
+   */
+  public canUndo(): boolean {
+    return this.historyIndex > 0;
+  }
+
+  /**
+   * Check if redo is available
+   */
+  public canRedo(): boolean {
+    return this.historyIndex < this.stateHistory.length - 1;
   }
 
   public getPlayerHand(playerId: string) {
