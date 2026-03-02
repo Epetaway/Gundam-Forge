@@ -1002,39 +1002,34 @@ After changes, run `npm run qa` from the repo root and confirm it passes.
 
 ### Task 9.2 — Fix Real Timestamps on Trending Decks
 
-**Fixes:** `updatedAgo: 'recently'` is a hardcoded placeholder visible on every trending deck card
+**Completion Status:** ✅ COMPLETE
 
-```
-TASK: Replace the `updatedAgo: 'recently'` placeholder in apps/web/app/page.tsx with real relative time display.
+**Implementation:**
+- Added `updatedAt?: string` field to DeckRecord interface in decks.ts
+- Populated all 12 decks with realistic ISO date strings (2026-02-04 to 2026-02-15)
+- Created relativeTime() utility in lib/utils/relativeTime.ts
+- Updated page.tsx to import and use relativeTime for trending deck display
+- TrendingDeckData now receives real relative time values instead of hardcoded 'recently'
 
-Step 1 — Check DeckRecord type in apps/web/lib/data/decks.ts.
-If no `updatedAt` or `createdAt` field exists, add optional `updatedAt?: string` (ISO date string) to the type and populate it in the seed data from Task 9.1.
+**Files Changed:**
+- apps/web/lib/data/decks.ts (added updatedAt field to interface, added timestamps to all 12 decks)
+- apps/web/lib/utils/relativeTime.ts (new file, relative time calculation utility)
+- apps/web/app/page.tsx (added import + relativeTime usage in TrendingDecksClient mapping)
 
-Step 2 — Create apps/web/lib/utils/relativeTime.ts:
-
-  export function relativeTime(isoDate: string | undefined): string {
-    if (!isoDate) return 'recently';
-    const diff = Date.now() - new Date(isoDate).getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) return 'today';
-    if (days === 1) return 'yesterday';
-    if (days < 7) return `${days}d ago`;
-    if (days < 30) return `${Math.floor(days / 7)}w ago`;
-    if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-    return `${Math.floor(days / 365)}y ago`;
-  }
-
-Step 3 — In page.tsx, import `relativeTime` and replace `updatedAgo: 'recently'` with:
-  updatedAgo: relativeTime(deck.updatedAt),
-
-Step 4 — Verify TrendingDecksClient renders the value. Read apps/web/components/deck/TrendingDecksClient.tsx to confirm it displays `updatedAgo` and will now show the real value.
-
-After changes, run `npm run qa` from the repo root and confirm it passes.
-```
+**Git Commit:** feat(task-9.2): Add real timestamps to deck records and fix relative time display  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export 51/51 pages)  
+**Tests:** 135 passing, 4 skipped, 0 new failures  
+**Production Readiness Impact:** +1 pt (Temporal accuracy in trending display)
 
 ---
 
 ## Phase 10 — Final Mobile QA Sweep
+
+**Objective:** Comprehensive mobile responsiveness fix pass across all pages for seamless mobile experience on all screen sizes.
+
+**Phase Status:** Not Started (0/1 task)
+
+---
 
 ### Task 10.1 — Comprehensive Mobile Responsiveness Fix Pass
 
@@ -1494,10 +1489,13 @@ This phase improves navigation and feature discovery by adding prominent entry p
    - ✅ Task 7.2 (Add empty state messaging to explore/decks) — COMPLETE
 7. ✅ **Phase 8 (Auth Cleanup) — COMPLETE (1/1 - 100%)**
    - ✅ Task 8.1 (Put auth into clean coming-soon state) — COMPLETE
-8. Phase 9 onwards (11 tasks remaining)
-   - IN PROGRESS: Phase 9 Task 9.2 (Fix real timestamps)
+8. ✅ **Phase 9 (Content & Seed Data) — COMPLETE (2/2 - 100%)**
+   - ✅ Task 9.1 (Add realistic seed decks and events) — COMPLETE
+   - ✅ Task 9.2 (Fix real timestamps on trending decks) — COMPLETE
+9. Phase 10 onwards (10 tasks remaining)
+   - IN PROGRESS: Phase 10 Task 10.1 (Mobile responsiveness)
 
-**Overall Progress:** 24 of 35 tasks complete (69%), 7 of 10 phases complete, production readiness estimated at ~91/100
+**Overall Progress:** 25 of 35 tasks complete (71%), 8 of 10 phases complete, production readiness estimated at ~92/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
