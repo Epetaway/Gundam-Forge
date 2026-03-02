@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import type { DeckIntent, CardDefinition } from '@gundam-forge/shared';
 import { sortCardsBySynergy, filterCardsByIntent } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
@@ -26,7 +22,6 @@ const CLAN_OPTIONS = [
 const TYPE_ORDER = ['Unit', 'Pilot', 'Command', 'Base'];
 
 const EXCLUDED_SETS = new Set(['Token']);
-const SLIDE_SIZE = 4;
 
 type GroupMode = 'none' | 'clan' | 'type';
 
@@ -280,17 +275,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
     return null;
   }, [filtered, groupMode, deckClans]);
 
-  // ── Swiper slides (used only when groupMode === 'none') ──────────────────
-  const slides = useMemo(() => {
-    if (groupMode !== 'none') return [];
-    const result: ScoredCard[][] = [];
-    for (let i = 0; i < filtered.length; i += SLIDE_SIZE) {
-      result.push(filtered.slice(i, i + SLIDE_SIZE));
-    }
-    return result;
-  }, [filtered, groupMode]);
-
-  const filterKey = `${query}|${typeFilter}|${colorFilter}|${setFilter}|${deckColorOnly}|${includeEX}`;
+  // No longer need slides computation - using simple scrollable grid instead
 
   return (
     <aside
@@ -505,7 +490,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
 
       {/* ── Card results ─────────────────────────────────────────────────── */}
       <div
-        className={cn('overflow-hidden', groupMode === 'none' ? 'min-h-[400px]' : 'overflow-y-auto')}
+        className="overflow-hidden"
         style={{ minWidth: 0 }}
         aria-label="Card results"
       >
@@ -527,30 +512,20 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
             ))}
           </div>
         ) : (
-          /* Swiper carousel (List mode) */
-          <Swiper
-            key={filterKey}
-            modules={[Pagination]}
-            pagination={{ type: 'progressbar' }}
-            className="h-full w-full"
-            style={{ maxWidth: '100%', overflowX: 'hidden' }}
-          >
-            {slides.map((slideCards, slideIdx) => (
-              <SwiperSlide key={slideIdx}>
-                <div className="grid grid-cols-2 gap-1.5 p-1.5" style={{ maxWidth: '100%' }}>
-                  {slideCards.map((card) => (
-                    <CardTile
-                      key={card.id}
-                      card={card}
-                      showSynergy={showSynergy}
-                      onPreview={setPreviewCardId}
-                      onSelect={onSelect}
-                    />
-                  ))}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          /* Scrollable grid (List mode) */
+          <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 320px)', minHeight: '300px' }}>
+            <div className="grid grid-cols-2 gap-1.5 p-1.5">
+              {filtered.map((card) => (
+                <CardTile
+                  key={card.id}
+                  card={card}
+                  showSynergy={showSynergy}
+                  onPreview={setPreviewCardId}
+                  onSelect={onSelect}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
