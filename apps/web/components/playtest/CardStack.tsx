@@ -34,18 +34,18 @@ type StackVariant = 'compact' | 'normal' | 'large';
 
 const VARIANT_CONFIG: Record<StackVariant, { width: string; height: string; offset: string }> = {
   compact: {
-    width: 'w-12',    // ~48px
-    height: 'h-16',   // ~64px (aspect 5:7)
+    width: 'w-16',    // ~64px
+    height: 'h-24',   // ~96px (aspect 5:7)
     offset: 'translate-y-1',
   },
   normal: {
-    width: 'w-16',    // ~64px
-    height: 'h-24',   // ~96px (aspect 5:7)
+    width: 'w-24',    // ~96px
+    height: 'h-32',   // ~128px (aspect 5:7)
     offset: 'translate-y-2',
   },
   large: {
-    width: 'w-20',    // ~80px
-    height: 'h-28',   // ~112px (aspect 5:7)
+    width: 'w-32',    // ~128px
+    height: 'h-44',   // ~176px (aspect 5:7)
     offset: 'translate-y-3',
   },
 };
@@ -73,6 +73,7 @@ export function CardStack({
   const topCardData = cardDatabase[topCard.cardId];
   const stackSize = cardArray.length;
   const isFaceDown = topCard.faceDown || topCard.zone === 'shields';
+  const isExResource = topCard.cardId === 'EX-RESOURCE-TOKEN' || topCard.zone === 'exResource';
 
   // Determine which cards to show visually (max 3 visible layers)
   const visibleCards = cardArray.slice(0, Math.min(3, cardArray.length));
@@ -114,11 +115,17 @@ export function CardStack({
                 zIndex: visibleCards.length - index,
               }}
             >
-              {isFaceDown ? (
+              {isExResource ? (
+                <img
+                  src="/card_art/EXR-001.webp"
+                  alt="EX Resource"
+                  className="w-full h-full object-cover"
+                />
+              ) : isFaceDown ? (
                 <div className="w-full h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center border-2 border-purple-500/30">
                   <div className="text-center">
                     <div className="text-4xl opacity-30">🛡️</div>
-                    <div className="text-[10px] text-purple-300/50 font-bold uppercase tracking-wider mt-1">Shield</div>
+                    <div className="text-xs text-purple-300/50 font-bold uppercase tracking-wider mt-1">Shield</div>
                   </div>
                 </div>
               ) : cardData ? (
@@ -143,15 +150,15 @@ export function CardStack({
       {/* Count badge (top-right) */}
       {showCount && stackSize > 1 && (
         <div className="absolute -top-2 -right-2 flex items-center justify-center">
-          <div className="min-w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-purple-300 shadow-lg">
+          <div className="min-w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-purple-300 shadow-lg">
             ×{stackSize}
           </div>
         </div>
       )}
 
       {/* Single card indicator */}
-      {showCount && stackSize === 1 && topCardData && (
-        <div className="absolute -top-2 -left-2 w-5 h-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-cyan-300 shadow-lg">
+      {showCount && stackSize === 1 && topCardData && !isExResource && (
+        <div className="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-cyan-300 shadow-lg">
           {topCardData.cost || '0'}
         </div>
       )}
