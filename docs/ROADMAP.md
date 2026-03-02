@@ -1085,6 +1085,18 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 ---
 
+## Phase 3 — Forge Core UX Overhaul
+
+### Tasks in This Phase
+- Task 3.1: Replace Swiper carousel with scrollable grid
+- Task 3.2: Fix card add interaction (single click to add)
+- Task 3.3: Fix filter panel density (collapse by default)
+- Task 3.4: Add "Add to Deck" from Cards reference page
+
+**Status:** 🔄 IN PROGRESS
+
+---
+
 ### Summary
 
 | Metric | Status |
@@ -1092,6 +1104,7 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 | **Tasks Complete** | 8 of 35 (23%) |
 | **Phases Complete** | 2 of 10 |
 | **Individual Tasks** | Task 2.5 complete |
+| **Current Phase** | Phase 3 — IN PROGRESS |
 | **TypeScript** | 0 errors |
 | **ESLint** | 0 errors, 0 warnings |
 | **Tests** | 135 passing, 4 skipped, 0 new failures |
@@ -1100,10 +1113,28 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 ---
 
+## Phase 3 Execution Status — 🔄 IN PROGRESS
+
+**Date:** March 2, 2026  
+**Session:** Phase 3 — Forge Core UX Overhaul  
+**Target Production Readiness:** ~65/100 → ~72/100 (estimated after phase 3)
+
+### Phase 3 Overview
+
+This phase focuses on the Forge (deck builder) user experience, making it faster and more intuitive to browse and add cards to your deck. Four focused UX improvements targeting the core friction points.
+
+**Completed Tasks:** 0 of 4  
+**QA Status:** Awaiting first task completion  
+**Tests Status:** Baseline 135 passing, 4 skipped
+
+---
+
+---
+
 ### Next Steps
 
 1. ✅ Task 2.5 (Deck card redesign) — COMPLETE
-2. Phase 3 (Forge UX overhaul) — 4 tasks pending
+2. 🔄 **Phase 3 (Forge UX overhaul) — IN PROGRESS** — 4 tasks starting
 3. Phases 4–10 — 24 tasks remaining
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
