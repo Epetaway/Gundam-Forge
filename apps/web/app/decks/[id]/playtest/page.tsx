@@ -3,9 +3,9 @@ import { cardsRecord } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { PlaytestGameEnhanced } from '@/components/playtest/PlaytestGameEnhanced';
 
-// Only generate playtest pages in development — hidden in production builds
+// Always generate static params so Next.js export doesn't reject the dynamic route.
+// The page body calls notFound() in production to keep the route inaccessible.
 export function generateStaticParams() {
-  if (process.env.NODE_ENV === 'production') return [];
   return deckCatalog.map((deck) => ({ id: deck.id }));
 }
 
