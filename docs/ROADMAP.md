@@ -23,7 +23,8 @@
 | Phase | Focus | Tasks | Score Impact |
 |---|---|---|---|
 | Phase 1 | Zero-risk quick wins (copy, nav, hardcoded data) | 4 | Home 7→9, Nav 5→7 |
-| Phase 2 | Cards page (truncation, mobile search, add-to-deck) | 3 | Cards 6→8.5 |
+| Phase 2 | Cards page (truncation, mobile search, hydration) | 3 | Cards 6→8.5 |
+| Task 2.5 | Deck preview card visual redesign (polish) | 1 | Decks 5→7 |
 | Phase 3 | Forge core UX overhaul (carousel, click-to-add, density) | 4 | Forge 6→9 |
 | Phase 4 | Create Deck flow (mobile layout, step clarity) | 2 | Create Deck 7→9 |
 | Phase 5 | Navigation & feature discovery | 2 | Nav 7→9 |
@@ -205,6 +206,88 @@ Fix: Use Next.js `useSearchParams` hook from `next/navigation` to read URL param
 4. Initialize each useState with the value from searchParams (or the default if null).
 5. Remove the `let initialColor`, `let initialType`, `let initialSet`, `let initialQuery` variables entirely.
 6. Note: `useSearchParams` requires a Suspense boundary. Check if apps/web/app/cards/page.tsx wraps CardsClient in Suspense — if not, add `<Suspense fallback={<div>Loading...</div>}>` around `<CardsClient>` in the page file.
+
+After changes, run `npm run qa` from the repo root and confirm it passes.
+```
+
+---
+
+### Task 2.5 — Deck Preview Card Visual Redesign
+
+**Fixes:** Deck cards lack visual hierarchy and polish; compare unfavorably to reference design (Zeon Rush card)
+
+```
+TASK: Redesign the DeckPreviewCard component to match a professional, polished visual standard with light/dark mode support.
+
+Current state:
+The deck preview cards at apps/web/components/deck/DeckPreviewCard.tsx currently display:
+- Deck name
+- Deck color badges (basic squares)
+- Archetype badge
+- Metadata line: views + card count + updatedAgo
+
+The design lacks visual hierarchy, image prominence, and the color/image contrast needed for professional presentation.
+
+Reference:
+Use the Zeon Rush card as the design reference:
+- Dark hero banner at top with gradient overlay (dark theme: darker, light theme: animated gradient)
+- Large, prominent deck image with strong contrast and saturation
+- Text overlay hierarchy: Deck name in large, bold white text; color badges below
+- Archetype badge positioned clearly within the design
+- Metadata line: subtle, right-aligned, uses reduced opacity
+- Hover effect: subtle scale/shadow elevation
+- White text with clear contrast on dark background
+
+Implementation:
+1. Replace the simple card layout with a hero-style layout:
+   - Top section: dark background with gradient (from design tokens: cobalt-900 → cobalt-800)
+   - Image area: deck image with 100% width, darker overlay (dark mode: stronger opacity, light mode: lighter with slight color tint)
+   - Text overlay: Deck name as `text-xl font-bold text-white`, positioned absolutely over image
+
+2. Update color badges:
+   - Change from plain colored squares to rounded pill badges with icon + label
+   - Use design tokens for background: `bg-{color}-900/40` with border `border-{color}-500/60`
+   - White text: `text-white text-xs font-semibold`
+   - Space horizontally: `flex gap-1 flex-wrap`
+
+3. Archetype badge:
+   - Styled as a small secondary badge below color badges
+   - Use `bg-surface-interactive text-foreground`
+   - Text: `text-xs font-medium`
+
+4. Metadata line:
+   - Right-align with `justify-end`
+   - Use reduced opacity: `text-steel-400` (dark) or `text-steel-600` (light)
+   - Smaller font: `text-xs`
+   - Elements separated by bullet: "123 views • 60 cards • recently"
+
+5. Light/dark mode:
+   - Dark mode (default): cobalt gradients, white text, reduced image opacity
+   - Light mode (dark: prefix): lighter gradients (cobalt-50 → cobalt-100), text-foreground, slightly more saturated image
+   - Use Tailwind dark: prefix throughout, no hard color resets
+
+6. Hover effects:
+   - Subtle scale: `hover:scale-105 transition-transform`
+   - Shadow elevation: `hover:shadow-lg`
+   - No aggressive animation — just 1-2 pixel lift
+
+7. Touch targets:
+   - Maintain clickable area: ensure the entire card is clickable (button element)
+   - No hover-only elements — make badges/info visible at rest
+
+Affected components:
+- apps/web/components/deck/DeckPreviewCard.tsx (primary)
+- Used by: apps/web/app/page.tsx (trending decks), apps/web/app/decks/page.tsx (deck list), apps/web/app/explore/page.tsx (explore cards)
+
+Testing:
+1. Visual check: Compare redesigned cards side-by-side with Zeon Rush reference. Verify:
+   - Image is prominent and high-contrast
+   - Text is readable on image overlay
+   - Color badges match design tokens
+   - Hover scale is subtle but visible
+2. Responsive: Verify cards stack correctly on mobile (375px+)
+3. Theme toggle: Test both light and dark modes in all pages
+4. QA: Run npm run qa — must pass with 0 errors
 
 After changes, run `npm run qa` from the repo root and confirm it passes.
 ```
@@ -945,3 +1028,75 @@ Should contain: index.html, _next/, cards/, decks/, forge/, explore/, events/ di
 **Overall: 52/100 → ~87/100**
 
 The remaining gap to true 9.5/10 requires live community data and completed auth — both are backend/infrastructure work. Everything in this roadmap is front-end and gets you to a credible, polished public launch.
+
+---
+
+## Execution Status — Phases 1–2 Complete
+
+**Date:** March 2, 2026  
+**Session:** Phase 1 & 2 Completion + Task 2.5 Specification  
+**Current Production Readiness:** 52/100 → ~60/100 (estimated after phase 2)
+
+### Phase 1 — Zero-Risk Quick Wins ✅ COMPLETE
+
+**Completed all 4 tasks:**
+- ✅ Task 1.1: Home hardcoded copy & dev notes (716 → cards.length, removed 'recently', engineering → user features)
+- ✅ Task 1.2: Navigation active state bug & Forge/Playtest links (fixed root path active state, added nav items)
+- ✅ Task 1.3: Auth button visibility sync (hidden in production, consistent with nav pattern)
+- ✅ Task 1.4: Dynamic stats audit (removed duplicate getDecks/getEvents calls, all counts now derived)
+
+**Files modified:** 5  
+**Lines added/removed:** +62, -32  
+**Git commit:** 2cbb34f  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped (allowed baseline), 0 new failures
+
+---
+
+### Phase 2 — Cards Page ✅ COMPLETE
+
+**Completed all 3 tasks:**
+- ✅ Task 2.1: Pagination (displayCount state, load-more button, "Showing X of Y" summary, filter-aware reset)
+- ✅ Task 2.2: Mobile search visibility (always visible on all breakpoints, toolbar restructured with flexbox ordering)
+- ✅ Task 2.3: URL param hydration (useSearchParams hook, Suspense boundary, safe initialization from search params)
+
+**Files modified:** 2  
+**Lines added/removed:** +131, -99  
+**Git commit:** 26a898e  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped (allowed baseline), 0 new failures
+
+---
+
+### Task 2.5 — Deck Card Redesign 🔄 IN PROGRESS
+
+**Specification:** Added to ROADMAP.md (lines 215–290)  
+**Focus:** Visual polish matching professional design reference (Zeon Rush card)  
+**Implementation details:** Hero layout, gradient overlays, light/dark mode, improved badges, subtle hover effects  
+**Status:** Specification complete, awaiting implementation
+
+---
+
+### Summary
+
+| Metric | Status |
+|---|---|
+| **Tasks Complete** | 7 of 35 (20%) |
+| **Phases Complete** | 2 of 10 |
+| **TypeScript** | 0 errors |
+| **ESLint** | 0 errors, 0 warnings |
+| **Tests** | 135 passing, 4 skipped, 0 new failures |
+| **Static Export** | ✅ Successful |
+| **Production Ready** | 52/100 → ~60/100 |
+
+---
+
+### Next Steps
+
+1. Implement Task 2.5 (Deck card redesign)
+2. Phase 3 (Forge UX overhaul) — 4 tasks pending
+3. Phases 4–10 — 24 tasks remaining
+
+All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
+
+**Note:** This document is the single source of truth for both task specifications AND execution progress. All updates (spec changes, task completions, metrics, decisions) are recorded here.
