@@ -1432,14 +1432,14 @@ This phase improves navigation and feature discovery by adding prominent entry p
 4. ✅ **Phase 5 (Navigation & discovery) — COMPLETE (2/2 - 100%)**
    - ✅ Task 5.1 (Forge & Playtest feature cards) — COMPLETE
    - ✅ Task 5.2 (Playtest CTA on deck detail) — COMPLETE
-5. 🔄 **Phase 6 (Playtester Polish) — IN PROGRESS (1/4 - 25%)**
+5. ✅ **Phase 6 (Playtester Polish) — COMPLETE (4/4 - 100%)**
    - ✅ Task 6.1 (Migrate Battlefield to design tokens) — COMPLETE
-   - ⏳ Task 6.2 (Fix resource deck to use real card IDs)
-   - ⏳ Task 6.3 (Token system for playtester UI)
-   - ⏳ Task 6.4 (Playtester feedback & polish)
+   - ✅ Task 6.2 (Fix resource deck to use real card IDs) — COMPLETE
+   - ✅ Task 6.3 (Add play card and attack affordances) — COMPLETE
+   - ✅ Task 6.4 (Add opponent unit display & mobile log) — COMPLETE
 6. Phase 7 onwards (15 tasks remaining)
 
-**Overall Progress:** 17 of 35 tasks complete (49%), 4 of 10 phases complete, production readiness estimated at ~80/100
+**Overall Progress:** 20 of 35 tasks complete (57%), 5 of 10 phases complete, production readiness estimated at ~83/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
