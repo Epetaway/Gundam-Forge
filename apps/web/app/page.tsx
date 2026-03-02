@@ -77,11 +77,12 @@ export default function HomePage(): JSX.Element {
                 id: deck.id,
                 heroUrl: previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png'),
                 title: deck.name,
-                subtitle: deck.archetype,
+                subtitle: deck.owner || 'Unknown Pilot',
                 author: deck.owner || 'Unknown',
                 views: deck.views || 0,
                 cardCount: deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0),
                 colors: deck.colors || [],
+                archetype: deck.archetype,
                 tags: deck.archetype ? [deck.archetype] : [],
                 avatarUrl: undefined,
               } satisfies TrendingDeckData;

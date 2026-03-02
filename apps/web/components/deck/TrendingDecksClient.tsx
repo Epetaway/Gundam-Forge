@@ -14,6 +14,7 @@ export interface TrendingDeckData {
   colors: string[];
   tags?: string[];
   avatarUrl?: string;
+  archetype?: string;
 }
 
 export function TrendingDecksClient({ decks }: { decks: TrendingDeckData[] }) {
