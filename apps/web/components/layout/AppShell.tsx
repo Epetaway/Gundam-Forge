@@ -10,10 +10,16 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps): JSX.Element {
-  const showAuthEntry = process.env.NODE_ENV !== 'production';
-
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Skip navigation for keyboard/screen reader users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-cobalt-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
         <Container className="flex h-16 items-center justify-between">
           <Link className="flex items-center gap-2" href="/">
@@ -25,16 +31,14 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <div className="flex items-center gap-3">
             <MainNav />
             <ThemeToggle />
-            {showAuthEntry ? (
-              <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
-                <Link href="/auth/login">Sign in</Link>
-              </Button>
-            ) : null}
+            <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
+              <Link href="/auth/login">Sign in</Link>
+            </Button>
           </div>
         </Container>
       </header>
 
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
 
       <footer className="border-t border-border bg-surface/90">
         <Container className="flex flex-col gap-3 py-6 text-xs text-steel-600 sm:flex-row sm:items-center sm:justify-between">
