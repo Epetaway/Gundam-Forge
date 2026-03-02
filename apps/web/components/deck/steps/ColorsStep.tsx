@@ -10,6 +10,7 @@ interface ColorsStepProps {
   colors: CardColor[];
   onColorsChange: (colors: CardColor[]) => void;
   showError?: boolean;
+  onBack?: () => void;
 }
 
 const GUNDAM_COLORS: { value: CardColor; label: string; bg: string; text: string; border: string }[] = [
@@ -27,6 +28,7 @@ export default function ColorsStep({
   colors,
   onColorsChange,
   showError = false,
+  onBack,
 }: ColorsStepProps) {
   const nonColorlessColors = colors.filter((c) => c !== 'Colorless');
 
@@ -107,6 +109,16 @@ export default function ColorsStep({
           <p className="text-xs text-steel-600">
             Selected colors will filter the card catalog to matching cards (plus Colorless).
           </p>
+
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="text-xs text-steel-500 hover:text-foreground text-left"
+            >
+              ← Back
+            </button>
+          )}
         </div>
       )}
     </div>
