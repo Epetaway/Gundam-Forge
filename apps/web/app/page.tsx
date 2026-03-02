@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Wrench, Swords } from 'lucide-react';
 import { Container } from '@/components/layout/Container';
 import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/TrendingDecksClient';
 import { Badge } from '@/components/ui/Badge';
@@ -87,6 +88,45 @@ export default function HomePage(): JSX.Element {
               } satisfies TrendingDeckData;
             })}
           />
+        </Container>
+      </section>
+
+      <section className="py-12">
+        <Container className="space-y-6">
+          <div className="space-y-1">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-steel-500">What You Can Do</p>
+            <h2 className="font-display text-2xl font-semibold text-foreground">Everything in One Place</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-surface-elevated">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-cobalt-400" />
+                  Build in the Forge
+                </CardTitle>
+                <CardDescription>A dedicated deck construction workspace with card search, synergy scoring, real-time validation, and four view modes. Your deck, built to official GCG rules.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="primary">
+                  <Link href="/forge">+ Open Forge</Link>
+                </Button>
+              </CardContent>
+            </Card>
+            <Card className="bg-surface-elevated">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Swords className="h-5 w-5 text-cobalt-400" />
+                  Playtest Your Deck
+                </CardTitle>
+                <CardDescription>Test any deck against an AI opponent using the full official GCG ruleset — phases, combat, triggers, and all official keywords.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="secondary">
+                  <Link href="/decks">Choose a Deck →</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </Container>
       </section>
 

@@ -103,6 +103,7 @@ export default function DeckIntentBuilder({
           colors={colors}
           onColorsChange={(newColors: CardColor[]) => handleIntentChange({ colors: newColors })}
           showError={showErrors && !isColorsValid}
+          onBack={() => setExpandedStep('clans')}
         />
 
         {/* Step 3: Packages */}
@@ -113,6 +114,7 @@ export default function DeckIntentBuilder({
           onPackagesChange={(newPackages: string[]) => handleIntentChange({ packages: newPackages })}
           selectedColors={colors}
           selectedClans={clans}
+          onBack={() => setExpandedStep('colors')}
         />
       </div>
 

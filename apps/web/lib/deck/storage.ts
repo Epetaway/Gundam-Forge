@@ -104,3 +104,8 @@ export function updateDeckMeta(
 export function deleteStoredDeck(id: string): void {
   saveAll(loadAll().filter((d) => d.id !== id));
 }
+
+export function getActiveDeckId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('forge:activeDeckId');
+}

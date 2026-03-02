@@ -15,6 +15,7 @@ interface ReferenceCardDetailModalProps {
   onOpenChange: (open: boolean) => void;
   onAdd?: () => void;
   onRemove?: () => void;
+  activeDeckId?: string | null;
 }
 
 const tabs = ['Card options', 'In decks', 'Collection records', 'Card info', 'Rulings'] as const;
@@ -26,6 +27,7 @@ export function ReferenceCardDetailModal({
   onOpenChange,
   onAdd,
   onRemove,
+  activeDeckId,
 }: ReferenceCardDetailModalProps): JSX.Element {
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -45,6 +47,14 @@ export function ReferenceCardDetailModal({
                   Card links
                 </Button>
               </div>
+              {activeDeckId && onAdd && (
+                <div className="pt-1">
+                  <Button onClick={onAdd} variant="primary" size="sm">
+                    <Plus className="mr-1.5 h-3.5 w-3.5" />
+                    Add to deck
+                  </Button>
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 {tabs.map((tab, index) => (

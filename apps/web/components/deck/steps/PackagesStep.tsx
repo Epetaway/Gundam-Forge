@@ -11,6 +11,7 @@ interface PackagesStepProps {
   onExpandChange: (expanded: boolean) => void;
   packages: string[];
   onPackagesChange: (packages: string[]) => void;
+  onBack?: () => void;
   
   /** Selected colors from Step 2 - used to filter/annotate packages */
   selectedColors?: CardColor[];
@@ -24,6 +25,7 @@ export default function PackagesStep({
   onExpandChange,
   packages,
   onPackagesChange,
+  onBack,
   selectedColors = [],
   selectedClans = [],
 }: PackagesStepProps) {
@@ -86,7 +88,7 @@ export default function PackagesStep({
           <span className="text-xs font-semibold text-cobalt-400 bg-cobalt-900/40 px-2 py-0.5 rounded">
             Step 3
           </span>
-          <span className="font-semibold text-sm text-foreground">Mechanics Packages</span>
+          <span className="font-semibold text-sm text-foreground">Play Style</span>
           <span className="text-xs text-steel-600">(optional)</span>
           {packages.length > 0 && (
             <span className="text-xs text-green-400">
@@ -104,8 +106,9 @@ export default function PackagesStep({
 
       {expanded && (
         <div className="px-4 py-3 border-t border-border bg-surface-interactive/50 flex flex-col gap-3">
+          <div className="rounded border border-cobalt-700/30 bg-cobalt-900/20 p-2 text-xs text-cobalt-300">ℹ️ Play styles guide card suggestions in the Forge. You can always change this later.</div>
           <p className="text-xs text-steel-600">
-            Select mechanics packages based on Gundam TCG keywords and triggers to guide your deckbuilding strategy.
+            Choose the strategies your deck will focus on. This helps the Forge suggest the right cards for your build.
             {selectedColors.length > 0 && (
               <span className="block mt-1 text-steel-500">
                 Packages sorted by card availability in your selected colors.
@@ -219,6 +222,17 @@ export default function PackagesStep({
           <p className="text-xs text-steel-600 leading-relaxed">
             Each package is derived from official Gundam TCG mechanics research and will filter your card catalog accordingly.
           </p>
+          {onBack && (
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={onBack}
+                className="text-xs text-steel-500 hover:text-foreground transition-colors"
+              >
+                ← Back
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
