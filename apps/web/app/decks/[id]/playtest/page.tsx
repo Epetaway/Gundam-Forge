@@ -16,10 +16,6 @@ interface PlaytestPageProps {
 }
 
 export default function PlaytestPage({ params }: PlaytestPageProps) {
-  if (process.env.NODE_ENV === 'production') {
-    notFound();
-  }
-
   const deck = getDeckById(params.id);
   if (!deck) {
     notFound();
