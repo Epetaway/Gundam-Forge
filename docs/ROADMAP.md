@@ -1068,12 +1068,20 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 ---
 
-### Task 2.5 — Deck Card Redesign 🔄 IN PROGRESS
+### Task 2.5 — Deck Card Redesign ✅ COMPLETE
 
-**Specification:** Added to ROADMAP.md (lines 215–290)  
-**Focus:** Visual polish matching professional design reference (Zeon Rush card)  
-**Implementation details:** Hero layout, gradient overlays, light/dark mode, improved badges, subtle hover effects  
-**Status:** Specification complete, awaiting implementation
+**Specification:** Implemented hero-style layout with professional visual polish  
+**Focus:** Visual hierarchy, image prominence, light/dark mode support  
+**Implementation details:** 
+- Hero image with gradient overlay (cobalt-700/900)
+- Title overlay on image with 60px hero section height
+- Rounded pill badges for color identity with design tokens
+- Archetype badge as secondary element
+- Metadata line right-aligned with reduced opacity
+- Hover effects: scale(1.05) + shadow elevation
+- Full light/dark mode support using Tailwind dark: prefix
+- No hover-only elements; all info visible at rest
+**Status:** ✅ Complete - Commit faea891
 
 ---
 
@@ -1081,19 +1089,20 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 | Metric | Status |
 |---|---|
-| **Tasks Complete** | 7 of 35 (20%) |
+| **Tasks Complete** | 8 of 35 (23%) |
 | **Phases Complete** | 2 of 10 |
+| **Individual Tasks** | Task 2.5 complete |
 | **TypeScript** | 0 errors |
 | **ESLint** | 0 errors, 0 warnings |
 | **Tests** | 135 passing, 4 skipped, 0 new failures |
 | **Static Export** | ✅ Successful |
-| **Production Ready** | 52/100 → ~60/100 |
+| **Production Ready** | 52/100 → ~65/100 |
 
 ---
 
 ### Next Steps
 
-1. Implement Task 2.5 (Deck card redesign)
+1. ✅ Task 2.5 (Deck card redesign) — COMPLETE
 2. Phase 3 (Forge UX overhaul) — 4 tasks pending
 3. Phases 4–10 — 24 tasks remaining
 
