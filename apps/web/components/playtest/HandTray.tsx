@@ -143,7 +143,7 @@ function DesktopArcFan({
   setHoveredCard: (id: string | null) => void;
 }) {
   return (
-    <div className="flex gap-2 justify-center items-end px-4 pb-1 overflow-x-auto max-h-[150px] overflow-y-visible">
+    <div className="flex flex-wrap gap-2 justify-center items-start px-4 pb-2 w-full overflow-visible">
       {cards.map((card) => {
         const cardData = cardDatabase[card.cardId];
         const isSelected = selectedCard?.instanceId === card.instanceId;
