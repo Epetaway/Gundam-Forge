@@ -767,7 +767,56 @@ After changes, run `npm run qa` from the repo root and confirm it passes.
 
 ## Phase 7 — Reliability & Error Handling
 
+**Objective:** Add defensive error handling and empty state messaging to gracefully handle failures and sparse data.
+
+**Phase Status:** ✅ COMPLETE (2/2 - 100%)
+
+---
+
 ### Task 7.1 — Add Error Boundaries to Critical Pages
+
+**Completion Status:** ✅ COMPLETE
+
+**Implementation:**
+- Created `apps/web/components/ui/ErrorBoundary.tsx` (class component)
+- Wrapped Playtester in `apps/web/app/decks/[id]/playtest/page.tsx`
+- Wrapped Forge in `apps/web/app/forge/page.tsx`
+- ErrorBoundary displays context-aware error messages with "Try again" button
+- Uses design tokens (steel-*, surface-*, foreground)
+
+**Files Changed:**
+- ErrorBoundary.tsx (new, 55 lines)
+- apps/web/app/decks/[id]/playtest/page.tsx (import + wrapper)
+- apps/web/app/forge/page.tsx (import + wrapper)
+
+**Git Commit:** feat(task-7.1): Add error boundaries to playtester and forge pages  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export 27/27 pages)  
+**Tests:** 135 passing, 4 skipped, 0 new failures  
+**Production Readiness Impact:** +2 pts (Graceful error recovery)
+
+---
+
+### Task 7.2 — Add Empty States to Explore & Decks Pages
+
+**Completion Status:** ✅ COMPLETE
+
+**Implementation:**
+- Added empty state UI to ExploreClient when no decks match filters
+- Added empty state UI to DecksClient when deck library is empty
+- Both states show centered message with CTA to create deck
+- Uses design tokens (border-border, bg-surface-muted, text-steel-*)
+- Maintains responsive grid layout switching
+
+**Files Changed:**
+- apps/web/app/explore/ExploreClient.tsx (empty state conditional)
+- apps/web/app/decks/DecksClient.tsx (empty state conditional)
+
+**Git Commit:** feat(task-7.2): Add empty state messaging to explore and decks pages  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export 27/27 pages)  
+**Tests:** 135 passing, 4 skipped, 0 new failures  
+**Production Readiness Impact:** +2 pts (Clear empty state guidance)
+
+---
 
 **Fixes:** No error boundaries — game engine init failure causes white screen; no user-facing error states
 
@@ -1437,9 +1486,12 @@ This phase improves navigation and feature discovery by adding prominent entry p
    - ✅ Task 6.2 (Fix resource deck to use real card IDs) — COMPLETE
    - ✅ Task 6.3 (Add play card and attack affordances) — COMPLETE
    - ✅ Task 6.4 (Add opponent unit display & mobile log) — COMPLETE
-6. Phase 7 onwards (15 tasks remaining)
+6. ✅ **Phase 7 (Reliability & Error Handling) — COMPLETE (2/2 - 100%)**
+   - ✅ Task 7.1 (Add error boundaries to playtester & forge) — COMPLETE
+   - ✅ Task 7.2 (Add empty state messaging to explore/decks) — COMPLETE
+7. Phase 8 onwards (13 tasks remaining)
 
-**Overall Progress:** 20 of 35 tasks complete (57%), 5 of 10 phases complete, production readiness estimated at ~83/100
+**Overall Progress:** 22 of 35 tasks complete (63%), 6 of 10 phases complete, production readiness estimated at ~87/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
