@@ -258,8 +258,9 @@ export function Battlefield({
         </div>
       </div>
 
-      {/* PLAYER HAND - Fixed at bottom with proper overflow constraints */}
-      <div className="flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/60 px-2 py-3 max-h-[220px] overflow-hidden relative z-30">
+      {/* PLAYER HAND - Flexible height, displays all cards without cutting or scrolling */}
+      <div className=\"flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/30 px-2 py-3 relative z-30 min-h-fit\">
+        <div className=\"text-xs font-bold text-slate-400 uppercase mb-1 px-2\">Hand ({playerState.hand.length}/10)</div>
         <HandTray
           cards={playerState.hand}
           cardDatabase={cardDatabase}
@@ -269,7 +270,6 @@ export function Battlefield({
           gamePhase={gamePhase}
           isPlayerTurn={isPlayerTurn}
         />
-      </div>
     </div>
   );
 }
