@@ -10,6 +10,7 @@ import { withBasePath } from '@/lib/utils/basePath';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
 import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
+import { relativeTime } from '@/lib/utils/relativeTime';
 
 export default function HomePage(): JSX.Element {
   const decks = getDecks();
@@ -86,6 +87,7 @@ export default function HomePage(): JSX.Element {
                 archetype: deck.archetype,
                 tags: deck.archetype ? [deck.archetype] : [],
                 avatarUrl: undefined,
+                updatedAgo: relativeTime(deck.updatedAt),
               } satisfies TrendingDeckData;
             })}
           />
