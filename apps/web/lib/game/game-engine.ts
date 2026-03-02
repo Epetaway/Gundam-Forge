@@ -201,8 +201,8 @@ export class GameEngine {
         name: tokenCard.name,
         type: tokenCard.type,
         cost: tokenCard.type === 'Resource' ? 0 : 1,
-        ap: (tokenCard as any).ap ?? (tokenCard as any).atk,
-        hp: (tokenCard as any).hp ?? (tokenCard as any).def,
+        ap: (tokenCard as any).ap,
+        hp: (tokenCard as any).hp,
         traits: ['Token'],
         keywords: tokenCard.keywords ?? [],
         imageUrl: '',
@@ -1189,7 +1189,7 @@ export class GameEngine {
 
   private getUnitAttack(unit: CardInstance): number {
     const definition = this.cardDb[unit.cardId] as any;
-    const baseAttack = definition?.ap ?? definition?.atk ?? definition?.power ?? 5;
+    const baseAttack = definition?.ap ?? definition?.power ?? 5;
     const supportBuff = unit.counters.tempApBuff ?? 0;
     // Use counters set by PAIR/LINK trigger resolution (actual pilot AP); fall back to flat +1 if not resolved yet
     const pairBonus = unit.counters.pairApBonus ?? (unit.attachments.pilot ? 1 : 0);
@@ -1199,7 +1199,7 @@ export class GameEngine {
 
   private getUnitHealth(unit: CardInstance): number {
     const definition = this.cardDb[unit.cardId] as any;
-    const baseHealth = definition?.hp ?? definition?.def ?? definition?.power ?? 5;
+    const baseHealth = definition?.hp ?? definition?.power ?? 5;
     // Use counters set by PAIR/LINK trigger resolution; fall back to flat +1
     const pairBonus = unit.counters.pairHpBonus ?? (unit.attachments.pilot ? 1 : 0);
     const linkBonus = unit.counters.linkHpBonus ?? (unit.attachments.linked?.length ?? 0);

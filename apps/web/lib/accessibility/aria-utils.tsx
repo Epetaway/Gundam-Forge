@@ -8,12 +8,12 @@
  */
 export function getCardAriaLabel(card: any): string {
   const name = card.cardDef?.name || card.cardId;
-  const atk = card.cardDef?.atk || 0;
-  const def = card.cardDef?.def || 0;
+  const ap = card.cardDef?.ap || 0;
+  const hp = card.cardDef?.hp || 0;
   const state = card.state || 'ready';
   const damage = card.damageMarkers || 0;
 
-  return `${name}, Attack ${atk}, Defense ${def}, ${state}${damage > 0 ? `, ${damage} damage` : ''}`;
+  return `${name}, AP ${ap}, HP ${hp}, ${state}${damage > 0 ? `, ${damage} damage` : ''}`;
 }
 
 /**
@@ -21,12 +21,12 @@ export function getCardAriaLabel(card: any): string {
  */
 export function getPhaseAriaLabel(phase: string, turnNumber: number): string {
   const phaseNames: Record<string, string> = {
-    setup: 'Setup Phase',
+    start: 'Start Phase',
     draw: 'Draw Phase',
+    resource: 'Resource Phase',
     main: 'Main Phase',
-    action: 'Action Phase',
-    battle: 'Battle Phase',
     end: 'End Phase',
+    gameOver: 'Game Over',
   };
 
   return `Turn ${turnNumber}, ${phaseNames[phase] || phase}`;
@@ -152,7 +152,7 @@ export function AccessibleCard({
     >
       <div className="text-sm font-bold">{card.cardDef?.name || card.cardId}</div>
       <div className="mt-2 text-xs">
-        ⚔️ {card.cardDef?.atk || '-'} | 🛡️ {card.cardDef?.def || '-'}
+        ⚔️ {card.cardDef?.ap || '-'} | 🛡️ {card.cardDef?.hp || '-'}
       </div>
     </button>
   );

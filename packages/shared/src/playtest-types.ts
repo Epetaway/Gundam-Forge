@@ -177,8 +177,8 @@ export interface CardDefinition {
   name: string;
   type: 'Unit' | 'Pilot' | 'Command' | 'Base' | 'Resource' | 'EX';
   cost?: number; // Resource cost to play
-  atk?: number;
-  def?: number;
+  ap?: number;
+  hp?: number;
   traits: string[];
   keywords: string[]; // [High-Maneuver, First Strike, Blocker, Pair, Link, etc.]
   imageUrl: string;
