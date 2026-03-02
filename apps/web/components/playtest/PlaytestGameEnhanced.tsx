@@ -83,11 +83,15 @@ export function PlaytestGameEnhanced({
         id: playerDeck.id,
         name: playerDeck.name,
         description: playerDeck.description,
-        cards: playerDeck.entries.map((entry) => ({
-          cardId: entry.cardId,
-          count: entry.qty,
-          zone: 'main' as const,
-        })),
+        cards: [
+          ...playerDeck.entries.map((entry) => ({
+            cardId: entry.cardId,
+            count: entry.qty,
+            zone: 'main' as const,
+          })),
+          // Official GCG: separate 10-card resource deck (outside 50-card main deck)
+          { cardId: 'TOKEN-RESOURCE-001', count: 10, zone: 'resource' as const },
+        ],
       };
 
       const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
@@ -264,49 +268,45 @@ export function PlaytestGameEnhanced({
   const isSetupPhase = !gameReady;
   const isPlayerTurn = gameState.activePlayerId === 'player1';
   const isDrawPhase = gameState.phase === 'draw';
+  const isResourcePhase = gameState.phase === 'resource';
   const needsToDraw = isDrawPhase && isPlayerTurn && !gameState.hasDrawnThisTurn;
   const playerState = gameState.players['player1'];
   const opponentState = gameState.players['player2'];
+  const needsToPlaceResource =
+    isResourcePhase &&
+    isPlayerTurn &&
+    !gameState.hasResourcePlacedThisTurn &&
+    playerState.resourceDeck.length > 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
-      <header className="border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-3">
-        <div className="flex justify-between items-center gap-2 flex-wrap">
-          <h1 className="text-xl font-bold text-white whitespace-nowrap">Gundam TCG Playtester</h1>
+      <header className="flex-shrink-0 border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-3 py-2">
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Title */}
+          <h1 className="text-base font-bold text-white whitespace-nowrap mr-2">Gundam TCG</h1>
 
-          <div className="flex gap-2 items-center flex-wrap">
-            {/* Sound Toggle */}
-            <button
-              onClick={toggleMute}
-              className={`px-3 py-1.5 rounded transition text-sm font-semibold ${
-                isMuted
-                  ? 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-                  : 'bg-blue-700 text-white hover:bg-blue-600'
-              }`}
-              title={isMuted ? 'Sound muted' : 'Sound on'}
-              aria-label={isMuted ? 'Enable sound' : 'Disable sound'}
-            >
-              {isMuted ? '🔇' : '🔊'}
-            </button>
+          {/* Phase + turn info */}
+          {!isSetupPhase && (
+            <PhaseIndicator
+              currentPhase={gameState.phase}
+              turnNumber={gameState.turnNumber}
+              activePlayer={isPlayerTurn ? 'You' : 'Opponent'}
+            />
+          )}
 
-            {/* Help Button */}
-            <button
-              onClick={() => setShowHelpModal(true)}
-              className="px-3 py-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition text-sm"
-              title="Show keyboard shortcuts (?)"
-              aria-label="Show help"
-            >
-              Help
-            </button>
+          {/* Spacer */}
+          <div className="flex-1" />
 
+          {/* Action buttons — always in one row, never wrap */}
+          <div className="flex items-center gap-1.5 shrink-0">
             {/* Undo/Redo */}
             {!isSetupPhase && (
-              <div className="flex gap-1 border-l border-r border-slate-600 px-2">
+              <>
                 <button
                   onClick={handleUndo}
                   disabled={!engine?.canUndo()}
-                  className="px-2 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-sm transition"
+                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
                   title="Undo (Ctrl+Z)"
                 >
                   ↶
@@ -314,46 +314,64 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleRedo}
                   disabled={!engine?.canRedo()}
-                  className="px-2 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-sm transition"
+                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
                   title="Redo (Ctrl+Y)"
                 >
                   ↷
                 </button>
-              </div>
+              </>
             )}
 
-            {/* Phase Indicator */}
-            {!isSetupPhase && (
-              <PhaseIndicator
-                currentPhase={gameState.phase}
-                turnNumber={gameState.turnNumber}
-                activePlayer={isPlayerTurn ? 'You' : 'Opponent'}
-              />
-            )}
-
-            {/* Draw Card button — only shown when player must draw */}
+            {/* Draw Card — only when player must draw */}
             {!isSetupPhase && needsToDraw && (
               <button
                 onClick={handleDraw}
-                className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-semibold text-sm transition animate-pulse"
-                title="Draw a card (draw phase)"
+                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition animate-pulse"
               >
                 Draw Card
               </button>
             )}
 
-            {/* Next Phase Button */}
+            {/* Place Resource — resource phase */}
+            {!isSetupPhase && needsToPlaceResource && (
+              <button
+                onClick={() =>
+                  handleAction({ type: 'PLACE_RESOURCE', playerId: 'player1', timestamp: Date.now() })
+                }
+                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-semibold text-xs transition animate-pulse"
+              >
+                Place Resource
+              </button>
+            )}
+
+            {/* Next Phase */}
             {!isSetupPhase && (
               <button
                 onClick={handleAdvancePhase}
-                disabled={!isPlayerTurn || needsToDraw}
-                className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm transition"
-                title={needsToDraw ? 'Draw a card first' : 'Next phase (Enter)'}
-                aria-label="Next phase"
+                disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
+                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white rounded font-semibold text-xs transition"
+                title={needsToDraw ? 'Draw first' : needsToPlaceResource ? 'Place resource first' : 'Next phase (Enter)'}
               >
-                {needsToDraw ? 'Draw First' : 'Next Phase →'}
+                {needsToDraw ? 'Draw First' : needsToPlaceResource ? 'Place Resource First' : 'Next Phase →'}
               </button>
             )}
+
+            {/* Sound Toggle */}
+            <button
+              onClick={toggleMute}
+              className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs transition"
+              title={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+
+            {/* Help */}
+            <button
+              onClick={() => setShowHelpModal(true)}
+              className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded text-xs transition"
+            >
+              ?
+            </button>
           </div>
         </div>
       </header>
@@ -391,6 +409,9 @@ export function PlaytestGameEnhanced({
             setStartPhase('shields');
           }}
           onShieldsPlaced={() => {
+            // Draw opponent's opening hand (5 cards)
+            engine.setupDraw('player2', 5);
+            setGameState(engine.getState());
             setStartPhase('ready');
           }}
           onGameReady={() => {
