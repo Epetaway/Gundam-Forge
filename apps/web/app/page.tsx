@@ -4,6 +4,7 @@ import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/Trendin
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Wrench, Swords } from 'lucide-react';
 import { cards, getCard, getCardImage } from '@/lib/data/cards';
 import { withBasePath } from '@/lib/utils/basePath';
 import { getDecks } from '@/lib/data/decks';
@@ -88,6 +89,55 @@ export default function HomePage(): JSX.Element {
               } satisfies TrendingDeckData;
             })}
           />
+        </Container>
+      </section>
+
+      <section className="py-12">
+        <Container className="space-y-6">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-wider text-cobalt-400 mb-2">What You Can Do</p>
+            <h2 className="font-display text-2xl font-semibold text-foreground">Everything in One Place</h2>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-surface-elevated">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-cobalt-600/20 p-2">
+                    <Wrench className="h-5 w-5 text-cobalt-400" />
+                  </div>
+                  <CardTitle>Build in the Forge</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  A dedicated deck construction workspace with card search, synergy scoring, real-time validation, and four view modes. Your deck, built to official GCG rules.
+                </CardDescription>
+                <Button asChild className="w-full" variant="primary">
+                  <Link href="/forge">+ Open Forge</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-surface-elevated">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-cobalt-600/20 p-2">
+                    <Swords className="h-5 w-5 text-cobalt-400" />
+                  </div>
+                  <CardTitle>Playtest Your Deck</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  Test any deck against an AI opponent using the full official GCG ruleset — phases, combat, triggers, and all official keywords.
+                </CardDescription>
+                <Button asChild className="w-full" variant="secondary">
+                  <Link href="/decks">Choose a Deck →</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </Container>
       </section>
 
