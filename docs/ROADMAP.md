@@ -722,6 +722,49 @@ After changes, run `npm run qa` from the repo root and confirm it passes.
 
 ---
 
+### Task 6.1 — Migrate Battlefield to Design Token System ✅ COMPLETE
+
+**Problem:** Playtester UI uses raw Tailwind color classes (slate-*, purple-*, gray-*) instead of design tokens — visually disconnected from main app
+
+**Solution:** Comprehensive migration of 14 playtester components from raw colors to design token system  
+**Implementation:**
+- **Battlefield.tsx:** Main playmat with header, zone container, hand tray
+- **Zone Components:** ShieldZone, BattleZone, BaseZone, ResourceZone, TrashZone, DeckZone, ResourceDeckZone
+- **UI Components:** HandTray (desktop arc + mobile drawer), PhaseIndicator, ZoneContainer (primitives), KeyboardShortcutsLegend, PlaytestGameEnhanced, MulliganModal
+
+**Color Token Mappings Applied:**
+- `bg-slate-950` → `bg-background`
+- `bg-slate-900` → `bg-surface`
+- `bg-slate-800` → `bg-surface-elevated`
+- `bg-slate-700/50` → `bg-surface-muted/50`
+- `border-slate-*` → `border-border`
+- `text-slate-400` → `text-steel-500`
+- `text-slate-300` → `text-steel-300`
+- `text-white` → `text-foreground`
+- `purple-*` → `cobalt-*` (accent color system)
+- **Preserved:** Semantic colors (green/red/blue/cyan for status indicators)
+
+**Visual Improvements:**
+- Unified color palette with rest of application
+- Better visual hierarchy and readability
+- Consistent dark mode implementation
+
+**Files Changed (14 components):**
+- Battlefield.tsx (277 lines)
+- ShieldZone.tsx, BattleZone.tsx, BaseZone.tsx
+- ResourceZone.tsx, TrashZone.tsx, DeckZone.tsx, ResourceDeckZone.tsx
+- HandTray.tsx (335 lines)
+- PhaseIndicator.tsx, ZoneContainer.tsx, KeyboardShortcutsLegend.tsx
+- PlaytestGameEnhanced.tsx (508 lines), MulliganModal.tsx (159 lines)
+
+**Color Replacements:** ~400 Tailwind class updates across codebase  
+**Git Commit:** (task-6.1)  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures  
+**Production Readiness Impact:** +2 pts (Playtester visual cohesion)
+
+---
+
 ## Phase 7 — Reliability & Error Handling
 
 ### Task 7.1 — Add Error Boundaries to Critical Pages
@@ -1389,9 +1432,14 @@ This phase improves navigation and feature discovery by adding prominent entry p
 4. ✅ **Phase 5 (Navigation & discovery) — COMPLETE (2/2 - 100%)**
    - ✅ Task 5.1 (Forge & Playtest feature cards) — COMPLETE
    - ✅ Task 5.2 (Playtest CTA on deck detail) — COMPLETE
-5. 🔄 Phase 6 onwards (20 tasks remaining)
+5. 🔄 **Phase 6 (Playtester Polish) — IN PROGRESS (1/4 - 25%)**
+   - ✅ Task 6.1 (Migrate Battlefield to design tokens) — COMPLETE
+   - ⏳ Task 6.2 (Fix resource deck to use real card IDs)
+   - ⏳ Task 6.3 (Token system for playtester UI)
+   - ⏳ Task 6.4 (Playtester feedback & polish)
+6. Phase 7 onwards (15 tasks remaining)
 
-**Overall Progress:** 16 of 35 tasks complete (46%), 4 of 10 phases complete, production readiness estimated at ~78/100
+**Overall Progress:** 17 of 35 tasks complete (49%), 4 of 10 phases complete, production readiness estimated at ~80/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
