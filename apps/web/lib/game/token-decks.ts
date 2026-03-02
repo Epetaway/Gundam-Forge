@@ -65,6 +65,14 @@ export const COLORLESS_TOKEN_DECK: TokenDeckConfig = {
       zone: 'resource',
       text: 'Resource token used by the bot.',
     },
+    {
+      id: 'EX-RESOURCE-TOKEN',
+      name: 'EX Resource',
+      type: 'Resource',
+      count: 1,
+      zone: 'resource',
+      text: '(At the start of the game, the second-turn player places 1 active EX Resource into their resource area.) (Rest an EX Resource then exile it from the game when paying a cost.)',
+    },
   ],
 };
 

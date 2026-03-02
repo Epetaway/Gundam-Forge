@@ -131,6 +131,7 @@ export interface GameState {
   hasDrawnThisTurn: boolean;
   hasResourcePlacedThisTurn: boolean;
   hasMainPhaseActions: number;
+  firstPlayerId?: string; // Track who goes first (for EX Resource determination)
 }
 
 export interface GameAction {
@@ -236,6 +237,7 @@ export class GameEngine {
       hasDrawnThisTurn: false,
       hasResourcePlacedThisTurn: false,
       hasMainPhaseActions: 0,
+      firstPlayerId: undefined, // Set by setFirstPlayer or coin flip
     };
 
     this.log('GAME_START', 'player1', 'start', 'Game initialized', 'Starting new playtest session');
@@ -267,19 +269,12 @@ export class GameEngine {
 
     this.shuffleDeck(deckCards, rngSeed);
 
-    // Official 2025 Gundam TCG: 6 shields face-down
-    const shields = Array(6)
-      .fill(null)
-      .map((_, i) => ({
-        instanceId: `${playerId}-shield-${i}`,
-        cardId: 'SHIELD',
-        zone: 'shields' as const,
-        state: 'ready' as const,
-        damageMarkers: 0,
-        attachments: { linked: [] },
-        counters: {},
-        usedAbilities: new Set<string>(),
-      }));
+    // Official 2025 Gundam TCG: 6 shields face-down from top of shuffled deck
+    const shieldCount = Math.min(6, deckCards.length);
+    const shields = deckCards.splice(0, shieldCount).map((card) => ({
+      ...card,
+      zone: 'shields' as const,
+    }));
 
     // Build resource deck from deck definition (zone: 'resource' cards)
     const resourceDeckCards: CardInstance[] = [];
@@ -346,13 +341,14 @@ export class GameEngine {
 
     this.shuffleDeck(deckCards, rngSeed);
 
+    // Opponent resource deck — feeds Resource Phase (one card placed per turn)
     const resourcePool: CardInstance[] = COLORLESS_TOKEN_DECK.cards
       .filter((c) => c.zone === 'resource')
       .flatMap((resourceCard, resourceIndex) =>
         Array.from({ length: resourceCard.count }, (_, copyIndex) => ({
           instanceId: `${playerId}-resource-${resourceIndex}-${copyIndex}`,
           cardId: resourceCard.id,
-          zone: 'resources' as const,
+          zone: 'resourceDeck' as const,
           state: 'ready' as const,
           damageMarkers: 0,
           attachments: { linked: [] },
@@ -396,8 +392,8 @@ export class GameEngine {
         counters: {},
         usedAbilities: new Set(),
       },
-      resources: resourcePool,
-      resourceDeck: [],
+      resources: [],
+      resourceDeck: resourcePool,
       exZone: { exResources: [] },
       baseHealth: 20,
       maxBaseHealth: 20,
@@ -652,6 +648,8 @@ export class GameEngine {
     }
     if (nextPhase === 'resource') {
       this.state.hasResourcePlacedThisTurn = false;
+      // Auto-place resource during resource phase
+      this.autoPlaceResource(action.playerId);
     }
 
     this.state.phase = nextPhase;
@@ -780,12 +778,12 @@ export class GameEngine {
       };
     }
 
-    const sourceHasSupport = this.hasKeyword(source, ['support']);
-    if (!sourceHasSupport) {
+    const supportValue = this.getKeywordValue(source, 'support');
+    if (supportValue === 0) {
       return {
         valid: false,
-        error: 'Source unit has no support ability',
-        rulesTrace: 'Only support units can activate this ability in MVP.',
+        error: 'Source unit has no Support ability',
+        rulesTrace: 'Only units with the Support keyword can activate this ability.',
       };
     }
 
@@ -793,14 +791,14 @@ export class GameEngine {
     source.usedAbilities.add(abilityId);
 
     const currentBuff = target.counters.tempApBuff ?? 0;
-    target.counters.tempApBuff = currentBuff + 1;
+    target.counters.tempApBuff = currentBuff + supportValue;
 
     this.log(
       'ACTIVATE_ABILITY',
       action.playerId,
       this.state.phase,
-      `${source.cardId} supported ${target.cardId}`,
-      'Support unit rested and granted +1 temporary AP for this turn.',
+      `${source.cardId} supported ${target.cardId} (+${supportValue} AP)`,
+      `Support ${supportValue}: unit rested and granted +${supportValue} temporary AP for this turn.`,
     );
 
     return { valid: true };
@@ -868,8 +866,12 @@ export class GameEngine {
   }
 
   private handleDeclareAttack(action: GameAction): ActionValidation {
-    const { attackerInstanceIds, defenderPlayerId, target } = action.payload || {};
-    if (!attackerInstanceIds || !Array.isArray(attackerInstanceIds)) {
+    const payload = action.payload || {};
+    // Normalize: accept either attackerInstanceIds (array) or attackerInstanceId (singular)
+    const rawIds = payload.attackerInstanceIds ?? (payload.attackerInstanceId ? [payload.attackerInstanceId] : null);
+    const attackerInstanceIds: string[] | null = Array.isArray(rawIds) ? rawIds : null;
+    const { defenderPlayerId, target } = payload;
+    if (!attackerInstanceIds || attackerInstanceIds.length === 0) {
       return { valid: false, error: 'Missing attackerInstanceIds' };
     }
 
@@ -1065,7 +1067,7 @@ export class GameEngine {
       }
     } else {
       const beforeShields = defender.shields.length;
-      const damageResult = this.resolveDamage(defender, attackerDamage);
+      const damageResult = this.resolveDamage(defender, attackerDamage, attackingUnit);
       shieldDamage = beforeShields - defender.shields.length;
       baseDamage = damageResult.baseDamage;
       revealedShieldIds = damageResult.revealedShieldIds;
@@ -1090,15 +1092,18 @@ export class GameEngine {
       },
     };
 
+    const attackerHasBreach = this.hasKeyword(attackingUnit, ['breach']);
+
     this.log(
       'RESOLVE_COMBAT',
       resolvedAttackerPlayerId,
       this.state.phase,
       `Combat resolved: attacker dealt ${attackerDamage}, shields broken ${shieldDamage}, base damage ${baseDamage}`,
-      `First Strike (attacker/blocker): ${attackerHasFirstStrike}/${blockerHasFirstStrike}; High-Maneuver: ${attackerHasHighManeuver}.`
+      `First Strike (attacker/blocker): ${attackerHasFirstStrike}/${blockerHasFirstStrike}; High-Maneuver: ${attackerHasHighManeuver}; Breach: ${attackerHasBreach}.`
     );
 
-    if (blockerDestroyed) {
+    // Breach: only triggers when attacker has the Breach keyword AND destroys a blocker
+    if (blockerDestroyed && attackerHasBreach) {
       this.triggerBreach(resolvedAttackerPlayerId, resolvedAttackerInstanceId, {
         defenderPlayerId: resolvedDefenderPlayerId,
         destroyedUnitId: resolvedBlockerInstanceIds[0],
@@ -1111,29 +1116,46 @@ export class GameEngine {
   public resolveDamage(
     defender: PlayerState,
     damageAmount: number,
+    attacker?: CardInstance,
   ): { revealedShieldIds: string[]; baseDamage: number } {
     const revealedShieldIds: string[] = [];
     const baseBefore = defender.baseHealth;
 
-    // Official GCG shield rule: any attack with AP ≥ 1 destroys exactly ONE shield.
-    // The shield card's stats are irrelevant — it is not a HP comparison.
-    // If no shields remain, damage goes directly to the base.
-    if (damageAmount >= 1 && defender.shields.length > 0) {
-      const shield = defender.shields.splice(0, 1)[0];
-      this.enqueueTrigger({
-        type: 'BURST',
-        sourceInstanceId: shield.instanceId,
-        ownerPlayerId: defender.playerId,
-        optionalChoice: true,
-        description: `Burst check for shield ${shield.cardId}`,
-        payload: { shieldCardId: shield.cardId },
-      });
-      shield.zone = 'trash';
-      defender.discardPile.push(shield);
-      revealedShieldIds.push(shield.cardId);
-    } else if (damageAmount >= 1 && defender.shields.length === 0) {
-      // No shields remain — damage hits the base directly
-      defender.baseHealth -= damageAmount;
+    if (damageAmount >= 1) {
+      // Suppression: destroys 2 shields simultaneously instead of 1
+      const hasSupression = attacker
+        ? this.hasKeyword(attacker, ['suppression'])
+        : false;
+      const shieldsToDestroy = hasSupression ? 2 : 1;
+
+      if (defender.shields.length > 0) {
+        const count = Math.min(shieldsToDestroy, defender.shields.length);
+        for (let i = 0; i < count; i++) {
+          const shield = defender.shields.splice(0, 1)[0];
+          // Burst: only trigger if the revealed shield card has the Burst keyword
+          if (this.hasKeyword(shield, ['burst'])) {
+            this.enqueueTrigger({
+              type: 'BURST',
+              sourceInstanceId: shield.instanceId,
+              ownerPlayerId: defender.playerId,
+              optionalChoice: false,
+              description: `Burst triggered by ${shield.cardId}`,
+              payload: { shieldCardId: shield.cardId },
+            });
+          }
+          shield.zone = 'trash';
+          defender.discardPile.push(shield);
+          revealedShieldIds.push(shield.cardId);
+        }
+
+        // If Suppression destroyed all shields and there was overflow, remainder hits base
+        if (hasSupression && shieldsToDestroy > count) {
+          defender.baseHealth -= damageAmount;
+        }
+      } else {
+        // No shields remain — damage hits the base directly
+        defender.baseHealth -= damageAmount;
+      }
     }
 
     // Check win condition
@@ -1152,16 +1174,18 @@ export class GameEngine {
     const definition = this.cardDb[unit.cardId] as any;
     const baseAttack = definition?.ap ?? definition?.atk ?? definition?.power ?? 5;
     const supportBuff = unit.counters.tempApBuff ?? 0;
-    const pairBonus = unit.attachments.pilot ? 1 : 0;
-    const linkBonus = unit.attachments.linked?.length ?? 0;
+    // Use counters set by PAIR/LINK trigger resolution (actual pilot AP); fall back to flat +1 if not resolved yet
+    const pairBonus = unit.counters.pairApBonus ?? (unit.attachments.pilot ? 1 : 0);
+    const linkBonus = unit.counters.linkApBonus ?? (unit.attachments.linked?.length ?? 0);
     return baseAttack + supportBuff + pairBonus + linkBonus;
   }
 
   private getUnitHealth(unit: CardInstance): number {
     const definition = this.cardDb[unit.cardId] as any;
     const baseHealth = definition?.hp ?? definition?.def ?? definition?.power ?? 5;
-    const pairBonus = unit.attachments.pilot ? 1 : 0;
-    const linkBonus = unit.attachments.linked?.length ?? 0;
+    // Use counters set by PAIR/LINK trigger resolution; fall back to flat +1
+    const pairBonus = unit.counters.pairHpBonus ?? (unit.attachments.pilot ? 1 : 0);
+    const linkBonus = unit.counters.linkHpBonus ?? (unit.attachments.linked?.length ?? 0);
     return baseHealth + pairBonus + linkBonus;
   }
 
@@ -1169,7 +1193,28 @@ export class GameEngine {
     const definition = this.cardDb[unit.cardId] as any;
     const keywords: string[] = definition?.keywords || [];
     const normalized = keywords.map((k) => String(k).toLowerCase());
-    return candidates.some((candidate) => normalized.includes(candidate.toLowerCase()));
+    return candidates.some((candidate) =>
+      normalized.some((k) => k === candidate.toLowerCase() || k.startsWith(candidate.toLowerCase() + ' ')),
+    );
+  }
+
+  /**
+   * Get the numeric value for a parameterized keyword, e.g. "Repair 2" → 2.
+   * Returns defaultValue if the keyword is present but has no number, or 0 if absent.
+   */
+  private getKeywordValue(unit: CardInstance, keyword: string, defaultValue = 1): number {
+    const definition = this.cardDb[unit.cardId] as any;
+    const keywords: string[] = definition?.keywords || [];
+    const lowerKeyword = keyword.toLowerCase();
+    for (const k of keywords) {
+      const kLower = k.toLowerCase();
+      if (kLower === lowerKeyword) return defaultValue;
+      if (kLower.startsWith(lowerKeyword + ' ')) {
+        const num = parseInt(kLower.slice(lowerKeyword.length + 1), 10);
+        return isNaN(num) ? defaultValue : num;
+      }
+    }
+    return 0;
   }
 
   private triggerDestroyed(
@@ -1227,14 +1272,15 @@ export class GameEngine {
   private triggerRepair(playerId: string): void {
     const player = this.state.players[playerId];
     player.battleArea.forEach((unit) => {
-      if (!this.hasKeyword(unit, ['repair'])) return;
+      const repairValue = this.getKeywordValue(unit, 'repair');
+      if (repairValue === 0) return;
       this.enqueueTrigger({
         type: 'REPAIR',
         sourceInstanceId: unit.instanceId,
         ownerPlayerId: playerId,
         optionalChoice: false,
-        description: `Repair trigger from ${unit.cardId}`,
-        payload: { unitInstanceId: unit.instanceId },
+        description: `Repair ${repairValue} trigger from ${unit.cardId}`,
+        payload: { unitInstanceId: unit.instanceId, repairAmount: repairValue },
       });
     });
   }
@@ -1340,21 +1386,8 @@ export class GameEngine {
         break;
       }
       case 'ATTACK': {
-        const sourceInstanceId = trigger.sourceInstanceId;
-        const ownerPlayerId = trigger.ownerPlayerId;
-        const defenderPlayerId = trigger.payload?.defenderPlayerId as string | undefined;
-        if (!sourceInstanceId || !ownerPlayerId || !defenderPlayerId) break;
-
-        const owner = this.state.players[ownerPlayerId];
-        const attacker = owner.battleArea.find((u) => u.instanceId === sourceInstanceId);
-        if (!attacker) break;
-
-        if (this.hasKeyword(attacker, ['breach', 'shield_break', 'shield-break'])) {
-          this.triggerBreach(ownerPlayerId, sourceInstanceId, {
-            defenderPlayerId,
-            via: 'attack-trigger',
-          });
-        }
+        // ATTACK triggers fire when a unit attacks. Breach fires via handleResolveCombat
+        // (only if blocker destroyed AND attacker has Breach). No extra logic needed here.
         break;
       }
       case 'DESTROYED': {
@@ -1408,23 +1441,125 @@ export class GameEngine {
         this.resolveDamage(defender, 1);
         break;
       }
-      case 'PAIR':
-      case 'LINK':
+      case 'PAIR': {
+        const playerId = trigger.ownerPlayerId;
+        const unitId = trigger.sourceInstanceId;
+        if (!playerId || !unitId) break;
+        const player = this.state.players[playerId];
+        const unit = player.battleArea.find((u) => u.instanceId === unitId);
+        if (!unit || !unit.attachments.pilot) break;
+
+        const pilot = unit.attachments.pilot;
+        const pilotDef = this.cardDb[pilot.cardId] as any;
+
+        // Apply pilot AP bonus to the unit as a permanent counter
+        const pilotAp = pilotDef?.ap ?? 0;
+        if (pilotAp > 0) {
+          unit.counters.pairApBonus = (unit.counters.pairApBonus ?? 0) + pilotAp;
+        }
+        // Apply pilot HP bonus
+        const pilotHp = pilotDef?.hp ?? 0;
+        if (pilotHp > 0) {
+          unit.counters.pairHpBonus = (unit.counters.pairHpBonus ?? 0) + pilotHp;
+        }
+
+        this.log(
+          'RESOLVE_TRIGGER',
+          playerId,
+          this.state.phase,
+          `${pilot.cardId} paired with ${unit.cardId}: +${pilotAp} AP, +${pilotHp} HP`,
+          'Pair trigger resolved — pilot bonuses applied.',
+        );
         break;
+      }
+      case 'LINK': {
+        const playerId = trigger.ownerPlayerId;
+        const unitId = trigger.sourceInstanceId;
+        if (!playerId || !unitId) break;
+        const player = this.state.players[playerId];
+        const unit = player.battleArea.find((u) => u.instanceId === unitId);
+        if (!unit || !unit.attachments.linked?.length) break;
+
+        const pilotInstanceId = trigger.payload?.pilotInstanceId as string | undefined;
+        const linked = pilotInstanceId
+          ? unit.attachments.linked.find((c) => c.instanceId === pilotInstanceId)
+          : unit.attachments.linked[unit.attachments.linked.length - 1];
+        if (!linked) break;
+
+        const linkedDef = this.cardDb[linked.cardId] as any;
+        const linkedAp = linkedDef?.ap ?? 0;
+        if (linkedAp > 0) {
+          unit.counters.linkApBonus = (unit.counters.linkApBonus ?? 0) + linkedAp;
+        }
+        const linkedHp = linkedDef?.hp ?? 0;
+        if (linkedHp > 0) {
+          unit.counters.linkHpBonus = (unit.counters.linkHpBonus ?? 0) + linkedHp;
+        }
+
+        this.log(
+          'RESOLVE_TRIGGER',
+          playerId,
+          this.state.phase,
+          `${linked.cardId} linked to ${unit.cardId}: +${linkedAp} AP, +${linkedHp} HP`,
+          'Link trigger resolved — linked card bonuses applied.',
+        );
+        break;
+      }
       case 'REPAIR': {
         const playerId = trigger.ownerPlayerId;
         const unitId = trigger.payload?.unitInstanceId as string | undefined;
+        const repairAmount = (trigger.payload?.repairAmount as number | undefined) ?? 1;
         if (!playerId || !unitId) break;
         const player = this.state.players[playerId];
         const unit = player.battleArea.find((u) => u.instanceId === unitId);
         if (unit && unit.damageMarkers > 0) {
-          unit.damageMarkers -= 1;
+          unit.damageMarkers = Math.max(0, unit.damageMarkers - repairAmount);
         }
         break;
       }
       default:
         break;
     }
+  }
+
+  /**
+   * Automatically place resource from resource deck during resource phase
+   * Called when advancing to resource phase
+   */
+  private autoPlaceResource(playerId: string): void {
+    const player = this.state.players[playerId];
+
+    if (this.state.hasResourcePlacedThisTurn) {
+      return; // Already placed this turn
+    }
+
+    if (player.resourceDeck.length === 0) {
+      // Resource Deck exhausted — skip (not a loss condition)
+      this.state.hasResourcePlacedThisTurn = true;
+      this.log(
+        'AUTO_PLACE_RESOURCE',
+        playerId,
+        this.state.phase,
+        'Resource Deck empty — Resource Phase skipped',
+        'No cards in Resource Deck; phase skipped per official rules.',
+      );
+      return;
+    }
+
+    // Take top of resource deck → place into resource area as ACTIVE
+    const resourceCard = player.resourceDeck.shift()!;
+    resourceCard.zone = 'resources';
+    resourceCard.state = 'ready'; // enters active — can be spent immediately
+    player.resources.push(resourceCard);
+    this.state.hasResourcePlacedThisTurn = true;
+
+    this.log(
+      'AUTO_PLACE_RESOURCE',
+      playerId,
+      this.state.phase,
+      `Auto-placed resource ${resourceCard.cardId} from Resource Deck`,
+      'Top of Resource Deck automatically moved to Resource Area (enters active).',
+    );
   }
 
   private handlePlaceResource(action: GameAction): ActionValidation {
@@ -1635,9 +1770,43 @@ export class GameEngine {
   }
 
   /** Set which player acts first (call before game starts, while still in setup phase). */
+  /**
+   * Set the first player and grant EX Resource to second player
+   * Official Rule: Second-turn player receives 1 EX Resource at game start
+   */
   public setFirstPlayer(playerId: string): void {
     this.state.activePlayerId = playerId;
     this.state.priorityPlayer = playerId;
+    this.state.firstPlayerId = playerId;
+    
+    // Grant EX Resource to second player (the player who goes second)
+    const secondPlayerId = playerId === 'player1' ? 'player2' : 'player1';
+    const secondPlayer = this.state.players[secondPlayerId];
+    
+    // Create EX Resource token
+    const exResource: CardInstance = {
+      instanceId: `${secondPlayerId}-ex-resource-0`,
+      cardId: 'EX-RESOURCE-TOKEN',
+      zone: 'exResource',
+      state: 'ready',
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set(),
+    };
+    
+    secondPlayer.exZone.exResources.push(exResource);
+    // Also add to resources for spending (EX Resources are spent like normal resources)
+    exResource.zone = 'resources';
+    secondPlayer.resources.push(exResource);
+    
+    this.log(
+      'EX_RESOURCE_GRANTED',
+      secondPlayerId,
+      this.state.phase,
+      `${secondPlayerId} received 1 EX Resource (second player advantage)`,
+      'Official Rule: Second-turn player places 1 active EX Resource at game start.',
+    );
   }
 
   public getLog(): GameLogEntry[] {
