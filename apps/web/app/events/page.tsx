@@ -22,7 +22,11 @@ export default function EventsPage(): JSX.Element {
 
       <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
         <div className="space-y-3">
-          {events.map((event) => (
+          {events.length === 0 ? (
+            <div className="flex items-center justify-center py-16 text-center">
+              <p className="text-sm text-steel-600">No events tracked yet. Results will appear here as tournaments are recorded.</p>
+            </div>
+          ) : events.map((event) => (
             <Card className="overflow-hidden border-steel-400 bg-surface-elevated" key={event.id}>
               <div className="flex items-center justify-between border-b border-border bg-[linear-gradient(120deg,rgba(59,130,246,0.2),transparent_65%)] px-4 py-2 text-xs text-steel-600">
                 <span className="inline-flex items-center gap-1">
@@ -41,17 +45,18 @@ export default function EventsPage(): JSX.Element {
                 <ul className="space-y-2">
                   {event.placements.map((placement) => (
                     <li
-                      className={`flex items-center justify-between rounded-md border px-3 py-2 ${getPlacementTone(placement.placement)}`}
+                      className={`flex flex-wrap items-start gap-2 rounded-md border px-3 py-2 sm:flex-nowrap sm:items-center sm:justify-between ${getPlacementTone(placement.placement)}`}
                       key={`${event.id}:${placement.placement}`}
                     >
-                      <div className="text-sm">
+                      <div className="min-w-0 flex-1 text-sm">
                         <p className="flex items-center gap-1 font-semibold">
-                          {placement.placement <= 3 ? <Medal className="h-4 w-4 text-amber-300" /> : <Trophy className="h-4 w-4 text-steel-500" />}
-                          #{placement.placement} {placement.player}
+                          {placement.placement <= 3 ? <Medal className="h-4 w-4 text-amber-300 shrink-0" /> : <Trophy className="h-4 w-4 text-steel-500 shrink-0" />}
+                          <span className="shrink-0">#{placement.placement}</span>
+                          <span className="truncate">{placement.player}</span>
                         </p>
-                        <p className="text-xs text-steel-600">{placement.deckName} • {placement.archetype}</p>
+                        <p className="truncate text-xs text-steel-600">{placement.deckName} • {placement.archetype}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
                         <Badge variant="accent">{placement.wins}-{placement.losses}-{placement.draws}</Badge>
                         <span className={`text-xs font-semibold ${getWinRateTone(placement.wins, placement.losses, placement.draws)}`}>
                           {formatMatchWinRate(placement.wins, placement.losses, placement.draws)}

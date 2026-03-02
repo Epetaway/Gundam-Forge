@@ -12,6 +12,8 @@ interface PhaseIndicatorProps {
   currentPhase: Phase;
   turnNumber: number;
   activePlayer: 'You' | 'Opponent';
+  onEndPhase?: () => void;
+  canEndPhase?: boolean;
 }
 
 const PHASE_LABELS: Record<Phase, string> = {
@@ -23,19 +25,28 @@ const PHASE_LABELS: Record<Phase, string> = {
   gameOver: 'Game Over',
 };
 
-export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: PhaseIndicatorProps) {
+export function PhaseIndicator({ currentPhase, turnNumber, activePlayer, onEndPhase, canEndPhase = true }: PhaseIndicatorProps) {
   const phaseLabel = PHASE_LABELS[currentPhase] ?? currentPhase;
   // Grammatically correct "Your Turn" vs "Opponent's Turn"
   const turnText = activePlayer === 'You' ? 'Your Turn' : "Opponent's Turn";
 
   return (
     <div className="flex items-center gap-2 shrink-0">
-      <span className="text-xs text-slate-400 whitespace-nowrap">
+      <span className="text-xs text-steel-500 whitespace-nowrap">
         Turn {turnNumber} &bull; {turnText}
       </span>
-      <span className="px-2.5 py-1 text-xs rounded font-bold bg-purple-600 text-white whitespace-nowrap">
+      <span className="px-2.5 py-1 text-xs rounded font-bold bg-cobalt-500 text-foreground whitespace-nowrap">
         {phaseLabel} Phase
       </span>
+      {onEndPhase && (
+        <button
+          onClick={onEndPhase}
+          disabled={!canEndPhase}
+          className="px-3 py-1 text-xs rounded font-bold bg-cobalt-400 hover:bg-cobalt-300 disabled:opacity-40 disabled:cursor-not-allowed text-foreground transition whitespace-nowrap"
+        >
+          End Phase →
+        </button>
+      )}
     </div>
   );
 }

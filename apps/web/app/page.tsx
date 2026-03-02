@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { cards, getCard, getCardImage } from '@/lib/data/cards';
 import { withBasePath } from '@/lib/utils/basePath';
+import { relativeTime } from '@/lib/utils/relativeTime';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
 import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
@@ -82,6 +83,7 @@ export default function HomePage(): JSX.Element {
                 author: deck.owner || 'Unknown',
                 views: deck.views || 0,
                 cardCount: deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0),
+                updatedAgo: relativeTime(deck.updatedAt),
                 colors: deck.colors || [],
                 tags: deck.archetype ? [deck.archetype] : [],
                 avatarUrl: undefined,

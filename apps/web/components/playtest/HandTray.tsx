@@ -52,7 +52,7 @@ export function HandTray({
 
   if (cards.length === 0) {
     return (
-      <div className="w-full h-20 md:h-32 flex items-center justify-center text-slate-500 text-sm">
+      <div className="w-full h-20 md:h-32 flex items-center justify-center text-steel-600 text-sm">
         Your hand is empty
       </div>
     );
@@ -170,29 +170,29 @@ function DesktopArcFan({
                     isSelected
                       ? 'border-yellow-400 shadow-yellow-500/50 ring-2 ring-yellow-300'
                       : isHovered
-                        ? 'border-slate-400 shadow-slate-500/50'
-                        : 'border-slate-600 shadow-slate-900/50',
+                        ? 'border-steel-400 shadow-steel-500/50'
+                        : 'border-border shadow-background/50',
                   )}
                 >
                   {cardData ? (
                     <CardArtImage card={cardData} alt={cardData.name} fill priority={false} loading="lazy" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-b from-slate-700 to-slate-800 flex items-center justify-center">
-                      <span className="text-xs text-slate-400">?</span>
+                      <span className="text-xs text-steel-500">?</span>
                     </div>
                   )}
                 </div>
 
                 {/* Cost badge */}
                 {cardData && (
-                  <div className="absolute -top-2 -left-2 w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-cyan-300 shadow-lg">
+                  <div className="absolute -top-2 -left-2 w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-xs font-bold border-2 border-cyan-300 shadow-lg">
                     {cardData.cost || 0}
                   </div>
                 )}
 
                 {/* Card name on hover */}
                 {isHovered && (
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-sm px-2 py-1 rounded border border-slate-600 z-50 pointer-events-none shadow-lg">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface text-foreground text-sm px-2 py-1 rounded border border-border z-50 pointer-events-none shadow-lg">
                     {cardData?.name || card.cardId}
                   </div>
                 )}
@@ -202,7 +202,7 @@ function DesktopArcFan({
               {canPlayCards && (isSelected || isHovered) && (
                 <button
                   onClick={() => onPlayCard(card)}
-                  className="absolute -bottom-6 left-0 right-0 mx-auto w-fit px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors z-[60] shadow-lg"
+                  className="absolute -bottom-6 left-0 right-0 mx-auto w-fit px-3 py-1 bg-green-600 hover:bg-green-500 text-foreground text-sm font-bold rounded transition-colors z-[60] shadow-lg"
                 >
                   Play
                 </button>
@@ -248,24 +248,24 @@ function MobileDrawer({
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t-2 border-purple-600/30 z-50 touch-pan-y"
+      className="fixed bottom-0 left-0 right-0 bg-surface/95 border-t-2 border-cobalt-500/30 z-50 touch-pan-y"
       animate={{ height: drawerHeight }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       {/* Handle Bar */}
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className="w-full h-12 flex items-center justify-center border-b border-slate-700 hover:bg-slate-800/50 transition-colors"
+        className="w-full h-12 flex items-center justify-center border-b border-border hover:bg-surface-elevated/50 transition-colors"
       >
         <div className="flex flex-col items-center gap-1">
-          <div className="text-xs font-bold text-slate-300 uppercase">
+          <div className="text-xs font-bold text-steel-300 uppercase">
             Hand ({cards.length}/10)
           </div>
           <motion.div animate={{ rotate: drawerOpen ? 180 : 0 }}>
             {drawerOpen ? (
-              <ChevronDown size={16} className="text-slate-400" />
+              <ChevronDown size={16} className="text-steel-500" />
             ) : (
-              <ChevronUp size={16} className="text-slate-400" />
+              <ChevronUp size={16} className="text-steel-500" />
             )}
           </motion.div>
         </div>
@@ -297,7 +297,7 @@ function MobileDrawer({
                       'border-2 transition-all',
                       isSelected
                         ? 'border-yellow-400 ring-2 ring-yellow-300 scale-105'
-                        : 'border-slate-600 hover:border-slate-400',
+                        : 'border-border hover:border-steel-400',
                     )}
                     title={cardData?.name || card.cardId}
                   >
@@ -311,13 +311,13 @@ function MobileDrawer({
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-b from-slate-700 to-slate-800 flex items-center justify-center">
-                        <span className="text-xs text-slate-400">?</span>
+                        <span className="text-xs text-steel-500">?</span>
                       </div>
                     )}
 
                     {/* Cost Badge */}
                     {cardData && (
-                      <div className="absolute -top-1.5 -left-1.5 w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border border-cyan-300 shadow">
+                      <div className="absolute -top-1.5 -left-1.5 w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-xs font-bold border border-cyan-300 shadow">
                         {cardData.cost || 0}
                       </div>
                     )}

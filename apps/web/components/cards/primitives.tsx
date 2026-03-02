@@ -144,9 +144,10 @@ export function ActionRail({
         'absolute right-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2',
         // Mobile: always reachable
         'pointer-events-auto opacity-100',
-        // sm+: fade out, reveal on card hover
+        // sm+: fade out, reveal on card hover or keyboard focus
         'sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:duration-150',
         'sm:group-hover:pointer-events-auto sm:group-hover:opacity-100',
+        'sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100',
       )}
     >
       {/* Add / Remove pill */}

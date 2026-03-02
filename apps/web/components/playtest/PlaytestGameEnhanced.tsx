@@ -63,6 +63,7 @@ export function PlaytestGameEnhanced({
   const [showLogPanel, setShowLogPanel] = useState(true);
   const [showHandPanel, setShowHandPanel] = useState(true);
   const [showBoardPanel, setShowBoardPanel] = useState(true);
+  const [showMobileLog, setShowMobileLog] = useState(false);
 
   // Phase 3: Sound Effects Integration
   const {
@@ -89,8 +90,21 @@ export function PlaytestGameEnhanced({
             count: entry.qty,
             zone: 'main' as const,
           })),
-          // Official GCG: separate 10-card resource deck (outside 50-card main deck)
-          { cardId: 'TOKEN-RESOURCE-001', count: 10, zone: 'resource' as const },
+          // Official GCG: separate 10-card resource deck using real card IDs from the deck
+          ...(() => {
+            const allCardIds = playerDeck.entries.flatMap((e) =>
+              Array.from({ length: e.qty }, () => e.cardId)
+            );
+            const padded = allCardIds.length >= 10
+              ? allCardIds
+              : [...allCardIds, ...Array.from({ length: 10 - allCardIds.length }, () => allCardIds[0] ?? 'ST01-001')];
+            const resourceDeckCards = padded.slice(0, 10);
+            return resourceDeckCards.map((cardId) => ({
+              cardId,
+              count: 1,
+              zone: 'resource' as const,
+            }));
+          })(),
         ],
       };
 
@@ -244,11 +258,8 @@ export function PlaytestGameEnhanced({
   // Loading State
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-lg text-white">Initializing Gundam TCG Playtester...</p>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-sm text-steel-500 animate-pulse">Initializing game engine...</p>
       </div>
     );
   }
@@ -259,7 +270,7 @@ export function PlaytestGameEnhanced({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="text-center">
           <p className="text-xl font-bold text-red-500">Error</p>
-          <p className="text-slate-300 mt-2">{error || 'Failed to load game'}</p>
+          <p className="text-steel-300 mt-2">{error || 'Failed to load game'}</p>
         </div>
       </div>
     );
@@ -278,13 +289,25 @@ export function PlaytestGameEnhanced({
     !gameState.hasResourcePlacedThisTurn &&
     playerState.resourceDeck.length > 0;
 
+  const statusBarText = isSetupPhase
+    ? 'Setting up game…'
+    : !isPlayerTurn
+      ? "Opponent's turn — waiting…"
+      : needsToDraw
+        ? 'Draw Phase — draw a card to continue'
+        : needsToPlaceResource
+          ? 'Resource Phase — place a resource card'
+          : gameState.phase === 'main'
+            ? 'Main Phase — play cards or end phase'
+            : `${gameState.phase.charAt(0).toUpperCase() + gameState.phase.slice(1)} Phase`;
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-surface flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
-      <header className="flex-shrink-0 border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-3 py-2">
+      <header className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-gradient-to-r from-surface-elevated to-surface px-3 py-2">
         <div className="flex items-center gap-2 min-w-0">
           {/* Title */}
-          <h1 className="text-base font-bold text-white whitespace-nowrap mr-2">Gundam TCG</h1>
+          <h1 className="text-base font-bold text-foreground whitespace-nowrap mr-2">Gundam TCG</h1>
 
           {/* Phase + turn info */}
           {!isSetupPhase && (
@@ -292,6 +315,8 @@ export function PlaytestGameEnhanced({
               currentPhase={gameState.phase}
               turnNumber={gameState.turnNumber}
               activePlayer={isPlayerTurn ? 'You' : 'Opponent'}
+              onEndPhase={handleAdvancePhase}
+              canEndPhase={isPlayerTurn && !needsToDraw && !needsToPlaceResource}
             />
           )}
 
@@ -306,7 +331,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleUndo}
                   disabled={!engine?.canUndo()}
-                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-elevated disabled:text-steel-600 rounded text-xs transition"
                   title="Undo (Ctrl+Z)"
                 >
                   ↶
@@ -314,7 +339,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleRedo}
                   disabled={!engine?.canRedo()}
-                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-elevated disabled:text-steel-600 rounded text-xs transition"
                   title="Redo (Ctrl+Y)"
                 >
                   ↷
@@ -326,7 +351,7 @@ export function PlaytestGameEnhanced({
             {!isSetupPhase && needsToDraw && (
               <button
                 onClick={handleDraw}
-                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition animate-pulse"
+                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-foreground rounded font-semibold text-xs transition animate-pulse"
               >
                 Draw Card
               </button>
@@ -338,7 +363,7 @@ export function PlaytestGameEnhanced({
                 onClick={() =>
                   handleAction({ type: 'PLACE_RESOURCE', playerId: 'player1', timestamp: Date.now() })
                 }
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-semibold text-xs transition animate-pulse"
+                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-foreground rounded font-semibold text-xs transition animate-pulse"
               >
                 Place Resource
               </button>
@@ -349,7 +374,7 @@ export function PlaytestGameEnhanced({
               <button
                 onClick={handleAdvancePhase}
                 disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
-                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white rounded font-semibold text-xs transition"
+                className="px-3 py-1 bg-cobalt-500 hover:bg-cobalt-400 disabled:bg-surface-elevated disabled:text-steel-600 disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
                 title={needsToDraw ? 'Draw first' : needsToPlaceResource ? 'Place resource first' : 'Next phase (Enter)'}
               >
                 {needsToDraw ? 'Draw First' : needsToPlaceResource ? 'Place Resource First' : 'Next Phase →'}
@@ -359,7 +384,7 @@ export function PlaytestGameEnhanced({
             {/* Sound Toggle */}
             <button
               onClick={toggleMute}
-              className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs transition"
+              className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
               title={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? '🔇' : '🔊'}
@@ -368,7 +393,7 @@ export function PlaytestGameEnhanced({
             {/* Help */}
             <button
               onClick={() => setShowHelpModal(true)}
-              className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded text-xs transition"
+              className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition"
             >
               ?
             </button>
@@ -447,6 +472,10 @@ export function PlaytestGameEnhanced({
             setTimeout(() => setError(null), 3000);
           }}
         >
+          {/* Status bar */}
+          <div className="text-xs text-steel-500 text-center py-1 bg-surface/50 flex-shrink-0">
+            {statusBarText}
+          </div>
           <main className="flex-1 overflow-hidden" id="main-content">
             <Battlefield
               playerState={playerState}
@@ -482,6 +511,28 @@ export function PlaytestGameEnhanced({
         </DragDropProvider>
       )}
 
+      {/* Mobile Log Toggle Button */}
+      {!isSetupPhase && (
+        <button
+          className="fixed bottom-16 right-4 z-50 md:hidden bg-surface-elevated border border-border rounded-full px-3 py-2 text-xs text-steel-300 shadow-lg"
+          onClick={() => setShowMobileLog((v) => !v)}
+        >
+          Log
+        </button>
+      )}
+
+      {/* Mobile Game Log Panel */}
+      {showMobileLog && !isSetupPhase && engine && (
+        <div className="fixed bottom-28 right-4 z-50 md:hidden w-64 max-h-60 overflow-y-auto bg-surface border border-border rounded-lg shadow-xl p-2">
+          <div className="text-xs font-bold text-steel-400 uppercase mb-1">Game Log</div>
+          {engine.getLog().slice(-20).reverse().map((entry, i) => (
+            <div key={i} className="text-[10px] text-steel-500 py-0.5 border-b border-border last:border-b-0">
+              {entry.actionType}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Keyboard Shortcuts Legend */}
       <KeyboardShortcutsLegend
         isOpen={showHelpModal}
@@ -490,7 +541,7 @@ export function PlaytestGameEnhanced({
 
       {/* Error Toast */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs z-50">
+        <div className="fixed bottom-4 right-4 bg-red-600 text-foreground px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs z-50">
           {error}
         </div>
       )}
@@ -498,7 +549,7 @@ export function PlaytestGameEnhanced({
       {/* Accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cobalt-500 focus:text-foreground focus:rounded"
       >
         Skip to main content
       </a>

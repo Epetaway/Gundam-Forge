@@ -32,11 +32,11 @@ export function ResourceZone({
   return (
     <div
       ref={isOpponent ? undefined : setNodeRef}
-      className={`border-2 rounded-lg bg-slate-800/70 p-3 transition-colors ${
-        !isOpponent && isOver ? 'border-cyan-500 bg-cyan-900/20' : 'border-slate-700'
+      className={`border-2 rounded-lg bg-surface-elevated/70 p-3 transition-colors ${
+        !isOpponent && isOver ? 'border-cyan-500 bg-cyan-900/20' : 'border-border'
       }`}
     >
-      <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
         Resources In Play
       </div>
 
@@ -64,7 +64,7 @@ export function ResourceZone({
             );
           })
         ) : (
-          <div className="col-span-2 text-slate-600 text-xs italic py-2 text-center">
+          <div className="col-span-2 text-steel-600 text-xs italic py-2 text-center">
             No resources in play
           </div>
         )}
