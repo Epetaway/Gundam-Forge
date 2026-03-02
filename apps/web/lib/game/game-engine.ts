@@ -471,6 +471,9 @@ export class GameEngine {
       case 'PLACE_RESOURCE':
         result = this.handlePlaceResource(action);
         break;
+      case 'SPEND_RESOURCE':
+        result = this.handleSpendResource(action);
+        break;
       case 'END_PHASE':
         result = this.handleEndPhase(action);
         break;
@@ -695,6 +698,18 @@ export class GameEngine {
     }
 
     player.hand = player.hand.filter((c) => c.instanceId !== cardInstanceId);
+
+    // Spend resources based on card cost
+    if (cardDef.cost && cardDef.cost > 0) {
+      for (let i = 0; i < cardDef.cost; i++) {
+        const resource = player.resources.pop();
+        if (resource) {
+          resource.zone = 'trash';
+          resource.state = 'rest'; // Mark as rest/spent
+          player.discardPile.push(resource);
+        }
+      }
+    }
 
     let targetZone: ZoneType = 'battle';
     if (cardDef.type === 'Base') targetZone = 'base';
@@ -1599,6 +1614,39 @@ export class GameEngine {
       this.state.phase,
       `Placed resource ${resourceCard.cardId} from Resource Deck`,
       'Top of Resource Deck moved to Resource Area (enters active).',
+    );
+
+    return { valid: true };
+  }
+
+  private handleSpendResource(action: GameAction): ActionValidation {
+    const { amount = 1 } = action.payload || {};
+    const player = this.state.players[action.playerId];
+
+    if (player.resources.length < amount) {
+      return {
+        valid: false,
+        error: `Not enough resources to spend`,
+        rulesTrace: `Need ${amount} resource(s), have ${player.resources.length}`,
+      };
+    }
+
+    // Spend the specified number of resources
+    for (let i = 0; i < amount; i++) {
+      const resource = player.resources.pop();
+      if (resource) {
+        resource.zone = 'trash';
+        resource.state = 'rest'; // Mark as spent
+        player.discardPile.push(resource);
+      }
+    }
+
+    this.log(
+      'SPEND_RESOURCE',
+      action.playerId,
+      this.state.phase,
+      `Spent ${amount} resource(s)`,
+      `${amount} resource card(s) moved from Resource Area to trash.`,
     );
 
     return { valid: true };
