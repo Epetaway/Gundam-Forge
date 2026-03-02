@@ -259,8 +259,8 @@ export function Battlefield({
       </div>
 
       {/* PLAYER HAND - Flexible height, displays all cards without cutting or scrolling */}
-      <div className=\"flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/30 px-2 py-3 relative z-30 min-h-fit\">
-        <div className=\"text-xs font-bold text-slate-400 uppercase mb-1 px-2\">Hand ({playerState.hand.length}/10)</div>
+      <div className="flex-shrink-0 border-t-2 border-purple-600/30 bg-slate-900/30 px-2 py-3 relative z-30 min-h-fit">
+        <div className="text-xs font-bold text-slate-400 uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
         <HandTray
           cards={playerState.hand}
           cardDatabase={cardDatabase}
