@@ -12,6 +12,7 @@ import { withBasePath } from '@/lib/utils/basePath';
 import { getEvents } from '@/lib/data/events';
 import { rankTrendingDecks } from '@/lib/meta/engine';
 import { useDecksQuery } from '@/lib/query/useDecksQuery';
+import { relativeTime } from '@/lib/utils/relativeTime';
 
 interface ExploreClientProps {
   initialDecks: DeckRecord[];
@@ -74,7 +75,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
                 author={deck.owner || 'Unknown'}
                 views={deck.views || 0}
                 cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
-                updatedAgo={'recently'}
+                updatedAgo={relativeTime(deck.updatedAt ?? deck.id)}
                 colors={deck.colors || []}
                 archetype={deck.archetype}
                 tags={deck.archetype ? [deck.archetype] : []}
