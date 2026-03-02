@@ -31,8 +31,8 @@ export function ShieldZone({
     healthPercentage > 50 ? 'bg-green-600' : healthPercentage > 25 ? 'bg-yellow-600' : 'bg-red-600';
 
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-3 h-full">
-      <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated/70 p-3 h-full">
+      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Shields
       </div>
 
@@ -47,25 +47,25 @@ export function ShieldZone({
             className="flex justify-center"
           />
         ) : (
-          <div className="text-slate-400 text-sm font-medium py-4">No shields</div>
+          <div className="text-steel-500 text-sm font-medium py-4">No shields</div>
         )}
       </div>
 
       {/* Shield Count Badge */}
       <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-2 text-center mb-3">
         <div className="text-sm font-bold text-blue-300">Shields: {shields.length}</div>
-        <div className="text-xs text-slate-400">Max: 6</div>
+        <div className="text-xs text-steel-500">Max: 6</div>
       </div>
 
       {/* Health Bar */}
       <div className="space-y-1">
-        <div className="text-xs text-slate-400">HP</div>
-        <div className="bg-slate-700 rounded-full h-6 overflow-hidden border border-slate-600">
+        <div className="text-xs text-steel-500">HP</div>
+        <div className="bg-surface rounded-full h-6 overflow-hidden border border-border">
           <div
             className={`h-full ${healthColor} transition-all duration-300 flex items-center justify-center`}
             style={{ width: `${healthPercentage}%` }}
           >
-            <span className="text-xs font-bold text-white drop-shadow">
+            <span className="text-xs font-bold text-foreground drop-shadow">
               {baseHealth}/{maxBaseHealth}
             </span>
           </div>
