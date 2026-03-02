@@ -12,6 +12,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { GameEngine } from '@/lib/game/game-engine';
 import { Autoplayer } from '@/lib/game/autoplayer';
 import { Battlefield } from './Battlefield';
@@ -203,6 +204,9 @@ export function PlaytestGameEnhanced({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.activePlayerId, gameState?.phase]);
 
+  // Dismiss error
+  const dismissError = () => setError(null);
+
   // Undo/Redo Handlers
   const handleUndo = () => {
     if (!engine) return;
@@ -372,6 +376,7 @@ export function PlaytestGameEnhanced({
             <button
               onClick={toggleMute}
               className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
+              aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
               title={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? '🔇' : '🔊'}
@@ -381,9 +386,20 @@ export function PlaytestGameEnhanced({
             <button
               onClick={() => setShowHelpModal(true)}
               className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition"
+              aria-label="Keyboard shortcuts help"
+              title="Keyboard shortcuts (?)"
             >
               ?
             </button>
+
+            {/* Back to Decks */}
+            <Link
+              href="/decks"
+              className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition border border-border ml-1"
+              title="Exit playtester and return to deck list"
+            >
+              ← Decks
+            </Link>
           </div>
         </div>
       </header>
@@ -502,8 +518,19 @@ export function PlaytestGameEnhanced({
 
       {/* Error Toast */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs z-50">
-          {error}
+        <div
+          className="fixed bottom-4 right-4 flex items-start gap-2 bg-destructive/90 text-white px-4 py-3 rounded-lg shadow-lg max-w-xs z-50 border border-destructive"
+          role="alert"
+          aria-live="assertive"
+        >
+          <span className="flex-1 text-sm">{error}</span>
+          <button
+            onClick={dismissError}
+            className="ml-1 shrink-0 text-white/80 hover:text-white transition-colors"
+            aria-label="Dismiss error"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -522,10 +549,10 @@ export function PlaytestGameEnhanced({
       {showMobileLog && !isSetupPhase && engine && (
         <div className="fixed md:hidden bottom-16 inset-x-0 z-50 max-h-64 overflow-y-auto bg-surface border-t border-border p-3 max-h-[40vh]">
           <div className="space-y-2">
-            {engine.getLog().slice(-20).map((entry, i) => (
-              <div key={i} className="text-xs text-steel-500 border-b border-border/30 pb-2 last:border-b-0">
-                <span className="font-semibold text-steel-400">{entry.actionType}</span>
-                {entry.description && <span className="text-steel-600 ml-1">{entry.description}</span>}
+            {engine.getLog().slice(-20).reverse().map((entry, i) => (
+              <div key={i} className="text-xs border-b border-border/30 pb-2 last:border-b-0">
+                <span className="text-steel-500 font-mono text-[10px]">[T{entry.turnNumber}]</span>
+                <span className="text-steel-300 ml-1">{entry.description || entry.actionType}</span>
               </div>
             ))}
           </div>

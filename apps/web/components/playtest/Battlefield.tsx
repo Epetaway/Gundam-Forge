@@ -164,28 +164,55 @@ export function Battlefield({
         </div>
       </div>
 
-      {/* OPPONENT BATTLE AREA - Compact unit display */}
+      {/* OPPONENT BATTLE AREA - Unit display with AP/HP stats */}
       {opponentState.battleArea.length > 0 && (
-        <div className="flex-shrink-0 flex flex-wrap gap-1 px-4 py-2 bg-surface/40 border-b border-border/50">
-          {opponentState.battleArea.map((unit) => (
-            <div
-              key={unit.instanceId}
-              className="relative h-12 w-9 overflow-hidden rounded border border-border bg-surface-elevated"
-              title={cardDatabase[unit.cardId]?.name ?? unit.cardId}
-            >
-              {cardDatabase[unit.cardId]?.imageUrl ? (
-                <img
-                  src={cardDatabase[unit.cardId].imageUrl}
-                  alt={cardDatabase[unit.cardId]?.name ?? ''}
-                  className={`h-full w-full object-cover ${unit.state === 'rest' ? 'rotate-90' : ''}`}
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-[8px] text-steel-500">
-                  {unit.cardId.slice(0, 4)}
+        <div className="flex-shrink-0 border-b border-border/50 bg-surface/40 px-4 py-2">
+          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-steel-500">
+            Opponent&apos;s Battle Area
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {opponentState.battleArea.map((unit) => {
+              const card = cardDatabase[unit.cardId];
+              return (
+                <div
+                  key={unit.instanceId}
+                  className={`flex items-center gap-1.5 rounded border px-2 py-1 text-xs ${
+                    unit.state === 'rest'
+                      ? 'border-steel-700/60 bg-surface-muted text-steel-500'
+                      : 'border-red-700/50 bg-red-900/10 text-steel-300'
+                  }`}
+                  title={`${card?.name ?? unit.cardId} — AP:${card?.ap ?? 0} HP:${card?.hp ?? 0}${unit.state === 'rest' ? ' (resting)' : ' (ready)'}`}
+                >
+                  <div className="relative h-8 w-6 flex-shrink-0 overflow-hidden rounded">
+                    {card?.imageUrl ? (
+                      <img
+                        src={card.imageUrl}
+                        alt={card?.name ?? ''}
+                        className={`h-full w-full object-cover ${unit.state === 'rest' ? 'opacity-60' : ''}`}
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-surface-elevated text-[8px] text-steel-500">
+                        {unit.cardId.slice(0, 3)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="max-w-[80px] truncate font-medium leading-none">
+                      {card?.name ?? unit.cardId}
+                    </div>
+                    <div className="mt-0.5 flex gap-1.5 font-mono text-[10px]">
+                      <span className="text-red-400" title="Attack Points">⚔{card?.ap ?? 0}</span>
+                      <span className="text-blue-400" title="Hit Points">🛡{card?.hp ?? 0}</span>
+                      {unit.damageMarkers > 0 && (
+                        <span className="text-amber-400">Dmg:{unit.damageMarkers}</span>
+                      )}
+                      {unit.state === 'rest' && <span className="text-steel-500 italic">rest</span>}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -294,12 +321,13 @@ export function Battlefield({
               Recent Actions
             </div>
             <div className="max-h-40 overflow-y-auto">
-              {gameLog.slice(-5).map((entry, i) => (
+              {gameLog.slice(-5).reverse().map((entry, i) => (
                 <div
                   key={i}
-                  className="text-[10px] text-steel-500 px-2 py-1 border-b border-surface last:border-b-0"
+                  className="text-[10px] text-steel-400 px-2 py-1 border-b border-surface last:border-b-0 leading-relaxed"
                 >
-                  <span className="text-steel-600">{entry.actionType}</span>
+                  <span className="font-mono text-steel-600 mr-1">[T{entry.turnNumber}]</span>
+                  {entry.description || entry.actionType}
                 </div>
               ))}
             </div>
