@@ -1089,11 +1089,11 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 ### Tasks in This Phase
 - ✅ Task 3.1: Replace Swiper carousel with scrollable grid
-- Task 3.2: Fix card add interaction (single click to add)
+- ✅ Task 3.2: Fix card add interaction (single click to add)
 - Task 3.3: Fix filter panel density (collapse by default)
 - Task 3.4: Add "Add to Deck" from Cards reference page
 
-**Status:** 🔄 IN PROGRESS (1 of 4 tasks complete)
+**Status:** 🔄 IN PROGRESS (2 of 4 tasks complete)
 
 ---
 
@@ -1101,15 +1101,15 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 | Metric | Status |
 |---|---|
-| **Tasks Complete** | 9 of 35 (26%) |
+| **Tasks Complete** | 10 of 35 (29%) |
 | **Phases Complete** | 2 of 10 |
-| **Phase 3 Progress** | 1 of 4 tasks (25%) |
+| **Phase 3 Progress** | 2 of 4 tasks (50%) |
 | **Current Phase** | Phase 3 — IN PROGRESS |
 | **TypeScript** | 0 errors |
 | **ESLint** | 0 errors, 0 warnings |
 | **Tests** | 135 passing, 4 skipped, 0 new failures |
 | **Static Export** | ✅ Successful |
-| **Production Ready** | 52/100 → ~67/100 |
+| **Production Ready** | 52/100 → ~68/100 |
 
 ---
 
@@ -1146,6 +1146,36 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
 **QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
 **Tests:** 135 passing, 4 skipped, 0 new failures
 
+### Task 3.2 — Fix Card Add Interaction: Single Click to Add ✅ COMPLETE
+
+**Problem:** Double-click to add is undiscoverable and broken on mobile touch devices  
+**Solution:** Dedicated "+" button that appears on hover/focus  
+**Implementation:**
+- Removed onDoubleClick handler from CardTile
+- Added "+" button in bottom-right corner (cobalt-600, 24px circle)
+- Button shows on hover (desktop) and always on mobile
+- Click card image = preview, click "+" = add to deck
+- Updated tooltip: "Click to preview · + to add"
+
+**Design Details:**
+- Button positioned: bottom-1 right-1 (bottom-right corner)
+- Opacity transitions: hidden on desktop (group-hover:opacity-100)
+- Always visible on mobile (removed sm:opacity-0)
+- Focus state: focus-visible:opacity-100 (keyboard accessible)
+- Hover state: cobalt-500 (darker shade)
+- Event handling: stopPropagation prevents modal from opening
+
+**Benefits:**
+- Discoverable: visual "+" affordance clearly indicates addability
+- Mobile-friendly: works on touch screens (no double-tap needed)
+- Accessible: focus state for keyboard navigation
+- Clear interaction model: image=preview, button=add
+
+**Files Changed:** `apps/web/app/forge/CardSearchPanel.tsx`  
+**Git Commit:** 0ee8d58  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
 ---
 
 ---
@@ -1153,9 +1183,9 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
 ### Next Steps
 
 1. ✅ Task 2.5 (Deck card redesign) — COMPLETE
-2. 🔄 **Phase 3 (Forge UX overhaul) — IN PROGRESS**
+2. 🔄 **Phase 3 (Forge UX overhaul) — IN PROGRESS (2/4)**
    - ✅ Task 3.1 (Swiper → scrollable grid) — COMPLETE
-   - Task 3.2 (Single-click card add) — PENDING
+   - ✅ Task 3.2 (Single-click card add) — COMPLETE
    - Task 3.3 (Collapse filters by default) — PENDING
    - Task 3.4 (Add to Deck from Cards) — PENDING
 3. Phases 4–10 — 24 tasks remaining
