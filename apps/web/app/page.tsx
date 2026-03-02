@@ -4,7 +4,7 @@ import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/Trendin
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { getCard, getCardImage } from '@/lib/data/cards';
+import { cards, getCard, getCardImage } from '@/lib/data/cards';
 import { withBasePath } from '@/lib/utils/basePath';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
@@ -13,12 +13,13 @@ import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
 export default function HomePage(): JSX.Element {
   const decks = getDecks();
   const events = getEvents();
+  const allArchetypes = rankArchetypes(events);
   const trendingDecks = rankTrendingDecks(decks, events, 3);
-  const archetypes = rankArchetypes(events).slice(0, 4);
-  const latestUpdates = [
-    'Meta engine now factors event-weighted placements and social momentum.',
-    'Cards and Forge now use unified reference card tile and detail modal.',
-    'Deck explorer sorting now includes trending and win-rate derived order.',
+  const archetypes = allArchetypes.slice(0, 4);
+  const platformFeatures = [
+    'Browse 600+ official Gundam Card Game cards with full-text search.',
+    'Build and validate decks against official GCG rules.',
+    'Playtest your deck against an AI opponent with official phase sequencing.',
   ];
 
   return (
@@ -51,10 +52,10 @@ export default function HomePage(): JSX.Element {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="Decks Indexed" value={`${getDecks().length}`} />
-                <Stat label="Cards in Pool" value={`${716}`} />
-                <Stat label="Events Tracked" value={`${getEvents().length}`} />
-                <Stat label="Archetypes" value={`${rankArchetypes(events).length}`} />
+                <Stat label="Decks Indexed" value={`${decks.length}`} />
+                <Stat label="Cards in Pool" value={`${cards.length}`} />
+                <Stat label="Events Tracked" value={`${events.length}`} />
+                <Stat label="Archetypes" value={`${allArchetypes.length}`} />
               </div>
             </CardContent>
           </Card>
@@ -80,7 +81,6 @@ export default function HomePage(): JSX.Element {
                 author: deck.owner || 'Unknown',
                 views: deck.views || 0,
                 cardCount: deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0),
-                updatedAgo: 'recently',
                 colors: deck.colors || [],
                 tags: deck.archetype ? [deck.archetype] : [],
                 avatarUrl: undefined,
@@ -135,12 +135,12 @@ export default function HomePage(): JSX.Element {
 
             <Card className="bg-surface-elevated">
               <CardHeader>
-                <CardTitle>Latest Updates</CardTitle>
+                <CardTitle>Platform Features</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {latestUpdates.map((update) => (
-                  <p className="rounded-md border border-border bg-surface-interactive px-3 py-2 text-xs text-steel-700" key={update}>
-                    {update}
+                {platformFeatures.map((feature) => (
+                  <p className="rounded-md border border-border bg-surface-interactive px-3 py-2 text-xs text-steel-700" key={feature}>
+                    {feature}
                   </p>
                 ))}
               </CardContent>

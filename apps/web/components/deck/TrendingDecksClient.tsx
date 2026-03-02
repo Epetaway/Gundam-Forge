@@ -10,7 +10,7 @@ export interface TrendingDeckData {
   author: string;
   views: number;
   cardCount: number;
-  updatedAgo: string;
+  updatedAgo?: string;
   colors: string[];
   tags?: string[];
   avatarUrl?: string;

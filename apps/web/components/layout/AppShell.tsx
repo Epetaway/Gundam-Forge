@@ -10,6 +10,8 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps): JSX.Element {
+  const showAuthEntry = process.env.NODE_ENV !== 'production';
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
@@ -23,9 +25,11 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <div className="flex items-center gap-3">
             <MainNav />
             <ThemeToggle />
-            <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
+            {showAuthEntry ? (
+              <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
+                <Link href="/auth/login">Sign in</Link>
+              </Button>
+            ) : null}
           </div>
         </Container>
       </header>

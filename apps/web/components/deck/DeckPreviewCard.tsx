@@ -19,7 +19,7 @@ export interface DeckPreviewCardProps {
   author: string;
   views: number;
   cardCount: number;
-  updatedAgo: string;
+  updatedAgo?: string;
   colors: string[];
   tags?: string[];
   avatarUrl?: string;
@@ -42,6 +42,12 @@ export function DeckPreviewCard({
   onMenu,
   isLoading,
 }: DeckPreviewCardProps & { isLoading?: boolean }) {
+  const metaLine = [
+    `${views.toLocaleString()} views`,
+    `${cardCount} cards`,
+    updatedAgo,
+  ].filter(Boolean).join(' • ');
+
   return (
     <article
       className="group relative cursor-pointer rounded-2xl bg-neutral-900 ring-1 ring-white/10 shadow-xl shadow-black/30 overflow-hidden transition-shadow hover:shadow-2xl"
@@ -64,9 +70,7 @@ export function DeckPreviewCard({
 
       {/* Meta line */}
       <div className="mt-3 flex justify-center">
-        <span className="text-sm text-neutral-300 text-center">
-          {views.toLocaleString()} views &bull; {cardCount} cards &bull; {updatedAgo}
-        </span>
+        <span className="text-sm text-neutral-300 text-center">{metaLine}</span>
       </div>
 
       {/* Color identity bar */}
