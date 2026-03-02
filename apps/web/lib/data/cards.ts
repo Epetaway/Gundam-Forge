@@ -53,6 +53,61 @@ export const cardsById = new Map(cards.map((card) => [card.id, card]));
 export const cardsRecord = Object.fromEntries(cards.map((card) => [card.id, card])) as Record<string, CardDefinition>;
 export const allSets = Array.from(new Set(cards.map((card) => card.set))).sort();
 
+// --- Card Enrichment ---
+// Populates keywords, triggers, and clans by parsing card text and traits.
+// Runs once at module load so all consumers automatically get enriched data.
+
+const KEYWORD_PATTERNS: [RegExp, string][] = [
+  [/<Repair/i,         'repair'],
+  [/<Breach/i,         'breach'],
+  [/<Blocker>/i,       'blocker'],
+  [/<High-Maneuver>/i, 'high_maneuver'],
+  [/<First Strike>/i,  'first_strike'],
+  [/<Suppression/i,    'suppression'],
+  [/<Support>/i,       'support'],
+];
+
+const TRIGGER_PATTERNS: [RegExp, string][] = [
+  [/【Deploy】/,      'deploy'],
+  [/【Burst】/,       'burst'],
+  [/【Attack】/,      'attack_trigger'],
+  [/【When Paired】/, 'when_paired'],
+  [/【During Pair】/, 'during_pair'],
+  [/【When Linked】/, 'when_linked'],
+  [/【During Link】/, 'during_link'],
+  [/【Destroyed】/,   'destroyed'],
+  [/【Main】/,        'activate_main'],
+  [/【Action】/,      'activate_action'],
+];
+
+function enrichCard(card: CardDefinition): void {
+  const text = card.text ?? '';
+
+  if (!card.keywords || card.keywords.length === 0) {
+    card.keywords = KEYWORD_PATTERNS
+      .filter(([pattern]) => pattern.test(text))
+      .map(([, tag]) => tag);
+  }
+
+  if (!card.triggers || card.triggers.length === 0) {
+    card.triggers = TRIGGER_PATTERNS
+      .filter(([pattern]) => pattern.test(text))
+      .map(([, tag]) => tag);
+  }
+
+  if (!card.clans || card.clans.length === 0) {
+    const clanSet = new Set<string>();
+    for (const trait of card.traits ?? []) {
+      for (const m of trait.matchAll(/\(([^)]+)\)/g)) {
+        clanSet.add(m[1]);
+      }
+    }
+    card.clans = [...clanSet];
+  }
+}
+
+cards.forEach(enrichCard);
+
 export function getCards(filters: CatalogFilters = {}): CardDefinition[] {
   const query = filters.query?.trim().toLowerCase();
 

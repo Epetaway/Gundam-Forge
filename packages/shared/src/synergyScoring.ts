@@ -22,7 +22,7 @@ export const SYNERGY_WEIGHTS = {
   TRIGGER_PRIMARY: 15,    // Direct trigger match (e.g., "when_paired" for Ace Sync)
   KEYWORD_SECONDARY: 10,  // Related keyword (e.g., "blocker" for defensive strategies)
   TRIGGER_SECONDARY: 8,   // Related trigger
-  CLAN_MATCH: 5,          // Clan/faction match (bonus)
+  CLAN_MATCH: 10,         // Clan/faction match (bonus — raised since clan is explicit user intent)
   COLOR_MATCH: 3,         // Color match (bonus)
   COLOR_MISMATCH: -10,    // Color incompatibility (penalty)
   EX_MISMATCH: -50,       // EX card when includeEX=false (hard penalty)
@@ -161,11 +161,10 @@ export function calculateCardSynergy(
     }
   }
 
-  // Check clan matches
-  if (selectedClans.length > 0 && (card as any).clans && (card as any).clans.length > 0) {
-    const clanMatch = (card as any).clans.some((c: string) => selectedClans.includes(c));
-    if (clanMatch) {
-      const matchedClan = (card as any).clans.filter((c: string) => selectedClans.includes(c))[0];
+  // Check clan matches (card.clans populated by enrichCard() in cards.ts)
+  if (selectedClans.length > 0 && card.clans && card.clans.length > 0) {
+    const matchedClan = card.clans.find((c) => selectedClans.includes(c));
+    if (matchedClan) {
       reasons.push({
         code: 'CLAN_MATCH',
         description: `${matchedClan} faction`,
@@ -184,7 +183,6 @@ export function calculateCardSynergy(
     const triggerMapping = PACKAGE_TRIGGER_MAP[packageId];
 
     if (keywordMapping) {
-      // Primary keywords
       for (const keyword of keywordMapping.primary) {
         if (cardKeywords.includes(keyword)) {
           reasons.push({
@@ -195,8 +193,6 @@ export function calculateCardSynergy(
           totalScore += SYNERGY_WEIGHTS.KEYWORD_PRIMARY;
         }
       }
-
-      // Secondary keywords
       for (const keyword of keywordMapping.secondary) {
         if (cardKeywords.includes(keyword)) {
           reasons.push({
@@ -210,7 +206,6 @@ export function calculateCardSynergy(
     }
 
     if (triggerMapping) {
-      // Primary triggers
       for (const trigger of triggerMapping.primary) {
         if (cardTriggers.includes(trigger)) {
           reasons.push({
@@ -221,8 +216,6 @@ export function calculateCardSynergy(
           totalScore += SYNERGY_WEIGHTS.TRIGGER_PRIMARY;
         }
       }
-
-      // Secondary triggers
       for (const trigger of triggerMapping.secondary) {
         if (cardTriggers.includes(trigger)) {
           reasons.push({
@@ -233,6 +226,25 @@ export function calculateCardSynergy(
           totalScore += SYNERGY_WEIGHTS.TRIGGER_SECONDARY;
         }
       }
+    }
+  }
+
+  // Cross-package bonus: card supports 2+ selected packages simultaneously
+  if (selectedPackages.length >= 2) {
+    const matchedPackageCount = selectedPackages.filter((pkg) => {
+      const kw = PACKAGE_KEYWORD_MAP[pkg];
+      const tr = PACKAGE_TRIGGER_MAP[pkg];
+      const allKw = [...(kw?.primary ?? []), ...(kw?.secondary ?? [])];
+      const allTr = [...(tr?.primary ?? []), ...(tr?.secondary ?? [])];
+      return allKw.some((k) => cardKeywords.includes(k)) || allTr.some((t) => cardTriggers.includes(t));
+    }).length;
+    if (matchedPackageCount >= 2) {
+      reasons.push({
+        code: 'CROSS_PACKAGE',
+        description: 'Supports multiple strategies',
+        weight: 8,
+      });
+      totalScore += 8;
     }
   }
 
@@ -295,8 +307,8 @@ export function filterCardsByIntent(
     }
 
     // Clan filtering (graceful: if card has no clan tags, include it)
-    if (selectedClans && selectedClans.length > 0 && (card as any).clans && (card as any).clans.length > 0) {
-      const hasMatchingClan = (card as any).clans.some((c: string) => selectedClans.includes(c));
+    if (selectedClans && selectedClans.length > 0 && card.clans && card.clans.length > 0) {
+      const hasMatchingClan = card.clans.some((c) => selectedClans.includes(c));
       if (!hasMatchingClan) return false;
     }
 
