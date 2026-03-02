@@ -105,6 +105,28 @@ export function Battlefield({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Get contextual status message based on phase and turn
+  const getStatusMessage = (): string => {
+    if (!isPlayerTurn) {
+      return 'Opponent is thinking...';
+    }
+
+    switch (gamePhase) {
+      case 'start':
+        return 'Start Phase — ready your units. Click "End Phase" when done.';
+      case 'draw':
+        return 'Draw Phase — drawing your card...';
+      case 'resource':
+        return 'Resource Phase — click "Place Resource" to move a card from your resource deck.';
+      case 'main':
+        return 'Main Phase — play cards from your hand, attack with ready units, or end your turn.';
+      case 'end':
+        return 'End Phase — tidying up. Click "Next Phase" to continue.';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-surface-muted via-surface to-surface-elevated relative">
       {/* OPPONENT STATUS - Compact strip (player POV only) */}
@@ -210,6 +232,8 @@ export function Battlefield({
               cardDatabase={cardDatabase}
               isOpponent={false}
               onUnitSelected={(unit) => onUnitSelected?.(unit, false)}
+              gamePhase={gamePhase}
+              isPlayerTurn={isPlayerTurn}
             />
           </div>
         </div>
@@ -259,17 +283,25 @@ export function Battlefield({
       </div>
 
       {/* PLAYER HAND - Flexible height, displays all cards without cutting or scrolling */}
-      <div className="flex-shrink-0 border-t-2 border-cobalt-500/30 bg-surface/30 px-2 py-3 relative z-30 min-h-fit">
-        <div className="text-xs font-bold text-steel-500 uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
-        <HandTray
-          cards={playerState.hand}
-          cardDatabase={cardDatabase}
-          selectedCard={selectedCard || null}
-          onSelectCard={onSelectCard || (() => {})}
-          onPlayCard={onCardPlayRequested || (() => {})}
-          gamePhase={gamePhase}
-          isPlayerTurn={isPlayerTurn}
-        />
+      <div className="flex flex-col flex-shrink-0 relative z-30">
+        {/* Contextual Status Bar */}
+        <div className="text-xs text-steel-500 text-center py-1.5 bg-surface/50 border-t border-b border-border/50">
+          {getStatusMessage()}
+        </div>
+
+        {/* Hand Label and Cards */}
+        <div className="border-t-2 border-cobalt-500/30 bg-surface/30 px-2 py-3 min-h-fit">
+          <div className="text-xs font-bold text-steel-500 uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
+          <HandTray
+            cards={playerState.hand}
+            cardDatabase={cardDatabase}
+            selectedCard={selectedCard || null}
+            onSelectCard={onSelectCard || (() => {})}
+            onPlayCard={onCardPlayRequested || (() => {})}
+            gamePhase={gamePhase}
+            isPlayerTurn={isPlayerTurn}
+          />
+        </div>
       </div>
     </div>
   );

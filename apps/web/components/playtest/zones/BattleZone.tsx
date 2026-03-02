@@ -17,6 +17,8 @@ interface BattleZoneProps {
   cardDatabase: Record<string, any>;
   isOpponent: boolean;
   onUnitSelected?: (unit: CardInstance) => void;
+  gamePhase?: string;
+  isPlayerTurn?: boolean;
 }
 
 export function BattleZone({
@@ -24,6 +26,8 @@ export function BattleZone({
   cardDatabase,
   isOpponent,
   onUnitSelected,
+  gamePhase = '',
+  isPlayerTurn = false,
 }: BattleZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-battle' : 'battle',
@@ -47,7 +51,7 @@ export function BattleZone({
           units.map((unit) => (
             <div
               key={unit.instanceId}
-              className="flex items-center gap-3 p-3 rounded-lg border-2 border-steel-600 bg-gradient-to-b from-surface-muted to-surface-elevated hover:border-cobalt-500 transition-all duration-200 cursor-pointer"
+              className="flex items-center gap-3 p-3 rounded-lg border-2 border-steel-600 bg-gradient-to-b from-surface-muted to-surface-elevated hover:border-cobalt-500 transition-all duration-200 cursor-pointer relative group"
               onClick={() => onUnitSelected?.(unit)}
             >
               <div className="flex-shrink-0">
@@ -73,6 +77,20 @@ export function BattleZone({
                   <div className="mt-1 text-sm text-steel-500 italic">RESTING</div>
                 )}
               </div>
+
+              {/* Attack button (player turn, main phase, unit ready) */}
+              {!isOpponent && isPlayerTurn && gamePhase === 'main' && unit.state === 'ready' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUnitSelected?.(unit);
+                  }}
+                  className="ml-auto px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded transition-colors whitespace-nowrap"
+                  title="Declare attack with this unit"
+                >
+                  ⚔ Attack
+                </button>
+              )}
             </div>
           ))
         ) : (
