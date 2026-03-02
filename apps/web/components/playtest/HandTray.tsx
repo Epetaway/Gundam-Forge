@@ -166,7 +166,7 @@ function DesktopArcFan({
                 <div
                   className={cn(
                     'relative aspect-[5/7] rounded-lg overflow-hidden',
-                    'border-2 shadow-lg transition-all w-16 sm:w-20',
+                    'border-2 shadow-lg transition-all w-24 sm:w-28',
                     isSelected
                       ? 'border-yellow-400 shadow-yellow-500/50 ring-2 ring-yellow-300'
                       : isHovered
@@ -185,14 +185,14 @@ function DesktopArcFan({
 
                 {/* Cost badge */}
                 {cardData && (
-                  <div className="absolute -top-1.5 -left-1.5 w-5 h-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-cyan-300 shadow">
+                  <div className="absolute -top-2 -left-2 w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-cyan-300 shadow-lg">
                     {cardData.cost || 0}
                   </div>
                 )}
 
                 {/* Card name on hover */}
                 {isHovered && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded border border-slate-600 z-50 pointer-events-none">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-sm px-2 py-1 rounded border border-slate-600 z-50 pointer-events-none shadow-lg">
                     {cardData?.name || card.cardId}
                   </div>
                 )}
@@ -202,7 +202,7 @@ function DesktopArcFan({
               {canPlayCards && (isSelected || isHovered) && (
                 <button
                   onClick={() => onPlayCard(card)}
-                  className="absolute -bottom-4 left-0 right-0 mx-auto w-fit px-2 py-0.5 bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold rounded transition-colors z-[60]"
+                  className="absolute -bottom-6 left-0 right-0 mx-auto w-fit px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors z-[60] shadow-lg"
                 >
                   Play
                 </button>
@@ -317,7 +317,7 @@ function MobileDrawer({
 
                     {/* Cost Badge */}
                     {cardData && (
-                      <div className="absolute -top-1 -left-1 w-5 h-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-cyan-300">
+                      <div className="absolute -top-1.5 -left-1.5 w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border border-cyan-300 shadow">
                         {cardData.cost || 0}
                       </div>
                     )}

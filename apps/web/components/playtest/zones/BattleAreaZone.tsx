@@ -54,23 +54,23 @@ export function BattleAreaZone({
                 <CardStack
                   cards={unit}
                   cardDatabase={cardDatabase}
-                  variant="compact"
+                  variant="normal"
                   showCount={false}
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-slate-300 truncate">
+                <div className="text-sm font-bold text-slate-200 truncate">
                   {getCardById(unit.cardId)?.name || unit.cardId}
                 </div>
-                <div className="flex gap-4 mt-1 text-sm font-bold">
+                <div className="flex gap-4 mt-1 text-base font-bold">
                   <div className="text-red-400">⚔️ {(getCardById(unit.cardId) as any)?.ap ?? 0}</div>
                   <div className="text-blue-400">🛡️ {(getCardById(unit.cardId) as any)?.hp ?? 0}</div>
                 </div>
                 {unit.damageMarkers > 0 && (
-                  <div className="mt-1 text-xs text-red-400 font-bold">Damage: {unit.damageMarkers}</div>
+                  <div className="mt-1 text-sm text-red-400 font-bold">Damage: {unit.damageMarkers}</div>
                 )}
                 {unit.state === 'rest' && (
-                  <div className="mt-1 text-xs text-slate-400 italic">RESTING</div>
+                  <div className="mt-1 text-sm text-slate-400 italic">RESTING</div>
                 )}
               </div>
             </div>
