@@ -78,6 +78,12 @@ export function PlaytestGameEnhanced({
   // Initialize Game Engine
   useEffect(() => {
     try {
+      // Build resource deck from player's deck: expand all entries by quantity, take first 10
+      const allCardIds = playerDeck.entries.flatMap((entry) =>
+        Array.from({ length: entry.qty }, () => entry.cardId)
+      );
+      const resourceDeckCards = allCardIds.slice(0, 10);
+
       // Convert DeckRecord to DeckDefinition
       const deckDefinition: DeckDefinition = {
         id: playerDeck.id,
@@ -90,7 +96,12 @@ export function PlaytestGameEnhanced({
             zone: 'main' as const,
           })),
           // Official GCG: separate 10-card resource deck (outside 50-card main deck)
-          { cardId: 'TOKEN-RESOURCE-001', count: 10, zone: 'resource' as const },
+          // Cards drawn from player's deck in order of construction
+          ...resourceDeckCards.map((cardId) => ({
+            cardId,
+            count: 1,
+            zone: 'resource' as const,
+          })),
         ],
       };
 
