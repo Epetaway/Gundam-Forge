@@ -1113,9 +1113,9 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 ---
 
-## Phase 3 Execution Status — 🔄 IN PROGRESS
+## Phase 3 Execution Status — ✅ COMPLETE
 
-**Date:** March 2, 2026  
+**Date:** March 2–3, 2026  
 **Session:** Phase 3 — Forge Core UX Overhaul  
 **Target Production Readiness:** ~65/100 → ~72/100 (estimated after phase 3)
 
@@ -1123,7 +1123,7 @@ The remaining gap to true 9.5/10 requires live community data and completed auth
 
 This phase focuses on the Forge (deck builder) user experience, making it faster and more intuitive to browse and add cards to your deck. Four focused UX improvements targeting the core friction points.
 
-**Completed Tasks:** 1 of 4
+**Completed Tasks:** 4 of 4 (100%)
 
 ### Task 3.1 — Replace Swiper Carousel with Scrollable Grid ✅ COMPLETE
 
@@ -1204,6 +1204,45 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
 **QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
 **Tests:** 135 passing, 4 skipped, 0 new failures
 
+### Task 3.4 — Add "Add to Deck" from Cards Reference Page ✅ COMPLETE
+
+**Problem:** No cross-page workflow from card browser → deck builder; users must context-switch to Forge  
+**Solution:** Active deck awareness on Cards page with direct add-to-deck action  
+**Implementation:**
+- Added `getActiveDeckId()` and `setActiveDeckId(id)` helpers to storage.ts (reads/writes `'gundam-forge.activeDeckId'` localStorage)
+- CardsClient loads active deck on mount via useEffect
+- Shows sticky bar below toolbar when deck is active:
+  - Display format: "Active deck: {name}" with "Change" button
+  - Background: gradient cobalt-600/10 to cobalt-500/5 with backdrop blur
+  - Includes "Card added!" feedback state (green, 1.5s duration)
+- ReferenceCardDetailModal receives `onAdd` callback (only when activeDeckId exists)
+- handleAddCard function:
+  - Validates deck still exists
+  - Counts existing copies (sums qty field)
+  - Caps at 4 copies per card (shows "Max copies (4) reached" if exceeded)
+  - Adds entry with qty: 1 to deck.entries
+  - Shows "Card added!" feedback for 1.5 seconds
+  - Closes modal after 300ms delay
+
+**Design Details:**
+- Active deck bar: sticky below main toolbar (z-30, top: 68px)
+- Feedback text: green-600 with CheckCircle icon, self-dismissing
+- Change button: secondary variant, allows selecting different active deck
+- Compatible with static export (client-only localStorage)
+
+**Benefits:**
+- Users can add cards while browsing reference page without leaving context
+- Active deck context persists across page navigations
+- Feedback confirms card addition
+- Caps prevent accidental over-adding
+
+**Files Changed:** 
+- `apps/web/lib/deck/storage.ts` (+ 21 lines)
+- `apps/web/app/cards/CardsClient.tsx` (+ 81 lines, restructured modal usage)  
+**Git Commit:** debbd46  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
 ---
 
 ---
@@ -1211,12 +1250,14 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
 ### Next Steps
 
 1. ✅ Task 2.5 (Deck card redesign) — COMPLETE
-2. 🔄 **Phase 3 (Forge UX overhaul) — IN PROGRESS (3/4 - 75%)**
+2. ✅ **Phase 3 (Forge UX overhaul) — COMPLETE (4/4 - 100%)**
    - ✅ Task 3.1 (Swiper → scrollable grid) — COMPLETE
    - ✅ Task 3.2 (Single-click card add) — COMPLETE
    - ✅ Task 3.3 (Collapse filters by default) — COMPLETE
-   - Task 3.4 (Add to Deck from Cards) — PENDING (Final task!)
-3. Phases 4–10 — 24 tasks remaining
+   - ✅ Task 3.4 (Add to Deck from Cards) — COMPLETE
+3. 🔄 Phase 4 onwards (24 tasks remaining)
+
+**Overall Progress:** 12 of 35 tasks complete (34%), 2 of 10 phases complete, production readiness estimated at ~72/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
