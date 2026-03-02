@@ -810,9 +810,13 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     return () => clearTimeout(t);
   }, []);
 
-  // Card add / remove
+  // Card add / remove — cap at 4 copies per card (official GCG Rule 2-1-2)
   const handleAdd = React.useCallback((cardId: string) => {
-    setDeck((prev) => ({ ...prev, [cardId]: (prev[cardId] || 0) + 1 }));
+    setDeck((prev) => {
+      const current = prev[cardId] || 0;
+      if (current >= 4) return prev;
+      return { ...prev, [cardId]: current + 1 };
+    });
   }, []);
 
   const handleRemove = React.useCallback((cardId: string) => {
@@ -880,7 +884,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       if (!card) {
         notFound.push(entry.name);
       } else {
-        newDeck[card.id] = (newDeck[card.id] || 0) + entry.qty;
+        newDeck[card.id] = Math.min((newDeck[card.id] || 0) + entry.qty, 4);
       }
     }
 
