@@ -18,24 +18,15 @@ type NavItem = {
   hint?: string;
 };
 
-const baseNavItems: NavItem[] = [
+const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
   { href: '/decks/new', label: '+ Create Deck' },
   { href: '/forge', label: 'Forge' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },
-  { href: '/decks', label: 'Playtest', hint: 'Pick a deck to playtest' },
+  { href: '/decks', label: 'Decks', hint: 'Browse and playtest your decks' },
 ];
-
-// Hide auth from nav during beta (production) until auth is ready
-const navItems: NavItem[] =
-  process.env.NODE_ENV === 'production'
-    ? baseNavItems
-    : [
-        ...baseNavItems,
-        { href: '/auth/login', label: 'Login' },
-      ];
 export function MainNav(): JSX.Element {
   const pathname = usePathname();
 
@@ -59,11 +50,7 @@ export function MainNav(): JSX.Element {
               title={item.hint}
             >
               {item.label}
-              {item.hint ? (
-                <span className="rounded border border-cobalt-500/40 bg-cobalt-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.06em] text-cobalt-300">
-                  Pick a deck
-                </span>
-              ) : null}
+  
             </Link>
           );
         })}
@@ -80,11 +67,7 @@ export function MainNav(): JSX.Element {
             <DropdownMenuItem asChild key={item.href}>
               <Link className="flex items-center justify-between gap-2" href={item.href} title={item.hint}>
                 <span>{item.label}</span>
-                {item.hint ? (
-                  <span className="rounded border border-cobalt-500/40 bg-cobalt-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.06em] text-cobalt-300">
-                    Pick a deck
-                  </span>
-                ) : null}
+  
               </Link>
             </DropdownMenuItem>
           ))}
