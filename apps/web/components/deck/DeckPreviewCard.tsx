@@ -1,15 +1,46 @@
 import React from "react";
 
-const COLOR_MAP: Record<string, string> = {
-  Blue: "bg-[#3b82f6]",
-  Green: "bg-[#22c55e]",
-  Red: "bg-[#ef4444]",
-  White: "bg-[#cbd5e1]",
-  Purple: "bg-[#a855f7]",
-  Colorless: "bg-[#6b7280]",
+const COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
+  Blue: {
+    bg: "bg-cobalt-700/40",
+    border: "border-cobalt-400/60",
+    text: "text-white",
+  },
+  Green: {
+    bg: "bg-green-700/40",
+    border: "border-green-400/60",
+    text: "text-white",
+  },
+  Red: {
+    bg: "bg-red-700/40",
+    border: "border-red-400/60",
+    text: "text-white",
+  },
+  White: {
+    bg: "bg-steel-700/40",
+    border: "border-steel-400/60",
+    text: "text-white",
+  },
+  Purple: {
+    bg: "bg-purple-700/40",
+    border: "border-purple-400/60",
+    text: "text-white",
+  },
+  Colorless: {
+    bg: "bg-steel-600/40",
+    border: "border-steel-400/60",
+    text: "text-white",
+  },
 };
-function colorToClass(color: string) {
-  return COLOR_MAP[color] || "bg-neutral-300";
+
+function colorToClasses(color: string) {
+  return (
+    COLOR_MAP[color] || {
+      bg: "bg-steel-600/40",
+      border: "border-steel-400/60",
+      text: "text-white",
+    }
+  );
 }
 
 export interface DeckPreviewCardProps {
@@ -23,6 +54,7 @@ export interface DeckPreviewCardProps {
   colors: string[];
   tags?: string[];
   avatarUrl?: string;
+  archetype?: string;
   onClick?: () => void;
   onMenu?: (e: React.MouseEvent) => void;
 }
@@ -38,6 +70,7 @@ export function DeckPreviewCard({
   colors,
   tags,
   avatarUrl,
+  archetype,
   onClick,
   onMenu,
   isLoading,
@@ -46,107 +79,135 @@ export function DeckPreviewCard({
     `${views.toLocaleString()} views`,
     `${cardCount} cards`,
     updatedAgo,
-  ].filter(Boolean).join(' • ');
+  ]
+    .filter(Boolean)
+    .join(" • ");
 
   return (
     <article
-      className="group relative cursor-pointer rounded-2xl bg-neutral-900 ring-1 ring-white/10 shadow-xl shadow-black/30 overflow-hidden transition-shadow hover:shadow-2xl"
+      className="group relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg dark:hover:shadow-cobalt-900/30"
       onClick={onClick}
       tabIndex={0}
       role="button"
       aria-label={`Open deck: ${title}`}
     >
-      {/* Hero banner */}
-      <div className="relative h-28 w-full">
+      {/* Hero Image with Overlay */}
+      <div className="relative h-40 w-full overflow-hidden bg-surface-muted">
         <img
           src={heroUrl}
-          alt=""
-          className="h-full w-full object-cover"
-          style={{ filter: 'contrast(1.08) saturate(1.08)' }}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+          style={{ filter: "contrast(1.1) saturate(1.15)" }}
           draggable={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+        {/* Dark overlay gradient for light/dark mode */}
+        <div className="absolute inset-0 bg-gradient-to-t from-cobalt-700 via-cobalt-700/40 to-transparent dark:from-cobalt-900 dark:via-cobalt-900/40" />
+        <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
+
+        {/* Title overlay - positioned absolutely on image */}
+        <div className="absolute inset-0 flex items-end p-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-white leading-tight truncate drop-shadow-lg">
+              {title}
+            </h2>
+            <p className="text-xs text-white/80 truncate mt-1">{subtitle}</p>
+          </div>
+        </div>
+
+        {/* Menu button - top right */}
+        <button
+          className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenu?.(e);
+          }}
+          tabIndex={0}
+          aria-label="Deck options"
+          type="button"
+        >
+          <span className="text-lg">⋮</span>
+        </button>
       </div>
 
-      {/* Meta line */}
-      <div className="mt-3 flex justify-center">
-        <span className="text-sm text-neutral-300 text-center">{metaLine}</span>
-      </div>
-
-      {/* Color identity bar */}
-      <div className="mt-3 flex h-6 w-full gap-1 px-4">
-        {colors.length > 0 ? (
-          colors.map((color, i) => (
-            <div
-              key={color + i}
-              className={`flex-1 h-full rounded-md ring-1 ring-white/10 ${colorToClass(color)}`}
-              title={color}
-            />
-          ))
-        ) : (
-          <div className="flex-1 h-full rounded-md ring-1 ring-white/10 bg-neutral-800" />
-        )}
-      </div>
-
-      {/* Title block */}
-      <div className="flex items-center gap-4 px-5 mt-4">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
+      {/* Content Section */}
+      <div className="bg-surface-elevated dark:bg-surface-elevated/80 p-4 space-y-3">
+        {/* Author info */}
+        <div className="flex items-center gap-2">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={author}
-              className="h-12 w-12 rounded-full object-cover border border-neutral-800"
+              className="h-8 w-8 rounded-full object-cover border border-border/50"
             />
           ) : (
-            <div className="h-12 w-12 rounded-full bg-neutral-700 border border-neutral-800 flex items-center justify-center text-sm font-bold text-neutral-300">
+            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-steel-400">
               {author.charAt(0).toUpperCase()}
             </div>
           )}
+          <span className="text-xs text-steel-500 dark:text-steel-400 truncate">
+            {author}
+          </span>
         </div>
-        {/* Title and subtitle */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold text-white truncate">{title}</h2>
-            {/* Kebab menu */}
-            <button
-              className="ml-auto p-1.5 rounded-lg hover:bg-white/10 text-neutral-400"
-              onClick={e => {
-                e.stopPropagation();
-                onMenu?.(e);
-              }}
-              tabIndex={0}
-              aria-label="Deck options"
-              type="button"
-            >
-              <span className="text-lg">⋮</span>
-            </button>
-          </div>
-          <div className="text-sm text-neutral-300 truncate">{subtitle}</div>
-          <div className="text-sm text-neutral-400 truncate">{author}</div>
-        </div>
-      </div>
 
-      {/* Bottom tags strip */}
-      <div className="mt-5 border-t border-neutral-800 px-5 py-2 flex flex-wrap justify-center gap-2">
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <span
-                key={i}
-                className="rounded-full bg-neutral-700/40 animate-pulse px-3 py-1 text-xs text-neutral-500 font-medium min-w-[48px] h-6"
-              />
-            ))
-          : tags && tags.length > 0
-          ? tags.map(tag => (
-              <span
-                key={tag}
-                className="rounded-full bg-white/10 px-3 py-1 text-xs text-neutral-200 font-medium"
-              >
-                {tag}
-              </span>
-            ))
-          : <span className="text-neutral-600 text-sm">No deck tags</span>
-        }
+        {/* Color badges */}
+        <div className="flex flex-wrap gap-1.5">
+          {colors.length > 0 ? (
+            colors.map((color, i) => {
+              const classes = colorToClasses(color);
+              return (
+                <span
+                  key={color + i}
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold ${classes.bg} ${classes.border} ${classes.text}`}
+                  title={color}
+                >
+                  ●{" "}
+                  <span className="ml-1.5">{color}</span>
+                </span>
+              );
+            })
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold bg-steel-600/40 border-steel-400/60 text-white">
+              ● Colorless
+            </span>
+          )}
+        </div>
+
+        {/* Archetype badge */}
+        {archetype && (
+          <div className="flex">
+            <span className="inline-block px-2.5 py-1 rounded-full bg-surface-interactive text-foreground text-xs font-medium">
+              {archetype}
+            </span>
+          </div>
+        )}
+
+        {/* Metadata line */}
+        <div className="flex justify-end pt-2 border-t border-border/30">
+          <span className="text-xs text-steel-500 dark:text-steel-400">
+            {metaLine}
+          </span>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5">
+          {isLoading
+            ? Array.from({ length: 2 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="rounded-full bg-surface-muted animate-pulse px-2 py-1 text-xs text-surface-muted min-w-[40px] h-5"
+                />
+              ))
+            : tags && tags.length > 0
+            ? tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-surface-muted text-steel-400 px-2 py-1 text-xs font-medium"
+                >
+                  {tag}
+                </span>
+              ))
+            : null}
+        </div>
       </div>
     </article>
   );
