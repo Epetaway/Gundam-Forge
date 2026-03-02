@@ -51,29 +51,41 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
         </Link>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {visibleDecks.map((deck) => {
-          const previewCard = getCard(deck.entries[0]?.cardId);
-          return (
-            <DeckPreviewCard
-              key={deck.id}
-              heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
-              title={deck.name}
-              subtitle={deck.owner || 'Unknown Pilot'}
-              author={deck.owner || 'Unknown'}
-              views={deck.views || 0}
-              cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
-              updatedAgo={'recently'}
-              colors={deck.colors || []}
-              archetype={deck.archetype}
-              tags={deck.archetype ? [deck.archetype] : []}
-              avatarUrl={undefined}
-              onClick={() => router.push(`/decks/${deck.id}`)}
-              onMenu={() => {}}
-            />
-          );
-        })}
-      </div>
+      {visibleDecks.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-16 text-center">
+          <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-3">No decks found</p>
+          <p className="text-sm text-steel-600 mb-6">
+            {isFetching ? 'Loading decks...' : 'No competitive decks match your filters. Try a different sort or create one yourself!'}
+          </p>
+          <Link href="/decks/new">
+            <Button size="sm" variant="primary">Create First Deck</Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {visibleDecks.map((deck) => {
+            const previewCard = getCard(deck.entries[0]?.cardId);
+            return (
+              <DeckPreviewCard
+                key={deck.id}
+                heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
+                title={deck.name}
+                subtitle={deck.owner || 'Unknown Pilot'}
+                author={deck.owner || 'Unknown'}
+                views={deck.views || 0}
+                cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
+                updatedAgo={'recently'}
+                colors={deck.colors || []}
+                archetype={deck.archetype}
+                tags={deck.archetype ? [deck.archetype] : []}
+                avatarUrl={undefined}
+                onClick={() => router.push(`/decks/${deck.id}`)}
+                onMenu={() => {}}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
