@@ -61,7 +61,7 @@ export function GameStartFlow({
   const [playerGoesFirst, setPlayerGoesFirst] = useState(true);
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center p-4">
+    <div className="w-full h-full bg-gradient-to-br from-background via-surface to-surface-elevated flex items-start justify-center overflow-y-auto p-4">
       <AnimatePresence mode="wait">
         {/* PHASE 1: Coin Flip */}
         {phase === 'coinFlip' && (

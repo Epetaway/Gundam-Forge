@@ -52,26 +52,42 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {visibleDecks.map((deck) => {
-          const previewCard = getCard(deck.entries[0]?.cardId);
-          return (
-            <DeckPreviewCard
-              key={deck.id}
-              heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
-              title={deck.name}
-              subtitle={deck.archetype}
-              author={deck.owner || 'Unknown'}
-              views={deck.views || 0}
-              cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
-              updatedAgo={'recently'}
-              colors={deck.colors || []}
-              tags={deck.archetype ? [deck.archetype] : []}
-              avatarUrl={undefined}
-              onClick={() => router.push(`/decks/${deck.id}`)}
-              onMenu={() => {}}
-            />
-          );
-        })}
+        {visibleDecks.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center gap-4 py-16 text-center">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-steel-500">No results</p>
+            <h2 className="text-xl font-semibold text-foreground">No decks found</h2>
+            <p className="max-w-xs text-sm text-steel-600">Try a different sort or check back later as the community grows.</p>
+            <Button size="sm" variant="secondary" onClick={() => setSort('trending')}>View Trending</Button>
+          </div>
+        ) : (
+          <>
+            {decks.length <= 5 && (
+              <div className="col-span-full rounded-lg border border-cobalt-500/30 bg-surface/50 px-4 py-3 text-sm text-steel-500">
+                Community decks coming soon — more shared builds will appear here as pilots submit their lists.
+              </div>
+            )}
+            {visibleDecks.map((deck) => {
+              const previewCard = getCard(deck.entries[0]?.cardId);
+              return (
+                <DeckPreviewCard
+                  key={deck.id}
+                  heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
+                  title={deck.name}
+                  subtitle={deck.archetype}
+                  author={deck.owner || 'Unknown'}
+                  views={deck.views || 0}
+                  cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
+                  updatedAgo={'recently'}
+                  colors={deck.colors || []}
+                  tags={deck.archetype ? [deck.archetype] : []}
+                  avatarUrl={undefined}
+                  onClick={() => router.push(`/decks/${deck.id}`)}
+                  onMenu={() => {}}
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </div>
   );

@@ -32,11 +32,11 @@ export function TrashZone({
   return (
     <div
       ref={isOpponent ? undefined : setNodeRef}
-      className={`border-2 rounded-lg bg-slate-800/70 p-3 transition-colors ${
-        !isOpponent && isOver ? 'border-red-500 bg-red-900/20' : 'border-slate-700'
+      className={`border-2 rounded-lg bg-surface-elevated/70 p-3 transition-colors ${
+        !isOpponent && isOver ? 'border-red-500 bg-red-900/20' : 'border-border'
       }`}
     >
-      <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
         Trash ({trash.length})
       </div>
 
@@ -51,7 +51,7 @@ export function TrashZone({
             className="flex justify-center"
           />
         ) : (
-          <div className="text-slate-600 text-xs italic py-4">Empty</div>
+          <div className="text-steel-600 text-xs italic py-4">Empty</div>
         )}
       </div>
 
@@ -76,7 +76,7 @@ export function TrashZone({
               return (
                 <div
                   key={card.instanceId}
-                  className="text-[9px] text-slate-400 px-1.5 py-1 bg-slate-900/50 rounded border border-slate-700"
+                  className="text-[9px] text-steel-500 px-1.5 py-1 bg-surface/50 rounded border border-border"
                 >
                   {cardDef?.name || card.cardId}
                 </div>
