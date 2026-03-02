@@ -244,10 +244,10 @@ export function PlaytestGameEnhanced({
   // Loading State
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-surface to-surface-elevated">
         <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-lg text-white">Initializing Gundam TCG Playtester...</p>
+          <div className="animate-spin w-12 h-12 border-4 border-cobalt-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-lg text-foreground">Initializing Gundam TCG Playtester...</p>
         </div>
       </div>
     );
@@ -256,10 +256,10 @@ export function PlaytestGameEnhanced({
   // Error State
   if (error || !gameState || !engine) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-surface to-surface-elevated">
         <div className="text-center">
           <p className="text-xl font-bold text-red-500">Error</p>
-          <p className="text-slate-300 mt-2">{error || 'Failed to load game'}</p>
+          <p className="text-steel-300 mt-2">{error || 'Failed to load game'}</p>
         </div>
       </div>
     );
@@ -279,12 +279,12 @@ export function PlaytestGameEnhanced({
     playerState.resourceDeck.length > 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
-      <header className="flex-shrink-0 border-b-2 border-purple-600/30 bg-gradient-to-r from-slate-800 to-slate-900 px-3 py-2">
+      <header className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-gradient-to-r from-surface-elevated to-surface px-3 py-2">
         <div className="flex items-center gap-2 min-w-0">
           {/* Title */}
-          <h1 className="text-base font-bold text-white whitespace-nowrap mr-2">Gundam TCG</h1>
+          <h1 className="text-base font-bold text-foreground whitespace-nowrap mr-2">Gundam TCG</h1>
 
           {/* Phase + turn info */}
           {!isSetupPhase && (
@@ -306,7 +306,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleUndo}
                   disabled={!engine?.canUndo()}
-                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-steel-600 rounded text-xs transition"
                   title="Undo (Ctrl+Z)"
                 >
                   ↶
@@ -314,7 +314,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleRedo}
                   disabled={!engine?.canRedo()}
-                  className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-steel-600 rounded text-xs transition"
                   title="Redo (Ctrl+Y)"
                 >
                   ↷
@@ -349,7 +349,7 @@ export function PlaytestGameEnhanced({
               <button
                 onClick={handleAdvancePhase}
                 disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
-                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white rounded font-semibold text-xs transition"
+                className="px-3 py-1 bg-cobalt-600 hover:bg-cobalt-700 disabled:bg-surface-muted disabled:text-steel-600 disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
                 title={needsToDraw ? 'Draw first' : needsToPlaceResource ? 'Place resource first' : 'Next phase (Enter)'}
               >
                 {needsToDraw ? 'Draw First' : needsToPlaceResource ? 'Place Resource First' : 'Next Phase →'}
@@ -359,7 +359,7 @@ export function PlaytestGameEnhanced({
             {/* Sound Toggle */}
             <button
               onClick={toggleMute}
-              className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs transition"
+              className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
               title={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? '🔇' : '🔊'}
@@ -368,7 +368,7 @@ export function PlaytestGameEnhanced({
             {/* Help */}
             <button
               onClick={() => setShowHelpModal(true)}
-              className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded text-xs transition"
+              className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition"
             >
               ?
             </button>
@@ -498,7 +498,7 @@ export function PlaytestGameEnhanced({
       {/* Accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cobalt-600 focus:text-foreground focus:rounded"
       >
         Skip to main content
       </a>

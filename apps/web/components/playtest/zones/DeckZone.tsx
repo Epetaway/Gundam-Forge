@@ -20,8 +20,8 @@ export function DeckZone({
   onDrawCard,
 }: DeckAreaProps) {
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-3">
-      <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
+      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Deck
       </div>
 
@@ -49,14 +49,14 @@ export function DeckZone({
             )}
           </div>
         ) : (
-          <div className="text-slate-600 text-sm italic">Deck empty</div>
+          <div className="text-steel-500 text-sm italic">Deck empty</div>
         )}
       </div>
 
       {/* Count Badge */}
       <div className="bg-indigo-900/50 border border-indigo-600 rounded-lg p-2 text-center">
         <div className="text-sm font-bold text-indigo-300">{deckSize} cards</div>
-        <div className="text-xs text-slate-400">Click to draw</div>
+        <div className="text-xs text-steel-500">Click to draw</div>
       </div>
 
       {/* Deck Status Warning */}

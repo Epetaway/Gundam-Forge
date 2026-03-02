@@ -29,8 +29,8 @@ export function BaseZone({
     healthPercentage > 50 ? 'bg-emerald-600' : healthPercentage > 25 ? 'bg-amber-600' : 'bg-red-600';
 
   return (
-    <div className="border-2 border-slate-700 rounded-lg bg-slate-800/70 p-3">
-      <div className="text-xs font-bold text-slate-300 uppercase mb-2 tracking-wider">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
+      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
         Base Area
       </div>
 
@@ -48,10 +48,10 @@ export function BaseZone({
 
           {/* Base Health Display */}
           <div className="space-y-1">
-            <div className="text-xs text-slate-400">Base Health</div>
-            <div className="bg-slate-700 rounded-lg h-8 overflow-hidden border border-slate-600 flex items-center px-2">
+            <div className="text-xs text-steel-500">Base Health</div>
+            <div className="bg-surface-muted rounded-lg h-8 overflow-hidden border border-steel-600 flex items-center px-2">
               <div className={`h-full w-full rounded ${healthColor} flex items-center justify-center`}>
-                <span className="text-sm font-bold text-white drop-shadow">
+                <span className="text-sm font-bold text-foreground drop-shadow">
                   {baseHealth}/{maxBaseHealth}
                 </span>
               </div>
@@ -59,9 +59,9 @@ export function BaseZone({
           </div>
         </>
       ) : (
-        <div className="bg-slate-700/40 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center">
-          <div className="text-xs text-slate-400 font-medium">No base played yet</div>
-          <div className="text-[10px] text-slate-500 mt-1">Play a Base card to start</div>
+        <div className="bg-surface-muted/40 border-2 border-dashed border-steel-600 rounded-lg p-4 text-center">
+          <div className="text-xs text-steel-500 font-medium">No base played yet</div>
+          <div className="text-[10px] text-steel-600 mt-1">Play a Base card to start</div>
         </div>
       )}
     </div>
