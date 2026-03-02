@@ -41,24 +41,26 @@ export default function EventsPage(): JSX.Element {
                 <ul className="space-y-2">
                   {event.placements.map((placement) => (
                     <li
-                      className={`flex items-center justify-between rounded-md border px-3 py-2 ${getPlacementTone(placement.placement)}`}
+                      className={`rounded-md border px-3 py-2 ${getPlacementTone(placement.placement)}`}
                       key={`${event.id}:${placement.placement}`}
                     >
-                      <div className="text-sm">
-                        <p className="flex items-center gap-1 font-semibold">
-                          {placement.placement <= 3 ? <Medal className="h-4 w-4 text-amber-300" /> : <Trophy className="h-4 w-4 text-steel-500" />}
-                          #{placement.placement} {placement.player}
-                        </p>
-                        <p className="text-xs text-steel-600">{placement.deckName} • {placement.archetype}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="accent">{placement.wins}-{placement.losses}-{placement.draws}</Badge>
-                        <span className={`text-xs font-semibold ${getWinRateTone(placement.wins, placement.losses, placement.draws)}`}>
-                          {formatMatchWinRate(placement.wins, placement.losses, placement.draws)}
-                        </span>
-                        <Button asChild size="sm" variant="secondary">
-                          <Link href={`/decks/${placement.deckId}`}>Deck</Link>
-                        </Button>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div className="text-sm">
+                          <p className="flex items-center gap-1 font-semibold">
+                            {placement.placement <= 3 ? <Medal className="h-4 w-4 text-amber-300" /> : <Trophy className="h-4 w-4 text-steel-500" />}
+                            #{placement.placement} {placement.player}
+                          </p>
+                          <p className="text-xs text-steel-600">{placement.deckName} • {placement.archetype}</p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="accent">{placement.wins}-{placement.losses}-{placement.draws}</Badge>
+                          <span className={`text-xs font-semibold ${getWinRateTone(placement.wins, placement.losses, placement.draws)}`}>
+                            {formatMatchWinRate(placement.wins, placement.losses, placement.draws)}
+                          </span>
+                          <Button asChild size="sm" variant="secondary">
+                            <Link href={`/decks/${placement.deckId}`}>Deck</Link>
+                          </Button>
+                        </div>
                       </div>
                     </li>
                   ))}
