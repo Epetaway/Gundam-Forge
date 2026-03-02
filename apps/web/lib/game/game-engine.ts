@@ -689,24 +689,26 @@ export class GameEngine {
       };
     }
 
-    if (cardDef.cost && player.resources.length < cardDef.cost) {
+    // Check cost against ready resources (tapped resources can't be spent)
+    const readyResources = player.resources.filter(r => r.state === 'ready');
+    if (cardDef.cost && readyResources.length < cardDef.cost) {
       return {
         valid: false,
-        error: `Not enough resources`,
-        rulesTrace: `Need ${cardDef.cost}, have ${player.resources.length}`,
+        error: `Not enough ready resources`,
+        rulesTrace: `Need ${cardDef.cost} ready resource(s), have ${readyResources.length}`,
       };
     }
 
     player.hand = player.hand.filter((c) => c.instanceId !== cardInstanceId);
 
     // Spend resources based on card cost
+    // Resources are rested (tapped) when spent and untapped at start of turn
     if (cardDef.cost && cardDef.cost > 0) {
-      for (let i = 0; i < cardDef.cost; i++) {
-        const resource = player.resources.pop();
-        if (resource) {
-          resource.zone = 'trash';
-          resource.state = 'rest'; // Mark as rest/spent
-          player.discardPile.push(resource);
+      let spent = 0;
+      for (let i = player.resources.length - 1; i >= 0 && spent < cardDef.cost; i--) {
+        if (player.resources[i].state === 'ready') {
+          player.resources[i].state = 'rest'; // Tap/rest the resource
+          spent++;
         }
       }
     }
@@ -1623,21 +1625,22 @@ export class GameEngine {
     const { amount = 1 } = action.payload || {};
     const player = this.state.players[action.playerId];
 
-    if (player.resources.length < amount) {
+    // Count available ready resources
+    const readyResources = player.resources.filter(r => r.state === 'ready');
+    if (readyResources.length < amount) {
       return {
         valid: false,
         error: `Not enough resources to spend`,
-        rulesTrace: `Need ${amount} resource(s), have ${player.resources.length}`,
+        rulesTrace: `Need ${amount} ready resource(s), have ${readyResources.length}`,
       };
     }
 
-    // Spend the specified number of resources
-    for (let i = 0; i < amount; i++) {
-      const resource = player.resources.pop();
-      if (resource) {
-        resource.zone = 'trash';
-        resource.state = 'rest'; // Mark as spent
-        player.discardPile.push(resource);
+    // Rest (tap) the specified number of ready resources
+    let spent = 0;
+    for (let i = 0; i < player.resources.length && spent < amount; i++) {
+      if (player.resources[i].state === 'ready') {
+        player.resources[i].state = 'rest'; // Tap/rest the resource
+        spent++;
       }
     }
 
@@ -1646,7 +1649,7 @@ export class GameEngine {
       action.playerId,
       this.state.phase,
       `Spent ${amount} resource(s)`,
-      `${amount} resource card(s) moved from Resource Area to trash.`,
+      `${amount} resource(s) tapped/rested. Will be untapped at start of turn.`,
     );
 
     return { valid: true };
