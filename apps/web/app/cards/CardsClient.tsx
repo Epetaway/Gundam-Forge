@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { LayoutGrid, List, Search, SlidersHorizontal, X } from 'lucide-react';
+import Link from 'next/link';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
@@ -13,6 +14,7 @@ import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage } from '@/lib/data/cards';
 import { cn } from '@/lib/utils/cn';
+import { getActiveDeckId, getStoredDeck } from '@/lib/deck/storage';
 
 const colorOptions: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
@@ -82,6 +84,8 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const [displayCount, setDisplayCount] = useState(GRID_PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [inspectCardId, setInspectCardId] = useState<string | null>(null);
+  const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
+  const [activeDeckName, setActiveDeckName] = useState<string>('');
   const [draft, setDraft] = useState<FilterDraft>({
     query: '',
     color: 'All',
@@ -108,6 +112,15 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   useEffect(() => {
     setDisplayCount(pageSize);
   }, [pageSize, query, color, type, setCode, sortBy]);
+
+  useEffect(() => {
+    const id = getActiveDeckId();
+    if (id) {
+      setActiveDeckId(id);
+      const deck = getStoredDeck(id);
+      setActiveDeckName(deck?.name ?? '');
+    }
+  }, []);
 
   const cardLookup = useMemo(() => new Map(sorted.map((card) => [card.id, card])), [sorted]);
   const inspectCard = inspectCardId ? cardLookup.get(inspectCardId) : undefined;
@@ -263,6 +276,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
       {/* ── Card Grid ─────────────────────────────────────────── */}
       <Container className="py-4" wide>
+        {activeDeckId && (
+          <div className="mb-2 flex items-center justify-between rounded border border-cobalt-600/30 bg-cobalt-900/30 px-3 py-1.5 text-xs text-cobalt-300">
+            <span>Active deck: <strong>{activeDeckName || activeDeckId}</strong></span>
+            <Link href="/forge" className="text-cobalt-400 hover:underline">Change deck ↗</Link>
+          </div>
+        )}
         {sorted.length === 0 ? (
           <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
             No cards match the active filters.
@@ -396,6 +415,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         onOpenChange={(open) => !open && setInspectCardId(null)}
         open={Boolean(inspectCard)}
         qty={0}
+        activeDeckId={activeDeckId}
       />
     </>
   );

@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import type { DeckIntent, CardDefinition } from '@gundam-forge/shared';
 import { sortCardsBySynergy, filterCardsByIntent } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
@@ -26,7 +22,6 @@ const CLAN_OPTIONS = [
 const TYPE_ORDER = ['Unit', 'Pilot', 'Command', 'Base'];
 
 const EXCLUDED_SETS = new Set(['Token']);
-const SLIDE_SIZE = 4;
 
 type GroupMode = 'none' | 'clan' | 'type';
 
@@ -74,9 +69,8 @@ function CardTile({
       type="button"
       className="group relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500"
       onClick={() => onPreview(card.id)}
-      onDoubleClick={() => { onSelect(card.id); }}
-      aria-label={`Preview ${card.name} (click to preview, double-click to add)`}
-      title="Click to preview • Double-click to add"
+      aria-label={`Preview ${card.name}`}
+      title="Click to preview · + to add"
     >
       <img
         src={getCardImage(card)}
@@ -91,6 +85,18 @@ function CardTile({
       <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 transform rounded bg-black/70 px-2 py-1 text-center text-[10px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         Click to Preview
       </div>
+      <button
+        type="button"
+        aria-label={`Add ${card.name} to deck`}
+        title="Add to deck"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(card.id);
+        }}
+        className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-600 text-white opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 text-sm font-bold shadow-lg"
+      >
+        +
+      </button>
     </button>
   );
 }
@@ -165,7 +171,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
   const [previewCardId, setPreviewCardId] = useState<string | null>(null);
   const previewCard = previewCardId ? (allCards.find((c) => c.id === previewCardId) ?? null) : null;
 
-  const [filtersExpanded, setFiltersExpanded] = useState(true);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const deckColors = deckIntent?.colors ?? [];
   const deckClans = deckIntent?.clans ?? [];
@@ -279,18 +285,6 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
 
     return null;
   }, [filtered, groupMode, deckClans]);
-
-  // ── Swiper slides (used only when groupMode === 'none') ──────────────────
-  const slides = useMemo(() => {
-    if (groupMode !== 'none') return [];
-    const result: ScoredCard[][] = [];
-    for (let i = 0; i < filtered.length; i += SLIDE_SIZE) {
-      result.push(filtered.slice(i, i + SLIDE_SIZE));
-    }
-    return result;
-  }, [filtered, groupMode]);
-
-  const filterKey = `${query}|${typeFilter}|${colorFilter}|${setFilter}|${deckColorOnly}|${includeEX}`;
 
   return (
     <aside
@@ -430,7 +424,13 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
             className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-surface-interactive/50 transition-colors"
             onClick={() => setFiltersExpanded((v) => !v)}
           >
-            <span className="text-xs font-semibold text-steel-400">Advanced Filters</span>
+            <span className="text-xs font-semibold text-steel-400">
+              {filtersExpanded
+                ? 'Filters'
+                : (typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All')
+                  ? `Filters (${[typeFilter !== 'All' ? 'Type' : null, colorFilter !== 'All' ? 'Color' : null, setFilter !== 'All' ? 'Set' : null].filter(Boolean).length} active)`
+                  : 'Filters (Type · Color · Set)'}
+            </span>
             <ChevronDown
               className={cn('w-4 h-4 text-steel-500 transition-transform duration-200', filtersExpanded ? 'rotate-180' : '')}
             />
@@ -505,7 +505,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
 
       {/* ── Card results ─────────────────────────────────────────────────── */}
       <div
-        className={cn('overflow-hidden', groupMode === 'none' ? 'min-h-[400px]' : 'overflow-y-auto')}
+        className="overflow-y-auto"
         style={{ minWidth: 0 }}
         aria-label="Card results"
       >
@@ -527,30 +527,20 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
             ))}
           </div>
         ) : (
-          /* Swiper carousel (List mode) */
-          <Swiper
-            key={filterKey}
-            modules={[Pagination]}
-            pagination={{ type: 'progressbar' }}
-            className="h-full w-full"
-            style={{ maxWidth: '100%', overflowX: 'hidden' }}
-          >
-            {slides.map((slideCards, slideIdx) => (
-              <SwiperSlide key={slideIdx}>
-                <div className="grid grid-cols-2 gap-1.5 p-1.5" style={{ maxWidth: '100%' }}>
-                  {slideCards.map((card) => (
-                    <CardTile
-                      key={card.id}
-                      card={card}
-                      showSynergy={showSynergy}
-                      onPreview={setPreviewCardId}
-                      onSelect={onSelect}
-                    />
-                  ))}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          /* Scrollable grid (List mode) */
+          <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 320px)', minHeight: '300px' }}>
+            <div className="grid grid-cols-2 gap-1.5 p-1.5">
+              {filtered.map((card) => (
+                <CardTile
+                  key={card.id}
+                  card={card}
+                  showSynergy={showSynergy}
+                  onPreview={setPreviewCardId}
+                  onSelect={onSelect}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

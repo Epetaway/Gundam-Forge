@@ -9,7 +9,7 @@ const COLOR_MAP: Record<string, string> = {
   Colorless: "bg-[#6b7280]",
 };
 function colorToClass(color: string) {
-  return COLOR_MAP[color] || "bg-neutral-300";
+  return COLOR_MAP[color] || "bg-[#6b7280]";
 }
 
 export interface DeckPreviewCardProps {
@@ -50,103 +50,114 @@ export function DeckPreviewCard({
 
   return (
     <article
-      className="group relative cursor-pointer rounded-2xl bg-neutral-900 ring-1 ring-white/10 shadow-xl shadow-black/30 overflow-hidden transition-shadow hover:shadow-2xl"
+      className="group relative cursor-pointer rounded-xl bg-surface-elevated ring-1 ring-border shadow-md overflow-hidden hover:scale-[1.02] transition-transform hover:shadow-lg"
       onClick={onClick}
       tabIndex={0}
       role="button"
       aria-label={`Open deck: ${title}`}
     >
-      {/* Hero banner */}
-      <div className="relative h-28 w-full">
-        <img
-          src={heroUrl}
-          alt=""
-          className="h-full w-full object-cover"
-          style={{ filter: 'contrast(1.08) saturate(1.08)' }}
-          draggable={false}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+      {/* Hero section with image and text overlay */}
+      <div className="relative overflow-hidden">
+        <div className="relative h-36 w-full bg-gradient-to-br from-steel-200 to-steel-300">
+          <img
+            src={heroUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+          {/* Deck name overlay */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 pt-8">
+            <h2 className="text-xl font-bold text-white truncate">{title}</h2>
+          </div>
+          {/* Kebab menu */}
+          <button
+            className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors"
+            onClick={e => {
+              e.stopPropagation();
+              onMenu?.(e);
+            }}
+            tabIndex={0}
+            aria-label="Deck options"
+            type="button"
+          >
+            <span className="text-base leading-none">⋮</span>
+          </button>
+        </div>
       </div>
 
-      {/* Meta line */}
-      <div className="mt-3 flex justify-center">
-        <span className="text-sm text-neutral-300 text-center">{metaLine}</span>
-      </div>
+      {/* Body */}
+      <div className="px-4 py-3 space-y-2.5">
+        {/* Archetype badge + metadata */}
+        <div className="flex items-center justify-between gap-2">
+          {subtitle ? (
+            <span className="rounded-full bg-surface-interactive px-2.5 py-0.5 text-xs font-medium text-foreground truncate max-w-[60%]">
+              {subtitle}
+            </span>
+          ) : (
+            <span />
+          )}
+          <span className="text-xs text-steel-400 text-right whitespace-nowrap">{metaLine}</span>
+        </div>
 
-      {/* Color identity bar */}
-      <div className="mt-3 flex h-6 w-full gap-1 px-4">
-        {colors.length > 0 ? (
-          colors.map((color, i) => (
-            <div
-              key={color + i}
-              className={`flex-1 h-full rounded-md ring-1 ring-white/10 ${colorToClass(color)}`}
-              title={color}
-            />
-          ))
-        ) : (
-          <div className="flex-1 h-full rounded-md ring-1 ring-white/10 bg-neutral-800" />
-        )}
-      </div>
+        {/* Color badges */}
+        <div className="flex flex-wrap gap-1.5">
+          {colors.length > 0 ? (
+            colors.map((color, i) => (
+              <span
+                key={color + i}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium text-white ${colorToClass(color)}`}
+                title={color}
+              >
+                {color}
+              </span>
+            ))
+          ) : (
+            <span className="rounded-full bg-surface-interactive px-2.5 py-0.5 text-xs font-medium text-steel-400">
+              Colorless
+            </span>
+          )}
+        </div>
 
-      {/* Title block */}
-      <div className="flex items-center gap-4 px-5 mt-4">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
+        {/* Author */}
+        <div className="flex items-center gap-2 pt-0.5 border-t border-border">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={author}
-              className="h-12 w-12 rounded-full object-cover border border-neutral-800"
+              className="h-6 w-6 rounded-full object-cover"
             />
           ) : (
-            <div className="h-12 w-12 rounded-full bg-neutral-700 border border-neutral-800 flex items-center justify-center text-sm font-bold text-neutral-300">
+            <div className="h-6 w-6 rounded-full bg-steel-300 flex items-center justify-center text-[10px] font-bold text-steel-600">
               {author.charAt(0).toUpperCase()}
             </div>
           )}
+          <span className="text-xs text-steel-400 truncate">{author}</span>
         </div>
-        {/* Title and subtitle */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold text-white truncate">{title}</h2>
-            {/* Kebab menu */}
-            <button
-              className="ml-auto p-1.5 rounded-lg hover:bg-white/10 text-neutral-400"
-              onClick={e => {
-                e.stopPropagation();
-                onMenu?.(e);
-              }}
-              tabIndex={0}
-              aria-label="Deck options"
-              type="button"
-            >
-              <span className="text-lg">⋮</span>
-            </button>
-          </div>
-          <div className="text-sm text-neutral-300 truncate">{subtitle}</div>
-          <div className="text-sm text-neutral-400 truncate">{author}</div>
-        </div>
-      </div>
 
-      {/* Bottom tags strip */}
-      <div className="mt-5 border-t border-neutral-800 px-5 py-2 flex flex-wrap justify-center gap-2">
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => (
+        {/* Tags strip */}
+        {isLoading ? (
+          <div className="flex flex-wrap gap-1.5">
+            {Array.from({ length: 3 }).map((_, i) => (
               <span
                 key={i}
-                className="rounded-full bg-neutral-700/40 animate-pulse px-3 py-1 text-xs text-neutral-500 font-medium min-w-[48px] h-6"
+                className="rounded-full bg-surface-interactive animate-pulse px-3 py-1 text-xs min-w-[48px] h-5"
               />
-            ))
-          : tags && tags.length > 0
-          ? tags.map(tag => (
+            ))}
+          </div>
+        ) : tags && tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map(tag => (
               <span
                 key={tag}
-                className="rounded-full bg-white/10 px-3 py-1 text-xs text-neutral-200 font-medium"
+                className="rounded-full bg-surface-interactive px-2.5 py-0.5 text-xs text-steel-400 font-medium"
               >
                 {tag}
               </span>
-            ))
-          : <span className="text-neutral-600 text-sm">No deck tags</span>
-        }
+            ))}
+          </div>
+        ) : null}
       </div>
     </article>
   );
