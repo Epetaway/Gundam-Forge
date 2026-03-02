@@ -16,6 +16,7 @@ export interface DeckRecord {
   likes: number;
   views: number;
   entries: DeckEntry[];
+  updatedAt?: string;
 }
 
 export const deckCatalog: DeckRecord[] = [
@@ -28,6 +29,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Blue', 'White'],
     likes: 102,
     views: 2234,
+    updatedAt: '2026-02-12T18:30:00Z',
     entries: [
       { cardId: 'ST01-001', qty: 3 },
       { cardId: 'ST01-005', qty: 4 },
@@ -55,6 +57,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Green'],
     likes: 88,
     views: 1915,
+    updatedAt: '2026-02-08T14:22:00Z',
     entries: [
       { cardId: 'ST02-001', qty: 4 },
       { cardId: 'ST02-002', qty: 4 },
@@ -82,6 +85,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Red'],
     likes: 144,
     views: 3370,
+    updatedAt: '2026-02-15T09:45:00Z',
     entries: [
       { cardId: 'ST03-001', qty: 4 },
       { cardId: 'ST03-002', qty: 4 },
@@ -109,6 +113,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Blue', 'Green'],
     likes: 77,
     views: 1741,
+    updatedAt: '2026-02-10T16:15:00Z',
     entries: [
       { cardId: 'ST01-001', qty: 4 },
       { cardId: 'ST01-002', qty: 4 },
@@ -136,6 +141,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Blue'],
     likes: 95,
     views: 1823,
+    updatedAt: '2026-02-14T11:20:00Z',
     entries: [
       { cardId: 'GD01-001', qty: 4 },
       { cardId: 'GD01-002', qty: 4 },
@@ -163,6 +169,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Red', 'White'],
     likes: 112,
     views: 2456,
+    updatedAt: '2026-02-13T19:55:00Z',
     entries: [
       { cardId: 'GD01-044', qty: 4 },
       { cardId: 'GD01-045', qty: 4 },
@@ -190,6 +197,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Green'],
     likes: 88,
     views: 1621,
+    updatedAt: '2026-02-09T12:30:00Z',
     entries: [
       { cardId: 'GD01-030', qty: 4 },
       { cardId: 'GD01-031', qty: 4 },
@@ -217,6 +225,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Purple', 'Blue'],
     likes: 76,
     views: 1534,
+    updatedAt: '2026-02-11T08:40:00Z',
     entries: [
       { cardId: 'GD02-053', qty: 4 },
       { cardId: 'GD02-054', qty: 4 },
@@ -244,6 +253,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['White'],
     likes: 64,
     views: 1298,
+    updatedAt: '2026-02-07T15:25:00Z',
     entries: [
       { cardId: 'GD01-065', qty: 4 },
       { cardId: 'GD01-066', qty: 4 },
@@ -271,6 +281,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Red'],
     likes: 102,
     views: 2187,
+    updatedAt: '2026-02-05T10:10:00Z',
     entries: [
       { cardId: 'GD01-044', qty: 4 },
       { cardId: 'GD01-045', qty: 4 },
@@ -298,6 +309,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Blue', 'Green'],
     likes: 85,
     views: 1756,
+    updatedAt: '2026-02-06T13:35:00Z',
     entries: [
       { cardId: 'GD01-001', qty: 3 },
       { cardId: 'GD01-030', qty: 3 },
@@ -325,6 +337,7 @@ export const deckCatalog: DeckRecord[] = [
     colors: ['Colorless'],
     likes: 54,
     views: 891,
+    updatedAt: '2026-02-04T07:50:00Z',
     entries: [
       { cardId: 'EXBP-001', qty: 4 },
       { cardId: 'EXBP-002', qty: 4 },
