@@ -1312,6 +1312,69 @@ This phase improves the Create Deck page UX, making the form mobile-friendly and
 
 ---
 
+## Phase 5 Execution Status — ✅ COMPLETE
+
+**Date:** March 3, 2026  
+**Session:** Phase 5 — Navigation & Feature Discovery  
+**Target Production Readiness:** ~75/100 → ~78/100 (estimated after phase 5)
+
+### Phase 5 Overview
+
+This phase improves navigation and feature discovery by adding prominent entry points for Forge and Playtest on the home page and deck detail pages.
+
+**Completed Tasks:** 2 of 2 (100%)
+
+### Task 5.1 — Add Forge & Playtest Feature Cards to Home Page ✅ COMPLETE
+
+**Problem:** Forge and Playtest have no home page entry points — new users don't know they exist  
+**Solution:** Add feature callout cards between Trending Decks and Tournament Results  
+**Implementation:**
+- New section with eyebrow "What You Can Do" and title "Everything in One Place"
+- 2-column grid (md:grid-cols-2) of feature cards:
+  1. **Build in the Forge**
+     - Wrench icon in cobalt-600/20 background
+     - Description: "A dedicated deck construction workspace with card search, synergy scoring, real-time validation, and four view modes. Your deck, built to official GCG rules."
+     - Primary button: "+ Open Forge" → /forge
+  2. **Playtest Your Deck**
+     - Swords icon in cobalt-600/20 background
+     - Description: "Test any deck against an AI opponent using the full official GCG ruleset — phases, combat, triggers, and all official keywords."
+     - Secondary button: "Choose a Deck →" → /decks
+
+**Discovery Improvement:**
+- Prominent placement on home page
+- Clear calls to action
+- User-facing language explaining what each feature does
+
+**Files Changed:** `apps/web/app/page.tsx`  
+**Git Commit:** 16dddbc  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
+### Task 5.2 — Add Playtest CTA to Deck Detail Page ✅ COMPLETE
+
+**Problem:** Playtester only reachable by users who already know the `/decks/[id]/playtest` URL pattern  
+**Solution:** Enhance Playtest button as primary action in deck header  
+**Implementation:**
+- Updated DeckHeader component (already had Playtest button)
+- Changed button variant from secondary to primary
+- Changed icon from Play to Swords (combat theme consistent with GCG)
+- Button positioned first in actions row (before Share/Export)
+- Links to `/decks/${deckId}/playtest`
+
+**Discovery Improvement:**
+- Primary button makes testing the next logical step after viewing
+- Swords icon reinforces combat theme
+- Prominent positioning before secondary actions
+
+**Files Changed:** `apps/web/components/deck/DeckHeader.tsx`  
+**Git Commit:** 1ba0a7e  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
+---
+
+---
+
 ### Next Steps
 
 1. ✅ Task 2.5 (Deck card redesign) — COMPLETE
@@ -1323,9 +1386,12 @@ This phase improves the Create Deck page UX, making the form mobile-friendly and
 3. ✅ **Phase 4 (Create Deck flow) — COMPLETE (2/2 - 100%)**
    - ✅ Task 4.1 (Mobile layout fix) — COMPLETE
    - ✅ Task 4.2 (Step clarity and back navigation) — COMPLETE
-4. 🔄 Phase 5 onwards (22 tasks remaining)
+4. ✅ **Phase 5 (Navigation & discovery) — COMPLETE (2/2 - 100%)**
+   - ✅ Task 5.1 (Forge & Playtest feature cards) — COMPLETE
+   - ✅ Task 5.2 (Playtest CTA on deck detail) — COMPLETE
+5. 🔄 Phase 6 onwards (20 tasks remaining)
 
-**Overall Progress:** 14 of 35 tasks complete (40%), 3 of 10 phases complete, production readiness estimated at ~75/100
+**Overall Progress:** 16 of 35 tasks complete (46%), 4 of 10 phases complete, production readiness estimated at ~78/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
