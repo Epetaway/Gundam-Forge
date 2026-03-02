@@ -164,6 +164,31 @@ export function Battlefield({
         </div>
       </div>
 
+      {/* OPPONENT BATTLE AREA - Compact unit display */}
+      {opponentState.battleArea.length > 0 && (
+        <div className="flex-shrink-0 flex flex-wrap gap-1 px-4 py-2 bg-surface/40 border-b border-border/50">
+          {opponentState.battleArea.map((unit) => (
+            <div
+              key={unit.instanceId}
+              className="relative h-12 w-9 overflow-hidden rounded border border-border bg-surface-elevated"
+              title={cardDatabase[unit.cardId]?.name ?? unit.cardId}
+            >
+              {cardDatabase[unit.cardId]?.imageUrl ? (
+                <img
+                  src={cardDatabase[unit.cardId].imageUrl}
+                  alt={cardDatabase[unit.cardId]?.name ?? ''}
+                  className={`h-full w-full object-cover ${unit.state === 'rest' ? 'rotate-90' : ''}`}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-[8px] text-steel-500">
+                  {unit.cardId.slice(0, 4)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* MAIN GAME AREA - Responsive CSS Grid playmat */}
       <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 relative z-10">
         {/* LEFT COLUMN - Player zones (Shields, Base, Resources, Trash) */}

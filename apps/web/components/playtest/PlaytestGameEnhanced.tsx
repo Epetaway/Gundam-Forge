@@ -63,6 +63,7 @@ export function PlaytestGameEnhanced({
   const [showLogPanel, setShowLogPanel] = useState(true);
   const [showHandPanel, setShowHandPanel] = useState(true);
   const [showBoardPanel, setShowBoardPanel] = useState(true);
+  const [showMobileLog, setShowMobileLog] = useState(false);
 
   // Phase 3: Sound Effects Integration
   const {
@@ -503,6 +504,31 @@ export function PlaytestGameEnhanced({
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse max-w-xs z-50">
           {error}
+        </div>
+      )}
+
+      {/* Mobile Game Log Button (visible only on mobile) */}
+      {!isSetupPhase && engine && (
+        <button
+          onClick={() => setShowMobileLog(!showMobileLog)}
+          className="fixed md:hidden bottom-4 right-4 bg-cobalt-600 hover:bg-cobalt-700 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg transition-colors z-40"
+          title="Toggle game log"
+        >
+          📋 Log
+        </button>
+      )}
+
+      {/* Mobile Game Log Panel */}
+      {showMobileLog && !isSetupPhase && engine && (
+        <div className="fixed md:hidden bottom-16 inset-x-0 z-50 max-h-64 overflow-y-auto bg-surface border-t border-border p-3 max-h-[40vh]">
+          <div className="space-y-2">
+            {engine.getLog().slice(-20).map((entry, i) => (
+              <div key={i} className="text-xs text-steel-500 border-b border-border/30 pb-2 last:border-b-0">
+                <span className="font-semibold text-steel-400">{entry.actionType}</span>
+                {entry.description && <span className="text-steel-600 ml-1">{entry.description}</span>}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
