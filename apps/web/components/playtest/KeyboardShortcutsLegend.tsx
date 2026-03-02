@@ -43,13 +43,13 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 border-2 border-purple-600 rounded-lg max-w-2xl w-full mx-4 shadow-2xl">
+      <div className="bg-surface-elevated border-2 border-cobalt-600 rounded-lg max-w-2xl w-full mx-4 shadow-2xl">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-700 p-6">
-          <h2 className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
+        <div className="flex justify-between items-center border-b border-border p-6">
+          <h2 className="text-2xl font-bold text-foreground">Keyboard Shortcuts</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white text-2xl transition"
+            className="text-steel-500 hover:text-foreground text-2xl transition"
           >
             ✕
           </button>
@@ -60,17 +60,17 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
           <div className="space-y-6">
             {shortcuts.map((category) => (
               <div key={category.category}>
-                <h3 className="text-lg font-semibold text-purple-400 mb-3">
+                <h3 className="text-lg font-semibold text-cobalt-400 mb-3">
                   {category.category}
                 </h3>
                 <div className="space-y-2">
                   {category.shortcuts.map((shortcut) => (
                     <div
                       key={shortcut.key}
-                      className="flex items-center justify-between p-3 bg-slate-700/50 rounded border border-slate-600 hover:border-slate-500 transition"
+                      className="flex items-center justify-between p-3 bg-surface-muted/50 rounded border border-border hover:border-border transition"
                     >
-                      <span className="text-slate-300">{shortcut.action}</span>
-                      <code className="bg-slate-800 text-purple-300 px-3 py-1 rounded font-mono text-sm border border-slate-600">
+                      <span className="text-steel-300">{shortcut.action}</span>
+                      <code className="bg-surface text-cobalt-300 px-3 py-1 rounded font-mono text-sm border border-border">
                         {shortcut.key}
                       </code>
                     </div>
@@ -82,10 +82,10 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-700 p-4 text-center">
+        <div className="border-t border-border p-4 text-center">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded font-semibold transition"
+            className="px-6 py-2 bg-cobalt-600 hover:bg-cobalt-700 rounded font-semibold transition"
           >
             Close
           </button>

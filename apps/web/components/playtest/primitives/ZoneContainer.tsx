@@ -11,7 +11,7 @@ interface ZoneContainerProps {
   label: string;
   count?: number;
   isOpponent?: boolean;
-  /** Tailwind class for the container background. Defaults to bg-slate-800/70 */
+  /** Tailwind class for the container background. Defaults to bg-surface-elevated */
   bg?: string;
   /** Tailwind class for min-height */
   minH?: string;
@@ -25,7 +25,7 @@ export function ZoneContainer({
   label,
   count,
   isOpponent = false,
-  bg = 'bg-slate-800/70',
+  bg = 'bg-surface-elevated',
   minH = 'min-h-[80px]',
   className,
   children,
@@ -45,7 +45,7 @@ export function ZoneContainer({
         minH,
         isOver
           ? 'border-green-400 bg-green-900/20'
-          : 'border-slate-600/50 hover:border-slate-500/70',
+          : 'border-border hover:border-border/70',
         className,
       )}
       aria-label={`${isOpponent ? 'Opponent ' : ''}${label} zone`}
@@ -53,10 +53,10 @@ export function ZoneContainer({
       data-opponent={isOpponent}
     >
       {/* Zone label */}
-      <span className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400 select-none">
+      <span className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-steel-500 select-none">
         {label}
         {count !== undefined && (
-          <span className="ml-1 text-slate-300">({count})</span>
+          <span className="ml-1 text-steel-300">({count})</span>
         )}
       </span>
 
