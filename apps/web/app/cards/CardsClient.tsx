@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { LayoutGrid, List, Search, SlidersHorizontal, X } from 'lucide-react';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
@@ -18,6 +19,9 @@ const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command',
 
 type CatalogView = 'grid' | 'list';
 type SortKey = 'name' | 'cost-asc' | 'cost-desc' | 'set';
+
+const GRID_PAGE_SIZE = 60;
+const LIST_PAGE_SIZE = 80;
 
 const selectClassName =
   'h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
@@ -56,24 +60,26 @@ function sortCards(cards: CardDefinition[], sortBy: SortKey): CardDefinition[] {
 }
 
 export default function CardsClient({ initialCards }: CardsClientProps): JSX.Element {
-  // Pre-apply filters from URL params if present
-  let initialColor: CardColor | 'All' = 'All';
-  let initialType: CardType | 'All' = 'All';
-  let initialSet: string = 'All';
-  let initialQuery: string = '';
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search);
-    initialColor = (urlParams.get('color') as CardColor | 'All') || 'All';
-    initialType = (urlParams.get('type') as CardType | 'All') || 'All';
-    initialSet = urlParams.get('set') || 'All';
-    initialQuery = urlParams.get('q') || '';
-  }
-  const [query, setQuery] = useState(initialQuery);
+  const searchParams = useSearchParams();
+
+  const colorParam = searchParams.get('color');
+  const typeParam = searchParams.get('type');
+  const setParam = searchParams.get('set');
+  const queryParam = searchParams.get('q');
+
+  const initialColor = colorOptions.includes((colorParam ?? 'All') as CardColor | 'All')
+    ? ((colorParam ?? 'All') as CardColor | 'All')
+    : 'All';
+  const initialType = typeOptions.includes((typeParam ?? 'All') as CardType | 'All')
+    ? ((typeParam ?? 'All') as CardType | 'All')
+    : 'All';
+  const [query, setQuery] = useState(queryParam ?? '');
   const [color, setColor] = useState<CardColor | 'All'>(initialColor);
   const [type, setType] = useState<CardType | 'All'>(initialType);
-  const [setCode, setSetCode] = useState(initialSet);
+  const [setCode, setSetCode] = useState(setParam ?? 'All');
   const [sortBy, setSortBy] = useState<SortKey>('name');
   const [view, setView] = useState<CatalogView>('grid');
+  const [displayCount, setDisplayCount] = useState(GRID_PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [inspectCardId, setInspectCardId] = useState<string | null>(null);
   const [draft, setDraft] = useState<FilterDraft>({
@@ -96,6 +102,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const { data: filtered = initialCards } = useCardsQuery({ filters, initialData: initialCards });
 
   const sorted = useMemo(() => sortCards(filtered, sortBy), [filtered, sortBy]);
+  const pageSize = view === 'grid' ? GRID_PAGE_SIZE : LIST_PAGE_SIZE;
+  const visibleCards = useMemo(() => sorted.slice(0, displayCount), [displayCount, sorted]);
+
+  useEffect(() => {
+    setDisplayCount(pageSize);
+  }, [pageSize, query, color, type, setCode, sortBy]);
 
   const cardLookup = useMemo(() => new Map(sorted.map((card) => [card.id, card])), [sorted]);
   const inspectCard = inspectCardId ? cardLookup.get(inspectCardId) : undefined;
@@ -143,53 +155,8 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       <div className="sticky top-16 z-30 border-b border-border bg-surface/95 backdrop-blur-md">
         <Container wide>
           <div className="flex flex-wrap items-center gap-2 py-2">
-            {/* Results count */}
-            <span className="flex-none text-sm text-steel-600">
-              <span className="font-semibold text-foreground">{sorted.length}</span> cards
-            </span>
-
-            <div className="flex-1" />
-
-            {/* Sort */}
-            <select
-              className={selectClassName}
-              onChange={(event) => setSortBy(event.target.value as SortKey)}
-              value={sortBy}
-            >
-              <option value="name">Name A→Z</option>
-              <option value="cost-asc">Cost ↑</option>
-              <option value="cost-desc">Cost ↓</option>
-              <option value="set">Set</option>
-            </select>
-
-            {/* View toggles */}
-            <div className="inline-flex items-center rounded-md border border-border bg-surface-interactive p-1">
-              <button
-                aria-label="Grid view"
-                className={cn(
-                  'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                  view === 'grid' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                )}
-                onClick={() => setView('grid')}
-                type="button"
-              >
-                <LayoutGrid className="h-3.5 w-3.5" />
-              </button>
-              <button
-                aria-label="List view"
-                className={cn(
-                  'rounded px-2 py-1 text-xs font-semibold transition-colors',
-                  view === 'list' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                )}
-                onClick={() => setView('list')}
-                type="button"
-              >
-                <List className="h-3.5 w-3.5" />
-              </button>
-            </div>
-
-            {/* Search — visible on sm+ */}
-            <div className="relative hidden w-52 sm:block lg:w-64">
+            {/* Search */}
+            <div className="relative order-1 w-full sm:order-none sm:w-52 lg:w-64">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" />
               <input
                 className="h-9 w-full rounded-md border border-border bg-surface-interactive pl-8 pr-8 text-sm text-foreground outline-none transition-colors placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
@@ -209,16 +176,63 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               ) : null}
             </div>
 
-            {/* Filters button — opens filter drawer */}
-            <Button onClick={openMobileFilters} size="sm" variant="secondary">
-              <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
-              Filters
-              {activeChips.length > 0 ? (
-                <span className="ml-1.5 rounded-full bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold text-accent">
-                  {activeChips.length}
-                </span>
-              ) : null}
-            </Button>
+            <div className="order-2 flex w-full flex-wrap items-center gap-2 sm:order-none sm:w-auto sm:flex-1">
+              {/* Results count */}
+              <span className="flex-none text-sm text-steel-600">
+                <span className="font-semibold text-foreground">{sorted.length}</span> cards
+              </span>
+
+              <div className="hidden sm:flex sm:flex-1" />
+
+              {/* Sort */}
+              <select
+                className={selectClassName}
+                onChange={(event) => setSortBy(event.target.value as SortKey)}
+                value={sortBy}
+              >
+                <option value="name">Name A→Z</option>
+                <option value="cost-asc">Cost ↑</option>
+                <option value="cost-desc">Cost ↓</option>
+                <option value="set">Set</option>
+              </select>
+
+              {/* View toggles */}
+              <div className="inline-flex items-center rounded-md border border-border bg-surface-interactive p-1">
+                <button
+                  aria-label="Grid view"
+                  className={cn(
+                    'rounded px-2 py-1 text-xs font-semibold transition-colors',
+                    view === 'grid' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                  )}
+                  onClick={() => setView('grid')}
+                  type="button"
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  aria-label="List view"
+                  className={cn(
+                    'rounded px-2 py-1 text-xs font-semibold transition-colors',
+                    view === 'list' ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                  )}
+                  onClick={() => setView('list')}
+                  type="button"
+                >
+                  <List className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Filters button — opens filter drawer */}
+              <Button onClick={openMobileFilters} size="sm" variant="secondary">
+                <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+                Filters
+                {activeChips.length > 0 ? (
+                  <span className="ml-1.5 rounded-full bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold text-accent">
+                    {activeChips.length}
+                  </span>
+                ) : null}
+              </Button>
+            </div>
           </div>
 
           {/* Active filter chips */}
@@ -253,33 +267,46 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
           <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
             No cards match the active filters.
           </p>
-        ) : view === 'grid' ? (
-          <ul
-            className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-            role="list"
-          >
-            {sorted.slice(0, 360).map((card) => (
-              <li key={card.id}>
-                <CardPreviewTile
-                  imageUrl={getCardImage(card)}
-                  name={card.name}
-                  qty={0}
-                  onClick={() => setInspectCardId(card.id)}
-                />
-              </li>
-            ))}
-          </ul>
         ) : (
-          <ul className="divide-y divide-border" role="list">
-            {sorted.slice(0, 400).map((card) => (
-              <li className="px-1.5 py-1" key={card.id}>
-                <ReferenceCardTile
-                  card={card}
-                  onOpen={() => setInspectCardId(card.id)}
-                />
-              </li>
-            ))}
-          </ul>
+          <>
+            {view === 'grid' ? (
+              <ul
+                className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+                role="list"
+              >
+                {visibleCards.map((card) => (
+                  <li key={card.id}>
+                    <CardPreviewTile
+                      imageUrl={getCardImage(card)}
+                      name={card.name}
+                      qty={0}
+                      onClick={() => setInspectCardId(card.id)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="divide-y divide-border" role="list">
+                {visibleCards.map((card) => (
+                  <li className="px-1.5 py-1" key={card.id}>
+                    <ReferenceCardTile
+                      card={card}
+                      onOpen={() => setInspectCardId(card.id)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-steel-600">Showing {visibleCards.length} of {sorted.length} cards</p>
+              {displayCount < sorted.length ? (
+                <Button onClick={() => setDisplayCount((count) => count + pageSize)} variant="secondary">
+                  Load more
+                </Button>
+              ) : null}
+            </div>
+          </>
         )}
       </Container>
 
