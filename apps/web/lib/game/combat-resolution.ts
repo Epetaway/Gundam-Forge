@@ -92,9 +92,9 @@ export class CombatResolver {
     const defenderDef = defender && combat.defenderCardId ? cardDatabase[combat.defenderCardId] : null;
 
     // Get base power values
-    const attackerAttack = attackerDef?.atk ?? 0;
-    const defenderAttack = defenderDef?.atk ?? 0;
-    const defenderHealth = defenderDef?.def ?? 0;
+    const attackerAttack = attackerDef?.ap ?? 0;
+    const defenderAttack = defenderDef?.ap ?? 0;
+    const defenderHealth = defenderDef?.hp ?? 0;
 
     // Apply damage modifiers
     let totalAttackerDamage = attackerAttack;
@@ -128,14 +128,14 @@ export class CombatResolver {
     } else if (hasFirstStrike) {
       // First Strike: Attacker damage first, defender only if survives
       attacker.damageMarkers += totalAttackerDamage;
-      const attackerSurvives = attacker.damageMarkers < (attackerDef?.def ?? 1);
+      const attackerSurvives = attacker.damageMarkers < (attackerDef?.hp ?? 1);
 
       if (attackerSurvives) {
         defender.damageMarkers += totalDefenderDamage;
       }
 
-      const attackerDestroyed = attacker.damageMarkers >= (attackerDef?.def ?? 1);
-      const defenderDestroyed = defender.damageMarkers >= (defenderDef?.def ?? 1);
+      const attackerDestroyed = attacker.damageMarkers >= (attackerDef?.hp ?? 1);
+      const defenderDestroyed = defender.damageMarkers >= (defenderDef?.hp ?? 1);
 
       result = {
         combat: {
@@ -161,8 +161,8 @@ export class CombatResolver {
       attacker.damageMarkers += defenderWould;
       defender.damageMarkers += attackerWould;
 
-      const attackerDestroyed = attacker.damageMarkers >= (attackerDef?.def ?? 1);
-      const defenderDestroyed = defender.damageMarkers >= (defenderDef?.def ?? 1);
+      const attackerDestroyed = attacker.damageMarkers >= (attackerDef?.hp ?? 1);
+      const defenderDestroyed = defender.damageMarkers >= (defenderDef?.hp ?? 1);
 
       result = {
         combat: {

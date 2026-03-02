@@ -6,8 +6,8 @@ export interface TokenDeckCardConfig {
   type: CardDefinition['type'];
   count: number;
   zone: 'main' | 'resource';
-  atk?: number;
-  def?: number;
+  ap?: number;
+  hp?: number;
   keywords?: string[];
   text?: string;
 }
@@ -30,8 +30,8 @@ export const COLORLESS_TOKEN_DECK: TokenDeckConfig = {
       type: 'Unit',
       count: 15,
       zone: 'main',
-      atk: 2,
-      def: 1,
+      ap: 2,
+      hp: 1,
       keywords: [],
       text: 'Basic token unit.',
     },
@@ -41,8 +41,8 @@ export const COLORLESS_TOKEN_DECK: TokenDeckConfig = {
       type: 'Unit',
       count: 10,
       zone: 'main',
-      atk: 3,
-      def: 2,
+      ap: 3,
+      hp: 2,
       keywords: [],
       text: 'Basic token unit.',
     },
@@ -52,8 +52,8 @@ export const COLORLESS_TOKEN_DECK: TokenDeckConfig = {
       type: 'Unit',
       count: 9,
       zone: 'main',
-      atk: 4,
-      def: 3,
+      ap: 4,
+      hp: 3,
       keywords: [],
       text: 'Basic token unit.',
     },

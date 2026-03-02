@@ -23,7 +23,8 @@
       "Bash(grep -i \"suppression\" /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/game/*.ts)",
       "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/packages/shared/src/*.ts)",
       "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/game/*.ts)",
-      "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/apps/web/components/playtest/*.tsx)"
+      "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/apps/web/components/playtest/*.tsx)",
+      "Read(//private handlePlayCard/,/^  private [a-zA-Z]/**)"
     ]
   }
 }

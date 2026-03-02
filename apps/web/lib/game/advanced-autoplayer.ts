@@ -53,7 +53,7 @@ export class AdvancedAutoplayer {
       const units = player.battleArea;
       const totalAttack = units.reduce((sum, u) => {
         const def = this.cardDatabase[u.cardId] as any;
-        return sum + (def?.ap ?? def?.atk ?? 0);
+        return sum + (def?.ap ?? 0);
       }, 0);
       const unitCount = units.length;
 
