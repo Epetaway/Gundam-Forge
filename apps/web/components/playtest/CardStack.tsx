@@ -72,7 +72,7 @@ export function CardStack({
   const topCard = cardArray[0];
   const topCardData = cardDatabase[topCard.cardId];
   const stackSize = cardArray.length;
-  const isFaceDown = topCard.faceDown || topCard.zone === 'shields';
+  const isFaceDown = topCard.zone === 'shields' || topCard.zone === 'deck' || topCard.zone === 'resourceDeck';
   const isExResource = topCard.cardId === 'EX-RESOURCE-TOKEN' || topCard.zone === 'exResource';
 
   // Determine which cards to show visually (max 3 visible layers)

@@ -12,17 +12,17 @@ import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
 
-interface TrashAreaProps {
+interface TrashZoneProps {
   trash: CardInstance[];
   cardDatabase: Record<string, any>;
   isOpponent: boolean;
 }
 
-export function TrashArea({
+export function TrashZone({
   trash,
   cardDatabase,
   isOpponent,
-}: TrashAreaProps) {
+}: TrashZoneProps) {
   const [showDetails, setShowDetails] = useState(false);
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-trash' : 'trash',

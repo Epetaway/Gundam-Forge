@@ -4,7 +4,26 @@
       "Bash(git -C /Users/earlhickson/Development/Gundam-Forge stash pop)",
       "Bash(git -C /Users/earlhickson/Development/Gundam-Forge add apps/web/app/forge/CardSearchPanel.tsx apps/web/app/forge/forge-workbench.tsx)",
       "Bash(git -C /Users/earlhickson/Development/Gundam-Forge stash drop)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(npm run test)",
+      "Bash(npx vitest run lib/game/__tests__/core-systems.test.ts)",
+      "Bash(npx vitest run)",
+      "Bash(npx tsc --noEmit -p apps/web/tsconfig.json)",
+      "Bash(npx vitest run --reporter=verbose)",
+      "Bash(git add apps/web/app/decks/[id]/playtest/page.tsx apps/web/components/deck/DeckHeader.tsx apps/web/components/playtest/CardStack.tsx apps/web/components/playtest/GameStartFlow.tsx apps/web/components/playtest/HandTray.tsx apps/web/components/playtest/PlaytestGameEnhanced.tsx apps/web/components/playtest/SetupPhase.tsx \"apps/web/components/playtest/zones/BattleAreaZone.tsx\" \"apps/web/components/playtest/zones/ResourceAreaZone.tsx\" \"apps/web/components/playtest/zones/TrashArea.tsx\" apps/web/lib/data/cards.ts \"apps/web/lib/game/__tests__/core-systems.test.ts\" apps/web/lib/game/advanced-autoplayer.ts apps/web/lib/game/game-engine.ts apps/web/lib/game/shuffle-and-seed.ts apps/web/lib/game/token-decks.ts apps/web/lib/hooks/DragDropContext.tsx)",
+      "Bash(git add 'apps/web/app/decks/[id]/playtest/page.tsx' 'apps/web/components/deck/DeckHeader.tsx' 'apps/web/components/playtest/CardStack.tsx' 'apps/web/components/playtest/GameStartFlow.tsx' 'apps/web/components/playtest/HandTray.tsx' 'apps/web/components/playtest/PlaytestGameEnhanced.tsx' 'apps/web/components/playtest/SetupPhase.tsx' 'apps/web/components/playtest/zones/BattleAreaZone.tsx' 'apps/web/components/playtest/zones/ResourceAreaZone.tsx' 'apps/web/components/playtest/zones/TrashArea.tsx' 'apps/web/lib/data/cards.ts' 'apps/web/lib/game/__tests__/core-systems.test.ts' 'apps/web/lib/game/advanced-autoplayer.ts' 'apps/web/lib/game/game-engine.ts' 'apps/web/lib/game/shuffle-and-seed.ts' 'apps/web/lib/game/token-decks.ts' 'apps/web/lib/hooks/DragDropContext.tsx')",
+      "Bash(git add 'apps/web/components/playtest/PlaytestGameEnhanced.tsx' 'apps/web/components/playtest/zones/ShieldArea.tsx')",
+      "WebFetch(domain:japan-figure.com)",
+      "WebFetch(domain:game.cardsrealm.com)",
+      "WebFetch(domain:www.gundam-gcg.com)",
+      "WebFetch(domain:gcgmeta.com)",
+      "WebFetch(domain:www.evvgamingguild.com)",
+      "WebFetch(domain:tcgtopdecks-hq.com)",
+      "WebFetch(domain:www.hobbykitz.com.au)",
+      "Bash(grep -i \"suppression\" /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/game/*.ts)",
+      "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/packages/shared/src/*.ts)",
+      "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/game/*.ts)",
+      "Bash(wc -l /Users/earlhickson/Development/Gundam-Forge/apps/web/components/playtest/*.tsx)"
     ]
   }
 }

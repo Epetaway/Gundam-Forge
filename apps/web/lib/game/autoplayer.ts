@@ -115,7 +115,7 @@ export class Autoplayer {
 
     // Play units if possible and we have board space
     const unitsInPlay = player.battleArea.length;
-    if (unitsInPlay < 3) {
+    if (unitsInPlay < 6) {
       const playableUnit = this.findPlayableUnit(player);
       if (playableUnit) {
         const cardDef = this.cardDatabase[playableUnit.cardId];

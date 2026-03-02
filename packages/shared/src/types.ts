@@ -96,3 +96,12 @@ export interface DeckIntent {
   setOrFormatId?: string;
 }
 
+/** CardLookup: Typed lookup for card definitions by card ID */
+export type CardLookup = Map<string, CardDefinition>;
+
+/** ZoneProps: Base props interface shared by all playground zone components */
+export interface ZoneProps {
+  isOpponent?: boolean;
+  cardLookup: CardLookup;
+}
+

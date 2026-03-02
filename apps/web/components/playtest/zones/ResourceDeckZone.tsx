@@ -13,7 +13,7 @@ interface ResourceDeckAreaProps {
   isOpponent: boolean;
 }
 
-export function ResourceDeckArea({
+export function ResourceDeckZone({
   resourceDeck,
   isOpponent,
 }: ResourceDeckAreaProps) {

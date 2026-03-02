@@ -14,7 +14,7 @@ interface DeckAreaProps {
   onDrawCard?: () => void;
 }
 
-export function DeckArea({
+export function DeckZone({
   deckSize,
   isOpponent,
   onDrawCard,

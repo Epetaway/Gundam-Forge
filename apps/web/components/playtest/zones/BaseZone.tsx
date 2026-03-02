@@ -17,7 +17,7 @@ interface BaseAreaProps {
   isOpponent: boolean;
 }
 
-export function BaseArea({
+export function BaseZone({
   baseCard,
   cardDatabase,
   baseHealth,

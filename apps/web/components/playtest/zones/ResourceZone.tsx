@@ -12,17 +12,17 @@ import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
 
-interface ResourceAreaZoneProps {
+interface ResourceZoneProps {
   resources: CardInstance[];
   cardDatabase: Record<string, any>;
   isOpponent: boolean;
 }
 
-export function ResourceAreaZone({
+export function ResourceZone({
   resources,
   cardDatabase,
   isOpponent,
-}: ResourceAreaZoneProps) {
+}: ResourceZoneProps) {
   const [selectedResource, setSelectedResource] = useState<string | null>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-resources' : 'resources',
