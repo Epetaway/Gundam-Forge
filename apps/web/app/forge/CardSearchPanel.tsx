@@ -173,7 +173,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
   const [previewCardId, setPreviewCardId] = useState<string | null>(null);
   const previewCard = previewCardId ? (allCards.find((c) => c.id === previewCardId) ?? null) : null;
 
-  const [filtersExpanded, setFiltersExpanded] = useState(true);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const deckColors = deckIntent?.colors ?? [];
   const deckClans = deckIntent?.clans ?? [];
@@ -428,7 +428,16 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
             className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-surface-interactive/50 transition-colors"
             onClick={() => setFiltersExpanded((v) => !v)}
           >
-            <span className="text-xs font-semibold text-steel-400">Advanced Filters</span>
+            <span className="text-xs font-semibold text-steel-400">
+              {(() => {
+                const activeCount = (typeFilter !== 'All' ? 1 : 0) +
+                                   (colorFilter !== 'All' ? 1 : 0) +
+                                   (setFilter !== 'All' ? 1 : 0);
+                if (filtersExpanded) return 'Advanced Filters';
+                if (activeCount > 0) return `Filters (${activeCount} active)`;
+                return 'Filters (Type · Color · Set)';
+              })()}
+            </span>
             <ChevronDown
               className={cn('w-4 h-4 text-steel-500 transition-transform duration-200', filtersExpanded ? 'rotate-180' : '')}
             />
