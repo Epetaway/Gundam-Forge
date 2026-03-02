@@ -22,13 +22,13 @@
 
 import React, { useState, useEffect } from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
-import { ShieldArea } from './zones/ShieldArea';
-import { BaseArea } from './zones/BaseArea';
-import { BattleAreaZone } from './zones/BattleAreaZone';
-import { ResourceDeckArea } from './zones/ResourceDeckArea';
-import { ResourceAreaZone } from './zones/ResourceAreaZone';
-import { TrashArea } from './zones/TrashArea';
-import { DeckArea } from './zones/DeckArea';
+import { ShieldZone } from './zones/ShieldZone';
+import { BaseZone } from './zones/BaseZone';
+import { BattleZone } from './zones/BattleZone';
+import { ResourceDeckZone } from './zones/ResourceDeckZone';
+import { ResourceZone } from './zones/ResourceZone';
+import { TrashZone } from './zones/TrashZone';
+import { DeckZone } from './zones/DeckZone';
 import { GameLog } from './GameLog';
 import { HandTray } from './HandTray';
 
@@ -151,7 +151,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Shield Area
             </div>
-            <ShieldArea
+            <ShieldZone
               shields={playerState.shields}
               cardDatabase={cardDatabase}
               isOpponent={false}
@@ -166,7 +166,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Base
             </div>
-            <BaseArea
+            <BaseZone
               baseCard={playerState.base}
               cardDatabase={cardDatabase}
               baseHealth={playerState.baseHealth}
@@ -180,7 +180,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Resource Deck
             </div>
-            <ResourceDeckArea
+            <ResourceDeckZone
               resourceDeck={playerState.resourceDeck || []}
               isOpponent={false}
             />
@@ -191,7 +191,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Trash
             </div>
-            <TrashArea
+            <TrashZone
               trash={playerState.discardPile}
               cardDatabase={cardDatabase}
               isOpponent={false}
@@ -205,7 +205,7 @@ export function Battlefield({
             Battle Area
           </div>
           <div className="flex-1 overflow-auto">
-            <BattleAreaZone
+            <BattleZone
               units={playerState.battleArea}
               cardDatabase={cardDatabase}
               isOpponent={false}
@@ -221,7 +221,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Resources
             </div>
-            <ResourceAreaZone
+            <ResourceZone
               resources={playerState.resources}
               cardDatabase={cardDatabase}
               isOpponent={false}
@@ -233,7 +233,7 @@ export function Battlefield({
             <div className="text-[10px] md:text-xs font-bold text-slate-300 uppercase mb-1 tracking-wider">
               Deck
             </div>
-            <DeckArea
+            <DeckZone
               deckSize={playerState.deck.length}
               isOpponent={false}
             />

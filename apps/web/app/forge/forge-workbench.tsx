@@ -413,6 +413,10 @@ interface DeckSettingsBarProps {
   onArchetypeChange: (a: string) => void;
   onSetIdChange: (s: string) => void;
   onExport: () => void;
+  /** Validation state for live feedback badge */
+  validationIsValid?: boolean;
+  validationMainDeckCards?: number;
+  validationHasOverLimit?: boolean;
 }
 
 function DeckSettingsBar({
@@ -426,6 +430,9 @@ function DeckSettingsBar({
   onArchetypeChange,
   onSetIdChange,
   onExport,
+  validationIsValid = false,
+  validationMainDeckCards = 0,
+  validationHasOverLimit = false,
 }: DeckSettingsBarProps) {
   const [open, setOpen] = React.useState(false);
   const [localName, setLocalName] = React.useState(name);
@@ -490,12 +497,29 @@ function DeckSettingsBar({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Validation badge */}
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-xs font-semibold',
+              validationIsValid
+                ? 'bg-green-900/40 text-green-400'
+                : 'bg-red-900/40 text-red-400',
+            )}
+            title={
+              validationIsValid
+                ? 'Deck is valid'
+                : `${validationMainDeckCards}/50 main deck cards${validationHasOverLimit ? ' · Some cards exceed 4-copy limit' : ''}`
+            }
+          >
+            {validationIsValid ? '✓ Valid' : `${validationMainDeckCards}/50`}
+          </span>
           <button
             type="button"
-            className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 transition-colors hover:text-foreground"
+            className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 transition-colors hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onExport}
             aria-label="Export deck list as text"
             title="Export deck list"
+            disabled={!validationIsValid}
           >
             <Download className="h-3 w-3" aria-hidden="true" />
             Export
@@ -1038,19 +1062,31 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
       {/* Main deck area */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Deck settings bar */}
-        <DeckSettingsBar
-          deckId={deckId}
-          name={deckMeta.name}
-          colors={deckMeta.deckIntent?.colors ?? []}
-          archetype={(deckMeta.deckIntent?.packages?.length ?? 0) > 0 ? `${deckMeta.deckIntent.packages.length} packages` : ''}
-          setId={deckMeta.setId}
-          onNameChange={handleNameChange}
-          onColorsChange={(colors) => handleDeckIntentChange({ ...(deckMeta.deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors })}
-          onArchetypeChange={() => {}} // Deprecated: packages now selected in DeckIntentBuilder
-          onSetIdChange={handleSetIdChange}
-          onExport={handleExport}
-        />
+        {/* Deck settings bar with live validation */}
+        {React.useMemo(() => {
+          const validationResult = validateDeck(
+            Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty })),
+            allCards as CardDefinition[],
+          );
+          
+          return (
+            <DeckSettingsBar
+              deckId={deckId}
+              name={deckMeta.name}
+              colors={deckMeta.deckIntent?.colors ?? []}
+              archetype={(deckMeta.deckIntent?.packages?.length ?? 0) > 0 ? `${deckMeta.deckIntent.packages.length} packages` : ''}
+              setId={deckMeta.setId}
+              onNameChange={handleNameChange}
+              onColorsChange={(colors) => handleDeckIntentChange({ ...(deckMeta.deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors })}
+              onArchetypeChange={() => {}} // Deprecated: packages now selected in DeckIntentBuilder
+              onSetIdChange={handleSetIdChange}
+              onExport={handleExport}
+              validationIsValid={validationResult.isValid}
+              validationMainDeckCards={validationResult.metrics.mainDeckCards}
+              validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
+            />
+          );
+        }, [deck, handleExport, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards])}
 
         {/* Validation bar (compact, single row) */}
         <ValidationBar

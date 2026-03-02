@@ -18,7 +18,7 @@ interface ShieldAreaProps {
   onDamaged?: (remaining: number) => void;
 }
 
-export function ShieldArea({
+export function ShieldZone({
   shields,
   cardDatabase,
   isOpponent,

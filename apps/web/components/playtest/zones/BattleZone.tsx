@@ -12,19 +12,19 @@ import type { CardInstance } from '@/lib/game/game-engine';
 import { getCardById } from '@/lib/data/cards';
 import { CardStack } from '../CardStack';
 
-interface BattleAreaZoneProps {
+interface BattleZoneProps {
   units: CardInstance[];
   cardDatabase: Record<string, any>;
   isOpponent: boolean;
   onUnitSelected?: (unit: CardInstance) => void;
 }
 
-export function BattleAreaZone({
+export function BattleZone({
   units,
   cardDatabase,
   isOpponent,
   onUnitSelected,
-}: BattleAreaZoneProps) {
+}: BattleZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-battle' : 'battle',
     data: { zone: isOpponent ? 'opponent-battle' : 'battle' },

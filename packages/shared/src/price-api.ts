@@ -246,7 +246,6 @@ export class PriceAPIManager {
     // Try each source in order
     for (const source of this.sources) {
       try {
-        console.log(`Fetching price from ${source.name} for "${cardName}" from set "${setName}"...`);
         const price = await source.fetchPrice(cardName, setName);
         if (price) {
           this.cache.set(cacheKey, price);

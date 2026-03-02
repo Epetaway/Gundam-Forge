@@ -23,32 +23,19 @@ const PHASE_LABELS: Record<Phase, string> = {
   gameOver: 'Game Over',
 };
 
-const PHASE_ORDER: Phase[] = ['start', 'draw', 'resource', 'main', 'end'];
-
 export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: PhaseIndicatorProps) {
-  const currentIndex = PHASE_ORDER.indexOf(currentPhase);
+  const phaseLabel = PHASE_LABELS[currentPhase] ?? currentPhase;
+  // Grammatically correct "Your Turn" vs "Opponent's Turn"
+  const turnText = activePlayer === 'You' ? 'Your Turn' : "Opponent's Turn";
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="text-sm text-slate-400">
-        Turn {turnNumber} - {activePlayer}'s Turn
-      </div>
-      <div className="flex gap-1">
-        {PHASE_ORDER.map((phase, index) => (
-          <div
-            key={phase}
-            className={`px-3 py-1 text-xs rounded font-semibold transition ${
-              index === currentIndex
-                ? 'bg-purple-600 text-white'
-                : index < currentIndex
-                  ? 'bg-slate-700 text-slate-400'
-                  : 'bg-slate-800 text-slate-500'
-            }`}
-          >
-            {PHASE_LABELS[phase]}
-          </div>
-        ))}
-      </div>
+    <div className="flex items-center gap-2 shrink-0">
+      <span className="text-xs text-slate-400 whitespace-nowrap">
+        Turn {turnNumber} &bull; {turnText}
+      </span>
+      <span className="px-2.5 py-1 text-xs rounded font-bold bg-purple-600 text-white whitespace-nowrap">
+        {phaseLabel} Phase
+      </span>
     </div>
   );
 }

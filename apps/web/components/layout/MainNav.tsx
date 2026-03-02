@@ -12,14 +12,22 @@ import {
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils/cn';
 
-const navItems = [
+const baseNavItems = [
   { href: '/', label: 'Home' },
   { href: '/decks/new', label: '+ Create Deck' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },
-  { href: '/auth/login', label: 'Login' },
 ] as const;
+
+// Hide auth from nav during beta (production) until auth is ready
+const navItems =
+  process.env.NODE_ENV === 'production'
+    ? baseNavItems
+    : ([
+        ...baseNavItems,
+        { href: '/auth/login', label: 'Login' },
+      ] as const);
 
 export function MainNav(): JSX.Element {
   const pathname = usePathname();
