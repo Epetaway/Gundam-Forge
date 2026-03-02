@@ -1245,6 +1245,71 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
 
 ---
 
+## Phase 4 Execution Status — ✅ COMPLETE
+
+**Date:** March 3, 2026  
+**Session:** Phase 4 — Create Deck Flow  
+**Target Production Readiness:** ~72/100 → ~75/100 (estimated after phase 4)
+
+### Phase 4 Overview
+
+This phase improves the Create Deck page UX, making the form mobile-friendly and the multi-step wizard more discoverable with clearer terminology and back navigation.
+
+**Completed Tasks:** 2 of 2 (100%)
+
+### Task 4.1 — Fix Create Deck Mobile Layout ✅ COMPLETE
+
+**Problem:** Two-panel flex layout competed for horizontal space on 375px screens  
+**Solution:** Responsive flex-col md:flex-row with mobile preview toggle  
+**Implementation:**
+- Changed outer flex from `flex` to `flex flex-col md:flex-row`
+- Updated form panel padding from `p-8` to `p-6 md:p-8`
+- Added `showPreview` state with "Preview deck →" toggle button on mobile (md:hidden)
+- Preview panel hidden by default on mobile (hidden md:flex), visible when showPreview is true
+- Added overflow-y-auto to left panel for scrolling on short screens
+- "Browse existing decks" and "Cancel" links remain reachable
+
+**Mobile UX:**
+- Form panel full width on mobile, stacks above preview
+- User can toggle preview on/off via button
+- Desktop: side-by-side layout unchanged
+
+**Files Changed:** `apps/web/app/decks/new/page.tsx`  
+**Git Commit:** c7a4440  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
+### Task 4.2 — Improve Deck Setup Step Clarity & Back Navigation ✅ COMPLETE
+
+**Problem:** No back button between steps; "Mechanics Packages" is opaque internal terminology  
+**Solution:** Rename to "Play Style" with clearer description; add back buttons to all steps (except step 1)  
+**Implementation:**
+- **PackagesStep.tsx:**
+  - Renamed step title from "Mechanics Packages" to "Play Style"
+  - Updated description: "Choose the strategies your deck will focus on. This helps the Forge suggest the right cards for your build."
+  - Added info callout: "ℹ️ Play styles guide card suggestions in the Forge. You can always change this later."
+  - Added "← Back" button at bottom (navigates to Colors step)
+- **ColorsStep.tsx:**
+  - Added "← Back" button at bottom (navigates to Clans step)
+- **DeckIntentBuilder.tsx:**
+  - Pass onBack callbacks to ColorsStep and PackagesStep
+  - onBack for ColorsStep expands Clans, onBack for PackagesStep expands Colors
+
+**UX Improvements:**
+- User-facing terminology ("Play Style" vs. "Mechanics Packages")
+- Visible back navigation between all steps
+- Info callout reduces anxiety ("can always change this later")
+
+**Files Changed:** 
+- `apps/web/components/deck/steps/PackagesStep.tsx`
+- `apps/web/components/deck/steps/ColorsStep.tsx`
+- `apps/web/components/deck/DeckIntentBuilder.tsx`  
+**Git Commit:** 4d43933  
+**QA Status:** ✅ All passing (0 lint, 0 type errors, static export successful)  
+**Tests:** 135 passing, 4 skipped, 0 new failures
+
+---
+
 ---
 
 ### Next Steps
@@ -1255,9 +1320,12 @@ This phase focuses on the Forge (deck builder) user experience, making it faster
    - ✅ Task 3.2 (Single-click card add) — COMPLETE
    - ✅ Task 3.3 (Collapse filters by default) — COMPLETE
    - ✅ Task 3.4 (Add to Deck from Cards) — COMPLETE
-3. 🔄 Phase 4 onwards (24 tasks remaining)
+3. ✅ **Phase 4 (Create Deck flow) — COMPLETE (2/2 - 100%)**
+   - ✅ Task 4.1 (Mobile layout fix) — COMPLETE
+   - ✅ Task 4.2 (Step clarity and back navigation) — COMPLETE
+4. 🔄 Phase 5 onwards (22 tasks remaining)
 
-**Overall Progress:** 12 of 35 tasks complete (34%), 2 of 10 phases complete, production readiness estimated at ~72/100
+**Overall Progress:** 14 of 35 tasks complete (40%), 3 of 10 phases complete, production readiness estimated at ~75/100
 
 All work follows strict QA gate after every task. Design tokens, static export constraints, and mobile-first patterns maintained throughout.
 
