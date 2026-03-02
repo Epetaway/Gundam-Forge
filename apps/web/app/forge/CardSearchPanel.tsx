@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { DeckIntent, CardDefinition } from '@gundam-forge/shared';
 import { sortCardsBySynergy, filterCardsByIntent } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { cn } from '@/lib/utils/cn';
+import { debounce } from '@/lib/utils/debounce';
 
 const CARD_TYPES = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 const CARD_COLORS = ['All', 'Red', 'Blue', 'Green', 'White', 'Purple', 'Colorless'];
@@ -163,6 +164,9 @@ function CardGroup({
 
 export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSearchPanelProps) {
   const [query, setQuery] = useState('');
+  const [rawQuery, setRawQuery] = useState('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSetQuery = useCallback(debounce((val: string) => setQuery(val), 150), []);
   const [typeFilter, setTypeFilter] = useState('All');
   const [colorFilter, setColorFilter] = useState('All');
   const [setFilter, setSetFilter] = useState(() => {
@@ -303,13 +307,13 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
           id="card-search-input"
           className="w-full rounded border border-border bg-surface p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
           placeholder="Search cards…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={rawQuery}
+          onChange={(e) => { setRawQuery(e.target.value); debouncedSetQuery(e.target.value); }}
           aria-label="Search cards by name, ID, or text"
         />
 
         {/* Active Filters Summary */}
-        {(query || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || deckColorOnly || includeEX) && (
+        {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || deckColorOnly || includeEX) && (
           <div className="rounded-lg border border-purple-500/30 bg-purple-900/10 p-2 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-purple-300">Active Filters</span>
@@ -318,6 +322,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
                 className="text-xs text-steel-500 hover:text-purple-300 transition-colors"
                 onClick={() => {
                   setQuery('');
+                  setRawQuery('');
                   setTypeFilter('All');
                   setColorFilter('All');
                   setSetFilter(initialSetId && SETS_LIST.includes(initialSetId) ? initialSetId : 'All');
@@ -330,10 +335,10 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId }: CardSear
               </button>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {query && (
+              {rawQuery && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
-                  Search: &quot;{query.slice(0, 15)}{query.length > 15 ? '…' : ''}&quot;
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setQuery('')} aria-label="Clear search">×</button>
+                  Search: &quot;{rawQuery.slice(0, 15)}{rawQuery.length > 15 ? '…' : ''}&quot;
+                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
                 </span>
               )}
               {typeFilter !== 'All' && (
