@@ -270,6 +270,7 @@ export function Battlefield({
           gamePhase={gamePhase}
           isPlayerTurn={isPlayerTurn}
         />
+      </div>
     </div>
   );
 }
