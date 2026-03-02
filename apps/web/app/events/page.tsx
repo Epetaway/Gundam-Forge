@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { MapPin, Medal, ShieldAlert, Sword, Trophy } from 'lucide-react';
+import type { JSX } from 'react';
+import { MapPin, Medal, ShieldAlert, Sword, Trophy, TrendingUp, Minus, TrendingDown } from 'lucide-react';
 import { Container } from '@/components/layout/Container';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
@@ -11,11 +12,12 @@ import { rankArchetypes } from '@/lib/meta/engine';
 export default function EventsPage(): JSX.Element {
   const events = getEvents();
   const archetypeMeta = rankArchetypes(events).slice(0, 5);
+  const latestEventDate = events[0]?.date ?? null;
 
   return (
     <Container className="space-y-6 py-8">
       <PageHeader
-        description="Tournament command board with placements, archetype pressure, and win-rate heat."
+        description={latestEventDate ? `Tournament command board · Last event: ${latestEventDate}` : "Tournament command board with placements, archetype pressure, and win-rate heat."}
         eyebrow="Events"
         title="Tournament Results"
       />
@@ -54,7 +56,8 @@ export default function EventsPage(): JSX.Element {
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="accent">{placement.wins}-{placement.losses}-{placement.draws}</Badge>
-                          <span className={`text-xs font-semibold ${getWinRateTone(placement.wins, placement.losses, placement.draws)}`}>
+                          <span className={`inline-flex items-center gap-1 text-xs font-semibold ${getWinRateTone(placement.wins, placement.losses, placement.draws)}`}>
+                            {getWinRateIcon(placement.wins, placement.losses, placement.draws)}
                             {formatMatchWinRate(placement.wins, placement.losses, placement.draws)}
                           </span>
                           <Button asChild size="sm" variant="secondary">
@@ -84,7 +87,8 @@ export default function EventsPage(): JSX.Element {
                   <p className="font-semibold">{record.archetype}</p>
                   <Badge variant="accent">{record.topThree} top 3</Badge>
                 </div>
-                <p className={`text-xs ${getMetaWinRateTone(record.winRate)}`}>
+                <p className={`inline-flex items-center gap-1 text-xs ${getMetaWinRateTone(record.winRate)}`}>
+                  {getMetaWinRateIcon(record.winRate)}
                   {record.placements} tracked placements • {(record.winRate * 100).toFixed(1)}% win rate
                 </p>
               </div>
@@ -128,4 +132,18 @@ function getMetaWinRateTone(winRate: number): string {
   if (winRate >= 0.8) return 'text-emerald-300';
   if (winRate >= 0.7) return 'text-amber-300';
   return 'text-red-300';
+}
+
+function getWinRateIcon(wins: number, losses: number, draws: number): JSX.Element {
+  const total = wins + losses + draws;
+  const rate = total === 0 ? 0 : wins / total;
+  if (rate >= 0.8) return <TrendingUp className="h-3 w-3" aria-hidden="true" />;
+  if (rate >= 0.7) return <Minus className="h-3 w-3" aria-hidden="true" />;
+  return <TrendingDown className="h-3 w-3" aria-hidden="true" />;
+}
+
+function getMetaWinRateIcon(winRate: number): JSX.Element {
+  if (winRate >= 0.8) return <TrendingUp className="h-3 w-3" aria-hidden="true" />;
+  if (winRate >= 0.7) return <Minus className="h-3 w-3" aria-hidden="true" />;
+  return <TrendingDown className="h-3 w-3" aria-hidden="true" />;
 }
