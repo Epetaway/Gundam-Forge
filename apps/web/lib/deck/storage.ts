@@ -104,3 +104,22 @@ export function updateDeckMeta(
 export function deleteStoredDeck(id: string): void {
   saveAll(loadAll().filter((d) => d.id !== id));
 }
+// ─── Active deck management (for cross-page "Add to deck" workflows) ──────────
+
+export function getActiveDeckId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('gundam-forge.activeDeckId');
+  } catch {
+    return null;
+  }
+}
+
+export function setActiveDeckId(id: string | null): void {
+  if (typeof window === 'undefined') return;
+  if (id === null) {
+    localStorage.removeItem('gundam-forge.activeDeckId');
+  } else {
+    localStorage.setItem('gundam-forge.activeDeckId', id);
+  }
+}

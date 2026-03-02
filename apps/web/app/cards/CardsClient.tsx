@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { LayoutGrid, List, Search, SlidersHorizontal, X } from 'lucide-react';
+import { LayoutGrid, List, Search, SlidersHorizontal, X, CheckCircle } from 'lucide-react';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
@@ -13,6 +13,7 @@ import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage } from '@/lib/data/cards';
 import { cn } from '@/lib/utils/cn';
+import { getActiveDeckId, getStoredDeck, updateDeckEntries } from '@/lib/deck/storage';
 
 const colorOptions: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
@@ -82,6 +83,9 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const [displayCount, setDisplayCount] = useState(GRID_PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [inspectCardId, setInspectCardId] = useState<string | null>(null);
+  const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
+  const [activeDeckName, setActiveDeckName] = useState<string | null>(null);
+  const [addFeedback, setAddFeedback] = useState<string | null>(null);
   const [draft, setDraft] = useState<FilterDraft>({
     query: '',
     color: 'All',
@@ -108,6 +112,18 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   useEffect(() => {
     setDisplayCount(pageSize);
   }, [pageSize, query, color, type, setCode, sortBy]);
+
+  // Load active deck from localStorage on mount
+  useEffect(() => {
+    const deckId = getActiveDeckId();
+    if (deckId) {
+      const deck = getStoredDeck(deckId);
+      if (deck) {
+        setActiveDeckId(deckId);
+        setActiveDeckName(deck.name);
+      }
+    }
+  }, []);
 
   const cardLookup = useMemo(() => new Map(sorted.map((card) => [card.id, card])), [sorted]);
   const inspectCard = inspectCardId ? cardLookup.get(inspectCardId) : undefined;
@@ -147,6 +163,46 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setType(draft.type);
     setSetCode(draft.setCode);
     setMobileFiltersOpen(false);
+  };
+
+  const handleAddCard = (cardId: string): void => {
+    if (!activeDeckId) return;
+
+    try {
+      const deck = getStoredDeck(activeDeckId);
+      if (!deck) return;
+
+      // Get the card to add
+      const cardToAdd = cardLookup.get(cardId);
+      if (!cardToAdd) return;
+
+      // Count existing copies of this card in deck
+      const existingCount = deck.entries.filter((e) => e.cardId === cardId).reduce((sum, e) => sum + e.qty, 0);
+      
+      // Max 4 copies per card
+      if (existingCount >= 4) {
+        setAddFeedback(`Max copies (4) reached`);
+        setTimeout(() => setAddFeedback(null), 1500);
+        return;
+      }
+
+      // Add to deck
+      const newEntry = {
+        cardId,
+        qty: 1,
+      };
+      updateDeckEntries(activeDeckId, [...deck.entries, newEntry]);
+
+      setAddFeedback('Card added!');
+      setTimeout(() => setAddFeedback(null), 1500);
+
+      // Close modal after short delay
+      setTimeout(() => setInspectCardId(null), 300);
+    } catch (err) {
+      console.error('Failed to add card:', err);
+      setAddFeedback('Error adding card');
+      setTimeout(() => setAddFeedback(null), 1500);
+    }
   };
 
   return (
@@ -261,7 +317,34 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         </Container>
       </div>
 
-      {/* ── Card Grid ─────────────────────────────────────────── */}
+      {/* ── Active Deck Bar ──────────────────────────────── */}
+      {activeDeckId && activeDeckName ? (
+        <div className="sticky top-[68px] z-30 border-b border-border bg-gradient-to-r from-cobalt-600/10 to-cobalt-500/5 backdrop-blur-sm">
+          <Container wide>
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground">
+                  Active deck: <span className="font-semibold text-cobalt-600">{activeDeckName}</span>
+                </span>
+                {addFeedback && (
+                  <div className="flex items-center gap-1 ml-4 text-xs font-medium text-green-600">
+                    <CheckCircle className="h-3.5 w-3.5" />
+                    {addFeedback}
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={() => setActiveDeckId(null)}
+                size="sm"
+                variant="ghost"
+              >
+                Change
+              </Button>
+            </div>
+          </Container>
+        </div>
+      ) : null}
+
       <Container className="py-4" wide>
         {sorted.length === 0 ? (
           <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
@@ -396,6 +479,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         onOpenChange={(open) => !open && setInspectCardId(null)}
         open={Boolean(inspectCard)}
         qty={0}
+        onAdd={activeDeckId ? () => inspectCard && handleAddCard(inspectCard.id) : undefined}
       />
     </>
   );
