@@ -18,8 +18,9 @@ export default function HomePage(): JSX.Element {
   const allArchetypes = rankArchetypes(events);
   const trendingDecks = rankTrendingDecks(decks, events, 3);
   const archetypes = allArchetypes.slice(0, 4);
+  const latestEventDate = events[0]?.date ?? null;
   const platformFeatures = [
-    'Browse 600+ official Gundam Card Game cards with full-text search.',
+    \`Browse ${cards.length} official Gundam Card Game cards with full-text search.\`,
     'Build and validate decks against official GCG rules.',
     'Playtest your deck against an AI opponent with official phase sequencing.',
   ];
@@ -49,8 +50,17 @@ export default function HomePage(): JSX.Element {
 
           <Card className="overflow-hidden border-steel-400 bg-surface-elevated/90">
             <CardHeader>
-              <CardTitle>Meta Snapshot</CardTitle>
-              <CardDescription>Current tournament data powering the archetype rankings.</CardDescription>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <CardTitle>Meta Snapshot</CardTitle>
+                  <CardDescription>Tournament data powering archetype rankings.</CardDescription>
+                </div>
+                {latestEventDate && (
+                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-steel-500">
+                    Latest: {latestEventDate}
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -59,6 +69,9 @@ export default function HomePage(): JSX.Element {
                 <Stat label="Events Tracked" value={`${events.length}`} />
                 <Stat label="Archetypes" value={`${allArchetypes.length}`} />
               </div>
+              <p className="text-[11px] text-steel-500">
+                Data updated with each build deployment.
+              </p>
             </CardContent>
           </Card>
         </Container>
@@ -147,8 +160,17 @@ export default function HomePage(): JSX.Element {
         <Container className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="bg-surface-elevated">
             <CardHeader>
-              <CardTitle>Recent Tournament Results</CardTitle>
-              <CardDescription>Latest placements informing the ranking engine.</CardDescription>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <CardTitle>Recent Tournament Results</CardTitle>
+                  <CardDescription>Latest placements informing the ranking engine.</CardDescription>
+                </div>
+                {latestEventDate && (
+                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-steel-500">
+                    {latestEventDate}
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
               {events.slice(0, 3).map((event) => (
