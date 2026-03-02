@@ -69,9 +69,8 @@ function CardTile({
       type="button"
       className="group relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500"
       onClick={() => onPreview(card.id)}
-      onDoubleClick={() => { onSelect(card.id); }}
-      aria-label={`Preview ${card.name} (click to preview, double-click to add)`}
-      title="Click to preview • Double-click to add"
+      aria-label={`Preview ${card.name}`}
+      title="Click to preview · + to add"
     >
       <img
         src={getCardImage(card)}
@@ -86,6 +85,20 @@ function CardTile({
       <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 transform rounded bg-black/70 px-2 py-1 text-center text-[10px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         Click to Preview
       </div>
+
+      {/* Add button — visible on hover and always on mobile */}
+      <button
+        type="button"
+        aria-label={`Add ${card.name} to deck`}
+        title="Add to deck"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(card.id);
+        }}
+        className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-600 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-300 hover:bg-cobalt-500 sm:opacity-0"
+      >
+        <span className="text-sm font-bold">+</span>
+      </button>
     </button>
   );
 }
