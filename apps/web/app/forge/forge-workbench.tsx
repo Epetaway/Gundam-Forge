@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Share2 } from 'lucide-react';
+import { withBasePath } from '@/lib/utils/basePath';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -23,7 +24,7 @@ import { validateDeck } from '@gundam-forge/shared';
 import type { CardDefinition, CardColor, DeckIntent } from '@gundam-forge/shared';
 import { CardSearchPanel } from './CardSearchPanel';
 import { cards as allCards, cardsById, allSets } from '@/lib/data/cards';
-import { parseDeckList } from './parseDeckList';
+import { parseDeckList, GCG_MAX_COPIES } from './parseDeckList';
 
 // ---------- types ----------
 
@@ -421,6 +422,55 @@ function ZoneHeader({ label, count, target }: { label: string; count: number; ta
   );
 }
 
+// ---------- cost curve ----------
+
+const COST_BUCKETS = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
+
+function CostCurve({ items }: { items: DeckViewItem[] }) {
+  const counts = React.useMemo(() => {
+    const map: Record<number, number> = {};
+    for (const item of items) {
+      const cmc = typeof item.cmc === 'number' ? item.cmc : 0;
+      const bucket = cmc >= 8 ? 8 : cmc;
+      map[bucket] = (map[bucket] ?? 0) + item.qty;
+    }
+    return map;
+  }, [items]);
+
+  const maxCount = Math.max(1, ...Object.values(counts));
+  if (items.length === 0) return null;
+
+  return (
+    <div
+      className="flex-shrink-0 border-b border-border bg-surface/60 px-3 pb-1.5 pt-1"
+      aria-label="Deck cost curve"
+      role="img"
+    >
+      <div className="flex items-end gap-px h-7">
+        {COST_BUCKETS.map((cost) => {
+          const count = counts[cost] ?? 0;
+          const pct = (count / maxCount) * 100;
+          return (
+            <div
+              key={cost}
+              className="flex flex-1 flex-col items-center gap-px"
+              title={`Cost ${cost === 8 ? '8+' : cost}: ${count} card${count !== 1 ? 's' : ''}`}
+            >
+              <div
+                className="w-full rounded-t bg-cobalt-500/70 transition-all"
+                style={{ height: count > 0 ? `${Math.max(pct, 8)}%` : '0%' }}
+              />
+              <span className="text-[8px] leading-none text-steel-600 tabular-nums">
+                {cost === 8 ? '8+' : cost}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ---------- deck settings bar ----------
 
 interface DeckSettingsBarProps {
@@ -665,20 +715,20 @@ function DeckSettingsBar({
 
 interface ImportModalProps {
   onClose: () => void;
-  onImport: (text: string) => { imported: number; notFound: string[] };
+  onImport: (text: string) => { imported: number; notFound: string[]; capped: string[] };
 }
 
 function ImportModal({ onClose, onImport }: ImportModalProps) {
   const [text, setText] = React.useState('');
-  const [result, setResult] = React.useState<{ imported: number; notFound: string[] } | null>(null);
+  const [result, setResult] = React.useState<{ imported: number; notFound: string[]; capped: string[] } | null>(null);
 
   const handleImport = () => {
     const r = onImport(text);
     setResult(r);
-    if (r.notFound.length === 0) {
+    if (r.notFound.length === 0 && r.capped.length === 0) {
       onClose();
     }
-    // If there are unmatched cards, stay open to show warnings.
+    // Stay open to show warnings for unmatched or capped cards.
   };
 
   return (
@@ -726,13 +776,21 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
           {/* Import result feedback */}
           {result && (
-            <div className={cn('rounded px-3 py-2 text-xs', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-300' : 'bg-green-500/10 text-green-400')}>
+            <div className={cn('rounded px-3 py-2 text-xs space-y-2', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-300' : 'bg-green-500/10 text-green-400')}>
               <p className="font-semibold">
                 {result.imported} card type{result.imported !== 1 ? 's' : ''} imported.
               </p>
+              {result.capped.length > 0 && (
+                <div className="text-amber-300">
+                  <p className="font-semibold">{result.capped.length} card{result.capped.length !== 1 ? 's' : ''} capped to {GCG_MAX_COPIES} copies (GCG max):</p>
+                  <ul className="mt-1 list-inside list-disc">
+                    {result.capped.map((n) => <li key={n}>{n}</li>)}
+                  </ul>
+                </div>
+              )}
               {result.notFound.length > 0 && (
                 <>
-                  <p className="mt-1 font-semibold text-amber-300">{result.notFound.length} card{result.notFound.length !== 1 ? 's' : ''} not found:</p>
+                  <p className="font-semibold text-amber-300">{result.notFound.length} card{result.notFound.length !== 1 ? 's' : ''} not found:</p>
                   <ul className="mt-1 list-inside list-disc">
                     {result.notFound.map((n) => <li key={n}>{n}</li>)}
                   </ul>
@@ -925,13 +983,33 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     );
   }, [deck, showToast]);
 
-  // Import handler — returns imported count and notFound list; applies partial import
-  const handleImport = React.useCallback((text: string): { imported: number; notFound: string[] } => {
+  // Share link — encodes the deck export text as Base64 in the URL for easy sharing
+  const handleShareLink = React.useCallback(() => {
+    const items = Object.entries(deck).flatMap(([cardId, qty]) => {
+      const item = toDeckViewItem({ cardId, qty, card: cardsById.get(cardId) });
+      return item ? [item] : [];
+    });
+    const text = buildDeckExportText(items);
+    const encoded = btoa(encodeURIComponent(text));
+    const url = `${window.location.origin}${withBasePath('/decks/new')}?import=${encoded}`;
+    if (url.length > 8000) {
+      showToast('Deck too large for a share link — copy the deck text instead.', 'warn');
+      return;
+    }
+    navigator.clipboard.writeText(url).then(
+      () => showToast('Share link copied to clipboard!'),
+      () => showToast('Could not copy link.', 'warn'),
+    );
+  }, [deck, showToast]);
+
+  // Import handler — returns imported count, notFound list, and capped list; applies partial import
+  const handleImport = React.useCallback((text: string): { imported: number; notFound: string[]; capped: string[] } => {
     const entries = parseDeckList(text);
-    if (entries.length === 0) return { imported: 0, notFound: [] };
+    if (entries.length === 0) return { imported: 0, notFound: [], capped: [] };
 
     const newDeck: Record<string, number> = {};
     const notFound: string[] = [];
+    const capped: string[] = [];
 
     for (const entry of entries) {
       // Prefer exact ID match first, then case-insensitive name match.
@@ -942,7 +1020,12 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       if (!card) {
         notFound.push(entry.name);
       } else {
-        newDeck[card.id] = Math.min((newDeck[card.id] || 0) + entry.qty, 4);
+        const prev = newDeck[card.id] || 0;
+        const next = Math.min(prev + entry.qty, GCG_MAX_COPIES);
+        if (prev + entry.qty > GCG_MAX_COPIES) {
+          capped.push(card.name);
+        }
+        newDeck[card.id] = next;
       }
     }
 
@@ -957,7 +1040,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       });
     }
 
-    return { imported: Object.keys(newDeck).length, notFound };
+    return { imported: Object.keys(newDeck).length, notFound, capped };
   }, []);
 
   // Build DeckViewItem list
@@ -1183,6 +1266,9 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           allCards={allCards as CardDefinition[]}
         />
 
+        {/* Cost curve — compact bar chart, hidden when deck is empty */}
+        <CostCurve items={deckViewItems} />
+
         {/*
          * Mobile toolbar — single compact row replacing the old mobile action bar.
          * Visible only on mobile (md:hidden).
@@ -1238,6 +1324,16 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
               aria-label="Import deck list"
             >
               Import Deck
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
+              onClick={handleShareLink}
+              aria-label="Copy share link for this deck"
+              title="Copy a share link for this deck"
+            >
+              <Share2 className="h-3 w-3" aria-hidden="true" />
+              Share
             </button>
           </div>
           <div className="flex-none px-4">

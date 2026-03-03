@@ -1,18 +1,50 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { DeckSetupProvider } from '@/components/deck/DeckSetupContext';
+import { useSearchParams } from 'next/navigation';
+import { DeckSetupProvider, useDeckSetupContext } from '@/components/deck/DeckSetupContext';
 import DeckSetupForm from '@/components/deck/DeckSetupForm';
 import DeckPreviewPanel from '@/components/deck/DeckPreviewPanel';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils/cn';
 import { cards } from '@/lib/data/cards';
 
+/**
+ * Reads `?import=<base64>` from the URL and pre-populates the decklist field.
+ * Must render inside DeckSetupProvider so it can access context.
+ */
+function ImportUrlReader() {
+  const { setDecklist } = useDeckSetupContext();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const encoded = searchParams.get('import');
+    if (!encoded) return;
+    try {
+      const text = decodeURIComponent(atob(encoded));
+      if (text.trim().length > 0) {
+        setDecklist(text);
+      }
+    } catch {
+      // Invalid or malformed param — silently ignore
+    }
+  // Only run once on mount; searchParams identity is stable for static export
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+}
+
 export default function CreateDeckPage() {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
     <DeckSetupProvider>
+      {/* Reads ?import= param and pre-fills the decklist */}
+      <React.Suspense fallback={null}>
+        <ImportUrlReader />
+      </React.Suspense>
+
       <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] bg-background">
         {/* Left Panel: Form */}
         <div className="w-full md:max-w-md flex-shrink-0 border-r border-border bg-surface p-6 md:p-8 flex flex-col justify-between overflow-y-auto">

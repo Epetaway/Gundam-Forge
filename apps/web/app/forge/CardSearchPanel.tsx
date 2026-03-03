@@ -141,7 +141,7 @@ function CardListTable({
                   <button
                     type="button"
                     aria-label={`Add ${card.name} to deck`}
-                    className="flex h-5 w-5 items-center justify-center rounded-full bg-cobalt-600/0 text-white transition-all group-hover:bg-cobalt-600 group-hover:text-white"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-cobalt-600/0 text-white transition-all group-hover:bg-cobalt-600 group-hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
                       onSelect(card.id);
@@ -492,49 +492,49 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
               {rawQuery && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   Search: &quot;{rawQuery.slice(0, 15)}{rawQuery.length > 15 ? '…' : ''}&quot;
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-cobalt-100 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
                 </span>
               )}
               {typeFilter !== 'All' && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
                   Type: {typeFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-purple-100 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
                 </span>
               )}
               {colorFilter !== 'All' && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
                   Color: {colorFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-purple-100 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
                 </span>
               )}
               {setFilter !== 'All' && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
                   Set: {setFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-purple-100 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
                 </span>
               )}
               {keywordFilters.map((kw) => (
                 <span key={kw} className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-300 border border-amber-500/30">
                   {kw.replace('-', ' ')}
-                  <button type="button" className="hover:text-amber-100 transition-colors" onClick={() => setKeywordFilters(keywordFilters.filter((k) => k !== kw))} aria-label={`Clear ${kw} keyword filter`}>×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-amber-100 transition-colors" onClick={() => setKeywordFilters(keywordFilters.filter((k) => k !== kw))} aria-label={`Clear ${kw} keyword filter`}>×</button>
                 </span>
               ))}
               {triggerFilters.map((tr) => (
                 <span key={tr} className="inline-flex items-center gap-1 rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs text-emerald-300 border border-emerald-500/30">
                   {tr.replace('-', ' ')}
-                  <button type="button" className="hover:text-emerald-100 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-emerald-100 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
                 </span>
               ))}
               {deckColorOnly && deckColors.length > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   Deck colors only
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setDeckColorOnly(false)} aria-label="Disable deck colors filter">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-cobalt-100 transition-colors" onClick={() => setDeckColorOnly(false)} aria-label="Disable deck colors filter">×</button>
                 </span>
               )}
               {includeEX && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-300 border border-amber-500/30">
                   EX cards shown
-                  <button type="button" className="hover:text-amber-100 transition-colors" onClick={() => setIncludeEX(false)} aria-label="Exclude EX cards">×</button>
+                  <button type="button" className="inline-flex items-center justify-center p-1 -mr-1 rounded hover:text-amber-100 transition-colors" onClick={() => setIncludeEX(false)} aria-label="Exclude EX cards">×</button>
                 </span>
               )}
             </div>
@@ -708,9 +708,9 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         </button>
 
         {/* Keywords Filter */}
-        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
+        <fieldset className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white">Keywords</span>
+            <legend className="text-xs font-semibold text-white float-left">Keywords</legend>
             {keywordFilters.length > 0 && (
               <button
                 type="button"
@@ -757,12 +757,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
               );
             })}
           </div>
-        </div>
+        </fieldset>
 
         {/* Triggers Filter */}
-        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
+        <fieldset className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white">Triggers</span>
+            <legend className="text-xs font-semibold text-white float-left">Triggers</legend>
             {triggerFilters.length > 0 && (
               <button
                 type="button"
@@ -809,7 +809,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
               );
             })}
           </div>
-        </div>
+        </fieldset>
 
         {/* Advanced Filters Collapsible Section */}
         <div className="rounded-lg border border-border bg-surface-interactive/30">
