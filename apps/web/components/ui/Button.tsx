@@ -17,10 +17,10 @@ const buttonVariants = cva(
           'border-red-500/70 bg-destructive text-destructive-foreground shadow-[0_8px_20px_rgba(220,38,38,0.28)] hover:-translate-y-px hover:bg-red-500',
       },
       size: {
-        sm: 'h-8 px-3 text-xs',
-        md: 'h-10 px-4',
-        lg: 'h-11 px-6 text-base',
-        icon: 'h-9 w-9',
+        sm: 'h-10 px-3 text-xs min-h-[44px] min-w-[44px]', // Touch target: 44px min
+        md: 'h-11 px-4 min-h-[44px]', // Touch target: 44px (WCAG 2.5.5)
+        lg: 'h-12 px-6 text-base min-h-[44px]', // Touch target: 48px
+        icon: 'h-11 w-11 min-h-[44px] min-w-[44px]', // Touch target: 44x44px
       },
     },
     defaultVariants: {

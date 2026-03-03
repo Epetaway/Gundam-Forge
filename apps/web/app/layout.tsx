@@ -11,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element {
   return (
     <html data-theme="dark" lang="en">
-      <body className="font-sans">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
+      <body className="font-sans min-h-svh" style={{ paddingTop: 'max(0px, env(safe-area-inset-top))' }}>
         <QueryProvider>
           <AppShell>{children}</AppShell>
         </QueryProvider>

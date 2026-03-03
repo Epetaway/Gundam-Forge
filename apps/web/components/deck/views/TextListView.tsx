@@ -109,7 +109,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
                         <button
                           type="button"
                           aria-label={`Remove one ${item.name}`}
-                          className="flex h-5 w-5 items-center justify-center rounded text-steel-500 hover:bg-red-900/30 hover:text-red-400"
+                          className="flex h-8 w-8 items-center justify-center rounded text-steel-500 hover:bg-red-900/30 hover:text-red-400 font-bold"
                           onClick={(e) => {
                             e.stopPropagation();
                             actions.onRemove?.(item.id);
@@ -120,7 +120,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
                         <button
                           type="button"
                           aria-label={`Add one ${item.name}`}
-                          className="flex h-5 w-5 items-center justify-center rounded text-steel-500 hover:bg-cobalt-900/30 hover:text-cobalt-400"
+                          className="flex h-8 w-8 items-center justify-center rounded text-steel-500 hover:bg-cobalt-900/30 hover:text-cobalt-400 font-bold"
                           onClick={(e) => {
                             e.stopPropagation();
                             actions.onAdd?.(item.id);
