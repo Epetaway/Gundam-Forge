@@ -19,6 +19,7 @@ interface BattleZoneProps {
   onUnitSelected?: (unit: CardInstance) => void;
   gamePhase?: string;
   isPlayerTurn?: boolean;
+  attackingUnitId?: string;
 }
 
 export function BattleZone({
@@ -28,6 +29,7 @@ export function BattleZone({
   onUnitSelected,
   gamePhase = '',
   isPlayerTurn = false,
+  attackingUnitId,
 }: BattleZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-battle' : 'battle',
@@ -48,10 +50,16 @@ export function BattleZone({
       {/* Battle Grid */}
       <div className="flex-1 grid gap-3 overflow-y-auto max-h-96">
         {units.length > 0 ? (
-          units.map((unit) => (
+          units.map((unit) => {
+            const isAttacking = unit.instanceId === attackingUnitId;
+            return (
             <div
               key={unit.instanceId}
-              className="flex items-center gap-3 p-3 rounded-lg border-2 border-steel-600 bg-gradient-to-b from-surface-muted to-surface-elevated hover:border-cobalt-500 transition-all duration-200 cursor-pointer relative group"
+              className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer relative group ${
+                isAttacking
+                  ? 'border-amber-400 bg-amber-900/20 ring-2 ring-amber-400/50'
+                  : 'border-steel-600 bg-gradient-to-b from-surface-muted to-surface-elevated hover:border-cobalt-500'
+              }`}
               onClick={() => onUnitSelected?.(unit)}
             >
               <div className="flex-shrink-0">
@@ -80,19 +88,27 @@ export function BattleZone({
 
               {/* Attack button (player turn, main phase, unit ready) */}
               {!isOpponent && isPlayerTurn && gamePhase === 'main' && unit.state === 'ready' && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUnitSelected?.(unit);
-                  }}
-                  className="ml-auto px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded transition-colors whitespace-nowrap"
-                  title="Declare attack with this unit"
-                >
-                  ⚔ Attack
-                </button>
+                isAttacking ? (
+                  <span className="ml-auto rounded border border-amber-400/60 bg-amber-900/30 px-2 py-1 text-xs font-bold text-amber-300 whitespace-nowrap">
+                    ⚔ Attacking…
+                  </span>
+                ) : !attackingUnitId ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUnitSelected?.(unit);
+                    }}
+                    className="ml-auto px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded transition-colors whitespace-nowrap"
+                    title="Declare attack with this unit"
+                    aria-label={`Attack with ${getCardById(unit.cardId)?.name ?? unit.cardId}`}
+                  >
+                    ⚔ Attack
+                  </button>
+                ) : null
               )}
             </div>
-          ))
+          );
+          })
         ) : (
           <div className="flex items-center justify-center h-32 text-steel-500 text-sm font-medium">
             Battle area empty

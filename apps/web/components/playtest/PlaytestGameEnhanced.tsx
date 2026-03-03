@@ -505,6 +505,14 @@ export function PlaytestGameEnhanced({
                   playShieldBreak();
                 }
               }}
+              onAttackDeclared={(attackerInstanceId, targetInstanceId) => {
+                handleAction({
+                  type: 'DECLARE_ATTACK',
+                  playerId: 'player1',
+                  timestamp: Date.now(),
+                  payload: { attackerInstanceId, ...(targetInstanceId ? { targetInstanceId } : {}) },
+                });
+              }}
             />
           </main>
         </DragDropProvider>
