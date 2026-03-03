@@ -66,7 +66,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
             {isFetching ? 'Loading decks…' : 'No competitive decks match your filters. Try a different sort or create one yourself!'}
           </p>
           <Link href="/decks/new">
-            <Button size="sm" variant="primary">Create First Deck</Button>
+            <Button size="sm" variant="primary">+ Create Deck</Button>
           </Link>
         </div>
       ) : (

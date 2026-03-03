@@ -5,6 +5,7 @@ import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { cn } from '@/lib/utils/cn';
 import {
   toDeckViewItem,
@@ -1038,6 +1039,35 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
   if (!mounted) return null;
 
+  // Show empty state if no deck is loaded and not initializing
+  if (!deckId && !initialDeck) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] min-w-0 flex-col items-center justify-center gap-6 bg-background p-6">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-cobalt-900/40 text-cobalt-400">
+            <Search className="h-8 w-8" />
+          </div>
+          <h2 className="mb-2 text-2xl font-bold text-foreground">Start Building</h2>
+          <p className="mb-6 max-w-sm text-steel-500">
+            Create a new deck or open an existing one to begin using the Forge.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <a href="/decks/new">
+              <button className="inline-flex items-center gap-2 rounded-sm border border-cobalt-400/70 bg-cobalt-500/25 px-4 py-2 font-semibold text-cobalt-300 transition-all hover:bg-cobalt-500/35">
+                + Create Deck
+              </button>
+            </a>
+            <a href="/decks">
+              <button className="inline-flex items-center gap-2 rounded-sm border border-steel-600 px-4 py-2 font-semibold text-foreground transition-all hover:bg-steel-200 dark:border-steel-500 dark:hover:bg-steel-900">
+                Browse Decks
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex h-[calc(100vh-4rem)] min-w-0 overflow-hidden">
       {/* Desktop sidebar collapse toggle — thin strip, hidden on mobile */}
@@ -1174,6 +1204,18 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
       {/* Main deck area */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Breadcrumb navigation */}
+        <div className="flex-shrink-0 border-b border-border bg-surface/50 px-4 py-2.5 hidden md:block">
+          <Breadcrumb
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Decks', href: '/decks' },
+              ...(deckId ? [{ label: deckMeta.name || 'Untitled Deck', href: `/decks/${deckId}` }] : []),
+              { label: 'Editing' },
+            ]}
+          />
+        </div>
+
         {/* Deck settings bar with live validation */}
         {deckSettingsBar}
 

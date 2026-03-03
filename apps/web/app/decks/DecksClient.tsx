@@ -30,7 +30,7 @@ export default function DecksClient({ initialDecks }: DecksClientProps): JSX.Ele
             {isFetching ? 'Loading decks…' : 'No decks have been added to the library yet. Start by creating your first deck!'}
           </p>
           <Link href="/decks/new">
-            <Button variant="primary">Create Deck</Button>
+            <Button variant="primary">+ Create Deck</Button>
           </Link>
         </div>
       ) : (
