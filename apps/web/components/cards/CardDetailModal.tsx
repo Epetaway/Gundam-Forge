@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { X, Minus, Plus, ChevronLeft, ChevronRight, Copy, TrendingUp } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -41,6 +41,18 @@ export function CardDetailModal({
   onSelectCard,
 }: CardDetailModalProps): JSX.Element {
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  // Return focus to trigger element when modal closes (WCAG 2.4.3)
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const prevOpenRef = useRef(false);
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      triggerRef.current = document.activeElement as HTMLElement;
+    } else if (!open && prevOpenRef.current) {
+      triggerRef.current?.focus();
+    }
+    prevOpenRef.current = open;
+  }, [open]);
 
   // Calculate navigation state
   const currentIndex = React.useMemo(

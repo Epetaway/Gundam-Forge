@@ -9,6 +9,9 @@ export interface ParsedDeckEntry {
 /** Maximum sensible quantity per line — catches typos like "400 Gundam". */
 const MAX_QTY = 50;
 
+/** GCG official rule: maximum 4 copies of any card in a deck. */
+export const GCG_MAX_COPIES = 4;
+
 export function parseDeckList(text: string): ParsedDeckEntry[] {
   return text
     .split('\n')

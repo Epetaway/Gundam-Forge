@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
 import { TrendingDecksClient, TrendingDeckData } from '@/components/deck/TrendingDecksClient';
+import { MyDecksRow } from '@/components/deck/MyDecksRow';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -76,6 +77,9 @@ export default function HomePage(): JSX.Element {
           </Card>
         </Container>
       </section>
+
+      {/* My Decks — client-only, shown only when the user has localStorage decks */}
+      <MyDecksRow />
 
       <section className="py-12">
         <Container className="space-y-5">
