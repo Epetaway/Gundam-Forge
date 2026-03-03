@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Layers, Loader2 } from 'lucide-react';
 import type { DeckRecord } from '@/lib/data/decks';
 import { useDecksQuery } from '@/lib/query/useDecksQuery';
 import { Badge } from '@/components/ui/Badge';
@@ -16,13 +17,17 @@ export default function DecksClient({ initialDecks }: DecksClientProps): JSX.Ele
 
   return (
     <div className="space-y-4">
-      <div className="text-xs text-steel-600">{isFetching ? 'Refreshing decks...' : `${decks.length} decks loaded`}</div>
+      <div className="flex items-center gap-1.5 text-xs text-steel-600" aria-live="polite" aria-atomic="true">
+        {isFetching && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
+        {isFetching ? 'Refreshing decks…' : `${decks.length} decks loaded`}
+      </div>
 
       {decks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-16 text-center" role="status">
+          <Layers className="mx-auto mb-3 h-8 w-8 text-steel-600" aria-hidden="true" />
           <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-3">Deck library empty</p>
           <p className="text-sm text-steel-600 mb-6">
-            {isFetching ? 'Loading decks...' : 'No decks have been added to the library yet. Start by creating your first deck!'}
+            {isFetching ? 'Loading decks…' : 'No decks have been added to the library yet. Start by creating your first deck!'}
           </p>
           <Link href="/decks/new">
             <Button variant="primary">Create Deck</Button>

@@ -26,7 +26,7 @@ export default function EventsPage(): JSX.Element {
         <div className="space-y-3">
           {events.map((event) => (
             <Card className="overflow-hidden border-steel-400 bg-surface-elevated" key={event.id}>
-              <div className="flex items-center justify-between border-b border-border bg-[linear-gradient(120deg,rgba(59,130,246,0.2),transparent_65%)] px-4 py-2 text-xs text-steel-600">
+              <div className="flex items-center justify-between border-b border-border bg-[linear-gradient(120deg,hsl(var(--accent)/0.2),transparent_65%)] px-4 py-2 text-xs text-steel-600">
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5 text-cobalt-300" />
                   {event.location}

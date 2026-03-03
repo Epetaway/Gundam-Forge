@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
+import { Layers, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
@@ -37,26 +38,32 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Button onClick={() => setSort('trending')} size="sm" variant={sort === 'trending' ? 'primary' : 'secondary'}>
-          Trending
-        </Button>
-        <Button onClick={() => setSort('winRate')} size="sm" variant={sort === 'winRate' ? 'primary' : 'secondary'}>
-          Win Rate
-        </Button>
-        <Button onClick={() => setSort('mostViewed')} size="sm" variant={sort === 'mostViewed' ? 'primary' : 'secondary'}>
-          Most Viewed
-        </Button>
-        <span className="ml-auto text-xs text-steel-600">{isFetching ? 'Refreshing deck index...' : `${visibleDecks.length} decks`}</span>
+        <div role="group" aria-label="Sort decks by" className="flex flex-wrap gap-2">
+          <Button onClick={() => setSort('trending')} size="sm" variant={sort === 'trending' ? 'primary' : 'secondary'} aria-pressed={sort === 'trending'}>
+            Trending
+          </Button>
+          <Button onClick={() => setSort('winRate')} size="sm" variant={sort === 'winRate' ? 'primary' : 'secondary'} aria-pressed={sort === 'winRate'}>
+            Win Rate
+          </Button>
+          <Button onClick={() => setSort('mostViewed')} size="sm" variant={sort === 'mostViewed' ? 'primary' : 'secondary'} aria-pressed={sort === 'mostViewed'}>
+            Most Viewed
+          </Button>
+        </div>
+        <div className="ml-auto flex items-center gap-1.5 text-xs text-steel-600" aria-live="polite" aria-atomic="true">
+          {isFetching && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
+          {isFetching ? 'Refreshing…' : `${visibleDecks.length} decks`}
+        </div>
         <Link href="/decks/new" className="ml-4">
           <Button size="sm" variant="primary">+ Create Deck</Button>
         </Link>
       </div>
 
       {visibleDecks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-16 text-center" role="status">
+          <Layers className="mx-auto mb-3 h-8 w-8 text-steel-600" aria-hidden="true" />
           <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-3">No decks found</p>
           <p className="text-sm text-steel-600 mb-6">
-            {isFetching ? 'Loading decks...' : 'No competitive decks match your filters. Try a different sort or create one yourself!'}
+            {isFetching ? 'Loading decks…' : 'No competitive decks match your filters. Try a different sort or create one yourself!'}
           </p>
           <Link href="/decks/new">
             <Button size="sm" variant="primary">Create First Deck</Button>

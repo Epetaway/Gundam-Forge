@@ -42,12 +42,13 @@ export function MainNav(): JSX.Element {
               className={cn(
                 'inline-flex items-center gap-2 rounded-sm border px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 isActive
-                  ? 'border-cobalt-400/70 bg-cobalt-500/25 text-cobalt-300 shadow-[0_0_14px_rgba(59,130,246,0.28)]'
+                  ? 'border-cobalt-400/70 bg-cobalt-500/25 text-cobalt-300 shadow-[0_0_14px_hsl(var(--accent)/0.28)]'
                   : 'border-transparent text-steel-600 hover:border-cobalt-500/30 hover:bg-steel-200 hover:text-foreground',
               )}
               href={item.href}
               key={item.href}
               title={item.hint}
+              aria-current={isActive ? 'page' : undefined}
             >
               {item.label}
   
@@ -63,14 +64,23 @@ export function MainNav(): JSX.Element {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
-          {navItems.map((item) => (
-            <DropdownMenuItem asChild key={item.href}>
-              <Link className="flex items-center justify-between gap-2" href={item.href} title={item.hint}>
-                <span>{item.label}</span>
-  
-              </Link>
-            </DropdownMenuItem>
-          ))}
+          {navItems.map((item) => {
+            const isActiveItem = item.href === '/'
+              ? pathname === '/'
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <DropdownMenuItem asChild key={item.href}>
+                <Link
+                  className="flex items-center justify-between gap-2"
+                  href={item.href}
+                  title={item.hint}
+                  aria-current={isActiveItem ? 'page' : undefined}
+                >
+                  <span>{item.label}</span>
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </>
