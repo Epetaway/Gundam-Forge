@@ -606,101 +606,232 @@ The app currently has **no retention loop**. There is:
 
 ---
 
-## High Priority Fix List (0–2 Weeks)
+## Plan to 8.5 / 10 — ROADMAP Alignment
 
-> These are blocking issues that actively harm user trust or break core functionality.
-
-1. **Remove or disable "Sign in" button from production nav** — replace with a non-clickable "Accounts coming soon" label or tooltip. Current behavior destroys trust
-2. **Remove the "Visibility" selector from the Create Deck form** in production — it's non-functional and implies cloud storage that doesn't exist
-3. **Fix `(GridView as any).builderControls`** — refactor to accept `onAdd`/`onRemove` as props properly
-4. **Fix `bg-steel-200` on Events page 2nd place row** — contrast bug in dark theme
-5. **Fix "Change" button on Active Deck bar in `/cards`** — clicking it should open a deck picker, not just clear the state
-6. **Add Error Boundary components to Forge, Cards, Explore pages**
-7. **Add "Edit in Forge" and "Playtest" buttons to Deck Detail page header**
-8. **Add `aria-label` context to Events "Deck" buttons** — `aria-label="View [player]'s [deckName]"`
-9. **Fix mobile Forge search panel height calculation** — `maxHeight: calc(100vh - 320px)` produces near-zero at 375px height on landscape; clamp to minimum 200px
-10. **Add localStorage save confirmation toast** — users need feedback that their deck was saved
+> This plan is structured around and cross-referenced with `docs/ROADMAP.md`, the authoritative execution document. Each audit finding is mapped to the ROADMAP phase that addresses it. Findings not covered by the current ROADMAP are collected into a **Phase 11 Polish Sprint** at the end.
 
 ---
 
-## Medium Priority Enhancements (2–4 Weeks)
+### Scorecard: Audit Findings vs. ROADMAP Coverage
 
-1. **Merge "Explore" and "Decks" nav items** into a single well-structured deck catalog page with tabs: "Community" and "My Decks"
-2. **Virtualize the cards grid** using react-window (already installed) — critical for performance at 613+ cards
-3. **Add cost curve visualization** to the Forge — a simple horizontal bar chart (bars proportional to card count at each cost value)
-4. **Add zone-separation view** in the Forge — visually distinguish main deck cards from resource cards and EX cards with section headers in all view modes
-5. **Add cost/power range filter** to the Cards page
-6. **Add inline "Quick Add" button on card grid tiles** in the Cards page without requiring modal open
-7. **Unify keyword filter options** between Cards page and Forge search panel
-8. **Fix resource deck in playtester** — the playtester must use the actual resource cards from the deck builder, not hardcoded token IDs
-9. **Add "Share deck" feature** using Base64-encoded URL params for localStorage decks
-10. **Add "My Decks" section to home page** using localStorage data
-11. **Restructure nav** to max 5 items: `Home | Cards | Forge | Community | Events`
-12. **Add hero card selection** to the Create Deck form — let users pick which card appears as their deck's thumbnail
-13. **Add cost filter to Cards page** — discrete buttons (0, 1, 2, 3, 4, 5, 6, 7, 8+) or a range slider
-
----
-
-## Long-Term Strategic Improvements (1–3 Months)
-
-1. **Cloud persistence via Supabase** — the Supabase schema appears to be designed; the auth flows exist in dev. Enabling this is the single highest-impact feature for retention. Users need a reason to come back, and that reason is their saved decks being available on any device
-
-2. **Real resource deck builder** — GCG's resource deck is a separate 10-card construct. The Forge needs a dedicated resource zone with its own card browser filtered to Resource and EX Resource type cards
-
-3. **Card rulings and errata layer** — competitive players need access to official rulings. A simple rulings panel within the card detail modal would differentiate this platform from basic card databases
-
-4. **Deck comparison tool** — "Compare with another deck" to show overlap, curve differences, and missing cards
-
-5. **Match tracker / win-loss logger** — simple localStorage-based session tracker showing win/loss rate with a given deck. No backend needed. Drives daily engagement
-
-6. **Playtester full rules implementation** — the current playtester skeleton needs: link mechanics, burst trigger resolution, resource phase automation, opponent hand visibility controls, and a game-end condition that actually shows a winner
-
-7. **Progressive Web App (PWA)** — add a service worker + manifest. PWA install + offline card database access would make this the most capable offline GCG tool available. Given GitHub Pages hosting, this is architecturally appropriate
-
-8. **Community deck submissions** — a simple GitHub issue-based pipeline (or Supabase insert) for players to submit their event-winning decks would grow the catalog organically
+| Audit Finding | ROADMAP Task | Status |
+|---|---|---|
+| Hardcoded card count "716" on home page | Task 1.1 | ✅ Phase 1 |
+| "recently" timestamp placeholder on trending decks | Task 1.1 / 9.2 | ✅ Phase 1 + 9 |
+| Dev engineering notes exposed to users | Task 1.1 | ✅ Phase 1 |
+| Home nav item active on every page (root `/` bug) | Task 1.2 | ✅ Phase 1 |
+| "Sign in" button in nav leads to dead end in production | Task 1.3 / Phase 8 | ✅ Phase 1 + 8 |
+| Duplicate `getDecks()` calls + hardcoded stats | Task 1.4 | ✅ Phase 1 |
+| Cards page silent truncation (360/400 card limit) | Task 2.1 | ✅ Phase 2 |
+| Search input hidden on mobile (`hidden sm:block`) | Task 2.2 | ✅ Phase 2 |
+| `typeof window` URL param init is SSR anti-pattern | Task 2.3 | ✅ Phase 2 |
+| Deck preview cards lack visual hierarchy / polish | Task 2.5 | ✅ Phase 2 |
+| Swiper carousel (4 cards/slide, ~118 slides) in Forge search | Task 3.1 | ✅ Phase 3 |
+| Double-click to add card is undiscoverable and mobile-broken | Task 3.2 | ✅ Phase 3 |
+| Advanced filters always expanded, pushes cards below fold | Task 3.3 | ✅ Phase 3 |
+| No "Add to deck" workflow from the Cards reference page | Task 3.4 | ✅ Phase 3 |
+| Create Deck two-panel layout broken on mobile | Task 4.1 | ✅ Phase 4 |
+| "Mechanics Packages" is opaque internal terminology | Task 4.2 | ✅ Phase 4 |
+| No back button between Create Deck wizard steps | Task 4.2 | ✅ Phase 4 |
+| Forge and Playtester have no home page entry points | Task 5.1 | ✅ Phase 5 |
+| Playtester not discoverable from deck detail page | Task 5.2 | ✅ Phase 5 |
+| Playtester uses `slate-*`/`purple-*` not design tokens | Task 6.1 | ✅ Phase 6 |
+| Resource deck uses `TOKEN-RESOURCE-001` placeholders | Task 6.2 | ✅ Phase 6 |
+| No visible affordance for how to play cards or attack | Task 6.3 | ✅ Phase 6 |
+| Opponent field shows no units; game log hidden on mobile | Task 6.4 | ✅ Phase 6 |
+| No error boundaries on Forge / Cards / Explore pages | Task 7.1 | ✅ Phase 7 |
+| No empty states on Explore / Decks pages | Task 7.2 | ✅ Phase 7 |
+| Auth pages accessible but non-functional in production | Task 8.1 | ✅ Phase 8 |
+| Only 4 seed decks; no realistic catalog for credibility | Task 9.1 | ✅ Phase 9 |
+| Events page mobile placement rows overflow on narrow screens | Task 10.1 | ✅ Phase 10 |
 
 ---
 
-## 30-Day Stabilization Plan
+### Phase-by-Phase Score Impact (from ROADMAP)
 
-**Goal: Make the platform trustworthy and non-embarrassing for public sharing**
+| Phase | What It Fixes | Page Score Before → After |
+|---|---|---|
+| **Phase 1** — Zero-Risk Quick Wins | Home data integrity, nav active state, auth button consistency, dynamic stats | Home 7→9 · Nav 5→7 |
+| **Phase 2** — Cards Page | Silent truncation, mobile search, SSR hydration bug, deck card visual redesign | Cards 6→8.5 · Decks 5→7 |
+| **Phase 3** — Forge Core UX | Swiper → scrollable grid, click-to-add, filters collapsed, cross-page add-to-deck | Forge 6→9 |
+| **Phase 4** — Create Deck Flow | Mobile two-panel layout, wizard terminology, back navigation | Create Deck 7→9 |
+| **Phase 5** — Navigation & Discovery | Feature cards on home, Playtest CTA on deck detail | Nav 7→9 |
+| **Phase 6** — Playtester Polish | Token migration, real resource deck, affordances, opponent display | Playtester 5→8 |
+| **Phase 7** — Reliability | Error boundaries, empty states | Error states 3→8 |
+| **Phase 8** — Auth Cleanup | Auth coming-soon state, removes trust-destroying dead ends | Auth 3→7 |
+| **Phase 9** — Content & Seed Data | 8 realistic decks, 4 events, real timestamps | Explore/Decks 5→8 |
+| **Phase 10** — Mobile QA Sweep | Events placement row responsiveness, mobile layout pass | Mobile 5→8.5 |
 
-| Week | Focus |
-|---|---|
-| Week 1 | Remove broken nav items ("Sign in", "Profile" if linked). Fix trust-destroying UI bugs (steel-200 contrast, GridView hack, error boundaries). Add toast feedback |
-| Week 2 | Merge Explore/Decks pages. Fix Active Deck "Change" button. Add "Edit in Forge" to deck detail. Virtualize cards grid |
-| Week 3 | Add cost filter to cards. Add zone separation in Forge. Add "My Decks" to home page. Add save confirmation |
-| Week 4 | Fix mobile Forge search panel height. Add cost curve. Label playtester as Alpha. Add "Share deck" URL feature |
+**Projected score after all 10 phases: ~87–91 / 100**
+
+All 10 phases are documented in `docs/ROADMAP.md` with self-contained task prompts, verification steps, and QA gates. Execute them top-to-bottom. Each task must pass `npm run qa` (TypeScript + ESLint + static export) before proceeding to the next.
 
 ---
 
-## 60-Day Growth Plan
+### Phase 11 — Polish Sprint (Audit Gaps Not in ROADMAP)
 
-**Goal: Give competitive players a reason to use this daily**
+The following findings from this audit are **not addressed by ROADMAP Phases 1–10**. They form a Phase 11 sprint required to reach a true, stable 8.5+/10 across all dimensions.
 
-| Week | Focus |
-|---|---|
-| Week 5–6 | Enable cloud persistence (Supabase auth + deck sync). This is the single feature that changes the platform from a toy to a tool |
-| Week 7 | Add resource deck builder zone. Fix playtester resource deck loading |
-| Week 8 | Add match tracker (localStorage). Add deck change log. Add card spotlight on home page |
+---
+
+#### P11-1 — Virtualize the Cards Grid
+
+**Why it matters:** 613 cards × "Load more" appending = 613+ DOM nodes at full load. No virtualization means memory growth and scroll jank on mid-range mobile devices. `react-window` is already installed.
+
+**What to do:**
+- Replace the paginated `sorted.slice(0, displayCount)` grid in `CardsClient.tsx` with a `react-window` `FixedSizeGrid`
+- Card tile dimensions: fixed width per column, fixed height per tile (e.g., 220px grid, 280px list)
+- Preserve the existing filter/sort state — virtualization is purely a rendering change
+- Expected bundle reduction: eliminates DOM node growth entirely; rendering stays at ~40 visible tiles regardless of catalog size
+
+**QA gate:** `npm run qa` passes + visually verify scrolling is smooth on 613-card result set
+
+---
+
+#### P11-2 — Cost Curve Widget in the Forge
+
+**Why it matters:** Every competitive TCG tool (Moxfield, Archidekt, PTCG Live) shows a mana/cost curve. Competitive players use it to evaluate deck consistency at a glance. Its absence makes the Forge feel incomplete to the target audience.
+
+**What to do:**
+- Add a compact horizontal bar chart below the Validation Bar in `forge-workbench.tsx`
+- Bars represent card count at each cost value (0–8+), height proportional to count
+- Width: full panel width, height: ~48px total (thin bars, compact)
+- Color: `bg-cobalt-500` bars on `bg-surface-muted` background
+- No library needed — pure CSS flex bars: `height: (count / maxCount) * 100%`
+- Show cost label (0–8+) and card count on hover/focus
+
+**QA gate:** `npm run qa` passes + verify bars update live as cards are added/removed
+
+---
+
+#### P11-3 — Zone Separation in All Forge View Modes
+
+**Why it matters:** GCG has strict zone rules (main deck, resource deck, EX). The Forge shows all cards together with no visual zone separation in Stacks, Grid, Text, and Table views. Players building legally valid decks need to see which zone each card belongs to.
+
+**What to do:**
+- In all view modes, group cards into three sections with clear headers: `Main Deck (X/50)`, `Resource Deck (X/10)`, `EX Cards (X)`
+- Section headers use the existing `ValidationBar` color coding (green/amber/red by count)
+- In Grid view: horizontal rule + section label between zone groups
+- In Text/Table view: a sticky group header row
+- In Stacks view: three separate column groups labeled by zone
+- Card zone is determined by `card.type` — resource cards have type `Resource`, EX cards have type `EX Unit` / `EX Base`
+
+**QA gate:** `npm run qa` passes + verify a deck with cards in all three zones shows three distinct sections
+
+---
+
+#### P11-4 — Accessibility: Touch Targets, Focus Return, Semantic Filters
+
+**Why it matters:** WCAG 2.1 AA is the minimum production bar. Three specific failures block compliance:
+
+**Touch targets (WCAG 2.5.5):**
+- The `×` chip clear buttons, `+` add buttons in list view, and synergy badge stars are all under 24px — below the 44px minimum
+- Fix: Wrap each with a `min-h-[44px] min-w-[44px]` container using `flex items-center justify-center` so the visual size stays compact but the tap target is full size
+
+**Focus return after modal close (WCAG 2.4.3):**
+- When `CardDetailModal` closes, focus drops to `document.body` instead of returning to the card tile that opened it
+- Fix: Store `const triggerRef = useRef<HTMLElement>(document.activeElement as HTMLElement)` when the modal opens; call `triggerRef.current?.focus()` in the modal's `onClose` handler
+
+**Semantic filter groups (WCAG 1.3.1):**
+- Keyword and Trigger filter button groups in the Forge search panel use `<span>` labels over `<div>` button grids — screen readers see a flat list of unnamed buttons
+- Fix: Wrap each group in a `<fieldset>` with a `<legend>` containing the group label. Remove the `<span>` labels
+
+**QA gate:** `npm run qa` passes + keyboard tab through the filter panel and verify each group is announced correctly
+
+---
+
+#### P11-5 — Share Deck via URL
+
+**Why it matters:** Sharable links are the primary organic growth loop for TCG tools. Players share decks on Discord, Reddit, and Twitter. Without a share URL for locally-built decks, every deck built on this platform is trapped in localStorage and invisible to the community.
+
+**What to do:**
+- On the Forge export button, add a "Copy share link" option alongside "Download .txt"
+- Encode the deck as Base64 JSON in a URL query param: `/decks/new?import=[base64]`
+- On `/decks/new` page load, if `?import=` param exists, decode and pre-populate the paste import field
+- The deck name, colors, and card list all travel in the URL
+- Maximum URL length guard: if encoded length > 4000 chars, show "Deck too large to share as URL — download and share the .txt instead"
+
+**QA gate:** `npm run qa` passes + encode a 50-card deck, copy the URL, open in an incognito tab, verify the deck pre-populates on the Create Deck form
+
+---
+
+#### P11-6 — "My Decks" Section on Home Page
+
+**Why it matters:** There is currently zero returning-user value on the home page. A user who built 3 decks last week sees the same page as a first-time visitor. Adding a "My Decks" section using localStorage data creates a reason to return and makes the home page feel personalized.
+
+**What to do:**
+- In `apps/web/app/page.tsx`, add a `client` component `MyDecksRow` (wrapped in `Suspense` for SSR safety)
+- `MyDecksRow` reads all localStorage decks on mount using `getStoredDecks()`
+- If no decks: show nothing (component renders null)
+- If 1–3 decks: show a horizontal row of `DeckPreviewCard` tiles under the heading "Your Decks"
+- If 3+ decks: show the 3 most recently modified + a "View all →" link to `/forge`
+- No auth required — fully client-side localStorage
+
+**QA gate:** `npm run qa` passes + create a deck in Forge, return to home, verify "Your Decks" row appears
+
+---
+
+#### P11-7 — Parser MAX_QTY Enforces GCG 4-Copy Rule
+
+**Why it matters:** The import parser clamps quantities to 50 but never validates the GCG-specific rule of max 4 copies per card. Pasting "400 Gundam" silently results in "50 Gundam" in the deck — a rules-illegal deck with no error message.
+
+**What to do:**
+- In `parseDeckList.ts`, change `MAX_QTY` from `50` to `4`
+- After matching, in `matchDeckEntries` in `cardMatching.ts`, enforce the 4-copy cap at the matching stage and add capped entries to the `warnings` array: `"Capped [Card Name] to 4 copies (GCG max)"`
+- Surface these warnings in `ImportResultsSummary` alongside the existing unmatched/ambiguous lists
+
+**QA gate:** `npm run qa` passes + paste "10 Gundam" → import → deck shows 4x Gundam + 1 warning
+
+---
+
+### Phase 11 Execution Order
+
+Execute in this order. Each task is independent unless noted.
+
+| Priority | Task | Effort | Score Impact |
+|---|---|---|---|
+| 1 | **P11-4** — Accessibility (touch targets, focus, semantic) | Small | a11y 62→78 |
+| 2 | **P11-7** — Parser 4-copy cap | Tiny | Trust 31→35 |
+| 3 | **P11-3** — Zone separation in Forge views | Medium | Forge 9→9.5, Feature Completeness +3 |
+| 4 | **P11-2** — Cost curve widget | Small-Medium | Forge 9→9.5 |
+| 5 | **P11-6** — "My Decks" on home page | Small | Retention +5, Home 9→9.5 |
+| 6 | **P11-5** — Share deck via URL | Medium | Retention +8, Trust 35→45 |
+| 7 | **P11-1** — Virtualize cards grid | Medium | Performance 58→75 |
+
+---
+
+### Projected Score After Full Execution (Phases 1–10 + Phase 11)
+
+| Dimension | Audit Baseline | After Phases 1–10 | After Phase 11 | Target |
+|---|---|---|---|---|
+| UI Visual Quality | 71 | 85 | 88 | 85+ ✅ |
+| Design System Consistency | 78 | 90 | 92 | 85+ ✅ |
+| Component Quality | 66 | 82 | 87 | 85+ ✅ |
+| UX Usability | 54 | 84 | 88 | 85+ ✅ |
+| Information Architecture | 48 | 82 | 85 | 85+ ✅ |
+| Feature Completeness | 38 | 78 | 85 | 85+ ✅ |
+| Accessibility | 62 | 68 | 82 | 85 ⚠ |
+| Performance | 58 | 62 | 76 | 85 ⚠ |
+| Mobile Responsiveness | 56 | 82 | 85 | 85+ ✅ |
+| Trust & Reliability | 31 | 72 | 78 | 85 ⚠ |
+| **Overall** | **52** | **~87** | **~87–89** | **85+ ✅** |
+
+**The three dimensions that remain below 8.5 even after Phase 11:**
+
+- **Accessibility (82/100):** Reaching 85+ requires a full a11y audit tool pass (axe DevTools / Lighthouse) in addition to the P11-4 fixes. Schedule a dedicated a11y review session after Phase 11 lands
+- **Performance (76/100):** Reaching 85+ requires card image optimization (WebP/AVIF via a build-time transform) and a service worker cache for repeat visits — both require infrastructure changes beyond static export
+- **Trust & Reliability (78/100):** The ceiling here is determined by the absence of cloud persistence. Trust cannot reach 85+ while decks exist only in localStorage. Supabase auth + deck sync is the unlock. This is a post-Phase 11 infrastructure milestone
 
 ---
 
 ## Final Verdict
 
-Gundam Forge has an excellent engineering foundation and a clearly ambitious vision. The design system is coherent. The Forge deck builder is genuinely the most sophisticated GCG deck tool publicly available. The cards database is complete and well-structured.
+The ROADMAP's 10 phases are the correct and sufficient plan to reach 8.5/10 for the majority of the platform. Execute them in order, pass the QA gate after every task, and the platform moves from 52/100 to ~87/100 — comfortably above the 8.5 target for the pages that matter most (Forge, Cards, Home, Events, Create Deck).
 
-**The platform fails at trust.** It presents itself as fully-featured when its most trust-bearing features — user accounts, cloud saves, social features — are either disabled or fake. A competitive player who clicks "Sign in" and sees "Coming Soon" will not return.
+Phase 11 closes the remaining audit gaps that the ROADMAP didn't explicitly cover. Together, Phases 1–10 + Phase 11 produce a platform that is production-credible, competitive-player-ready, and defensible as an alpha-tier public launch.
 
-**Fix the trust layer first. Everything else is secondary.**
-
-The path to "production-ready for competitive players" is:
-1. Be honest about what's missing (no auth, localStorage only, playtester is alpha)
-2. Make the things that work, work excellently (Forge, Cards, Events)
-3. Ship cloud persistence
-
-Everything else in this audit is optimization.
+**The one non-negotiable for sustained 8.5+/10 across all dimensions is Supabase auth and cloud deck persistence.** Every trust and retention metric is capped by localStorage-only storage. Schedule this as the first post-launch infrastructure sprint.
 
 ---
 
-*Audit generated for internal use. All scores are professional estimates based on static code analysis, component inspection, and simulated user walkthroughs. Live environment testing via browser automation was not performed in this audit cycle.*
+*Audit generated for internal use. Scores are professional estimates based on static code analysis, component inspection, and simulated user walkthroughs. Plan sections are cross-referenced against `docs/ROADMAP.md` (March 2026 version). Execute all QA gates — `npm run qa` must pass after every task before proceeding.*
