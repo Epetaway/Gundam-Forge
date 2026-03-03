@@ -370,8 +370,8 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   type="button"
                 >
                   {chip.label}
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-accent/20">
-                    <X className="h-3 w-3" />
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-accent/20">
+                    <X className="h-3.5 w-3.5" />
                   </span>
                 </button>
               ))}

@@ -22,7 +22,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
         Skip to main content
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur" style={{ paddingTop: 'max(0px, env(safe-area-inset-top))', paddingLeft: 'max(0px, env(safe-area-inset-left))', paddingRight: 'max(0px, env(safe-area-inset-right))' }}>
         <Container className="flex h-16 items-center justify-between">
           <Link className="flex items-center gap-2" href="/">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-cobalt-400/70 bg-cobalt-500/25 font-mono text-xs font-bold text-cobalt-300 shadow-[0_0_20px_rgba(59,130,246,0.45),inset_0_0_8px_rgba(59,130,246,0.15)]">
@@ -42,7 +42,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       <main id="main-content">{children}</main>
 
-      <footer className="border-t border-border bg-surface/90">
+      <footer className="border-t border-border bg-surface/90" style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))', paddingLeft: 'max(0px, env(safe-area-inset-left))', paddingRight: 'max(0px, env(safe-area-inset-right))' }}>
         <Container className="flex flex-col gap-3 py-6 text-xs text-steel-600 sm:flex-row sm:items-center sm:justify-between">
           <p>Built for high-velocity Gundam GCG deck iteration.</p>
           <p className="font-mono uppercase tracking-[0.16em]">SSR first • Accessible • Tokenized</p>

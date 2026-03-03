@@ -1,10 +1,12 @@
 'use client';
 
+import { useRef } from 'react';
 import { ArrowRight, ChevronDown, ChevronLeft, CircleHelp, Minus, Plus, Star, X } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { useSwipeToClose } from '@/lib/hooks/useSwipeToClose';
 
 type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'set' | 'text' | 'imageUrl' | 'placeholderArt'>;
 
@@ -27,17 +29,26 @@ export function ReferenceCardDetailModal({
   onAdd,
   onRemove,
 }: ReferenceCardDetailModalProps): JSX.Element {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Enable swipe-to-close gesture on mobile
+  useSwipeToClose(contentRef, {
+    threshold: 50,
+    onClose: () => onOpenChange(false),
+  });
+
   return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="w-[min(1240px,96vw)] max-w-[1240px] gap-0 border border-[#3a475c] bg-[#151a22] p-0">
-        {card ? (
-          <>
-            <DialogHeader className="border-b border-[#2a3444] bg-[#1c2330] px-6 py-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2">
-                  <DialogTitle className="text-4xl font-semibold leading-none text-[#e6edf8]">{card.name}</DialogTitle>
-                  <DialogDescription className="text-sm text-[#9aa9bf]">
-                    {card.id} • {card.color} • {card.type} • Cost {card.cost}
+    <div ref={contentRef}>
+      <Dialog onOpenChange={onOpenChange} open={open}>
+        <DialogContent className="w-[min(1240px,96vw)] max-w-[1240px] gap-0 border border-[#3a475c] bg-[#151a22] p-0">
+          {card ? (
+            <>
+              <DialogHeader className="border-b border-[#2a3444] bg-[#1c2330] px-6 py-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <DialogTitle className="text-4xl font-semibold leading-none text-[#e6edf8]">{card.name}</DialogTitle>
+                    <DialogDescription className="text-sm text-[#9aa9bf]">
+                      {card.id} • {card.color} • {card.type} • Cost {card.cost}
                   </DialogDescription>
                 </div>
                 <Button className="h-10 rounded-md border border-[#3a475c] bg-[#151a22] px-4 text-[#e6edf8]" variant="secondary">
@@ -168,7 +179,7 @@ export function ReferenceCardDetailModal({
 
         <button
           aria-label="Close card details"
-          className="absolute left-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a]"
+          className="absolute left-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a]"
           onClick={() => onOpenChange(false)}
           type="button"
         >
@@ -176,5 +187,6 @@ export function ReferenceCardDetailModal({
         </button>
       </DialogContent>
     </Dialog>
+    </div>
   );
 }

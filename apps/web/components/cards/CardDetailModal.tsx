@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { X, Minus, Plus, ChevronLeft, ChevronRight, Copy, TrendingUp } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -8,6 +8,7 @@ import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, D
 import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Button } from '@/components/ui/Button';
 import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
+import { useSwipeToClose } from '@/lib/hooks/useSwipeToClose';
 import { features } from '@/lib/features/feature-flags';
 
 interface CardDetailModalProps {
@@ -42,6 +43,13 @@ export function CardDetailModal({
   onSelectCard,
 }: CardDetailModalProps): JSX.Element {
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Enable swipe-to-close gesture on mobile
+  useSwipeToClose(contentRef, {
+    threshold: 50,
+    onClose: () => onOpenChange(false),
+  });
 
   // Calculate navigation state
   const currentIndex = React.useMemo(
@@ -90,6 +98,7 @@ export function CardDetailModal({
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
+          ref={contentRef}
           className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[90svh] sm:w-[min(1100px,94vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35"
         >
         {card ? (
@@ -126,7 +135,7 @@ export function CardDetailModal({
                   )}
                   <button
                     onClick={() => onOpenChange(false)}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-surface-elevated"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-surface-elevated"
                     aria-label="Close modal"
                   >
                     <X className="h-5 w-5" />

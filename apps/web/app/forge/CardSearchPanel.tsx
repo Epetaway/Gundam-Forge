@@ -143,7 +143,7 @@ function CardListTable({
                   <button
                     type="button"
                     aria-label={`Add ${card.name} to deck`}
-                    className="flex h-5 w-5 items-center justify-center rounded-full bg-cobalt-600/0 text-white transition-all group-hover:bg-cobalt-600 group-hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600/0 text-white transition-all group-hover:bg-cobalt-600 group-hover:text-white font-bold"
                     onClick={(e) => {
                       e.stopPropagation();
                       onSelect(card.id);
