@@ -9,13 +9,31 @@ export interface ParsedDeckEntry {
 /** Maximum sensible quantity per line — catches typos like "400 Gundam". */
 const MAX_QTY = 50;
 
-export function parseDeckList(text: string): ParsedDeckEntry[] {
-  return text
+/**
+ * Parse a decklist text and return structured entries.
+ * For imports >100 lines, call onProgress every 50 lines for UI feedback.
+ */
+export function parseDeckList(
+  text: string,
+  onProgress?: (current: number, total: number) => void,
+): ParsedDeckEntry[] {
+  const lines = text
     .split('\n')
     .map((line) => line.trim())
     // Skip blanks and comment lines (# or //)
-    .filter((line) => line.length > 0 && !line.startsWith('#') && !line.startsWith('//'))
-    .map((line) => {
+    .filter((line) => line.length > 0 && !line.startsWith('#') && !line.startsWith('//'));
+
+  const total = lines.length;
+  const shouldReportProgress = total > 100;
+  const progressInterval = 50;
+
+  return lines
+    .map((line, index) => {
+      // Report progress every 50 lines
+      if (shouldReportProgress && index % progressInterval === 0) {
+        onProgress?.(index, total);
+      }
+
       let qty = 1;
       let name = line;
       let setId: string | undefined;
