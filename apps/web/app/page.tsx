@@ -20,7 +20,7 @@ export default function HomePage(): JSX.Element {
   const archetypes = allArchetypes.slice(0, 4);
   const latestEventDate = events[0]?.date ?? null;
   const platformFeatures = [
-    \`Browse ${cards.length} official Gundam Card Game cards with full-text search.\`,
+    `Browse ${cards.length} official Gundam Card Game cards with full-text search.`,
     'Build and validate decks against official GCG rules.',
     'Playtest your deck against an AI opponent with official phase sequencing.',
   ];

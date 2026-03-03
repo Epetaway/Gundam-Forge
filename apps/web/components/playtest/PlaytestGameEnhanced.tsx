@@ -551,7 +551,7 @@ export function PlaytestGameEnhanced({
           <div className="space-y-2">
             {engine.getLog().slice(-20).reverse().map((entry, i) => (
               <div key={i} className="text-xs border-b border-border/30 pb-2 last:border-b-0">
-                <span className="text-steel-500 font-mono text-[10px]">[T{entry.turnNumber}]</span>
+                <span className="text-steel-500 font-mono text-[10px]">[T{entry.state.turnNumber ?? '?'}]</span>
                 <span className="text-steel-300 ml-1">{entry.description || entry.actionType}</span>
               </div>
             ))}
