@@ -36,7 +36,7 @@ export function ResourceZone({
         !isOpponent && isOver ? 'border-cyan-500 bg-cyan-900/20' : 'border-border'
       }`}
     >
-      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         Resources In Play
       </div>
 
@@ -64,7 +64,7 @@ export function ResourceZone({
             );
           })
         ) : (
-          <div className="col-span-2 text-steel-500 text-xs italic py-2 text-center">
+          <div className="col-span-2 text-white text-xs italic py-2 text-center">
             No resources in play
           </div>
         )}

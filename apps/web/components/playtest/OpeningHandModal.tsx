@@ -68,7 +68,7 @@ export default function OpeningHandModal({
                           <div className="text-xs font-bold text-white truncate">
                             {cardDef?.name || 'Unknown Card'}
                           </div>
-                          <div className="text-[10px] text-slate-300">
+                          <div className="text-[10px] text-white">
                             {cardDef?.type || 'N/A'}
                           </div>
                         </div>
@@ -99,7 +99,7 @@ export default function OpeningHandModal({
                 );
               })
             ) : (
-              <div className="col-span-7 text-center text-slate-400 py-12">
+              <div className="col-span-7 text-center text-white py-12">
                 <p>No cards in hand</p>
               </div>
             )}

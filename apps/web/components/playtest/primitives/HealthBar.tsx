@@ -17,9 +17,9 @@ export function HealthBar({ current, max, label, className }: HealthBarProps) {
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <div className="mb-0.5 flex justify-between text-[10px] text-slate-400">
+        <div className="mb-0.5 flex justify-between text-[10px] text-white">
           <span>{label}</span>
-          <span className="text-slate-300">{current}/{max}</span>
+          <span className="text-white">{current}/{max}</span>
         </div>
       )}
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-700">

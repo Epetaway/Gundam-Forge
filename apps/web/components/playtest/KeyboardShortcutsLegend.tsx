@@ -49,7 +49,7 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
           <h2 className="text-2xl font-bold text-foreground">Keyboard Shortcuts</h2>
           <button
             onClick={onClose}
-            className="text-steel-500 hover:text-foreground text-2xl transition"
+            className="text-white hover:text-foreground text-2xl transition"
           >
             ✕
           </button>
@@ -69,7 +69,7 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
                       key={shortcut.key}
                       className="flex items-center justify-between p-3 bg-surface-muted/50 rounded border border-border hover:border-border transition"
                     >
-                      <span className="text-steel-300">{shortcut.action}</span>
+                      <span className="text-white">{shortcut.action}</span>
                       <code className="bg-surface text-cobalt-300 px-3 py-1 rounded font-mono text-sm border border-border">
                         {shortcut.key}
                       </code>

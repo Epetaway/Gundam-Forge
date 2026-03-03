@@ -153,6 +153,10 @@ create trigger trg_archetypes_updated_at
   execute function public.update_updated_at();
 
 -- 4. Decks (user-owned and official)
+-- Official Gundam TCG deck structure: up to 50-card main deck + up to 10-card resource deck
+-- The deck_cards table stores all cards with card.type determining deck classification
+-- During initialization, cards of type 'Resource' or 'Base' go to resource deck (max 10)
+-- All other cards go to main deck (max 50)
 create table if not exists public.decks (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references auth.users(id) on delete cascade,  -- NULL for official decks
@@ -172,12 +176,30 @@ create table if not exists public.decks (
 );
 
 -- 5. Deck cards (junction table)
+-- Stores all cards for a deck (up to 50 main + up to 10 resource)
+-- Classification: card.type determines deck assignment
+--   Resource/Base types → resource deck (10 cards max)
+--   Other types → main deck (50 cards max)
+-- During validation, sum must respect: main<=50, resource<=10
 create table if not exists public.deck_cards (
   id          uuid primary key default gen_random_uuid(),
   deck_id     uuid not null references public.decks(id) on delete cascade,
   card_id     text not null references public.cards(id),
   qty         integer not null default 1 check (qty > 0 and qty <= 4),
   is_boss     boolean not null default false,
+  created_at  timestamptz not null default now(),
+  unique (deck_id, card_id)
+);
+
+-- 5c. Side deck cards (optional - tournament alternate set)
+-- Stores optional side deck cards (0-15 cards max per official rules)
+-- Used for deck tuning between games without changing main deck
+-- Each card can have up to 4 copies, independent of main deck counts
+create table if not exists public.side_deck_cards (
+  id          uuid primary key default gen_random_uuid(),
+  deck_id     uuid not null references public.decks(id) on delete cascade,
+  card_id     text not null references public.cards(id),
+  qty         integer not null default 1 check (qty > 0 and qty <= 4),
   created_at  timestamptz not null default now(),
   unique (deck_id, card_id)
 );
@@ -194,6 +216,7 @@ create index if not exists idx_decks_slug on public.decks(slug) where slug is no
 create index if not exists idx_decks_colors_gin on public.decks using gin (colors);
 create index if not exists idx_decks_name_trgm on public.decks using gin (name gin_trgm_ops);
 create index if not exists idx_deck_cards_deck_id on public.deck_cards(deck_id);
+create index if not exists idx_side_deck_cards_deck_id on public.side_deck_cards(deck_id);
 create index if not exists idx_profiles_username on public.profiles(username);
 create index if not exists idx_cards_search on public.cards using gin (search_vector);
 create index if not exists idx_cards_name_trgm on public.cards using gin (name gin_trgm_ops);
@@ -217,6 +240,7 @@ alter table public.card_prices enable row level security;
 alter table public.profiles enable row level security;
 alter table public.decks enable row level security;
 alter table public.deck_cards enable row level security;
+alter table public.side_deck_cards enable row level security;
 alter table public.deck_likes enable row level security;
 
 -- Cards: readable by everyone (public reference data)
@@ -339,6 +363,73 @@ create policy "Official deck cards are visible to everyone"
     exists (
       select 1 from public.decks
       where decks.id = deck_cards.deck_id
+        and decks.source = 'official'
+    )
+  );
+
+-- Side deck cards: inherit access from parent deck
+create policy "Users can view their own side deck cards"
+  on public.side_deck_cards for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
+        and decks.user_id = auth.uid()
+    )
+  );
+
+create policy "Users can view public side deck cards"
+  on public.side_deck_cards for select
+  to authenticated, anon
+  using (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
+        and decks.is_public = true
+    )
+  );
+
+create policy "Users can insert their own side deck cards"
+  on public.side_deck_cards for insert
+  to authenticated
+  with check (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
+        and decks.user_id = auth.uid()
+    )
+  );
+
+create policy "Users can update their own side deck cards"
+  on public.side_deck_cards for update
+  to authenticated
+  using (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
+        and decks.user_id = auth.uid()
+    )
+  );
+
+create policy "Users can delete their own side deck cards"
+  on public.side_deck_cards for delete
+  to authenticated
+  using (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
+        and decks.user_id = auth.uid()
+    )
+  );
+
+create policy "Official side deck cards are visible to everyone"
+  on public.side_deck_cards for select
+  to authenticated, anon
+  using (
+    exists (
+      select 1 from public.decks
+      where decks.id = side_deck_cards.deck_id
         and decks.source = 'official'
     )
   );

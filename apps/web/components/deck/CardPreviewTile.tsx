@@ -28,12 +28,6 @@ export function CardPreviewTile({ imageUrl, name, cost, type, qty, onClick, onAd
             x{qty}
           </span>
         )}
-        {/* Cost badge */}
-        {cost !== undefined && (
-          <span className="absolute right-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-cobalt-600/90 font-mono text-[10px] font-bold text-white shadow">
-            {cost}
-          </span>
-        )}
         {/* Name + type bar always visible at bottom */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-1.5 pb-1 pt-4">
           <p className="truncate text-[11px] font-semibold leading-tight text-white">{name}</p>

@@ -28,7 +28,7 @@ export function CardGrid({
 }: CardGridProps) {
   if (cards.length === 0) {
     return (
-      <div className="flex items-center justify-center p-8 text-slate-500">
+      <div className="flex items-center justify-center p-8 text-white">
         No cards
       </div>
     );
@@ -74,7 +74,7 @@ export function CardGrid({
                 />
               ) : (
                 <div className="w-full h-full bg-slate-700 flex items-center justify-center">
-                  <div className="text-center text-xs text-slate-400 px-1">
+                  <div className="text-center text-xs text-white px-1">
                     {card.cardId}
                   </div>
                 </div>

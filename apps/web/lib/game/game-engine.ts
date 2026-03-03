@@ -298,6 +298,26 @@ export class GameEngine {
     }
     this.shuffleDeck(resourceDeckCards, rngSeed + 1);
 
+    // Create EX Base token for this player (starts in play, not from deck)
+    const exBase: CardInstance = {
+      instanceId: `${playerId}-ex-base-0`,
+      cardId: 'EXB-001',
+      zone: 'base',
+      state: 'ready',
+      damageMarkers: 0,
+      attachments: { linked: [] },
+      counters: {},
+      usedAbilities: new Set(),
+    };
+
+    // Get EX Base card definition for health stats from cardDatabase
+    // Always pull from official card database to ensure data accuracy
+    const exBaseCardDef = this.cardDb['EXB-001'];
+    if (!exBaseCardDef) {
+      console.warn('EXB-001 card definition not found in cardDatabase. Using default hp: 3');
+    }
+    const baseHealthValue = exBaseCardDef?.hp ?? 3; // Default to 3 if not found
+
     const player: PlayerState = {
       playerId,
       name: playerId === 'player1' ? 'You' : 'Opponent',
@@ -306,12 +326,12 @@ export class GameEngine {
       discardPile: [],
       battleArea: [],
       shields,
-      base: null,
+      base: exBase,
       resources: [],
       resourceDeck: resourceDeckCards,
-      exZone: { exResources: [] },
-      baseHealth: 20,
-      maxBaseHealth: 20,
+      exZone: { exBase, exResources: [] },
+      baseHealth: baseHealthValue, // Initialize to max value from card definition
+      maxBaseHealth: baseHealthValue,
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
       mulliganTaken: false,
@@ -383,8 +403,8 @@ export class GameEngine {
           usedAbilities: new Set(),
         })),
       base: {
-        instanceId: `${playerId}-base`,
-        cardId: 'BASE',
+        instanceId: `${playerId}-ex-base-0`,
+        cardId: 'EXB-001',
         zone: 'base',
         state: 'ready',
         damageMarkers: 0,
@@ -394,9 +414,21 @@ export class GameEngine {
       },
       resources: [],
       resourceDeck: resourcePool,
-      exZone: { exResources: [] },
-      baseHealth: 20,
-      maxBaseHealth: 20,
+      exZone: {
+        exBase: {
+          instanceId: `${playerId}-ex-base-0`,
+          cardId: 'EXB-001',
+          zone: 'base',
+          state: 'ready',
+          damageMarkers: 0,
+          attachments: { linked: [] },
+          counters: {},
+          usedAbilities: new Set(),
+        },
+        exResources: [],
+      },
+      baseHealth: 3,
+      maxBaseHealth: 3,
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
       mulliganTaken: false,

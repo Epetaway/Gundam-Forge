@@ -142,39 +142,34 @@ export function Battlefield({
   };
 
   return (
-    <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-surface-muted via-surface to-surface-elevated relative">
+    <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-surface-muted via-surface to-surface-elevated relative" style={{ display: 'flex', flexDirection: 'column' }}>
       {/* OPPONENT STATUS - Compact strip (player POV only) */}
       <div className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-surface/60 px-4 py-2 relative z-10">
         <div className="flex items-center gap-6 flex-wrap">
-          <span className="text-xs text-steel-500 font-semibold uppercase tracking-wider">
+          <span className="text-xs text-white font-semibold uppercase tracking-wider">
             {opponentState.name}'s Field
           </span>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-purple-400 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.shields.length}</span>
-            <span className="text-steel-600 text-xs">shields</span>
+            <span className="text-white text-xs">shields</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.battleArea.length}</span>
-            <span className="text-steel-600 text-xs">units</span>
+            <span className="text-white text-xs">units</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.resources.length}</span>
-            <span className="text-steel-600 text-xs">resources</span>
+            <span className="text-white text-xs">resources</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-slate-500 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.hand.length}</span>
-            <span className="text-steel-600 text-xs">in hand</span>
+            <span className="text-white text-xs">in hand</span>
           </div>
-          <div className="ml-auto flex items-center gap-1.5">
-            <span className="text-steel-600 text-xs">HP</span>
-            <span className="text-accent font-bold text-sm">
-              {opponentState.baseHealth}/{opponentState.maxBaseHealth}
-            </span>
-          </div>
+
         </div>
       </div>
 
@@ -198,7 +193,7 @@ export function Battlefield({
             </button>
             <button
               type="button"
-              className="rounded border border-border px-2 py-1 text-xs text-steel-500 hover:text-foreground transition-colors"
+              className="rounded border border-border px-2 py-1 text-xs text-white hover:text-foreground transition-colors"
               onClick={() => setAttackingUnit(null)}
               aria-label="Cancel attack"
             >
@@ -211,7 +206,7 @@ export function Battlefield({
       {/* OPPONENT BATTLE AREA - Unit display with AP/HP stats */}
       {opponentState.battleArea.length > 0 && (
         <div className={`flex-shrink-0 border-b px-4 py-2 ${attackingUnit ? 'border-amber-500/40 bg-amber-900/10' : 'border-border/50 bg-surface/40'}`}>
-          <div className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${attackingUnit ? 'text-amber-400' : 'text-steel-500'}`}>
+          <div className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${attackingUnit ? 'text-amber-400' : 'text-white'}`}>
             {attackingUnit ? '⚔ Select Target — ' : ''}{opponentState.name}&apos;s Battle Area
           </div>
           <div className="flex flex-wrap gap-2">
@@ -226,8 +221,8 @@ export function Battlefield({
                     isTargetable
                       ? 'cursor-pointer border-amber-500/70 bg-amber-900/20 text-amber-200 ring-1 ring-amber-500/40 hover:ring-2 hover:ring-amber-400 hover:bg-amber-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400'
                       : unit.state === 'rest'
-                        ? 'border-steel-700/60 bg-surface-muted text-steel-500 cursor-default'
-                        : 'border-red-700/50 bg-red-900/10 text-steel-300 cursor-default'
+                        ? 'border-steel-700/60 bg-surface-muted text-white cursor-default'
+                        : 'border-red-700/50 bg-red-900/10 text-white cursor-default'
                   }`}
                   title={`${card?.name ?? unit.cardId} — AP:${card?.ap ?? 0} HP:${card?.hp ?? 0}${unit.state === 'rest' ? ' (resting)' : ' (ready)'}${isTargetable ? ' — Click to target' : ''}`}
                   onClick={() => {
@@ -251,7 +246,7 @@ export function Battlefield({
                         className={`h-full w-full object-cover ${unit.state === 'rest' ? 'opacity-60' : ''}`}
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center bg-surface-elevated text-[8px] text-steel-500">
+                      <div className="flex h-full items-center justify-center bg-surface-elevated text-[8px] text-white">
                         {unit.cardId.slice(0, 3)}
                       </div>
                     )}
@@ -266,7 +261,7 @@ export function Battlefield({
                       {unit.damageMarkers > 0 && (
                         <span className="text-amber-400">Dmg:{unit.damageMarkers}</span>
                       )}
-                      {unit.state === 'rest' && <span className="text-steel-500 italic">rest</span>}
+                      {unit.state === 'rest' && <span className="text-white italic">rest</span>}
                     </div>
                   </div>
                 </button>
@@ -277,12 +272,12 @@ export function Battlefield({
       )}
 
       {/* MAIN GAME AREA - Responsive CSS Grid playmat */}
-      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 relative z-10">
+      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 relative z-10 min-h-0">
         {/* LEFT COLUMN - Player zones (Shields, Base, Resources, Trash) */}
-        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto md:overflow-y-auto pb-2">
+        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto md:overflow-y-auto pb-2 min-h-0">
           {/* Shield Area */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Shield Area
             </div>
             <ShieldZone
@@ -297,7 +292,7 @@ export function Battlefield({
 
           {/* Base Area */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Base
             </div>
             <BaseZone
@@ -311,7 +306,7 @@ export function Battlefield({
 
           {/* Resource Deck Area */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Resource Deck
             </div>
             <ResourceDeckZone
@@ -322,7 +317,7 @@ export function Battlefield({
 
           {/* Trash Area */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Trash
             </div>
             <TrashZone
@@ -335,7 +330,7 @@ export function Battlefield({
 
         {/* CENTER COLUMN - Battle Area (takes most space) */}
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+          <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
             Battle Area
           </div>
           <div className="flex-1 overflow-auto">
@@ -358,10 +353,10 @@ export function Battlefield({
         </div>
 
         {/* RIGHT COLUMN - Resources, Deck, Log */}
-        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto pb-2">
+        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto pb-2 min-h-0">
           {/* Resources In Play */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Resources
             </div>
             <ResourceZone
@@ -373,27 +368,28 @@ export function Battlefield({
 
           {/* Deck Area */}
           <div>
-            <div className="text-[10px] md:text-xs font-bold text-steel-300 uppercase mb-1 tracking-wider">
+            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
               Deck
             </div>
             <DeckZone
               deckSize={playerState.deck.length}
+              resourceDeckSize={playerState.resourceDeck.length}
               isOpponent={false}
             />
           </div>
 
           {/* Game Log Preview - hidden on mobile to save space */}
           <div className="hidden md:block border border-border rounded-lg bg-surface-elevated/50 overflow-hidden">
-            <div className="text-xs font-bold text-steel-500 uppercase p-2 border-b border-border">
+            <div className="text-xs font-bold text-white uppercase p-2 border-b border-border">
               Recent Actions
             </div>
             <div className="max-h-40 overflow-y-auto">
               {gameLog.slice(-5).reverse().map((entry, i) => (
                 <div
                   key={i}
-                  className="text-[10px] text-steel-400 px-2 py-1 border-b border-surface last:border-b-0 leading-relaxed"
+                  className="text-[10px] text-white px-2 py-1 border-b border-surface last:border-b-0 leading-relaxed"
                 >
-                  <span className="font-mono text-steel-600 mr-1">[T{entry.state.turnNumber ?? '?'}]</span>
+                  <span className="font-mono text-white mr-1">[T{entry.state.turnNumber ?? '?'}]</span>
                   {entry.description || entry.actionType}
                 </div>
               ))}
@@ -402,16 +398,16 @@ export function Battlefield({
         </div>
       </div>
 
-      {/* PLAYER HAND - Flexible height, displays all cards without cutting or scrolling */}
-      <div className="flex flex-col flex-shrink-0 relative z-30">
+      {/* PLAYER HAND - Always visible, flexible height */}
+      <div className="flex flex-col flex-shrink-0 relative z-30 w-full">
         {/* Contextual Status Bar */}
-        <div className="text-xs text-steel-500 text-center py-1.5 bg-surface/50 border-t border-b border-border/50">
+        <div className="text-xs text-white text-center py-1.5 bg-surface/50 border-t border-b border-border/50 flex-shrink-0">
           {getStatusMessage()}
         </div>
 
         {/* Hand Label and Cards */}
-        <div className="border-t-2 border-cobalt-500/30 bg-surface/30 px-2 py-3 min-h-fit">
-          <div className="text-xs font-bold text-steel-500 uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
+        <div className="border-t-2 border-cobalt-500/30 bg-surface/30 px-2 py-3 w-full flex-shrink-0">
+          <div className="text-xs font-bold text-white uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
           <HandTray
             cards={playerState.hand}
             cardDatabase={cardDatabase}

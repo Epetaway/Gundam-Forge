@@ -32,7 +32,7 @@ export function ShieldZone({
 
   return (
     <div className="border-2 border-border rounded-lg bg-surface-elevated p-3 h-full">
-      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Shields
       </div>
 
@@ -47,19 +47,19 @@ export function ShieldZone({
             className="flex justify-center"
           />
         ) : (
-          <div className="text-steel-500 text-sm font-medium py-4">No shields</div>
+          <div className="text-white text-sm font-medium py-4">No shields</div>
         )}
       </div>
 
       {/* Shield Count Badge */}
       <div className="bg-cobalt-900/50 border border-cobalt-600 rounded-lg p-2 text-center mb-3">
         <div className="text-sm font-bold text-cobalt-300">Shields: {shields.length}</div>
-        <div className="text-xs text-steel-500">Max: 6</div>
+        <div className="text-xs text-white">Max: 6</div>
       </div>
 
       {/* Health Bar */}
       <div className="space-y-1">
-        <div className="text-xs text-steel-500">HP</div>
+        <div className="text-xs text-white">HP</div>
         <div className="bg-surface-muted rounded-full h-6 overflow-hidden border border-steel-700">
           <div
             className={`h-full ${healthColor} transition-all duration-300 flex items-center justify-center`}

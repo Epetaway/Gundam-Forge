@@ -43,7 +43,7 @@ export function BattleZone({
         !isOpponent && isOver ? 'border-green-500 bg-green-900/20' : 'border-border'
       }`}
     >
-      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Battle Area
       </div>
 
@@ -82,7 +82,7 @@ export function BattleZone({
                   <div className="mt-1 text-sm text-red-400 font-bold">Damage: {unit.damageMarkers}</div>
                 )}
                 {unit.state === 'rest' && (
-                  <div className="mt-1 text-sm text-steel-500 italic">RESTING</div>
+                  <div className="mt-1 text-sm text-white italic">RESTING</div>
                 )}
               </div>
 
@@ -110,14 +110,14 @@ export function BattleZone({
           );
           })
         ) : (
-          <div className="flex items-center justify-center h-32 text-steel-500 text-sm font-medium">
+          <div className="flex items-center justify-center h-32 text-white text-sm font-medium">
             Battle area empty
           </div>
         )}
       </div>
 
       {/* Unit Count */}
-      <div className="mt-2 pt-2 border-t border-border text-xs text-steel-500">
+      <div className="mt-2 pt-2 border-t border-border text-xs text-white">
         Units in battle: {units.length}
       </div>
     </div>

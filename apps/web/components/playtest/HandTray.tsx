@@ -52,7 +52,7 @@ export function HandTray({
 
   if (cards.length === 0) {
     return (
-      <div className="w-full h-20 md:h-32 flex items-center justify-center text-steel-500 text-sm">
+      <div className="w-full h-20 md:h-32 flex items-center justify-center text-white text-sm">
         Your hand is empty
       </div>
     );
@@ -178,7 +178,7 @@ function DesktopArcFan({
                     <CardArtImage card={cardData} alt={cardData.name} fill priority={false} loading="lazy" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-b from-surface-muted to-surface-elevated flex items-center justify-center">
-                      <span className="text-xs text-steel-500">?</span>
+                      <span className="text-xs text-white">?</span>
                     </div>
                   )}
                 </div>
@@ -258,14 +258,14 @@ function MobileDrawer({
         className="w-full h-12 flex items-center justify-center border-b border-border hover:bg-surface-elevated/50 transition-colors"
       >
         <div className="flex flex-col items-center gap-1">
-          <div className="text-xs font-bold text-steel-300 uppercase">
+          <div className="text-xs font-bold text-white uppercase">
             Hand ({cards.length}/10)
           </div>
           <motion.div animate={{ rotate: drawerOpen ? 180 : 0 }}>
             {drawerOpen ? (
-              <ChevronDown size={16} className="text-steel-500" />
+              <ChevronDown size={16} className="text-white" />
             ) : (
-              <ChevronUp size={16} className="text-steel-500" />
+              <ChevronUp size={16} className="text-white" />
             )}
           </motion.div>
         </div>
@@ -311,7 +311,7 @@ function MobileDrawer({
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-b from-surface-muted to-surface-elevated flex items-center justify-center">
-                        <span className="text-xs text-steel-500">?</span>
+                        <span className="text-xs text-white">?</span>
                       </div>
                     )}
 

@@ -1010,6 +1010,32 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     };
   }, [sidebarOpen]);
 
+  const deckSettingsBar = React.useMemo(() => {
+    const validationResult = validateDeck(
+      Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty })),
+      allCards as CardDefinition[],
+    );
+    return (
+      <DeckSettingsBar
+        deckId={deckId}
+        name={deckMeta.name}
+        colors={deckMeta.deckIntent?.colors ?? []}
+        archetype={(deckMeta.deckIntent?.packages?.length ?? 0) > 0 ? `${deckMeta.deckIntent.packages.length} packages` : ''}
+        setId={deckMeta.setId}
+        onNameChange={handleNameChange}
+        onColorsChange={(colors) => handleDeckIntentChange({ ...(deckMeta.deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors })}
+        onArchetypeChange={() => {}}
+        onSetIdChange={handleSetIdChange}
+        onExport={handleExport}
+        validationIsValid={validationResult.isValid}
+        validationMainDeckCards={validationResult.metrics.mainDeckCards}
+        validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
+        isSaving={saving}
+        lastSaved={lastSaved}
+      />
+    );
+  }, [deck, handleExport, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards, deckId, saving, lastSaved]);
+
   if (!mounted) return null;
 
   return (
@@ -1036,6 +1062,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             onSelect={(cardId) => handleAdd(cardId)}
             deckIntent={deckMeta.deckIntent ?? undefined}
             initialSetId={deckMeta.setId}
+            onIntentChange={handleDeckIntentChange}
+            currentDeckCards={Object.keys(deck).map((id) => cardsById.get(id)).filter((c): c is CardDefinition => c !== undefined)}
           />
         </div>
       )}
@@ -1098,6 +1126,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
                 onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}
                 deckIntent={deckMeta.deckIntent ?? undefined}
                 initialSetId={deckMeta.setId}
+                onIntentChange={handleDeckIntentChange}
+                currentDeckCards={Object.keys(deck).map((id) => cardsById.get(id)).filter((c): c is CardDefinition => c !== undefined)}
               />
             </div>
           </div>
@@ -1145,32 +1175,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       {/* Main deck area */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Deck settings bar with live validation */}
-        {React.useMemo(() => {
-          const validationResult = validateDeck(
-            Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty })),
-            allCards as CardDefinition[],
-          );
-          
-          return (
-            <DeckSettingsBar
-              deckId={deckId}
-              name={deckMeta.name}
-              colors={deckMeta.deckIntent?.colors ?? []}
-              archetype={(deckMeta.deckIntent?.packages?.length ?? 0) > 0 ? `${deckMeta.deckIntent.packages.length} packages` : ''}
-              setId={deckMeta.setId}
-              onNameChange={handleNameChange}
-              onColorsChange={(colors) => handleDeckIntentChange({ ...(deckMeta.deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors })}
-              onArchetypeChange={() => {}} // Deprecated: packages now selected in DeckIntentBuilder
-              onSetIdChange={handleSetIdChange}
-              onExport={handleExport}
-              validationIsValid={validationResult.isValid}
-              validationMainDeckCards={validationResult.metrics.mainDeckCards}
-              validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
-              isSaving={saving}
-              lastSaved={lastSaved}
-            />
-          );
-        }, [deck, handleExport, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards])}
+        {deckSettingsBar}
 
         {/* Validation bar (compact, single row) */}
         <ValidationBar

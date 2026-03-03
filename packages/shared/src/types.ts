@@ -33,10 +33,17 @@ export interface CardDefinition {
   apModifier?: number;   // AP bonus when paired with a Unit
   hpModifier?: number;   // HP bonus when paired with a Unit
 
-  // TCG Mechanics keywords for filtering and synergy detection (enriched)
-  keywords?: string[];   // e.g., ["repair", "blocker", "high_maneuver"]
-  triggers?: string[];   // e.g., ["burst", "deploy", "when_paired"]
-  
+  // TCG Mechanics keywords for filtering and synergy detection (enriched by scripts/enrich-keywords.mjs)
+  /** Intrinsic mechanic keywords. Normalized lowercase, with value where applicable.
+   *  e.g. ["blocker", "repair 1", "support 3", "breach 2", "first-strike", "high-maneuver", "suppression"] */
+  keywords?: string[];
+  /** Timing trigger types the card has effects for.
+   *  e.g. ["burst", "when-paired", "during-pair", "during-link", "deploy", "attack", "destroyed", "activate"] */
+  triggers?: string[];
+  /** Clan/trait qualifiers for When Paired / During Pair effects (Units only).
+   *  e.g. ["(ZAFT)", "(Coordinator)", "Red", "Lv.4+"] — empty means works with any pilot */
+  pairQualifiers?: string[];
+
   // Legacy field (deprecated - use keywords + triggers)
   mechanics?: string[];  // @deprecated Use keywords/triggers instead
 

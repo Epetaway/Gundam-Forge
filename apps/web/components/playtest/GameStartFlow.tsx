@@ -174,7 +174,7 @@ function CoinFlipModal({
     >
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-purple-500/50 rounded-lg p-8 text-center shadow-2xl">
         <h2 className="text-3xl font-bold text-white mb-2">Coin Flip</h2>
-        <p className="text-slate-400 text-sm mb-8">
+        <p className="text-white text-sm mb-8">
           The winner chooses to go first or second
         </p>
 
@@ -223,7 +223,7 @@ function CoinFlipModal({
               {/* Player won: give them the choice */}
               {playerWon && (
                 <>
-                  <p className="text-slate-300 text-sm">Choose your turn order:</p>
+                  <p className="text-white text-sm">Choose your turn order:</p>
                   <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={() => onResult(true, true)}
@@ -246,7 +246,7 @@ function CoinFlipModal({
               {/* Opponent won: they auto-choose first */}
               {!playerWon && (
                 <>
-                  <p className="text-slate-400 text-sm">{opponentId} will go first.</p>
+                  <p className="text-white text-sm">{opponentId} will go first.</p>
                   <Button
                     onClick={() => onResult(false, false)}
                     variant="primary"
@@ -261,7 +261,7 @@ function CoinFlipModal({
               {/* Flip again option */}
               <button
                 onClick={handleFlip}
-                className="text-xs text-slate-500 hover:text-slate-300 underline transition"
+                className="text-xs text-white hover:text-white underline transition"
               >
                 Flip again
               </button>
@@ -273,11 +273,11 @@ function CoinFlipModal({
         {!result && (
           <div className="grid grid-cols-2 gap-4 text-sm mt-8">
             <div className="p-3 bg-slate-700/50 rounded border border-slate-600">
-              <p className="text-slate-400 text-xs uppercase mb-1">You</p>
+              <p className="text-white text-xs uppercase mb-1">You</p>
               <p className="text-white font-semibold">{playerId}</p>
             </div>
             <div className="p-3 bg-slate-700/50 rounded border border-slate-600">
-              <p className="text-slate-400 text-xs uppercase mb-1">Opponent</p>
+              <p className="text-white text-xs uppercase mb-1">Opponent</p>
               <p className="text-white font-semibold">{opponentId}</p>
             </div>
           </div>
@@ -329,7 +329,7 @@ function ShuffleModal({
         </div>
 
         {shuffling ? (
-          <p className="text-slate-400 text-sm">Randomizing deck order...</p>
+          <p className="text-white text-sm">Randomizing deck order...</p>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -397,10 +397,10 @@ function DrawPhaseModal({
           </div>
         </div>
 
-        <p className="text-slate-300 text-lg font-semibold mb-2">
+        <p className="text-white text-lg font-semibold mb-2">
           {drawn} / {total} cards drawn
         </p>
-        <p className="text-slate-400 text-sm">Setting up your opening hand...</p>
+        <p className="text-white text-sm">Setting up your opening hand...</p>
       </div>
     </motion.div>
   );
@@ -463,10 +463,10 @@ function ShieldSetupModal({
           </div>
         </div>
 
-        <p className="text-slate-300 text-lg font-semibold mb-2">
+        <p className="text-white text-lg font-semibold mb-2">
           {shieldsPlaced} / {TARGET_SHIELDS} shields placed face-down
         </p>
-        <p className="text-slate-400 text-sm">These will protect your base from damage</p>
+        <p className="text-white text-sm">These will protect your base from damage</p>
       </div>
     </motion.div>
   );
@@ -507,14 +507,14 @@ function ReadyToPlayModal({
 
         <h2 className="text-3xl font-bold text-white mb-4">Ready to Play!</h2>
 
-        <p className="text-slate-300 text-lg mb-6">
+        <p className="text-white text-lg mb-6">
           {playerGoesFirst
             ? 'You go first!'
             : `${opponentId} goes first`}
         </p>
 
         <div className="mb-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600 text-left">
-          <ul className="text-slate-300 text-sm space-y-2">
+          <ul className="text-white text-sm space-y-2">
             <li>✓ Deck shuffled</li>
             <li>✓ Opening hand drawn (5 cards)</li>
             <li>✓ Shields placed (×6)</li>

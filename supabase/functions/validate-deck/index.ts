@@ -19,6 +19,8 @@ interface ValidationResult {
     total_cards: number;
     main_deck_cards: number;
     resource_deck_cards: number;
+    side_deck_cards: number;
+    total_with_side: number;
     unique_colors: string[];
     boss_count: number;
   };
@@ -30,9 +32,10 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { deck_id, cards } = await req.json() as {
+    const { deck_id, cards, side_cards } = await req.json() as {
       deck_id?: string;
       cards: DeckCardInput[];
+      side_cards?: DeckCardInput[];
     };
 
     if (!cards || !Array.isArray(cards)) {
@@ -42,17 +45,20 @@ serve(async (req: Request) => {
       );
     }
 
+    // Side deck is optional - default to empty array if not provided
+    const sideCards = side_cards || [];
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     // Fetch card definitions for validation
-    const cardIds = cards.map((c) => c.card_id);
+    const allCardIds = [...new Set([...cards.map((c) => c.card_id), ...sideCards.map((c) => c.card_id)])];
     const { data: cardDefs, error: cardError } = await supabase
       .from('cards')
       .select('id, name, color, type')
-      .in('id', cardIds);
+      .in('id', allCardIds);
 
     if (cardError) {
       return new Response(
@@ -65,13 +71,13 @@ serve(async (req: Request) => {
     const errors: string[] = [];
 
     // Validate all card IDs exist
-    for (const c of cards) {
+    for (const c of [...cards, ...sideCards]) {
       if (!cardMap.has(c.card_id)) {
         errors.push(`Card ${c.card_id} not found in database`);
       }
     }
 
-    // Calculate metrics
+    // Calculate metrics for main + resource decks
     let mainDeckCards = 0;
     let resourceDeckCards = 0;
     const colorSet = new Set<string>();
@@ -92,25 +98,47 @@ serve(async (req: Request) => {
       }
 
       if (c.qty > 4) {
-        errors.push(`${def.name} exceeds max 4 copies (has ${c.qty})`);
+        errors.push(`${def.name} exceeds max 4 copies in main deck (has ${c.qty})`);
       }
 
       if (c.is_boss) bossCount++;
     }
 
+    // Calculate metrics for side deck
+    let sideDeckCards = 0;
+    for (const c of sideCards) {
+      const def = cardMap.get(c.card_id);
+      if (!def) continue;
+
+      sideDeckCards += c.qty;
+
+      if (c.qty > 4) {
+        errors.push(`${def.name} exceeds max 4 copies in side deck (has ${c.qty})`);
+      }
+    }
+
     const totalCards = mainDeckCards + resourceDeckCards;
 
-    // Rule 6-1-1: Main deck must be exactly 50
-    if (mainDeckCards !== 50) {
-      errors.push(`Main deck must be exactly 50 cards (has ${mainDeckCards})`);
+    // Official GCG Rules: Main deck MUST be exactly 50 cards (strictly enforced)
+    if (mainDeckCards < 50) {
+      errors.push(`Main deck must contain exactly 50 cards (currently has ${mainDeckCards})`);
+    } else if (mainDeckCards > 50) {
+      errors.push(`Main deck must contain exactly 50 cards (currently has ${mainDeckCards})`);
     }
 
-    // Rule 6-1-1: Resource deck must be exactly 10
-    if (resourceDeckCards !== 10) {
-      errors.push(`Resource deck must be exactly 10 cards (has ${resourceDeckCards})`);
+    // Official GCG Rules: Resource deck maximum 10 cards (optional)
+    // Resource deck consists of Resource cards and Base cards only
+    // Resource deck is SEPARATE from the 50-card main deck limit
+    if (resourceDeckCards > 10) {
+      errors.push(`Resource deck cannot exceed 10 cards (has ${resourceDeckCards})`);
     }
 
-    // Rule 6-1-1-2: Max 2 colors excluding Colorless
+    // Side deck is optional: 0-15 cards max
+    if (sideDeckCards > 15) {
+      errors.push(`Side deck cannot exceed 15 cards (has ${sideDeckCards})`);
+    }
+
+    // Official GCG Rules (Rule 6-1-1-2): Max 2 non-Colorless colors per deck
     if (colorSet.size > 2) {
       errors.push(`Deck can have at most 2 colors (has ${[...colorSet].join(', ')})`);
     }
@@ -122,6 +150,8 @@ serve(async (req: Request) => {
         total_cards: totalCards,
         main_deck_cards: mainDeckCards,
         resource_deck_cards: resourceDeckCards,
+        side_deck_cards: sideDeckCards,
+        total_with_side: totalCards + sideDeckCards,
         unique_colors: [...colorSet],
         boss_count: bossCount,
       },

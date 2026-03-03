@@ -73,6 +73,7 @@ export const COLORLESS_TOKEN_DECK: TokenDeckConfig = {
       zone: 'resource',
       text: '(At the start of the game, the second-turn player places 1 active EX Resource into their resource area.) (Rest an EX Resource then exile it from the game when paying a cost.)',
     },
+
   ],
 };
 

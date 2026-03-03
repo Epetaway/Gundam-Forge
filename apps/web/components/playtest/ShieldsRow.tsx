@@ -11,7 +11,7 @@ export default function ShieldsRow({ shields, player }: ShieldsRowProps) {
   return (
     <div className={`flex gap-2 ${player === 'opponent' ? 'justify-end' : ''}`}>
       <div className="flex gap-2 bg-slate-800 rounded-lg p-3 border border-slate-700">
-        <div className="text-xs font-semibold text-slate-300 self-center mr-2">
+        <div className="text-xs font-semibold text-white self-center mr-2">
           {shields.length}/6 Shields
         </div>
         <div className="flex gap-2">
@@ -32,7 +32,7 @@ export default function ShieldsRow({ shields, player }: ShieldsRowProps) {
               key={`empty-${idx}`}
               className="w-16 h-20 bg-slate-800 border-2 border-dashed border-slate-600 rounded flex items-center justify-center"
             >
-              <div className="text-xs text-slate-500">Empty</div>
+              <div className="text-xs text-white">Empty</div>
             </div>
           ))}
         </div>
