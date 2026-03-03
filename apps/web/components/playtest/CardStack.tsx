@@ -106,9 +106,9 @@ export function CardStack({
             <div
               key={card.instanceId || index}
               className={cn(
-                'absolute inset-0 rounded-lg overflow-hidden border-2 border-slate-600',
+                'absolute inset-0 rounded-lg overflow-hidden border-2 border-steel-600',
                 'shadow-lg transition-all duration-200',
-                isHovered && 'border-slate-400 shadow-slate-500/50',
+                isHovered && 'border-steel-400 shadow-steel-500/50',
               )}
               style={{
                 transform: `${config.offset.replace('translate-y-', 'translateY(') + index * 4}px)`,

@@ -79,7 +79,7 @@ The following features are **confirmed implemented and working correctly** per c
 | Phase 9 | Content & seed data | 2 | Explore/Decks 5→8 | ⚠️ Data exists |
 | Phase 10 | Mobile QA sweep | 1 | Mobile 5→8.5 | ⚠️ Core responsive ✅ |
 | **Phase 11** | **Navigation & IA Clarity** | **4** | **Nav 7→9** | **✅ COMPLETE** |
-| **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **❌ Not started** |
+| **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **🔄 In Progress (Task 12.3)** |
 | **Phase 13** | **Performance & Scalability** | **5** | **Perf 5→8** | **❌ Not started** |
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **❌ Not started** |
 
@@ -1675,6 +1675,42 @@ This phase improves first-time user experience and navigational clarity by addin
 - CTA consistency: +2 points (reduced cognitive load)
 
 **Estimated Revised Score After Phase 11:** 78/100
+
+---
+
+## Phase 12 Execution Status — 🔄 IN PROGRESS
+
+**Session:** Phase 12 — Visual Polish & Design System  
+**Target:** Reduce technical debt · Unify design patterns · Optimize rendering
+
+**Current Work:**
+- Task 12.3: Design Token Audit — ✅ PARTIAL COMPLETE
+  - Created `apps/web/lib/design-system/card-sizes.ts` with responsive card sizing tokens
+  - Migrated CardSearchPanel.tsx: color/set filters (purple→cobalt, 4 replacements)
+  - Migrated CardDetailModal.tsx: clan badges, Link badge, Resource badge (3 replacements)
+  - Migrated CardInspector.tsx: backgrounds, borders, keyword badges (5+ replacements)
+  - Migrated ZonesPanel.tsx: zone cards, health summary area (7+ replacements)
+  - Migrated CardGrid.tsx: card borders, placeholder (3+ replacements)
+  - Migrated HealthBar.tsx: progress track (1 replacement)
+  - Migrated MulliganModal.tsx: rules divider (1 replacement)
+  - Migrated OpeningHandModal.tsx: headers, card layout, borders (5+ replacements)
+  - Migrated GameStartFlow.tsx: player info cards (2+ replacements)
+  - **Total:** 30+ design token replacements across 10 files
+
+**QA Status:** ✅ PASSED (0 lint errors, 0 type errors, 51/51 routes built)
+
+**Production Readiness:** 78/100 → 79/100 (estimated after design token cleanup)
+- Design consistency: +1 point (unified color tokens, eliminated raw Tailwind colors)
+
+**Remaining Tasks:**
+- 12.1: Unify CardTile Components — Not started
+- 12.2: Standardize Card Sizing Tokens — Tokens created (12.3), integration pending
+- 12.4: Add Loading Skeletons — Not started
+- 12.5: Polish DeckPreviewCard — Not started
+
+**Next:** Complete design token migration, then evaluate if 12.1/12.4/12.5 are necessary for production or defer to future phases.
+
+---
 
 **Focus:** Improve first-time user experience and clarify the relationship between Forge, Cards, Decks, and Create Deck workflows
 

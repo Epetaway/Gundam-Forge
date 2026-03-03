@@ -25,7 +25,7 @@ export default function OpeningHandModal({
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center">
       <div className="w-full max-h-screen flex flex-col">
         {/* Header */}
-        <div className="text-center py-8 border-b border-slate-700 bg-black/50">
+        <div className="text-center py-8 border-b border-steel-600 bg-black/50">
           <h2 className="text-4xl font-bold text-white">Opening hand</h2>
         </div>
 
@@ -55,7 +55,7 @@ export default function OpeningHandModal({
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-28 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-b border-slate-500">
+                        <div className="w-full h-28 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-b border-steel-500">
                           <span className="text-xs text-white text-center px-2 font-bold">
                             {card.cardId}
                           </span>
@@ -63,7 +63,7 @@ export default function OpeningHandModal({
                       )}
 
                       {/* Card Footer */}
-                      <div className="flex-1 bg-gradient-to-b from-slate-700 to-slate-900 p-2 flex flex-col justify-between border-t border-slate-600">
+                      <div className="flex-1 bg-gradient-to-b from-surface-interactive to-surface-elevated p-2 flex flex-col justify-between border-t border-steel-500">
                         <div>
                           <div className="text-xs font-bold text-white truncate">
                             {cardDef?.name || 'Unknown Card'}
@@ -107,7 +107,7 @@ export default function OpeningHandModal({
         </div>
 
         {/* Action Buttons */}
-        <div className="border-t border-slate-700 bg-black/80 px-8 py-6 flex gap-4 justify-center">
+        <div className="border-t border-steel-600 bg-black/80 px-8 py-6 flex gap-4 justify-center">
           <Button
             onClick={onKeep}
             className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded"

@@ -10,7 +10,7 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
   return (
     <div className="space-y-4">
       {/* Library */}
-      <div className="bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg border border-slate-600 p-4 cursor-pointer hover:border-blue-500 transition-colors">
+      <div className="bg-gradient-to-br from-surface-interactive to-surface-elevated rounded-lg border border-steel-600 p-4 cursor-pointer hover:border-blue-500 transition-colors">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-white">Library</h3>
           <span className="text-2xl font-bold text-blue-400">{player.deck.length}</span>
@@ -21,7 +21,7 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
       </div>
 
       {/* Discard / Graveyard */}
-      <div className="bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg border border-slate-600 p-4 cursor-pointer hover:border-orange-500 transition-colors">
+      <div className="bg-gradient-to-br from-surface-interactive to-surface-elevated rounded-lg border border-steel-600 p-4 cursor-pointer hover:border-orange-500 transition-colors">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-white">Trash</h3>
           <span className="text-2xl font-bold text-orange-400">{player.discardPile.length}</span>
@@ -32,7 +32,7 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
       </div>
 
       {/* Exile / RFG */}
-      <div className="bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg border border-slate-600 p-4 cursor-pointer hover:border-purple-500 transition-colors">
+      <div className="bg-gradient-to-br from-surface-interactive to-surface-elevated rounded-lg border border-steel-600 p-4 cursor-pointer hover:border-purple-500 transition-colors">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-white">Exile</h3>
           <span className="text-2xl font-bold text-purple-400">0</span>
@@ -41,10 +41,10 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-slate-600 pt-4">
+      <div className="border-t border-steel-600 pt-4">
         {/* Health Summary */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded">
+          <div className="flex items-center justify-between p-3 bg-surface-interactive/50 rounded">
             <span className="text-sm font-semibold text-white">Base Health</span>
             <div className="flex items-center gap-2">
               <div className={`text-2xl font-bold ${
@@ -56,7 +56,7 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded">
+          <div className="flex items-center justify-between p-3 bg-surface-interactive/50 rounded">
             <span className="text-sm font-semibold text-white">Shields</span>
             <div className="flex items-center gap-2">
               <div className="text-2xl font-bold text-blue-400">{player.shields.length}</div>
@@ -64,7 +64,7 @@ export default function ZonesPanel({ player }: ZonesPanelProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded">
+          <div className="flex items-center justify-between p-3 bg-surface-interactive/50 rounded">
             <span className="text-sm font-semibold text-white">Resources</span>
             <div className="text-2xl font-bold text-green-400">{player.resources.length}</div>
           </div>

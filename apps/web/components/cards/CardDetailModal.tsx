@@ -272,7 +272,7 @@ export function CardDetailModal({
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Factions</p>
                     <div className="flex flex-wrap gap-1">
                       {card.clans.map((clan) => (
-                        <span key={clan} className="rounded bg-purple-500/20 px-2 py-1 text-xs font-medium text-purple-300">
+                        <span key={clan} className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">
                           {clan}
                         </span>
                       ))}
@@ -297,12 +297,12 @@ export function CardDetailModal({
                     <div className="flex flex-wrap gap-1">
                       <span className="rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">Play</span>
                       {card.type?.includes('Pilot') && (
-                        <span className="rounded bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-300">Link</span>
+                        <span className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">Link</span>
                       )}
                       {card.ap !== undefined && (
                         <span className="rounded bg-orange-500/20 px-2 py-1 text-xs font-medium text-orange-300">Attack</span>
                       )}
-                      <span className="rounded bg-slate-500/20 px-2 py-1 text-xs font-medium text-slate-300">Resource</span>
+                      <span className="rounded bg-steel-500/20 px-2 py-1 text-xs font-medium text-steel-300">Resource</span>
                     </div>
                   </div>
                 )}

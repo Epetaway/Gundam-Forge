@@ -146,7 +146,7 @@ export function MulliganModal({
         </div>
 
         {/* Rules Reference */}
-        <div className="mt-8 pt-6 border-t border-slate-700">
+        <div className="mt-8 pt-6 border-t border-steel-600">
           <p className="text-xs text-white">
             Official Mulligan Rule: Each player may mulligan their opening hand only once.
             A mulligan reshuffles the entire opening hand and redraws {SETUP_RULES.openingHandSize} cards.
