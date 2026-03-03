@@ -85,14 +85,14 @@ export function CardDetailModal({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-h-[92vh] w-[min(1100px,94vw)] gap-0 overflow-hidden p-0">
+      <DialogContent className="flex max-h-[92vh] w-[min(1100px,94vw)] flex-col gap-0 overflow-hidden p-0">
         {card ? (
           <>
             {/* Header */}
-            <DialogHeader className="border-b border-border bg-surface-muted px-6 py-4">
+            <DialogHeader className="flex-shrink-0 border-b border-border bg-surface-muted px-4 py-3 md:px-6 md:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <DialogTitle className="text-2xl font-semibold">
+                  <DialogTitle className="text-xl font-semibold md:text-2xl">
                     {card.name}
                     {/* Trending Badge (feature-flagged) */}
                     {features.trending() && (
@@ -102,7 +102,7 @@ export function CardDetailModal({
                       </span>
                     )}
                   </DialogTitle>
-                  <DialogDescription className="mt-1 text-sm">
+                  <DialogDescription className="mt-1 text-xs md:text-sm">
                     {card.id} • {card.color} • {card.type} • Cost {card.cost}
                   </DialogDescription>
                 </div>
@@ -129,195 +129,183 @@ export function CardDetailModal({
               </div>
             </DialogHeader>
 
-            {/* Content - Two column layout */}
-            <div className="flex flex-1 overflow-hidden">
-              {/* Left column: Image (sticky) */}
-              <div className="flex w-full flex-col border-r border-border md:w-80 md:flex-shrink-0">
-                <div className="flex-shrink-0 bg-black p-4 md:sticky md:top-0">
-                  <div className="relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border">
-                    <CardArtImage
-                      card={card}
-                      className="h-full w-full object-cover"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 320px"
-                      priority
-                    />
-                  </div>
-                </div>
-
-                {/* Mobile rules text (below image on small screens) */}
-                <div className="flex-1 overflow-y-auto border-t border-border p-4 md:hidden">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Rules Text</p>
-                  <p className="whitespace-pre-wrap text-sm text-foreground">
-                    {card.text?.trim() ? card.text : 'No rules text available for this card.'}
-                  </p>
+            {/* Content - single scrollable column on mobile, two-column on desktop */}
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+              {/* Image column - small centered image on mobile, fixed left panel on desktop */}
+              <div className="flex-shrink-0 bg-black p-4 md:w-80 md:border-r md:border-border">
+                <div className="relative mx-auto aspect-[5/7] w-full max-w-[160px] overflow-hidden rounded-md border border-border md:max-w-none">
+                  <CardArtImage
+                    card={card}
+                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 160px, 320px"
+                    priority
+                  />
                 </div>
               </div>
 
-              {/* Right column: Details (scrollable on mobile) */}
-              <div className="hidden flex-1 flex-col overflow-hidden md:flex">
-                <div className="flex-1 space-y-4 overflow-y-auto bg-surface-muted/50 p-6">
-                  {/* Type & Stats */}
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Type</p>
-                    <p className="text-sm font-medium text-foreground">{card.type}</p>
-                  </div>
-
-                  {/* Price History (feature-flagged) */}
-                  {features.priceHistory() && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Price History</p>
-                      <div className="rounded border border-border bg-surface p-3">
-                        <p className="text-xs text-steel-600">Market data unavailable</p>
-                        <p className="mt-2 text-xs text-foreground">Price tracking coming soon</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Combat Stats */}
-                  {(card.ap !== undefined || card.hp !== undefined || card.level !== undefined) && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Stats</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {card.level !== undefined && (
-                          <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                            <p className="text-[10px] uppercase tracking-wider text-steel-600">Level</p>
-                            <p className="text-lg font-bold tabular-nums text-foreground">{card.level}</p>
-                          </div>
-                        )}
-                        {card.ap !== undefined && (
-                          <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                            <p className="text-[10px] uppercase tracking-wider text-steel-600">AP</p>
-                            <p className="text-lg font-bold tabular-nums text-foreground">{card.ap}</p>
-                          </div>
-                        )}
-                        {card.hp !== undefined && (
-                          <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                            <p className="text-[10px] uppercase tracking-wider text-steel-600">HP</p>
-                            <p className="text-lg font-bold tabular-nums text-foreground">{card.hp}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Pilot Modifiers */}
-                  {(card.apModifier !== undefined || card.hpModifier !== undefined) && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Modifiers</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {card.apModifier !== undefined && (
-                          <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
-                            <p className="text-[10px] uppercase tracking-wider text-steel-600">AP Mod</p>
-                            <p className="text-lg font-bold tabular-nums text-cobalt-300">
-                              {card.apModifier > 0 ? '+' : ''}
-                              {card.apModifier}
-                            </p>
-                          </div>
-                        )}
-                        {card.hpModifier !== undefined && (
-                          <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
-                            <p className="text-[10px] uppercase tracking-wider text-steel-600">HP Mod</p>
-                            <p className="text-lg font-bold tabular-nums text-cobalt-300">
-                              {card.hpModifier > 0 ? '+' : ''}
-                              {card.hpModifier}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Traits */}
-                  {card.traits && card.traits.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Traits</p>
-                      <p className="text-sm text-foreground">{card.traits.join(' • ')}</p>
-                    </div>
-                  )}
-
-                  {/* Link Condition */}
-                  {card.linkCondition && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Link Condition</p>
-                      <p className="text-sm text-foreground">{card.linkCondition}</p>
-                    </div>
-                  )}
-
-                  {/* Keywords */}
-                  {card.keywords && card.keywords.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Keywords</p>
-                      <div className="flex flex-wrap gap-1">
-                        {card.keywords.map((kw) => (
-                          <span key={kw} className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">
-                            {kw}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Triggers */}
-                  {card.triggers && card.triggers.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Triggers</p>
-                      <div className="flex flex-wrap gap-1">
-                        {card.triggers.map((tr) => (
-                          <span key={tr} className="rounded bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-300">
-                            {tr}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Clans/Factions */}
-                  {card.clans && card.clans.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Factions</p>
-                      <div className="flex flex-wrap gap-1">
-                        {card.clans.map((clan) => (
-                          <span key={clan} className="rounded bg-purple-500/20 px-2 py-1 text-xs font-medium text-purple-300">
-                            {clan}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Rules Text */}
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Rules Text</p>
-                    <div className="rounded border border-border bg-surface p-3">
-                      <p className="whitespace-pre-wrap text-sm text-foreground">
-                        {card.text?.trim() ? card.text : 'No rules text available for this card.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Playtest Actions (feature-flagged) */}
-                  {features.playtestActions() && (
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Playtest Actions</p>
-                      <div className="flex flex-wrap gap-1">
-                        <span className="rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">Play</span>
-                        {card.type?.includes('Pilot') && (
-                          <span className="rounded bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-300">Link</span>
-                        )}
-                        {card.ap !== undefined && (
-                          <span className="rounded bg-orange-500/20 px-2 py-1 text-xs font-medium text-orange-300">Attack</span>
-                        )}
-                        <span className="rounded bg-slate-500/20 px-2 py-1 text-xs font-medium text-slate-300">Resource</span>
-                      </div>
-                    </div>
-                  )}
+              {/* Details column - visible on all screens, scrollable on desktop */}
+              <div className="flex-1 space-y-4 bg-surface-muted/50 p-4 md:overflow-y-auto md:p-6">
+                {/* Type & Stats */}
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Type</p>
+                  <p className="text-sm font-medium text-foreground">{card.type}</p>
                 </div>
+
+                {/* Price History (feature-flagged) */}
+                {features.priceHistory() && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Price History</p>
+                    <div className="rounded border border-border bg-surface p-3">
+                      <p className="text-xs text-steel-600">Market data unavailable</p>
+                      <p className="mt-2 text-xs text-foreground">Price tracking coming soon</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Combat Stats */}
+                {(card.ap !== undefined || card.hp !== undefined || card.level !== undefined) && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Stats</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {card.level !== undefined && (
+                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-steel-600">Level</p>
+                          <p className="text-lg font-bold tabular-nums text-foreground">{card.level}</p>
+                        </div>
+                      )}
+                      {card.ap !== undefined && (
+                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-steel-600">AP</p>
+                          <p className="text-lg font-bold tabular-nums text-foreground">{card.ap}</p>
+                        </div>
+                      )}
+                      {card.hp !== undefined && (
+                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-steel-600">HP</p>
+                          <p className="text-lg font-bold tabular-nums text-foreground">{card.hp}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pilot Modifiers */}
+                {(card.apModifier !== undefined || card.hpModifier !== undefined) && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Modifiers</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {card.apModifier !== undefined && (
+                        <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-steel-600">AP Mod</p>
+                          <p className="text-lg font-bold tabular-nums text-cobalt-300">
+                            {card.apModifier > 0 ? '+' : ''}
+                            {card.apModifier}
+                          </p>
+                        </div>
+                      )}
+                      {card.hpModifier !== undefined && (
+                        <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-steel-600">HP Mod</p>
+                          <p className="text-lg font-bold tabular-nums text-cobalt-300">
+                            {card.hpModifier > 0 ? '+' : ''}
+                            {card.hpModifier}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Traits */}
+                {card.traits && card.traits.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Traits</p>
+                    <p className="text-sm text-foreground">{card.traits.join(' • ')}</p>
+                  </div>
+                )}
+
+                {/* Link Condition */}
+                {card.linkCondition && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Link Condition</p>
+                    <p className="text-sm text-foreground">{card.linkCondition}</p>
+                  </div>
+                )}
+
+                {/* Keywords */}
+                {card.keywords && card.keywords.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Keywords</p>
+                    <div className="flex flex-wrap gap-1">
+                      {card.keywords.map((kw) => (
+                        <span key={kw} className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Triggers */}
+                {card.triggers && card.triggers.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Triggers</p>
+                    <div className="flex flex-wrap gap-1">
+                      {card.triggers.map((tr) => (
+                        <span key={tr} className="rounded bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-300">
+                          {tr}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Clans/Factions */}
+                {card.clans && card.clans.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Factions</p>
+                    <div className="flex flex-wrap gap-1">
+                      {card.clans.map((clan) => (
+                        <span key={clan} className="rounded bg-purple-500/20 px-2 py-1 text-xs font-medium text-purple-300">
+                          {clan}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rules Text */}
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Rules Text</p>
+                  <div className="rounded border border-border bg-surface p-3">
+                    <p className="whitespace-pre-wrap text-sm text-foreground">
+                      {card.text?.trim() ? card.text : 'No rules text available for this card.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Playtest Actions (feature-flagged) */}
+                {features.playtestActions() && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Playtest Actions</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">Play</span>
+                      {card.type?.includes('Pilot') && (
+                        <span className="rounded bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-300">Link</span>
+                      )}
+                      {card.ap !== undefined && (
+                        <span className="rounded bg-orange-500/20 px-2 py-1 text-xs font-medium text-orange-300">Attack</span>
+                      )}
+                      <span className="rounded bg-slate-500/20 px-2 py-1 text-xs font-medium text-slate-300">Resource</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex flex-col gap-3 border-t border-border bg-surface-muted px-6 py-4">
+            <div className="flex flex-shrink-0 flex-col gap-3 border-t border-border bg-surface-muted px-4 py-3 md:px-6 md:py-4">
               {/* Compare Cards Button (feature-flagged) */}
               {features.compareCards() && (
                 <Button variant="secondary" className="w-full">
