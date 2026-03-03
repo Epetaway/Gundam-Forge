@@ -85,7 +85,7 @@ export function DeckPreviewCard({
 
   return (
     <article
-      className="group relative rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 active:scale-100 hover:shadow-lg dark:hover:shadow-cobalt-900/30 focus-within:ring-2 focus-within:ring-cobalt-400/60"
+      className="group relative rounded-lg overflow-hidden border border-border transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:border-cobalt-500/40 focus-within:ring-2 focus-within:ring-cobalt-400/60 will-change-transform cursor-pointer"
       aria-label={`Deck: ${title}`}
     >
       {/* Hero Image with Overlay */}

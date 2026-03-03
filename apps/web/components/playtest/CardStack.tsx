@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import type { CardInstance, CardDefinition } from '@/lib/game/game-engine';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
 
 interface CardStackProps {

@@ -7,6 +7,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Button } from '@/components/ui/Button';
+import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { features } from '@/lib/features/feature-flags';
 
 interface CardDetailModalProps {
