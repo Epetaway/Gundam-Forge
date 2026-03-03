@@ -85,7 +85,7 @@ export function CardDetailModal({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="flex max-h-[92vh] w-[min(1100px,94vw)] flex-col gap-0 overflow-hidden p-0">
+      <DialogContent className="flex max-h-[92svh] w-[min(1100px,94vw)] flex-col gap-0 overflow-hidden p-0 top-[50svh]">
         {card ? (
           <>
             {/* Header */}
