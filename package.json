@@ -12,11 +12,13 @@
     "dev:web": "npm --workspace @gundam-forge/web run dev",
     "sync-cards": "tsx scripts/sync-official-cards.ts",
     "sync-decks": "tsx scripts/sync-official-decks.ts",
+    "sync-news": "tsx scripts/sync-news.ts",
     "sync-cards-xlsx": "tsx scripts/sync-cards-from-xlsx.ts",
     "fetch-assets": "tsx scripts/fetchCardAssets.ts",
     "fetch-hq-images": "tsx scripts/fetch-hq-images.ts",
     "validate-cards": "tsx scripts/validate-cards.ts",
     "build-card-catalog": "tsx scripts/build-card-catalog.ts",
+    "sync-all": "npm run sync-cards && npm run fetch-assets && npm run build-card-catalog && npm run sync-news && npm run sync-decks",
     "test": "vitest run",
     "test:watch": "vitest"
   },

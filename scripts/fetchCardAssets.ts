@@ -35,6 +35,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
+// Primary image source: official Gundam TCG site (gundam-gcg.com)
+const OFFICIAL_CARD_ART_BASE = 'https://www.gundam-gcg.com/en/images/cards/card';
+// Secondary/fallback image source: ExBurst community database
 const EXBURST_BASE = 'https://exburst.dev/gundam/cards/sd';
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 10);
 const IMAGE_EXTENSIONS = ['webp', 'png', 'jpg', 'jpeg'] as const;
@@ -51,7 +54,12 @@ interface ImageCandidate {
   buffer: Buffer;
 }
 
-/** Canonical exburst image URL for a card ID */
+/** Official Gundam TCG image URL for a card ID (primary source) */
+function officialUrl(cardId: string, ext: ImageExtension, suffix = ''): string {
+  return `${OFFICIAL_CARD_ART_BASE}/${cardId}${suffix}.${ext}`;
+}
+
+/** ExBurst image URL for a card ID (secondary/fallback source) */
 function exburstUrl(cardId: string, ext: ImageExtension): string {
   return `${EXBURST_BASE}/${cardId}.${ext}`;
 }
@@ -120,12 +128,40 @@ async function removeOtherVariants(cardArtDir: string, cardId: string, keepExt: 
   );
 }
 
-async function downloadBestImage(cardId: string): Promise<ImageCandidate | null> {
+// Variant suffixes used on the official site (e.g. card with parallel art)
+const OFFICIAL_VARIANT_SUFFIXES = ['', '_p1', '_p2', '_p3'] as const;
+
+async function downloadBestImage(cardId: string, preferredUrl?: string): Promise<ImageCandidate | null> {
   const candidates: ImageCandidate[] = [];
 
-  for (const ext of IMAGE_EXTENSIONS) {
-    const candidate = await fetchCandidate(exburstUrl(cardId, ext), ext);
-    if (candidate) candidates.push(candidate);
+  // 1. Try the card's existing imageUrl if it points to the official site
+  if (preferredUrl && preferredUrl.includes('gundam-gcg.com')) {
+    try {
+      const ext = preferredUrl.split('.').pop()?.toLowerCase() as ImageExtension | undefined;
+      if (ext && IMAGE_EXTENSIONS.includes(ext)) {
+        const c = await fetchCandidate(preferredUrl, ext);
+        if (c) candidates.push(c);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 2. Try official gundam-gcg.com image URLs (primary source)
+  for (const suffix of OFFICIAL_VARIANT_SUFFIXES) {
+    for (const ext of IMAGE_EXTENSIONS) {
+      const c = await fetchCandidate(officialUrl(cardId, ext, suffix), ext);
+      if (c) candidates.push(c);
+    }
+    if (candidates.length > 0) break; // base variant found, skip suffix variants
+  }
+
+  // 3. Fall back to ExBurst when official site has no image
+  if (candidates.length === 0) {
+    for (const ext of IMAGE_EXTENSIONS) {
+      const c = await fetchCandidate(exburstUrl(cardId, ext), ext);
+      if (c) candidates.push(c);
+    }
   }
 
   if (candidates.length === 0) return null;
@@ -187,7 +223,8 @@ function setupPriceManager(): PriceAPIManager {
 
 async function main() {
   console.log('Gundam Forge — Card Asset Fetcher');
-  console.log(`Source     : ${EXBURST_BASE}`);
+  console.log(`Primary    : ${OFFICIAL_CARD_ART_BASE}`);
+  console.log(`Fallback   : ${EXBURST_BASE}`);
   console.log(`Concurrency: ${CONCURRENCY}\n`);
 
   const cardsPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
@@ -224,7 +261,7 @@ async function main() {
       return;
     }
 
-    const best = await downloadBestImage(card.id);
+    const best = await downloadBestImage(card.id, card.imageUrl);
     if (best) {
       const dest = path.join(cardArtDir, `${card.id}.${best.ext}`);
       await fs.mkdir(path.dirname(dest), { recursive: true });

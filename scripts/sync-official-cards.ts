@@ -9,8 +9,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const DEFAULT_BASE_URL = 'https://exburst.dev';
-const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/gundam/cardlist`;
+const DEFAULT_BASE_URL = 'https://www.gundam-gcg.com';
+const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/en/cards`;
+
+// ExBurst is used as a secondary/fallback source when the primary returns no cards
+const EXBURST_BASE_URL = 'https://exburst.dev';
+const EXBURST_CARDS_URL = `${EXBURST_BASE_URL}/gundam/cardlist`;
 const USE_PLAYWRIGHT = process.env.GUNDAM_GCG_USE_PLAYWRIGHT !== 'false';
 const FETCH_TIMEOUT_MS = Number(process.env.GUNDAM_GCG_FETCH_TIMEOUT_MS || '20000');
 const FETCH_RETRIES = Number(process.env.GUNDAM_GCG_FETCH_RETRIES || '2');
@@ -985,9 +989,41 @@ const main = async () => {
     }
   }
 
+  // ── ExBurst fallback ────────────────────────────────────────────────────────
+  // If the primary source (gundam-gcg.com) returned no cards, try ExBurst as
+  // a secondary/fallback source so the pipeline never comes up empty.
+  if (candidates.length === 0 && cardsUrl !== EXBURST_CARDS_URL) {
+    console.log(`  ℹ️  Primary source returned no cards. Falling back to ExBurst: ${EXBURST_CARDS_URL}`);
+    try {
+      const exburstHtml = await fetchText(EXBURST_CARDS_URL);
+      const exburstPayloads = extractJsonPayloads(exburstHtml);
+      candidates = collectCardsFromJsonPayloads(exburstPayloads, EXBURST_BASE_URL);
+
+      if (candidates.length === 0) {
+        const exburstLinks = extractCardLinksFromHtml(exburstHtml, EXBURST_BASE_URL);
+        if (exburstLinks.length > 0) {
+          candidates = await fetchDetailCandidates(exburstLinks, undefined, detailDelayMs);
+        }
+      }
+
+      if (candidates.length === 0 && USE_PLAYWRIGHT) {
+        const exburstRendered = await fetchRenderedPayloads(EXBURST_CARDS_URL);
+        if (exburstRendered.length > 0) {
+          candidates = collectCardsFromJsonPayloads(exburstRendered, EXBURST_BASE_URL);
+        }
+      }
+
+      if (candidates.length > 0) {
+        console.log(`  ✓ ExBurst fallback returned ${candidates.length} candidate(s).`);
+      }
+    } catch (fallbackError) {
+      console.warn(`  ⚠️  ExBurst fallback failed: ${fallbackError}`);
+    }
+  }
+
   if (candidates.length === 0) {
     const hint = discoveredEndpoints.length > 0 ? ` Tried endpoints: ${discoveredEndpoints.slice(0, 5).join(', ')}` : '';
-    throw new Error(`No card data found. Set GUNDAM_GCG_CARDS_URL or GUNDAM_GCG_CARD_DETAIL_TEMPLATE.${hint}`);
+    throw new Error(`No card data found from primary (${cardsUrl}) or ExBurst fallback.${hint}`);
   }
 
   const uniqueCandidates = new Map<string, OfficialCardCandidate>();
