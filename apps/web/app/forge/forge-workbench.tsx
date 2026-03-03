@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save } from 'lucide-react';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -400,6 +400,27 @@ function MobileToolbar({
   );
 }
 
+// ---------- zone header ----------
+
+function ZoneHeader({ label, count, target }: { label: string; count: number; target?: number }) {
+  const over = target !== undefined && count > target;
+  const exact = target !== undefined && count === target;
+  return (
+    <div className="mb-2 flex items-center gap-2">
+      <span className="text-xs font-bold uppercase tracking-widest text-steel-500">{label}</span>
+      <span
+        className={cn(
+          'rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold',
+          over ? 'bg-red-900/40 text-red-400' : exact ? 'bg-green-900/30 text-green-400' : 'bg-surface-interactive text-steel-500',
+        )}
+      >
+        {count}{target !== undefined ? `/${target}` : ''}
+      </span>
+      <div className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
 // ---------- deck settings bar ----------
 
 interface DeckSettingsBarProps {
@@ -417,6 +438,9 @@ interface DeckSettingsBarProps {
   validationIsValid?: boolean;
   validationMainDeckCards?: number;
   validationHasOverLimit?: boolean;
+  /** Autosave state */
+  isSaving?: boolean;
+  lastSaved?: Date | null;
 }
 
 function DeckSettingsBar({
@@ -433,6 +457,8 @@ function DeckSettingsBar({
   validationIsValid = false,
   validationMainDeckCards = 0,
   validationHasOverLimit = false,
+  isSaving,
+  lastSaved,
 }: DeckSettingsBarProps) {
   const [open, setOpen] = React.useState(false);
   const [localName, setLocalName] = React.useState(name);
@@ -497,6 +523,13 @@ function DeckSettingsBar({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Autosave indicator */}
+          {isSaving !== undefined && (
+            <span className="hidden items-center gap-1 text-xs text-steel-600 sm:inline-flex" aria-live="polite">
+              <Save className="h-3 w-3" aria-hidden="true" />
+              {isSaving ? 'Saving…' : lastSaved ? 'Saved' : ''}
+            </span>
+          )}
           {/* Validation badge */}
           <span
             className={cn(
@@ -762,7 +795,10 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
   const [sortBy, setSortBy] = React.useState<DeckSortKey>('type');
   const [activeCardId, setActiveCardId] = React.useState<string | null>(null);
   // Inline feedback toast
-  const [toast, setToast] = React.useState<{ msg: string; kind: 'success' | 'warn' } | null>(null);
+  const [toast, setToast] = React.useState<{ msg: string; kind: 'success' | 'warn'; undo?: () => void } | null>(null);
+  // Autosave indicator
+  const [lastSaved, setLastSaved] = React.useState<Date | null>(null);
+  const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
     const loaded = deckId ? getStoredDeck(deckId) : null;
@@ -804,9 +840,9 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     } catch { /* ignore */ }
   }, [deckId, initialDeck, initialSetId]);
 
-  const showToast = React.useCallback((msg: string, kind: 'success' | 'warn' = 'success') => {
-    setToast({ msg, kind });
-    const t = setTimeout(() => setToast(null), 3500);
+  const showToast = React.useCallback((msg: string, kind: 'success' | 'warn' = 'success', undo?: () => void) => {
+    setToast({ msg, kind, undo });
+    const t = setTimeout(() => setToast(null), undo ? 5000 : 3500);
     return () => clearTimeout(t);
   }, []);
 
@@ -820,22 +856,44 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
   }, []);
 
   const handleRemove = React.useCallback((cardId: string) => {
+    let removedQty = 0;
     setDeck((prev) => {
       const next = { ...prev };
-      if ((next[cardId] ?? 0) <= 1) {
+      removedQty = next[cardId] ?? 0;
+      if (removedQty <= 1) {
         delete next[cardId];
       } else {
         next[cardId] -= 1;
+        removedQty = 1;
       }
       return next;
     });
-  }, []);
+    // Show undo toast after state update
+    setTimeout(() => {
+      const card = allCards.find((c) => c.id === cardId);
+      const cardName = card?.name ?? cardId;
+      showToast(
+        `Removed ${cardName}`,
+        'warn',
+        () => {
+          setDeck((prev) => ({ ...prev, [cardId]: Math.min((prev[cardId] ?? 0) + 1, 4) }));
+          setToast(null);
+        },
+      );
+    }, 0);
+  }, [showToast]);
 
-  // Persist deck entries whenever deck changes
+  // Persist deck entries whenever deck changes — autosave with indicator
   React.useEffect(() => {
     if (!deckId) return;
+    setSaving(true);
     const entries = Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }));
     updateDeckEntries(deckId, entries);
+    const t = setTimeout(() => {
+      setSaving(false);
+      setLastSaved(new Date());
+    }, 400);
+    return () => clearTimeout(t);
   }, [deck, deckId]);
 
   // Deck meta updaters (persist to localStorage when deckId is set)
@@ -916,6 +974,16 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     () => applyDeckFilterSort(deckViewItems, { query, sortBy }),
     [deckViewItems, query, sortBy],
   );
+
+  // Zone grouping for zone headers
+  const zoneGroups = React.useMemo(() => {
+    const isEX = (id: string) => id.startsWith('EXB') || id.startsWith('EXR');
+    const main = filteredDeckItems.filter((i) => !isEX(i.id) && i.typeLine !== 'Resource');
+    const resources = filteredDeckItems.filter((i) => !isEX(i.id) && i.typeLine === 'Resource');
+    const ex = filteredDeckItems.filter((i) => isEX(i.id));
+    const total = (items: typeof filteredDeckItems) => items.reduce((s, i) => s + i.qty, 0);
+    return { main, resources, ex, mainTotal: total(main), resourcesTotal: total(resources), exTotal: total(ex) };
+  }, [filteredDeckItems]);
 
   // Sidebar state: mobile overlay drawer + desktop collapse (persisted)
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -1054,13 +1122,23 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       {toast && (
         <div
           className={cn(
-            'fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm font-medium shadow-lg',
-            toast.kind === 'warn' ? 'bg-amber-600 text-white' : 'bg-green-700 text-white',
+            'fixed bottom-4 left-1/2 z-50 -translate-x-1/2 flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium shadow-lg',
+            toast.kind === 'warn' ? 'bg-amber-700 text-white' : 'bg-green-700 text-white',
           )}
           role="status"
           aria-live="polite"
         >
-          {toast.msg}
+          <span>{toast.msg}</span>
+          {toast.undo && (
+            <button
+              type="button"
+              className="ml-1 rounded border border-white/30 px-2 py-0.5 text-xs font-bold text-white underline hover:bg-white/20 transition-colors"
+              onClick={toast.undo}
+              aria-label="Undo last action"
+            >
+              Undo
+            </button>
+          )}
         </div>
       )}
 
@@ -1088,6 +1166,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
               validationIsValid={validationResult.isValid}
               validationMainDeckCards={validationResult.metrics.mainDeckCards}
               validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
+              isSaving={saving}
+              lastSaved={lastSaved}
             />
           );
         }, [deck, handleExport, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards])}
@@ -1193,18 +1273,43 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
               )}
             </div>
           ) : (
-            <div className="p-4">
-              <DeckListRenderer
-                viewMode={viewMode}
-                items={filteredDeckItems}
-                selection={{ activeCardId }}
-                actions={{
-                  onOpenCard: setActiveCardId,
-                  onAdd: handleAdd,
-                  onRemove: handleRemove,
-                }}
-                ui={{ density, mode: 'builder', features: { collection: false, deckEdit: true } }}
-              />
+            <div className="space-y-2 p-4">
+              {zoneGroups.main.length > 0 && (
+                <>
+                  <ZoneHeader label="Main Deck" count={zoneGroups.mainTotal} target={50} />
+                  <DeckListRenderer
+                    viewMode={viewMode}
+                    items={zoneGroups.main}
+                    selection={{ activeCardId }}
+                    actions={{ onOpenCard: setActiveCardId, onAdd: handleAdd, onRemove: handleRemove }}
+                    ui={{ density, mode: 'builder', features: { collection: false, deckEdit: true } }}
+                  />
+                </>
+              )}
+              {zoneGroups.resources.length > 0 && (
+                <>
+                  <ZoneHeader label="Resource Deck" count={zoneGroups.resourcesTotal} target={10} />
+                  <DeckListRenderer
+                    viewMode={viewMode}
+                    items={zoneGroups.resources}
+                    selection={{ activeCardId }}
+                    actions={{ onOpenCard: setActiveCardId, onAdd: handleAdd, onRemove: handleRemove }}
+                    ui={{ density, mode: 'builder', features: { collection: false, deckEdit: true } }}
+                  />
+                </>
+              )}
+              {zoneGroups.ex.length > 0 && (
+                <>
+                  <ZoneHeader label="EX Zone" count={zoneGroups.exTotal} />
+                  <DeckListRenderer
+                    viewMode={viewMode}
+                    items={zoneGroups.ex}
+                    selection={{ activeCardId }}
+                    actions={{ onOpenCard: setActiveCardId, onAdd: handleAdd, onRemove: handleRemove }}
+                    ui={{ density, mode: 'builder', features: { collection: false, deckEdit: true } }}
+                  />
+                </>
+              )}
             </div>
           )}
         </div>

@@ -326,7 +326,7 @@ export function Battlefield({
                   key={i}
                   className="text-[10px] text-steel-400 px-2 py-1 border-b border-surface last:border-b-0 leading-relaxed"
                 >
-                  <span className="font-mono text-steel-600 mr-1">[T{entry.turnNumber}]</span>
+                  <span className="font-mono text-steel-600 mr-1">[T{entry.state.turnNumber ?? '?'}]</span>
                   {entry.description || entry.actionType}
                 </div>
               ))}
