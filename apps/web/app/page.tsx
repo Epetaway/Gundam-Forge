@@ -28,7 +28,7 @@ export default function HomePage(): JSX.Element {
   return (
     <>
       <section className="relative overflow-hidden border-b border-border">
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_500px_at_18%_-10%,rgba(59,130,246,0.24),transparent_72%),linear-gradient(120deg,rgba(59,130,246,0.08),transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_500px_at_18%_-10%,hsl(var(--accent)/0.24),transparent_72%),linear-gradient(120deg,hsl(var(--accent)/0.08),transparent_45%)]" />
         <Container className="relative grid gap-12 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:py-24">
           <div className="space-y-6">
             <Badge variant="accent" className="w-fit">Gundam Card Game Forge</Badge>

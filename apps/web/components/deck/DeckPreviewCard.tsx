@@ -85,26 +85,24 @@ export function DeckPreviewCard({
 
   return (
     <article
-      className="group relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg dark:hover:shadow-cobalt-900/30"
-      onClick={onClick}
-      tabIndex={0}
-      role="button"
-      aria-label={`Open deck: ${title}`}
+      className="group relative rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 active:scale-100 hover:shadow-lg dark:hover:shadow-cobalt-900/30 focus-within:ring-2 focus-within:ring-cobalt-400/60"
+      aria-label={`Deck: ${title}`}
     >
       {/* Hero Image with Overlay */}
       <div className="relative h-40 w-full overflow-hidden bg-surface-muted">
         <img
           src={heroUrl}
-          alt={title}
+          alt=""
+          aria-hidden="true"
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
           style={{ filter: "contrast(1.1) saturate(1.15)" }}
           draggable={false}
         />
-        {/* Dark overlay gradient for light/dark mode */}
+        {/* Dark overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-cobalt-700 via-cobalt-700/40 to-transparent dark:from-cobalt-900 dark:via-cobalt-900/40" />
         <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
 
-        {/* Title overlay - positioned absolutely on image */}
+        {/* Title overlay */}
         <div className="absolute inset-0 flex items-end p-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-white leading-tight truncate drop-shadow-lg">
@@ -114,18 +112,17 @@ export function DeckPreviewCard({
           </div>
         </div>
 
-        {/* Menu button - top right */}
+        {/* Menu button — must be z-20 to stay above the click overlay below */}
         <button
-          className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
+          className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onMenu?.(e);
           }}
-          tabIndex={0}
           aria-label="Deck options"
           type="button"
         >
-          <span className="text-lg">⋮</span>
+          <span className="text-lg" aria-hidden="true">⋮</span>
         </button>
       </div>
 
@@ -140,7 +137,7 @@ export function DeckPreviewCard({
               className="h-8 w-8 rounded-full object-cover border border-border/50"
             />
           ) : (
-            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-steel-400">
+            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-steel-400" aria-hidden="true">
               {author.charAt(0).toUpperCase()}
             </div>
           )}
@@ -150,7 +147,7 @@ export function DeckPreviewCard({
         </div>
 
         {/* Color badges */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5" aria-label="Deck colors">
           {colors.length > 0 ? (
             colors.map((color, i) => {
               const classes = colorToClasses(color);
@@ -158,16 +155,16 @@ export function DeckPreviewCard({
                 <span
                   key={color + i}
                   className={`inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold ${classes.bg} ${classes.border} ${classes.text}`}
-                  title={color}
                 >
-                  ●{" "}
+                  <span aria-hidden="true">● </span>
                   <span className="ml-1.5">{color}</span>
                 </span>
               );
             })
           ) : (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold bg-steel-600/40 border-steel-400/60 text-white">
-              ● Colorless
+              <span aria-hidden="true">● </span>
+              <span className="ml-1.5">Colorless</span>
             </span>
           )}
         </div>
@@ -209,6 +206,17 @@ export function DeckPreviewCard({
             : null}
         </div>
       </div>
+
+      {/* Full-card click overlay — last in DOM so it stacks on top; z-10 below menu (z-20) */}
+      {onClick && (
+        <button
+          type="button"
+          className="absolute inset-0 z-10 cursor-pointer rounded-lg"
+          onClick={onClick}
+          aria-label={`Open deck: ${title}`}
+          tabIndex={0}
+        />
+      )}
     </article>
   );
 }
