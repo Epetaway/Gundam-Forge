@@ -31,12 +31,17 @@ const config: Config = {
           from: { opacity: '1', transform: 'translate(-50%, -50%) scale(1)' },
           to: { opacity: '0', transform: 'translate(-50%, -47%) scale(0.97)' },
         },
+        'shimmer': {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 160ms ease-out',
         'fade-out': 'fade-out 140ms ease-in',
         'zoom-in': 'zoom-in 200ms ease-out',
         'zoom-out': 'zoom-out 140ms ease-in',
+        'shimmer': 'shimmer 2s infinite',
       },
       maxWidth: {
         content: '80rem',

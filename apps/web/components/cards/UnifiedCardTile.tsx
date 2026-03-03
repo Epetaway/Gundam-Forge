@@ -3,6 +3,7 @@
 import { ChevronRight, Minus, Plus } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
 
 type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'imageUrl' | 'placeholderArt'>;
