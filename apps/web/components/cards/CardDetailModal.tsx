@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { X, Minus, Plus, ChevronLeft, ChevronRight, Copy, TrendingUp } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
 import { Button } from '@/components/ui/Button';
 import { features } from '@/lib/features/feature-flags';
@@ -85,7 +86,11 @@ export function CardDetailModal({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="flex max-h-[92svh] w-[min(1100px,94vw)] flex-col gap-0 overflow-hidden p-0 top-[50svh]">
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogPrimitive.Content
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[90svh] sm:w-[min(1100px,94vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35"
+        >
         {card ? (
           <>
             {/* Header */}
@@ -386,7 +391,8 @@ export function CardDetailModal({
         ) : (
           <div className="p-6 text-center text-sm text-steel-600">No card selected.</div>
         )}
-      </DialogContent>
+        </DialogPrimitive.Content>
+      </DialogPortal>
     </Dialog>
   );
 }
