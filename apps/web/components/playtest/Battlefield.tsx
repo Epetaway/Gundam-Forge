@@ -73,6 +73,7 @@ interface BattlefieldProps {
   onCardPlayRequested?: (card: CardInstance) => void;
   onShieldDamaged?: (shieldCount: number) => void;
   onSelectCard?: (card: CardInstance) => void;
+  onAttackDeclared?: (attackerInstanceId: string, targetInstanceId?: string) => void;
 }
 
 /**
@@ -92,10 +93,13 @@ export function Battlefield({
   onCardPlayRequested,
   onShieldDamaged,
   onSelectCard,
+  onAttackDeclared,
 }: BattlefieldProps) {
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   const [draggedCard, setDraggedCard] = useState<CardInstance | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  // Targeting mode state
+  const [attackingUnit, setAttackingUnit] = useState<CardInstance | null>(null);
 
   // Detect mobile for hand tray rendering
   useEffect(() => {
@@ -104,6 +108,16 @@ export function Battlefield({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Escape key cancels targeting mode
+  useEffect(() => {
+    if (!attackingUnit) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAttackingUnit(null);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [attackingUnit]);
 
   // Get contextual status message based on phase and turn
   const getStatusMessage = (): string => {
@@ -164,25 +178,71 @@ export function Battlefield({
         </div>
       </div>
 
+      {/* TARGETING MODE BANNER */}
+      {attackingUnit && (
+        <div className="flex-shrink-0 border-b-2 border-amber-500/60 bg-amber-900/20 px-4 py-2 flex items-center gap-3 z-20 relative" role="status" aria-live="assertive">
+          <span className="text-amber-300 font-bold text-xs uppercase tracking-wider">Targeting Mode</span>
+          <span className="text-amber-200 text-xs">
+            Attacking with <strong>{cardDatabase[attackingUnit.cardId]?.name ?? attackingUnit.cardId}</strong> — click an opponent unit or Attack Base
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded border border-amber-500/50 bg-amber-600/20 px-2 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-600/40 transition-colors"
+              onClick={() => {
+                onAttackDeclared?.(attackingUnit.instanceId, undefined);
+                setAttackingUnit(null);
+              }}
+            >
+              ⚔ Attack Base
+            </button>
+            <button
+              type="button"
+              className="rounded border border-border px-2 py-1 text-xs text-steel-500 hover:text-foreground transition-colors"
+              onClick={() => setAttackingUnit(null)}
+              aria-label="Cancel attack"
+            >
+              Cancel (Esc)
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* OPPONENT BATTLE AREA - Unit display with AP/HP stats */}
       {opponentState.battleArea.length > 0 && (
-        <div className="flex-shrink-0 border-b border-border/50 bg-surface/40 px-4 py-2">
-          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-steel-500">
-            Opponent&apos;s Battle Area
+        <div className={`flex-shrink-0 border-b px-4 py-2 ${attackingUnit ? 'border-amber-500/40 bg-amber-900/10' : 'border-border/50 bg-surface/40'}`}>
+          <div className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${attackingUnit ? 'text-amber-400' : 'text-steel-500'}`}>
+            {attackingUnit ? '⚔ Select Target — ' : ''}{opponentState.name}&apos;s Battle Area
           </div>
           <div className="flex flex-wrap gap-2">
             {opponentState.battleArea.map((unit) => {
               const card = cardDatabase[unit.cardId];
+              const isTargetable = !!attackingUnit;
               return (
-                <div
+                <button
                   key={unit.instanceId}
-                  className={`flex items-center gap-1.5 rounded border px-2 py-1 text-xs ${
-                    unit.state === 'rest'
-                      ? 'border-steel-700/60 bg-surface-muted text-steel-500'
-                      : 'border-red-700/50 bg-red-900/10 text-steel-300'
+                  type="button"
+                  className={`flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all ${
+                    isTargetable
+                      ? 'cursor-pointer border-amber-500/70 bg-amber-900/20 text-amber-200 ring-1 ring-amber-500/40 hover:ring-2 hover:ring-amber-400 hover:bg-amber-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400'
+                      : unit.state === 'rest'
+                        ? 'border-steel-700/60 bg-surface-muted text-steel-500 cursor-default'
+                        : 'border-red-700/50 bg-red-900/10 text-steel-300 cursor-default'
                   }`}
-                  title={`${card?.name ?? unit.cardId} — AP:${card?.ap ?? 0} HP:${card?.hp ?? 0}${unit.state === 'rest' ? ' (resting)' : ' (ready)'}`}
+                  title={`${card?.name ?? unit.cardId} — AP:${card?.ap ?? 0} HP:${card?.hp ?? 0}${unit.state === 'rest' ? ' (resting)' : ' (ready)'}${isTargetable ? ' — Click to target' : ''}`}
+                  onClick={() => {
+                    if (isTargetable) {
+                      onAttackDeclared?.(attackingUnit.instanceId, unit.instanceId);
+                      setAttackingUnit(null);
+                    } else {
+                      onUnitSelected?.(unit, true);
+                    }
+                  }}
+                  aria-label={isTargetable ? `Attack ${card?.name ?? unit.cardId}` : card?.name ?? unit.cardId}
                 >
+                  {isTargetable && (
+                    <span className="text-amber-400 font-bold text-[10px]">⚔</span>
+                  )}
                   <div className="relative h-8 w-6 flex-shrink-0 overflow-hidden rounded">
                     {card?.imageUrl ? (
                       <img
@@ -209,7 +269,7 @@ export function Battlefield({
                       {unit.state === 'rest' && <span className="text-steel-500 italic">rest</span>}
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -283,9 +343,16 @@ export function Battlefield({
               units={playerState.battleArea}
               cardDatabase={cardDatabase}
               isOpponent={false}
-              onUnitSelected={(unit) => onUnitSelected?.(unit, false)}
+              onUnitSelected={(unit) => {
+                if (isPlayerTurn && gamePhase === 'main' && unit.state === 'ready') {
+                  setAttackingUnit(unit);
+                } else {
+                  onUnitSelected?.(unit, false);
+                }
+              }}
               gamePhase={gamePhase}
               isPlayerTurn={isPlayerTurn}
+              attackingUnitId={attackingUnit?.instanceId}
             />
           </div>
         </div>
