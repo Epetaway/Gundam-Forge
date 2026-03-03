@@ -79,7 +79,7 @@ The following features are **confirmed implemented and working correctly** per c
 | Phase 9 | Content & seed data | 2 | Explore/Decks 5→8 | ⚠️ Data exists |
 | Phase 10 | Mobile QA sweep | 1 | Mobile 5→8.5 | ⚠️ Core responsive ✅ |
 | **Phase 11** | **Navigation & IA Clarity** | **4** | **Nav 7→9** | **✅ COMPLETE** |
-| **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **🔄 In Progress (Task 12.3)** |
+| **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **🔄 In Progress (Task 12.1→12.2)** |
 | **Phase 13** | **Performance & Scalability** | **5** | **Perf 5→8** | **❌ Not started** |
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **❌ Not started** |
 
