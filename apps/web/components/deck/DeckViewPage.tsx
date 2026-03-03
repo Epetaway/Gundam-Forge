@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2 } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, FileJson } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/layout/Container';
 import { DeckHeader } from '@/components/deck/DeckHeader';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
@@ -103,6 +104,27 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
     window.setTimeout(() => setFeedback(''), 1800);
   }, [initialItems]);
 
+  const handleExportJson = React.useCallback(() => {
+    const payload = {
+      name: deck.name,
+      description: deck.description,
+      archetype: deck.archetype,
+      colors: deck.colors,
+      owner: deck.owner,
+      exportedAt: new Date().toISOString(),
+      cards: initialItems.map((item) => ({ id: item.id, name: item.name, qty: item.qty })),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deck.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setFeedback('Deck JSON downloaded.');
+    window.setTimeout(() => setFeedback(''), 1800);
+  }, [deck, initialItems]);
+
   const ActiveRenderer = activeView.Component;
 
   return (
@@ -118,7 +140,12 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
         owner={deck.owner}
         totalCards={initialItems.reduce((sum, item) => sum + item.qty, 0)}
         deckId={deck.id}
-      />
+      >
+        <Button onClick={handleExportJson} size="sm" variant="secondary" title="Download deck as JSON file">
+          <FileJson className="mr-1.5 h-3.5 w-3.5" />
+          JSON
+        </Button>
+      </DeckHeader>
 
       <DeckToolbar
         density={density}
