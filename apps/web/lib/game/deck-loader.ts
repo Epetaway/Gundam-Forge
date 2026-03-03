@@ -145,7 +145,7 @@ export function getDeckSummary(loaded: LoadedDeck): string {
     summary += `❌ Status: Invalid\n`;
   }
 
-  summary += `Cards: ${loaded.validation.mainCount} / 60\n`;
+  summary += `Cards: ${loaded.validation.mainCount} / 50\n`;
 
   if (loaded.validation.errors.length > 0) {
     summary += `\nErrors (${loaded.validation.errors.length}):\n`;

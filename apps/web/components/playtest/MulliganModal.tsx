@@ -44,14 +44,14 @@ export function MulliganModal({
         {/* Header */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-2">Mulligan Decision</h2>
-          <p className="text-steel-300">
+          <p className="text-white">
             You can redraw your entire opening hand one time. What would you like to do?
           </p>
         </div>
 
         {/* Hand Display */}
         <div className="mb-8">
-          <p className="text-sm text-steel-500 mb-3">Your opening hand ({hand.length} cards):</p>
+          <p className="text-sm text-white mb-3">Your opening hand ({hand.length} cards):</p>
           <div className="flex gap-2 overflow-x-auto pb-2 max-h-48">
             {hand.map((card) => {
               const cardDef = cardDatabase[card.cardId];
@@ -70,13 +70,13 @@ export function MulliganModal({
                       />
                     ) : (
                       <div className="w-full h-full bg-surface-muted flex items-center justify-center">
-                        <span className="text-xs text-steel-500 text-center px-1">
+                        <span className="text-xs text-white text-center px-1">
                           {card.cardId}
                         </span>
                       </div>
                     )}
                   </div>
-                  <span className="text-xs text-steel-300 text-center w-24 truncate">
+                  <span className="text-xs text-white text-center w-24 truncate">
                     {cardDef?.name || card.cardId}
                   </span>
                 </div>
@@ -88,14 +88,14 @@ export function MulliganModal({
         {/* Info Boxes */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="p-4 bg-surface-muted/50 rounded border border-border">
-            <div className="text-sm font-semibold text-steel-300 mb-2">Keep This Hand</div>
-            <p className="text-xs text-steel-500">
+            <div className="text-sm font-semibold text-white mb-2">Keep This Hand</div>
+            <p className="text-xs text-white">
               Proceed with your current opening hand. You cannot mulligan again.
             </p>
           </div>
           <div className="p-4 bg-surface-muted/50 rounded border border-border">
-            <div className="text-sm font-semibold text-steel-300 mb-2">Mulligan (Redraw)</div>
-            <p className="text-xs text-steel-500">
+            <div className="text-sm font-semibold text-white mb-2">Mulligan (Redraw)</div>
+            <p className="text-xs text-white">
               Shuffle all cards back into your deck and draw {SETUP_RULES.openingHandSize} new cards. This is your only mulligan.
             </p>
           </div>
@@ -109,7 +109,7 @@ export function MulliganModal({
             className={`flex-1 py-3 px-4 rounded font-semibold transition ${
               choice === 'keep'
                 ? 'bg-green-600 text-white'
-                : 'bg-surface-elevated text-steel-200 hover:bg-surface border border-border'
+                : 'bg-surface-elevated text-white hover:bg-surface border border-border'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             Keep This Hand
@@ -121,7 +121,7 @@ export function MulliganModal({
             className={`flex-1 py-3 px-4 rounded font-semibold transition ${
               choice === 'mulligan'
                 ? 'bg-cobalt-600 text-white'
-                : 'bg-surface-elevated text-steel-200 hover:bg-surface border border-border'
+                : 'bg-surface-elevated text-white hover:bg-surface border border-border'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             Mulligan (Redraw)
@@ -147,7 +147,7 @@ export function MulliganModal({
 
         {/* Rules Reference */}
         <div className="mt-8 pt-6 border-t border-slate-700">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-white">
             Official Mulligan Rule: Each player may mulligan their opening hand only once.
             A mulligan reshuffles the entire opening hand and redraws {SETUP_RULES.openingHandSize} cards.
           </p>

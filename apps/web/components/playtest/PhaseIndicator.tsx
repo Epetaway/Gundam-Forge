@@ -30,7 +30,7 @@ export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: Phase
 
   return (
     <div className="flex items-center gap-2 shrink-0">
-      <span className="text-xs text-steel-500 whitespace-nowrap">
+      <span className="text-xs text-white whitespace-nowrap">
         Turn {turnNumber} &bull; {turnText}
       </span>
       <span className="px-2.5 py-1 text-xs rounded font-bold bg-cobalt-600 text-foreground whitespace-nowrap">

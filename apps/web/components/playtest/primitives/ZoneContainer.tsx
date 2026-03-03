@@ -53,10 +53,10 @@ export function ZoneContainer({
       data-opponent={isOpponent}
     >
       {/* Zone label */}
-      <span className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-steel-500 select-none">
+      <span className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-white select-none">
         {label}
         {count !== undefined && (
-          <span className="ml-1 text-steel-300">({count})</span>
+          <span className="ml-1 text-white">({count})</span>
         )}
       </span>
 

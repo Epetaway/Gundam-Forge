@@ -80,31 +80,27 @@ export function PlaytestGameEnhanced({
   // Initialize Game Engine
   useEffect(() => {
     try {
-      // Build resource deck from player's deck: expand all entries by quantity, take first 10
-      const allCardIds = playerDeck.entries.flatMap((entry) =>
-        Array.from({ length: entry.qty }, () => entry.cardId)
+      // All deck entries are main deck cards
+      const mainDeckEntries: Array<{ cardId: string; count: number; zone: 'main' }> = playerDeck.entries.map(
+        (entry) => ({
+          cardId: entry.cardId,
+          count: entry.qty,
+          zone: 'main' as const,
+        })
       );
-      const resourceDeckCards = allCardIds.slice(0, 10);
 
-      // Convert DeckRecord to DeckDefinition
+      // Create a basic 10-card resource deck using generic resource tokens
+      // until the deck builder supports explicit resource deck specification
+      const resourceDeckEntries: Array<{ cardId: string; count: number; zone: 'resource' }> = [
+        { cardId: 'TOKEN-RESOURCE-001', count: 8, zone: 'resource' as const },
+        { cardId: 'EX-RESOURCE-TOKEN', count: 2, zone: 'resource' as const },
+      ];
+
       const deckDefinition: DeckDefinition = {
         id: playerDeck.id,
         name: playerDeck.name,
         description: playerDeck.description,
-        cards: [
-          ...playerDeck.entries.map((entry) => ({
-            cardId: entry.cardId,
-            count: entry.qty,
-            zone: 'main' as const,
-          })),
-          // Official GCG: separate 10-card resource deck (outside 50-card main deck)
-          // Cards drawn from player's deck in order of construction
-          ...resourceDeckCards.map((cardId) => ({
-            cardId,
-            count: 1,
-            zone: 'resource' as const,
-          })),
-        ],
+        cards: [...mainDeckEntries, ...resourceDeckEntries],
       };
 
       const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
@@ -275,7 +271,7 @@ export function PlaytestGameEnhanced({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-surface to-surface-elevated">
         <div className="text-center">
           <p className="text-xl font-bold text-red-500">Error</p>
-          <p className="text-steel-300 mt-2">{error || 'Failed to load game'}</p>
+          <p className="text-white mt-2">{error || 'Failed to load game'}</p>
         </div>
       </div>
     );
@@ -322,7 +318,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleUndo}
                   disabled={!engine?.canUndo()}
-                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-steel-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-white rounded text-xs transition"
                   title="Undo (Ctrl+Z)"
                 >
                   ↶
@@ -330,7 +326,7 @@ export function PlaytestGameEnhanced({
                 <button
                   onClick={handleRedo}
                   disabled={!engine?.canRedo()}
-                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-steel-600 rounded text-xs transition"
+                  className="px-2 py-1 bg-surface-elevated hover:bg-surface disabled:bg-surface-muted disabled:text-white rounded text-xs transition"
                   title="Redo (Ctrl+Y)"
                 >
                   ↷
@@ -365,7 +361,7 @@ export function PlaytestGameEnhanced({
               <button
                 onClick={handleAdvancePhase}
                 disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
-                className="px-3 py-1 bg-cobalt-600 hover:bg-cobalt-700 disabled:bg-surface-muted disabled:text-steel-600 disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
+                className="px-3 py-1 bg-cobalt-600 hover:bg-cobalt-700 disabled:bg-surface-muted disabled:text-white disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
                 title={needsToDraw ? 'Draw first' : needsToPlaceResource ? 'Place resource first' : 'Next phase (Enter)'}
               >
                 {needsToDraw ? 'Draw First' : needsToPlaceResource ? 'Place Resource First' : 'Next Phase →'}
@@ -385,7 +381,7 @@ export function PlaytestGameEnhanced({
             {/* Help */}
             <button
               onClick={() => setShowHelpModal(true)}
-              className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition"
+              className="px-2 py-1 text-white hover:text-foreground hover:bg-surface-elevated rounded text-xs transition"
               aria-label="Keyboard shortcuts help"
               title="Keyboard shortcuts (?)"
             >
@@ -395,7 +391,7 @@ export function PlaytestGameEnhanced({
             {/* Back to Decks */}
             <Link
               href="/decks"
-              className="px-2 py-1 text-steel-500 hover:text-foreground hover:bg-surface-elevated rounded text-xs transition border border-border ml-1"
+              className="px-2 py-1 text-white hover:text-foreground hover:bg-surface-elevated rounded text-xs transition border border-border ml-1"
               title="Exit playtester and return to deck list"
             >
               ← Decks
@@ -559,8 +555,8 @@ export function PlaytestGameEnhanced({
           <div className="space-y-2">
             {engine.getLog().slice(-20).reverse().map((entry, i) => (
               <div key={i} className="text-xs border-b border-border/30 pb-2 last:border-b-0">
-                <span className="text-steel-500 font-mono text-[10px]">[T{entry.state.turnNumber ?? '?'}]</span>
-                <span className="text-steel-300 ml-1">{entry.description || entry.actionType}</span>
+                <span className="text-white font-mono text-[10px]">[T{entry.state.turnNumber ?? '?'}]</span>
+                <span className="text-white ml-1">{entry.description || entry.actionType}</span>
               </div>
             ))}
           </div>

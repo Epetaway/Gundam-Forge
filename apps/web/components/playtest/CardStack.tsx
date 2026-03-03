@@ -138,7 +138,7 @@ export function CardStack({
                   quality={75}
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-b from-slate-700 to-slate-800 flex items-center justify-center text-slate-400">
+                <div className="w-full h-full bg-gradient-to-b from-slate-700 to-slate-800 flex items-center justify-center text-white">
                   <span className="text-xs">?</span>
                 </div>
               )}
@@ -198,7 +198,7 @@ export function CardStackRow({
 
   if (displayStacks.length === 0) {
     return (
-      <div className={cn('text-slate-600 text-sm italic p-4', className)}>
+      <div className={cn('text-white text-sm italic p-4', className)}>
         No cards
       </div>
     );
@@ -217,7 +217,7 @@ export function CardStackRow({
         />
       ))}
       {maxStacks && stacks.length > maxStacks && (
-        <div className="flex items-center justify-center px-2 text-slate-400 text-xs">
+        <div className="flex items-center justify-center px-2 text-white text-xs">
           +{stacks.length - maxStacks} more
         </div>
       )}

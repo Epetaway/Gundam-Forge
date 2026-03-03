@@ -71,7 +71,7 @@ export function MobileGameLayout({ children }: { children: React.ReactNode }) {
             className={`flex-1 py-3 px-4 text-center transition text-sm font-semibold border-b-2 ${
               activeTab === tab
                 ? 'border-purple-600 text-purple-300 bg-slate-800'
-                : 'border-slate-700 text-slate-400 hover:text-slate-300'
+                : 'border-slate-700 text-white hover:text-white'
             }`}
           >
             {tab === 'board' && '🎮'}
@@ -94,7 +94,7 @@ export function TabletGameLayout({ children }: { children: React.ReactNode }) {
       {/* Tablet Header */}
       <div className="border-b border-slate-700 bg-slate-800/50 px-4 py-3 flex justify-between items-center">
         <h1 className="text-xl font-bold">Gundam TCG Playtester</h1>
-        <div className="text-sm text-slate-400">Tablet View</div>
+        <div className="text-sm text-white">Tablet View</div>
       </div>
 
       {/* Main Content */}

@@ -31,6 +31,10 @@ export interface ValidationError {
 
 /**
  * Validate a deck against official rules
+ * 
+ * Official deck structure: exactly 50 main deck cards + up to 10 resource deck cards
+ * - Main deck: exactly 50 cards (drawn during game)
+ * - Resource deck: maximum 10 cards (separate deck for Resource Phase)
  */
 export function validateDeck(
   cards: DeckCard[],
@@ -46,16 +50,23 @@ export function validateDeck(
   const cardCounts: Record<string, number> = {};
   const cardsNeedingImages: DeckCard[] = [];
 
-  // Rule 1: Check deck size
+  // Rule 1: Check deck size (main deck: exactly 50 cards)
+  // Resource deck (up to 10 cards) should be validated separately at submission time.
   for (const card of cards) {
     totalCards += card.count;
     cardCounts[card.cardId] = (cardCounts[card.cardId] || 0) + card.count;
   }
 
-  if (totalCards !== DECK_RULES.mainDeckSize) {
+  // Main deck MUST be exactly 50 cards (strict enforcment)
+  if (totalCards < DECK_RULES.minMainDeckSize) {
     errors.push({
       type: 'error',
-      message: `${VALIDATION_ERRORS.DECK_SIZE_INVALID} (current: ${totalCards})`,
+      message: `Main deck must contain exactly ${DECK_RULES.minMainDeckSize} cards. Currently ${totalCards} card${totalCards === 1 ? '' : 's'}.`,
+    });
+  } else if (totalCards > DECK_RULES.maxMainDeckSize) {
+    errors.push({
+      type: 'error',
+      message: `Main deck must contain exactly ${DECK_RULES.maxMainDeckSize} cards. Currently ${totalCards} card${totalCards === 1 ? '' : 's'}.`,
     });
   }
 
@@ -122,7 +133,7 @@ export function validateDeck(
     });
   }
 
-  const isValid = errors.length === 0 && totalCards === DECK_RULES.mainDeckSize;
+  const isValid = errors.length === 0 && totalCards === DECK_RULES.maxMainDeckSize;
 
   return {
     valid: isValid,
@@ -332,7 +343,7 @@ export function formatValidationReport(result: DeckValidationResult): string {
     report += '❌ DECK INVALID\n';
   }
 
-  report += `\nCards: ${result.mainCount} / ${DECK_RULES.mainDeckSize}\n`;
+  report += `\nCards: ${result.mainCount} / ${DECK_RULES.minMainDeckSize}\n`;
 
   if (result.errors.length > 0) {
     report += '\n⚠️  ERRORS:\n';

@@ -13,6 +13,8 @@ export interface DeckValidationMetrics {
   totalCards: number;
   mainDeckCards: number;
   resourceDeckCards: number;
+  sideDeckCards: number;
+  totalWithSide: number;
   unknownCardIds: string[];
   colorsUsed: CardColor[];
   colorCounts: Partial<Record<CardColor, number>>;
@@ -30,10 +32,13 @@ export interface DeckValidationResult {
 
 /** Official rules: max 4 copies per card number (Rule 2-1-2) */
 const DEFAULT_MAX_COPIES_PER_CARD = 4;
-/** Official rules: main deck is exactly 50 cards (Rule 6-1-1) */
-const MAIN_DECK_SIZE = 50;
-/** Official rules: resource deck is exactly 10 cards (Rule 6-1-1) */
-const RESOURCE_DECK_SIZE = 10;
+/** Official rules: main deck MUST be exactly 50 cards (strictly enforced) */
+const MIN_MAIN_DECK_SIZE = 50;
+const MAX_MAIN_DECK_SIZE = 50;
+/** Official rules: resource deck maximum 10 cards */
+const MAX_RESOURCE_DECK_SIZE = 10;
+/** Official rules: side deck maximum 15 cards */
+const MAX_SIDE_DECK_SIZE = 15;
 /** Official rules: max 2 colors excluding Colorless (Rule 6-1-1-2) */
 const MAX_COLORS = 2;
 
@@ -91,14 +96,16 @@ export const validateDeck = (
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Rule 1: Main deck = exactly 50 cards (Rule 6-1-1)
-  if (mainDeckCards !== MAIN_DECK_SIZE) {
-    errors.push(`Main deck must contain exactly ${MAIN_DECK_SIZE} cards (currently ${mainDeckCards}).`);
+  // Rule 1: Main deck MUST be exactly 50 cards (strictly enforced)
+  if (mainDeckCards < MIN_MAIN_DECK_SIZE) {
+    errors.push(`Main deck must contain exactly ${MIN_MAIN_DECK_SIZE} cards (currently ${mainDeckCards}).`);
+  } else if (mainDeckCards > MAX_MAIN_DECK_SIZE) {
+    errors.push(`Main deck must contain exactly ${MAX_MAIN_DECK_SIZE} cards (currently ${mainDeckCards}).`);
   }
 
-  // Rule 2: Resource deck = exactly 10 cards (Rule 6-1-1)
-  if (resourceDeckCards > 0 && resourceDeckCards !== RESOURCE_DECK_SIZE) {
-    errors.push(`Resource deck must contain exactly ${RESOURCE_DECK_SIZE} cards (currently ${resourceDeckCards}).`);
+  // Rule 2: Resource deck = maximum 10 cards (optional)
+  if (resourceDeckCards > MAX_RESOURCE_DECK_SIZE) {
+    errors.push(`Resource deck cannot exceed ${MAX_RESOURCE_DECK_SIZE} cards (currently ${resourceDeckCards}).`);
   }
 
   // Rule 3: Maximum 2 colors excluding Colorless (Rule 6-1-1-2)
@@ -153,6 +160,8 @@ export const validateDeck = (
       totalCards,
       mainDeckCards,
       resourceDeckCards,
+      sideDeckCards: 0, // Side deck validated separately
+      totalWithSide: totalCards,
       unknownCardIds: [...unknownCardIds].sort(),
       colorsUsed,
       colorCounts,
@@ -160,5 +169,54 @@ export const validateDeck = (
       costCurve,
       cardCopies
     }
+  };
+};
+
+/**
+ * Validate optional side deck (0-15 cards max, separate from main deck)
+ * Each card can have up to 4 copies independ ent of main deck counts
+ */
+export const validateSideDeck = (
+  sideDeck: DeckCardEntry[],
+  cards: CardDefinition[],
+  options: ValidateDeckOptions = {}
+): { isValid: boolean; errors: string[]; sideDeckCards: number } => {
+  const cardsById = new Map(cards.map((card) => [card.id, card]));
+  const normalizedSideDeck = sideDeck
+    .map((entry) => ({ cardId: entry.cardId, qty: Math.max(0, Math.floor(entry.qty)) }))
+    .filter((entry) => entry.cardId.trim().length > 0 && entry.qty > 0);
+
+  const errors: string[] = [];
+  let sideDeckCards = 0;
+  const cardCopies: Record<string, number> = {};
+
+  for (const entry of normalizedSideDeck) {
+    sideDeckCards += entry.qty;
+    cardCopies[entry.cardId] = (cardCopies[entry.cardId] ?? 0) + entry.qty;
+
+    const card = cardsById.get(entry.cardId);
+    if (!card) {
+      errors.push(`Side deck card ${entry.cardId} not found in database.`);
+      continue;
+    }
+  }
+
+  // Side deck: optional, max 15 cards
+  if (sideDeckCards > MAX_SIDE_DECK_SIZE) {
+    errors.push(`Side deck cannot exceed ${MAX_SIDE_DECK_SIZE} cards (currently ${sideDeckCards}).`);
+  }
+
+  // Rule: Maximum 4 copies per card
+  const maxCopiesPerCard = options.maxCopiesPerCard ?? DEFAULT_MAX_COPIES_PER_CARD;
+  for (const [cardId, qty] of Object.entries(cardCopies)) {
+    if (qty > maxCopiesPerCard) {
+      errors.push(`Side deck card ${cardId} exceeds max copies (${qty}/${maxCopiesPerCard}).`);
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    sideDeckCards
   };
 };

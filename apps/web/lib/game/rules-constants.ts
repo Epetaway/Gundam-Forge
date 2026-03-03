@@ -9,15 +9,22 @@
 
 /**
  * DECK CONSTRUCTION RULES
+ * Official Gundam TCG Structure: Exactly 50 main deck cards + Up to 10 resource deck cards
+ * Strictly enforced: no fewer, no more than 50 cards in main deck
  */
 export const DECK_RULES = {
-  // Main deck size (exact)
-  mainDeckSize: 50,
+  // Main deck size: STRICTLY 50 cards (enforced minimum = maximum)
   minMainDeckSize: 50,
   maxMainDeckSize: 50,
 
-  // Resource deck size (exact) — separate 10-card deck, outside the 50-card main deck
-  resourceDeckSize: 10,
+  // Resource deck size limits — separate deck, feeds Resource Phase
+  minResourceDeckSize: 0,
+  maxResourceDeckSize: 10,
+
+  // Side deck: optional tournament alternate set (0-15 cards max)
+  // Each card can have up to 4 copies, independent of main deck counts
+  minSideDeckSize: 0,
+  maxSideDeckSize: 15,
 
   // Copy limits per card — official GCG allows 4 copies
   maxCopiesPerCard: 4,
@@ -211,9 +218,10 @@ export const WIN_CONDITIONS = {
 
 /**
  * VALIDATION ERRORS
+ * Official GCG Deck Construction
  */
 export const VALIDATION_ERRORS = {
-  DECK_SIZE_INVALID: 'Deck must be exactly 50 cards',
+  DECK_SIZE_INVALID: 'Main deck must be exactly 50 cards, resource deck up to 10 cards',
   COPY_LIMIT_EXCEEDED: 'Cannot exceed 4 copies of any card',
   CARD_NOT_FOUND: 'Card not found in database',
   IMAGE_URL_MISSING: 'Card image URL is missing - cannot display card',
@@ -222,6 +230,9 @@ export const VALIDATION_ERRORS = {
   HAND_SIZE_EXCEEDED: 'Hand size exceeds maximum',
   COLOR_LIMIT_EXCEEDED: 'Deck exceeds color identity limit',
   UNIT_COUNT_LOW: 'Deck has fewer than recommended unit cards',
+  SIDE_DECK_TOO_LARGE: 'Side deck cannot exceed 15 cards',
+  MAIN_DECK_WRONG_SIZE: 'Main deck must be exactly 50 cards',
+  RESOURCE_DECK_TOO_LARGE: 'Resource deck cannot exceed 10 cards',
 } as const;
 
 /**

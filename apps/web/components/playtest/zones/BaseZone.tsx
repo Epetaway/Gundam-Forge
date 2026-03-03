@@ -1,6 +1,7 @@
 /**
  * Base Area Component
  * Shows the active Base card and base health pool
+ * Health is derived from the base card's hp value
  */
 
 'use client';
@@ -24,13 +25,19 @@ export function BaseZone({
   maxBaseHealth,
   isOpponent,
 }: BaseAreaProps) {
-  const healthPercentage = (baseHealth / maxBaseHealth) * 100;
+  // Get health from the base card if available
+  // Always use official card database for hp value
+  const baseCardData = baseCard ? cardDatabase[baseCard.cardId] : null;
+  const cardHp = baseCardData?.hp ?? maxBaseHealth;
+  // Ensure current health doesn't exceed max and is never negative
+  const currentHealth = baseCard ? Math.min(Math.max(baseHealth, 0), cardHp) : 0;
+  const healthPercentage = cardHp > 0 ? (currentHealth / cardHp) * 100 : 0;
   const healthColor =
     healthPercentage > 50 ? 'bg-emerald-600' : healthPercentage > 25 ? 'bg-amber-600' : 'bg-red-600';
 
   return (
     <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
-      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         Base Area
       </div>
 
@@ -48,11 +55,11 @@ export function BaseZone({
 
           {/* Base Health Display */}
           <div className="space-y-1">
-            <div className="text-xs text-steel-500">Base Health</div>
+            <div className="text-xs text-white">{baseCardData?.name ?? 'Base'} Health</div>
             <div className="bg-surface-muted rounded-lg h-8 overflow-hidden border border-steel-600 flex items-center px-2">
               <div className={`h-full w-full rounded ${healthColor} flex items-center justify-center`}>
                 <span className="text-sm font-bold text-foreground drop-shadow">
-                  {baseHealth}/{maxBaseHealth}
+                  {currentHealth}/{cardHp}
                 </span>
               </div>
             </div>
@@ -60,8 +67,8 @@ export function BaseZone({
         </>
       ) : (
         <div className="bg-surface-muted/40 border-2 border-dashed border-steel-600 rounded-lg p-4 text-center">
-          <div className="text-xs text-steel-500 font-medium">No base played yet</div>
-          <div className="text-[10px] text-steel-600 mt-1">Play a Base card to start</div>
+          <div className="text-xs text-white font-medium">No base played yet</div>
+          <div className="text-[10px] text-white mt-1">Play a Base card to start</div>
         </div>
       )}
     </div>

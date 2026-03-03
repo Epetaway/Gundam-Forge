@@ -19,7 +19,7 @@ export function ResourceDeckZone({
 }: ResourceDeckAreaProps) {
   return (
     <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
-      <div className="text-xs font-bold text-steel-300 uppercase mb-2 tracking-wider">
+      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         Resource Deck
       </div>
 
@@ -41,7 +41,7 @@ export function ResourceDeckZone({
             )}
           </div>
         ) : (
-          <div className="text-steel-500 text-xs italic">Empty</div>
+          <div className="text-white text-xs italic">Empty</div>
         )}
       </div>
 

@@ -31,6 +31,7 @@ const mockCardDb: Record<string, any> = {
   'card-0': { id: 'card-0', name: 'Unit Alpha', type: 'Unit', ap: 5, hp: 5 },
   'card-1': { id: 'card-1', name: 'Unit Beta', type: 'Unit', ap: 4, hp: 6 },
   'card-2': { id: 'card-2', name: 'Command Card', type: 'Command', ap: 0, hp: 0 },
+  'EXB-001': { id: 'EXB-001', name: 'EX Base', type: 'Base', hp: 3 },
 };
 
 describe('GameEngine - Core Functionality', () => {
@@ -71,13 +72,13 @@ describe('GameEngine - Core Functionality', () => {
     expect(state.players['player2'].shields.length).toBe(6);
   });
 
-  it('should have both players with 20 base health', () => {
+  it('should have both players with 3 base health (EX Base hp)', () => {
     const deck = createMockDeck();
     const engine = new GameEngine('deck-1', deck, mockCardDb);
     const state = engine.getState();
 
-    expect(state.players['player1'].baseHealth).toBe(20);
-    expect(state.players['player2'].baseHealth).toBe(20);
+    expect(state.players['player1'].baseHealth).toBe(3);
+    expect(state.players['player2'].baseHealth).toBe(3);
   });
 });
 
