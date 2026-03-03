@@ -4,6 +4,7 @@ import { Container } from '@/components/layout/Container';
 import { MainNav } from '@/components/layout/MainNav';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Button } from '@/components/ui/Button';
+import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
 
 interface AppShellProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps): JSX.Element {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <WelcomeModal />
       {/* Skip navigation for keyboard/screen reader users */}
       <a
         href="#main-content"
