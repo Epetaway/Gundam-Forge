@@ -21,7 +21,7 @@ export function CardPreviewTile({ imageUrl, name, cost, type, qty, onClick, onAd
         aria-label={`View ${name}${cost !== undefined ? ` — Cost ${cost}` : ''}${type ? `, ${type}` : ''}`}
       >
         {imageUrl && (
-          <img src={imageUrl} alt={name} className="aspect-[5/7] w-full object-cover" />
+          <img src={imageUrl} alt={name} className="aspect-[5/7] w-full object-cover" loading="lazy" />
         )}
         {qty > 1 && (
           <span className="absolute left-2 top-2 z-10 rounded bg-black/80 px-2 py-0.5 font-mono text-xs font-bold text-white shadow">

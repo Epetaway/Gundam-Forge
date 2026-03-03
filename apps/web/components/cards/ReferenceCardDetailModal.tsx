@@ -65,7 +65,7 @@ export function ReferenceCardDetailModal({
               <div className="space-y-3">
                 <div className="relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[8px] border border-[#3a475c] bg-black">
                   <div className="relative aspect-[5/7] w-full">
-                    <CardArtImage card={card} className="h-full w-full object-cover" fill sizes="300px" />
+                    <CardArtImage card={card} className="h-full w-full object-cover" fill sizes="300px" priority />
                   </div>
                 </div>
               </div>

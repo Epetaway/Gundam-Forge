@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChevronDown, ChevronRight, Lightbulb, Edit } from 'lucide-react';
 import type { DeckIntent, CardDefinition, CardColor } from '@gundam-forge/shared';
-import { sortCardsBySynergy, filterCardsByIntent } from '@gundam-forge/shared';
+import { sortCardsBySynergy, filterCardsByIntent, clearSynergyScoreCache } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { UnifiedCardTile } from '@/components/cards/UnifiedCardTile';
@@ -110,7 +111,7 @@ function CardListTable({
       )}
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="border-b border-border bg-surface-interactive text-[10px] uppercase tracking-wider text-white">
+          <thead className="border-b border-border bg-surface-interactive text-[10px] uppercase tracking-wider text-white sticky top-0 z-10">
             <tr>
               <th className="px-3 py-1.5">Card</th>
               <th className="px-2 py-1.5 hidden sm:table-cell">Type</th>
@@ -179,6 +180,25 @@ function CardGroup({
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [hovered, setHovered] = useState<{ card: ScoredCard; anchor: DOMRect } | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Virtualize grid rows (2 columns per row)
+  const COLS = 2;
+  const rows = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < cards.length; i += COLS) {
+      result.push(cards.slice(i, i + COLS));
+    }
+    return result;
+  }, [cards]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 240, // ~200px for card + 40px for gap/padding
+    enabled: !collapsed && rows.length > 5, // Only virtualize with 5+ rows
+    overscan: 5, // Render extra rows on each side
+  });
 
   return (
     <div className="border-b border-border last:border-b-0">
@@ -204,18 +224,64 @@ function CardGroup({
         </span>
       </button>
       {!collapsed && (
-        <div className="grid grid-cols-2 gap-3 px-2.5 pb-3.5">
-          {cards.map((card) => (
-            <UnifiedCardTile
-              key={card.id}
-              card={card}
-              mode="deckbuilder"
-              showSynergy={showSynergy}
-              onPreview={onPreview}
-              onAdd={() => onSelect(card.id)}
-              onHoverChange={setHovered}
-            />
-          ))}
+        <div
+          ref={scrollContainerRef}
+          className="max-h-[600px] overflow-y-auto"
+          style={{ minWidth: 0 }}
+        >
+          {rows.length > 5 ? (
+            // Virtualized grid for large groups
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                position: 'relative',
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className="px-2.5 pb-3.5"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    {rows[virtualRow.index].map((card) => (
+                      <UnifiedCardTile
+                        key={card.id}
+                        card={card}
+                        mode="deckbuilder"
+                        showSynergy={showSynergy}
+                        onPreview={onPreview}
+                        onAdd={() => onSelect(card.id)}
+                        onHoverChange={setHovered}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            // Non-virtualized grid for small groups
+            <div className="grid grid-cols-2 gap-3 px-2.5 pb-3.5">
+              {cards.map((card) => (
+                <UnifiedCardTile
+                  key={card.id}
+                  card={card}
+                  mode="deckbuilder"
+                  showSynergy={showSynergy}
+                  onPreview={onPreview}
+                  onAdd={() => onSelect(card.id)}
+                  onHoverChange={setHovered}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -258,6 +324,11 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
   );
   // Track whether user manually overrode the group mode
   const [groupModeOverridden, setGroupModeOverridden] = useState(false);
+
+  // Clear synergy cache when deck intent changes (packages, clans, colors, or EX flag)
+  useEffect(() => {
+    clearSynergyScoreCache();
+  }, [mechanicsPackages, deckClans, deckColors, intentIncludeEX]);
 
   // Auto-enable deck-color filter when deck colors first become known
   const prevDeckColorsLenRef = React.useRef(deckColors.length);

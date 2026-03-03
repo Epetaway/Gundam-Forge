@@ -13,6 +13,73 @@
 import type { CardDefinition } from './types';
 import { getPackagesByIds, getMechanicsFromPackages } from './deckIntentPackages';
 
+// ─── Simple LRU Cache ────────────────────────────────────────────────────────
+// Caches synergy scoring results to avoid recomputing for the same parameters
+class SynergyScoreCache {
+  private cache = new Map<string, CardSynergyScore>();
+  private readonly maxSize = 5000; // ~5000 card score computations per intent
+
+  private buildKey(
+    cardId: string,
+    selectedPackages: string[],
+    selectedClans: string[],
+    selectedColors: string[],
+    includeEX: boolean,
+  ): string {
+    // Cache key format: cardId:packages:clans:colors:includeEX
+    // Uses sorted arrays for consistent keys
+    const pkgs = [...selectedPackages].sort().join(',');
+    const clans = [...selectedClans].sort().join(',');
+    const colors = [...selectedColors].sort().join(',');
+    return `${cardId}:${pkgs}:${clans}:${colors}:${includeEX}`;
+  }
+
+  get(
+    cardId: string,
+    selectedPackages: string[],
+    selectedClans: string[],
+    selectedColors: string[],
+    includeEX: boolean,
+  ): CardSynergyScore | null {
+    const key = this.buildKey(cardId, selectedPackages, selectedClans, selectedColors, includeEX);
+    return this.cache.get(key) ?? null;
+  }
+
+  set(
+    cardId: string,
+    selectedPackages: string[],
+    selectedClans: string[],
+    selectedColors: string[],
+    includeEX: boolean,
+    score: CardSynergyScore,
+  ): void {
+    if (this.cache.size >= this.maxSize) {
+      // Simple eviction: remove first entry when full
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) this.cache.delete(firstKey);
+    }
+    const key = this.buildKey(cardId, selectedPackages, selectedClans, selectedColors, includeEX);
+    this.cache.set(key, score);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  size(): number {
+    return this.cache.size;
+  }
+}
+
+const synergyScoreCache = new SynergyScoreCache();
+
+/**
+ * Clear the synergy score cache when deck intent changes
+ */
+export function clearSynergyScoreCache(): void {
+  synergyScoreCache.clear();
+}
+
 /**
  * Synergy weights for scoring
  * Higher weights = stronger match
@@ -119,6 +186,7 @@ export interface CardSynergyScore {
 
 /**
  * Calculate synergy score for a single card given selected packages and deck intent
+ * Results are cached to avoid recomputation for the same parameters
  */
 export function calculateCardSynergy(
   card: CardDefinition,
@@ -127,6 +195,16 @@ export function calculateCardSynergy(
   selectedColors: string[] = [],
   includeEX: boolean = false,
 ): CardSynergyScore {
+  // Check cache first
+  const cached = synergyScoreCache.get(
+    card.id,
+    selectedPackages,
+    selectedClans,
+    selectedColors,
+    includeEX,
+  );
+  if (cached) return cached;
+
   const reasons: SynergyReason[] = [];
   let totalScore = 0;
 
@@ -138,7 +216,16 @@ export function calculateCardSynergy(
       weight: SYNERGY_WEIGHTS.EX_MISMATCH,
     });
     totalScore += SYNERGY_WEIGHTS.EX_MISMATCH;
-    return { cardId: card.id, totalScore, reasons };
+    const result = { cardId: card.id, totalScore, reasons };
+    synergyScoreCache.set(
+      card.id,
+      selectedPackages,
+      selectedClans,
+      selectedColors,
+      includeEX,
+      result,
+    );
+    return result;
   }
 
   // Check color matches (non-Colorless only)
@@ -248,11 +335,23 @@ export function calculateCardSynergy(
     }
   }
 
-  return {
+  const result = {
     cardId: card.id,
     totalScore,
     reasons,
   };
+
+  // Cache the result before returning
+  synergyScoreCache.set(
+    card.id,
+    selectedPackages,
+    selectedClans,
+    selectedColors,
+    includeEX,
+    result,
+  );
+
+  return result;
 }
 
 /**
