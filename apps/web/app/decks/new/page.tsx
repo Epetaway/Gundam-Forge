@@ -55,6 +55,10 @@ export default function CreateDeckPage() {
               Your deck will be created when you click "Create Deck &amp; Open Forge".<br />
               You can always add more cards inside the Forge builder.
             </p>
+            <p className="rounded-md border border-steel-700/50 bg-steel-900/20 px-3 py-2 text-center text-[11px] text-steel-500">
+              <span className="font-semibold text-steel-400">Browser-local storage only.</span>{' '}
+              Decks are saved in your browser and not synced to the cloud. Clearing site data will remove them.
+            </p>
           </div>
         </div>
       </div>
