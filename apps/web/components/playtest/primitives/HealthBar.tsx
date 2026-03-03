@@ -22,7 +22,7 @@ export function HealthBar({ current, max, label, className }: HealthBarProps) {
           <span className="text-white">{current}/{max}</span>
         </div>
       )}
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-interactive">
         <div
           className={cn('h-full rounded-full transition-all duration-300', color)}
           style={{ width: `${pct}%` }}

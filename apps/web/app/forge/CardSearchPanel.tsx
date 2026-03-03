@@ -466,12 +466,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
         {/* Active Filters Summary */}
         {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || deckColorOnly || includeEX) && (
-          <div className="rounded-lg border border-purple-500/30 bg-purple-900/10 p-2 space-y-2">
+          <div className="rounded-lg border border-cobalt-500/30 bg-cobalt-900/10 p-2 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-purple-300">Active Filters</span>
+              <span className="text-xs font-semibold text-cobalt-300">Active Filters</span>
               <button
                 type="button"
-                className="text-xs text-white hover:text-purple-300 transition-colors"
+                className="text-xs text-white hover:text-cobalt-300 transition-colors"
                 onClick={() => {
                   setQuery('');
                   setRawQuery('');
@@ -496,21 +496,21 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                 </span>
               )}
               {typeFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   Type: {typeFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
+                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
                 </span>
               )}
               {colorFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   Color: {colorFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
+                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
                 </span>
               )}
               {setFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   Set: {setFilter}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
+                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
                 </span>
               )}
               {keywordFilters.map((kw) => (
@@ -560,7 +560,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             </div>
             <div className="flex flex-wrap gap-1.5">
               {deckClans.map((clan) => (
-                <span key={clan} className="inline-flex items-center rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                <span key={clan} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
                   {clan}
                 </span>
               ))}
@@ -653,7 +653,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                       className={cn(
                         'rounded px-2 py-1 text-xs font-medium transition-colors',
                         active
-                          ? 'bg-purple-600 text-white'
+                          ? 'bg-cobalt-600 text-white'
                           : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                       )}
                       aria-pressed={active}

@@ -60,7 +60,7 @@ export function CardGrid({
                 'border-2 hover:shadow-lg',
                 isSelected
                   ? 'border-yellow-400 shadow-lg shadow-yellow-500/50'
-                  : 'border-slate-600 hover:border-slate-500',
+                  : 'border-steel-600 hover:border-steel-500',
                 canInteract && 'cursor-pointer',
               )}
               title={cardData?.name || card.cardId}
@@ -73,7 +73,7 @@ export function CardGrid({
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+                <div className="w-full h-full bg-surface-interactive flex items-center justify-center">
                   <div className="text-center text-xs text-white px-1">
                     {card.cardId}
                   </div>
@@ -82,7 +82,7 @@ export function CardGrid({
 
               {/* Quantity Badge for deck view */}
               {card.state === 'ready' && (
-                <div className="absolute bottom-1 right-1 bg-black/70 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold text-white border border-slate-400">
+                <div className="absolute bottom-1 right-1 bg-black/70 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold text-white border border-steel-400">
                   1
                 </div>
               )}

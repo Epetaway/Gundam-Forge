@@ -10,7 +10,7 @@ export default function CardInspector({ cardId }: CardInspectorProps) {
   const card = cardId ? cardsById.get(cardId) : null;
 
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 h-full overflow-y-auto">
+    <div className="bg-surface-elevated rounded-lg border border-steel-600 p-4 h-full overflow-y-auto">
       <h3 className="font-semibold mb-4 text-white">Card Details</h3>
 
       {!card ? (
@@ -22,7 +22,7 @@ export default function CardInspector({ cardId }: CardInspectorProps) {
             <img
               src={card.imageUrl}
               alt={card.name}
-              className="w-full rounded border border-slate-600"
+              className="w-full rounded border border-steel-500"
             />
           )}
 
@@ -34,12 +34,12 @@ export default function CardInspector({ cardId }: CardInspectorProps) {
 
           {/* Card Stats */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-slate-700 rounded p-2">
+            <div className="bg-surface-interactive rounded p-2">
               <p className="text-xs text-white">Cost</p>
-              <p className="font-bold text-blue-400">{card.cost} AP</p>
+              <p className="font-bold text-cobalt-400">{card.cost} AP</p>
             </div>
             {card.hp && (
-              <div className="bg-slate-700 rounded p-2">
+              <div className="bg-surface-interactive rounded p-2">
                 <p className="text-xs text-white">HP</p>
                 <p className="font-bold text-red-400">{card.hp}</p>
               </div>
@@ -52,7 +52,7 @@ export default function CardInspector({ cardId }: CardInspectorProps) {
               <p className="text-xs text-white mb-2">Keywords</p>
               <div className="flex flex-wrap gap-1">
                 {card.keywords.map((kw) => (
-                  <span key={kw} className="bg-purple-900 text-purple-200 text-xs px-2 py-1 rounded">
+                  <span key={kw} className="bg-cobalt-900/20 text-cobalt-300 text-xs px-2 py-1 rounded">
                     {kw}
                   </span>
                 ))}
@@ -69,7 +69,7 @@ export default function CardInspector({ cardId }: CardInspectorProps) {
           )}
 
           {/* Rules Reference */}
-          <div className="border-t border-slate-700 pt-4 mt-4">
+          <div className="border-t border-steel-600 pt-4 mt-4">
             <p className="text-xs font-semibold text-white mb-2">Quick Rules</p>
             <div className="space-y-1 text-xs text-white">
               <p>• Right-click cards in battle to <span className="text-yellow-400">Rest/Ready</span></p>
