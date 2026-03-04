@@ -5,6 +5,7 @@ import { MainNav } from '@/components/layout/MainNav';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import { Badge } from '@/components/ui/Badge';
 
 interface AppShellProps {
   children: ReactNode;
@@ -33,9 +34,13 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
           <div className="flex items-center gap-3">
             <MainNav />
             <ThemeToggle />
-            <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
-              <Link href="/auth/login">Sign in</Link>
-            </Button>
+            {process.env.NODE_ENV === 'production' ? (
+              <Badge className="hidden md:inline-flex">Coming Soon</Badge>
+            ) : (
+              <Button asChild className="hidden md:inline-flex" size="sm" variant="secondary">
+                <Link href="/auth/login">Sign in</Link>
+              </Button>
+            )}
           </div>
         </Container>
       </header>

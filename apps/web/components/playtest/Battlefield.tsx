@@ -146,28 +146,28 @@ export function Battlefield({
       {/* OPPONENT STATUS - Compact strip (player POV only) */}
       <div className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-surface/60 px-4 py-2 relative z-10">
         <div className="flex items-center gap-6 flex-wrap">
-          <span className="text-xs text-white font-semibold uppercase tracking-wider">
+          <span className="text-xs text-foreground font-semibold uppercase tracking-wider">
             {opponentState.name}'s Field
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-purple-400 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-cobalt-400 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.shields.length}</span>
-            <span className="text-white text-xs">shields</span>
+            <span className="text-steel-600 text-xs">shields</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-cobalt-500 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.battleArea.length}</span>
-            <span className="text-white text-xs">units</span>
+            <span className="text-steel-600 text-xs">units</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-cobalt-600 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.resources.length}</span>
-            <span className="text-white text-xs">resources</span>
+            <span className="text-steel-600 text-xs">resources</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-slate-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-steel-500 inline-block" />
             <span className="text-foreground font-bold text-sm">{opponentState.hand.length}</span>
-            <span className="text-white text-xs">in hand</span>
+            <span className="text-steel-600 text-xs">in hand</span>
           </div>
 
         </div>
