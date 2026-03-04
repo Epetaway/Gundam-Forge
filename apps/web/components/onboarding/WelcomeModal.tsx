@@ -90,7 +90,7 @@ export function WelcomeModal(): JSX.Element | null {
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute right-4 top-4 text-steel-400 hover:text-foreground transition-colors"
+            className="absolute right-4 top-4 text-text-subtle hover:text-foreground transition-colors"
             aria-label="Close welcome modal"
           >
             <span className="text-2xl">&times;</span>
@@ -117,10 +117,10 @@ export function WelcomeModal(): JSX.Element | null {
             <h2 className="text-3xl font-bold text-foreground mb-3">
               {step.title}
             </h2>
-            <p className="text-lg text-steel-300 mb-6">{step.description}</p>
+            <p className="text-lg text-text-secondary mb-6">{step.description}</p>
 
             {/* Highlights */}
-            <ul className="space-y-2 text-sm text-steel-400">
+            <ul className="space-y-2 text-sm text-text-secondary">
               {step.highlights.map((highlight, idx) => (
                 <li key={idx} className="flex items-center justify-center gap-2">
                   <ChevronRight className="h-4 w-4 text-cobalt-400" />
@@ -159,7 +159,7 @@ export function WelcomeModal(): JSX.Element | null {
           </div>
 
           {/* Step counter */}
-          <div className="mt-6 text-center text-xs text-steel-500">
+          <div className="mt-6 text-center text-xs text-text-muted">
             Step {currentStep + 1} of {WELCOME_STEPS.length}
           </div>
         </div>

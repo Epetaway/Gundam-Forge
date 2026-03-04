@@ -23,6 +23,11 @@ export const designTheme = {
     },
     success: 'hsl(var(--success))',
     warning: 'hsl(var(--warning))',
+    // Text hierarchy
+    'text-primary': 'hsl(var(--text-primary))',
+    'text-secondary': 'hsl(var(--text-secondary))',
+    'text-muted': 'hsl(var(--text-muted))',
+    'text-subtle': 'hsl(var(--text-subtle))',
     steel: colorPrimitives.steel,
     cobalt: colorPrimitives.cobalt,
   },
@@ -83,4 +88,8 @@ export const semanticHslTokens = {
   destructiveForeground: hexToHslToken(semanticColorTokens.destructiveForeground),
   success: hexToHslToken(semanticColorTokens.success),
   warning: hexToHslToken(semanticColorTokens.warning),
+  textPrimary: hexToHslToken(semanticColorTokens.textPrimary),
+  textSecondary: hexToHslToken(semanticColorTokens.textSecondary),
+  textMuted: hexToHslToken(semanticColorTokens.textMuted),
+  textSubtle: hexToHslToken(semanticColorTokens.textSubtle),
 } as const;

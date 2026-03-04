@@ -9,7 +9,7 @@ import { cards, getCard, getCardImage } from '@/lib/data/cards';
 import { withBasePath } from '@/lib/utils/basePath';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
-import { rankArchetypes, rankTrendingDecks } from '@/lib/meta/engine';
+import { rankArchetypes, rankTrendingDecks, getColorDistribution } from '@/lib/meta/engine';
 import { relativeTime } from '@/lib/utils/relativeTime';
 
 export default function HomePage(): JSX.Element {
@@ -17,14 +17,9 @@ export default function HomePage(): JSX.Element {
   const events = getEvents();
   const allArchetypes = rankArchetypes(events);
   const trendingDecks = rankTrendingDecks(decks, events, 3);
-  const archetypes = allArchetypes.slice(0, 4);
+  const archetypes = allArchetypes.slice(0, 6);
+  const colorDistribution = getColorDistribution(events, decks);
   const latestEventDate = events[0]?.date ?? null;
-  const platformFeatures = [
-    `Browse ${cards.length} official Gundam Card Game cards with full-text search.`,
-    'Build and validate decks against official GCG rules.',
-    'Playtest your deck against an AI opponent with official phase sequencing.',
-  ];
-
   return (
     <>
       <section className="relative overflow-hidden border-b border-border">
@@ -35,7 +30,7 @@ export default function HomePage(): JSX.Element {
             <h1 className="max-w-[18ch] font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
               Build. Test. Win.
             </h1>
-            <p className="max-w-[62ch] text-base text-steel-700">
+            <p className="max-w-[62ch] text-base text-text-secondary">
               Competitive deck-building for Gundam Card Game. Browse the full card pool, craft your list in the Forge, and validate it against official rules — all in one command interface.
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -56,7 +51,7 @@ export default function HomePage(): JSX.Element {
                   <CardDescription>Tournament data powering archetype rankings.</CardDescription>
                 </div>
                 {latestEventDate && (
-                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-steel-500">
+                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-muted">
                     Latest: {latestEventDate}
                   </span>
                 )}
@@ -69,7 +64,7 @@ export default function HomePage(): JSX.Element {
                 <Stat label="Events Tracked" value={`${events.length}`} />
                 <Stat label="Archetypes" value={`${allArchetypes.length}`} />
               </div>
-              <p className="text-[11px] text-steel-500">
+              <p className="text-[11px] text-text-muted">
                 Data updated with each build deployment.
               </p>
             </CardContent>
@@ -98,7 +93,7 @@ export default function HomePage(): JSX.Element {
                 cardCount: deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0),
                 colors: deck.colors || [],
                 archetype: deck.archetype,
-                tags: deck.archetype ? [deck.archetype] : [],
+                tags: [],
                 avatarUrl: undefined,
                 updatedAgo: relativeTime(deck.updatedAt),
               } satisfies TrendingDeckData;
@@ -166,7 +161,7 @@ export default function HomePage(): JSX.Element {
                   <CardDescription>Latest placements informing the ranking engine.</CardDescription>
                 </div>
                 {latestEventDate && (
-                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-steel-500">
+                  <span className="flex-shrink-0 rounded border border-border bg-surface-interactive px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-muted">
                     {latestEventDate}
                   </span>
                 )}
@@ -179,7 +174,7 @@ export default function HomePage(): JSX.Element {
                     <p className="font-semibold">{event.name}</p>
                     <Badge>{event.date}</Badge>
                   </div>
-                  <p className="text-xs text-steel-600">
+                  <p className="text-xs text-text-muted">
                     #{event.placements[0]?.placement} {event.placements[0]?.deckName} • {event.location}
                   </p>
                 </div>
@@ -193,16 +188,30 @@ export default function HomePage(): JSX.Element {
           <div className="space-y-4">
             <Card className="bg-surface-elevated">
               <CardHeader>
-                <CardTitle>Popular Archetypes</CardTitle>
+                <CardTitle>Archetype Standings</CardTitle>
+                <CardDescription>Meta share across all tracked events.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                {archetypes.map((record) => (
-                  <div className="rounded-md border border-border bg-surface-interactive px-3 py-2" key={record.archetype}>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold">{record.archetype}</p>
-                      <Badge variant="accent">{record.topThree} top 3</Badge>
+                {archetypes.map((record, idx) => (
+                  <div className="rounded-md border border-border bg-surface-interactive px-3 py-2.5" key={record.archetype}>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="font-mono text-[10px] tabular-nums text-text-muted w-4 shrink-0">#{idx + 1}</span>
+                        <p className="text-sm font-semibold truncate">{record.archetype}</p>
+                        <ArchetypeBadge archetype={record.archetype} />
+                      </div>
+                      <Badge variant="accent" className="shrink-0 text-[10px]">{record.topThree} top 3</Badge>
                     </div>
-                    <p className="text-xs text-steel-600">{(record.winRate * 100).toFixed(1)}% win rate</p>
+                    <div className="h-1 rounded-full bg-surface-muted overflow-hidden mb-1.5">
+                      <div
+                        className="h-full rounded-full bg-cobalt-500"
+                        style={{ width: `${(record.metaShare * 100).toFixed(1)}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-text-muted">
+                      <span>{(record.metaShare * 100).toFixed(1)}% meta share</span>
+                      <span>{(record.winRate * 100).toFixed(1)}% win rate</span>
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -210,13 +219,29 @@ export default function HomePage(): JSX.Element {
 
             <Card className="bg-surface-elevated">
               <CardHeader>
-                <CardTitle>Platform Features</CardTitle>
+                <CardTitle>Color Distribution</CardTitle>
+                <CardDescription>Among tournament-placing decks.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {platformFeatures.map((feature) => (
-                  <p className="rounded-md border border-border bg-surface-interactive px-3 py-2 text-xs text-steel-700" key={feature}>
-                    {feature}
-                  </p>
+              <CardContent className="space-y-2.5">
+                {colorDistribution.map(({ color, share }) => (
+                  <div key={color}>
+                    <div className="flex items-center justify-between mb-1 text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="inline-block h-2 w-2 rounded-full shrink-0"
+                          style={{ backgroundColor: CARD_COLOR_HEX[color] ?? '#9aa9bf' }}
+                        />
+                        <span className="text-text-secondary">{color}</span>
+                      </span>
+                      <span className="font-mono text-text-muted">{(share * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-surface-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${(share * 100).toFixed(1)}%`, backgroundColor: CARD_COLOR_HEX[color] ?? '#9aa9bf' }}
+                      />
+                    </div>
+                  </div>
                 ))}
               </CardContent>
             </Card>
@@ -230,8 +255,37 @@ export default function HomePage(): JSX.Element {
 function Stat({ label, value }: { label: string; value: string }): JSX.Element {
   return (
     <div className="rounded-md border border-border bg-surface-interactive px-3 py-2">
-      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-steel-500">{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-muted">{label}</p>
       <p className="mt-1 font-display text-xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }
+
+const ARCHETYPE_COLORS: Record<string, string> = {
+  aggro: 'bg-red-500/15 text-red-400 border-red-500/20',
+  control: 'bg-cobalt-600/20 text-cobalt-400 border-cobalt-500/20',
+  midrange: 'bg-green-500/15 text-green-400 border-green-500/20',
+  ramp: 'bg-green-500/15 text-green-400 border-green-500/20',
+  combo: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+  burn: 'bg-red-500/15 text-red-400 border-red-500/20',
+  toolbox: 'bg-steel-400/15 text-steel-600 border-steel-400/20',
+};
+
+function ArchetypeBadge({ archetype }: { archetype: string }): JSX.Element {
+  const key = archetype.toLowerCase();
+  const cls = ARCHETYPE_COLORS[key] ?? 'bg-steel-400/15 text-steel-600 border-steel-400/20';
+  return (
+    <span className={`inline-flex items-center rounded border px-1.5 py-px font-mono text-[9px] uppercase tracking-wider ${cls}`}>
+      {archetype}
+    </span>
+  );
+}
+
+const CARD_COLOR_HEX: Record<string, string> = {
+  Blue: '#4c90fa',
+  Green: '#34d399',
+  Red: '#f87171',
+  White: '#d5ddeb',
+  Purple: '#a78bfa',
+  Colorless: '#9aa9bf',
+};

@@ -33,9 +33,9 @@ function CardHoverPreview({ item, anchor }: { item: DeckViewItem; anchor: DOMRec
       ) : (
         <div className="flex h-56 flex-col items-center justify-center gap-1 bg-surface-interactive p-3 text-center">
           <p className="text-xs font-semibold leading-tight text-foreground">{item.name}</p>
-          {item.typeLine && <p className="text-[10px] text-steel-600">{item.typeLine}</p>}
+          {item.typeLine && <p className="text-[10px] text-text-muted">{item.typeLine}</p>}
           {item.ap !== undefined && (
-            <p className="text-[10px] text-steel-500">
+            <p className="text-[10px] text-text-muted">
               AP {item.ap} / HP {item.hp}
             </p>
           )}
@@ -52,7 +52,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
 
   if (items.length === 0) {
     return (
-      <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
+      <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-text-muted">
         No cards match your filters.
       </p>
     );
@@ -65,7 +65,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
       )}
       <div className="overflow-x-auto rounded-md border border-border bg-surface">
         <table className="w-full text-left">
-          <thead className="border-b border-border bg-surface-interactive text-[11px] uppercase tracking-[0.12em] text-steel-600">
+          <thead className="border-b border-border bg-surface-interactive text-[11px] uppercase tracking-[0.12em] text-text-muted">
             <tr>
               <th className="w-10 px-3 py-2">Qty</th>
               <th className="px-3 py-2">Card</th>
@@ -93,11 +93,11 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
                   }
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <td className="px-3 py-1.5 font-mono text-xs font-bold text-steel-500">
+                  <td className="px-3 py-1.5 font-mono text-xs font-bold text-text-muted">
                     ×{item.qty}
                   </td>
                   <td className="px-3 py-1.5 font-medium text-foreground">{item.name}</td>
-                  <td className="hidden px-3 py-1.5 text-xs text-steel-600 sm:table-cell">
+                  <td className="hidden px-3 py-1.5 text-xs text-text-muted sm:table-cell">
                     {item.typeLine}
                   </td>
                   <td className="hidden px-3 py-1.5 font-mono text-xs text-steel-600 sm:table-cell">

@@ -118,13 +118,13 @@ export function UnifiedCardTile({
         type="button"
       >
         <p className="truncate text-[13px] font-semibold leading-tight">{card.name}</p>
-        <p className="mt-0.5 truncate text-[11px] text-steel-600">
+        <p className="mt-0.5 truncate text-[11px] text-text-muted">
           {card.id} · {card.type}
         </p>
       </button>
 
       {/* Cost chip */}
-      <span className="flex-none rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] font-bold text-steel-700">
+      <span className="flex-none rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] font-bold text-text-secondary">
         {card.cost}
       </span>
 
@@ -145,7 +145,7 @@ export function UnifiedCardTile({
       >
         <button
           aria-label={`Remove ${card.name}`}
-          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-steel-600 transition-colors hover:bg-surface-muted hover:text-foreground disabled:opacity-30"
+          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-text-muted transition-colors hover:bg-surface-muted hover:text-foreground disabled:opacity-30"
           disabled={qty === 0}
           onClick={onRemove}
           type="button"
@@ -154,7 +154,7 @@ export function UnifiedCardTile({
         </button>
         <button
           aria-label={`Add ${card.name}`}
-          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-steel-600 transition-colors hover:bg-surface-muted hover:text-foreground"
+          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
           onClick={onAdd}
           type="button"
         >
@@ -165,7 +165,7 @@ export function UnifiedCardTile({
       {/* Open detail chevron */}
       <button
         aria-label={`Open details for ${card.name}`}
-        className="flex-none rounded p-0.5 text-steel-600 transition-colors hover:text-cobalt-300"
+        className="flex-none rounded p-0.5 text-text-muted transition-colors hover:text-cobalt-300"
         onClick={onOpen}
         type="button"
       >
