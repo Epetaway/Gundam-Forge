@@ -20,6 +20,11 @@
   --success: 142 71% 45%;
   --warning: 38 92% 50%;
   --overlay: 0 0% 0%;
+  /* Text hierarchy */
+  --text-primary: 215 46% 94%;   /* steel-900 - Primary text */
+  --text-secondary: 220 38% 88%; /* steel-800 - Secondary text */
+  --text-muted: 218 29% 80%;     /* steel-700 - Muted text */
+  --text-subtle: 220 21% 67%;    /* steel-600 - Subtle text */
   color-scheme: dark;
   /* Safe area insets for iPhone notch/Dynamic Island */
   --safe-area-inset-top: safe-area-inset-top;
@@ -44,6 +49,11 @@
   --success: 163 95% 30%;
   --warning: 37 69% 50%;
   --overlay: 0 0% 0%;
+  /* Text hierarchy */
+  --text-primary: 222 47% 11%;    /* Dark text for light mode */
+  --text-secondary: 220 18% 25%;  /* Secondary dark text */
+  --text-muted: 220 13% 45%;      /* Muted dark text */
+  --text-subtle: 220 9% 60%;      /* Subtle dark text */
   color-scheme: light;
 }
 

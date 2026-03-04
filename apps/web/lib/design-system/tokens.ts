@@ -46,6 +46,11 @@ export const semanticColorTokens = {
   destructiveForeground: '#ffffff',
   success: '#22c55e',
   warning: '#f59e0b',
+  // Text hierarchy tokens
+  textPrimary: '#e6edf8',      // steel-900 - Primary text
+  textSecondary: '#d5ddeb',    // steel-800 - Secondary text
+  textMuted: '#bac6d8',        // steel-700 - Muted/tertiary text
+  textSubtle: '#9aa9bf',       // steel-600 - Very subtle text
 } as const;
 
 export const radiusTokens = {

@@ -6,6 +6,7 @@ import type { CardDefinition } from '@gundam-forge/shared';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { useSwipeToClose } from '@/lib/hooks/useSwipeToClose';
 
 type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'set' | 'text' | 'imageUrl' | 'placeholderArt'>;
@@ -40,7 +41,7 @@ export function ReferenceCardDetailModal({
   return (
     <div ref={contentRef}>
       <Dialog onOpenChange={onOpenChange} open={open}>
-        <DialogContent className="w-[min(1240px,96vw)] max-w-[1240px] gap-0 border border-[#3a475c] bg-[#151a22] p-0">
+        <DialogContent className="w-[min(1240px,96vw)] max-w-[1240px] max-h-[calc(100vh-2rem)] flex flex-col gap-0 border border-[#3a475c] bg-[#151a22] p-0">
           {card ? (
             <>
               <DialogHeader className="border-b border-[#2a3444] bg-[#1c2330] px-6 py-4">
@@ -72,7 +73,8 @@ export function ReferenceCardDetailModal({
               </div>
             </DialogHeader>
 
-            <div className="grid gap-5 px-6 py-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid gap-5 px-6 py-5 lg:grid-cols-[320px_minmax(0,1fr)]">
               <div className="space-y-3">
                 <div className="relative mx-auto w-full max-w-[300px] overflow-hidden rounded-[8px] border border-[#3a475c] bg-black">
                   <div className="relative aspect-[5/7] w-full">
@@ -93,7 +95,7 @@ export function ReferenceCardDetailModal({
                       />
                       <button
                         aria-label={`Decrease ${card.name}`}
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a] disabled:opacity-40"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a] disabled:opacity-40 disabled:cursor-not-allowed"
                         disabled={qty === 0}
                         onClick={onRemove}
                         type="button"
@@ -102,13 +104,16 @@ export function ReferenceCardDetailModal({
                       </button>
                       <button
                         aria-label={`Increase ${card.name}`}
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a]"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a] hover:border-[#60a5fa]"
                         onClick={onAdd}
                         type="button"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
                     </div>
+                    {qty === 0 && (
+                      <p className="mt-2 text-xs text-[#9aa9bf]">Click + to add this card to your deck</p>
+                    )}
 
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#9aa9bf]">Printing</p>
                     <button className="mt-1 flex h-11 w-full items-center justify-between rounded-md border border-[#2a3444] bg-[#151a22] px-3 text-sm font-medium text-[#e6edf8]" type="button">
@@ -133,16 +138,27 @@ export function ReferenceCardDetailModal({
                   <div className="rounded-md border border-[#2a3444] bg-[#1c2330] p-3">
                     <div className="flex items-center gap-1 text-sm font-semibold text-[#e6edf8]">
                       Categories:
-                      <CircleHelp className="h-4 w-4 text-[#9aa9bf]" />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button type="button" className="inline-flex" aria-label="Info about categories">
+                              <CircleHelp className="h-4 w-4 text-[#9aa9bf] hover:text-[#60a5fa] transition-colors" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs max-w-[200px]">Organize cards by deck section: Main Deck, Side Deck, or cards you're considering.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                     <div className="mt-2 flex items-center gap-2 rounded-md border border-[#2a3444] bg-[#151a22] p-2">
                       <Star className="h-4 w-4 text-[#60a5fa]" />
                       <span className="text-sm font-medium text-[#e6edf8]">Main Deck</span>
                     </div>
                     <div className="mt-3 grid grid-cols-3 gap-2">
-                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Creature</button>
-                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Sideboard</button>
-                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Maybeboard</button>
+                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Unit</button>
+                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Side Deck</button>
+                      <button className="rounded-md border border-[#2a3444] bg-[#151a22] px-2 py-2 text-sm font-semibold text-[#e6edf8]" type="button">Considering</button>
                     </div>
                   </div>
 
@@ -160,6 +176,7 @@ export function ReferenceCardDetailModal({
                   {card.text?.trim() ? card.text : 'No rules text available for this card.'}
                 </div>
               </div>
+            </div>
             </div>
 
             <div className="flex items-center justify-between border-t border-[#2a3444] bg-[#1c2330] px-6 py-3">
@@ -179,7 +196,7 @@ export function ReferenceCardDetailModal({
 
         <button
           aria-label="Close card details"
-          className="absolute left-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a]"
+          className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2a3444] bg-[#151a22] text-[#e6edf8] hover:bg-[#222b3a] z-50"
           onClick={() => onOpenChange(false)}
           type="button"
         >

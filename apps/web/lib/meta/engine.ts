@@ -13,6 +13,13 @@ export interface ArchetypeMetaRecord {
   topThree: number;
   winRate: number;
   score: number;
+  metaShare: number; // 0–1, fraction of total tournament placements
+}
+
+export interface ColorShareRecord {
+  color: string;
+  count: number;
+  share: number; // 0–1
 }
 
 function ageWeight(eventDate: string): number {
@@ -81,12 +88,14 @@ export function rankTrendingDecks(decks: DeckRecord[], events: EventRecord[], li
 
 export function rankArchetypes(events: EventRecord[]): ArchetypeMetaRecord[] {
   const map = new Map<string, EventPlacementRecord[]>();
+  let totalPlacements = 0;
 
   for (const event of events) {
     for (const placement of event.placements) {
       const bucket = map.get(placement.archetype) ?? [];
       bucket.push(placement);
       map.set(placement.archetype, bucket);
+      totalPlacements++;
     }
   }
 
@@ -102,7 +111,29 @@ export function rankArchetypes(events: EventRecord[]): ArchetypeMetaRecord[] {
         topThree,
         winRate,
         score: Number.parseFloat(score.toFixed(2)),
+        metaShare: totalPlacements > 0 ? placements / totalPlacements : 0,
       };
     })
     .sort((a, b) => b.score - a.score);
+}
+
+export function getColorDistribution(events: EventRecord[], decks: DeckRecord[]): ColorShareRecord[] {
+  const deckMap = new Map(decks.map((d) => [d.id, d]));
+  const colorCount = new Map<string, number>();
+  let total = 0;
+
+  for (const event of events) {
+    for (const placement of event.placements) {
+      const deck = deckMap.get(placement.deckId);
+      if (!deck) continue;
+      for (const color of deck.colors) {
+        colorCount.set(color, (colorCount.get(color) ?? 0) + 1);
+        total++;
+      }
+    }
+  }
+
+  return Array.from(colorCount.entries())
+    .map(([color, count]) => ({ color, count, share: total > 0 ? count / total : 0 }))
+    .sort((a, b) => b.count - a.count);
 }

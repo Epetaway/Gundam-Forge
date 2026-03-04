@@ -137,11 +137,11 @@ export function DeckPreviewCard({
               className="h-8 w-8 rounded-full object-cover border border-border/50"
             />
           ) : (
-            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-steel-400" aria-hidden="true">
+            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-text-subtle" aria-hidden="true">
               {author.charAt(0).toUpperCase()}
             </div>
           )}
-          <span className="text-xs text-steel-500 dark:text-steel-400 truncate">
+          <span className="text-xs text-text-muted truncate">
             {author}
           </span>
         </div>
@@ -180,7 +180,7 @@ export function DeckPreviewCard({
 
         {/* Metadata line */}
         <div className="flex justify-end pt-2 border-t border-border/30">
-          <span className="text-xs text-steel-500 dark:text-steel-400">
+          <span className="text-xs text-text-secondary dark:text-text-secondary">
             {metaLine}
           </span>
         </div>
@@ -198,7 +198,7 @@ export function DeckPreviewCard({
             ? tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-surface-muted text-steel-400 px-2 py-1 text-xs font-medium"
+                  className="rounded-full bg-surface-muted text-text-subtle px-2 py-1 text-xs font-medium"
                 >
                   {tag}
                 </span>

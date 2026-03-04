@@ -160,7 +160,7 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
       />
 
       <section aria-live="polite" className="space-y-3 pb-4">
-        <p className="text-xs text-steel-600">{visibleCards.length} cards shown</p>
+        <p className="text-xs text-text-muted">{visibleCards.length} cards shown</p>
         <ActiveRenderer
           actions={{ onOpenCard: setActiveCardId }}
           items={visibleCards}
