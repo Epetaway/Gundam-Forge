@@ -1,12 +1,12 @@
-import { deckCatalog, getDeckById, getResolvedEntries } from '@/lib/data/decks';
+import { getDecks, getDeckById, getResolvedEntries } from '@/lib/data/decks';
 import { cards } from '@/lib/data/cards';
 import { notFound } from 'next/navigation';
 import { Container } from '@/components/layout/Container';
 import { DeckBuilderPage } from '@/app/forge/forge-workbench';
 
-/** Pre-build pages for the 4 built-in decks. User-created decks are handled by /forge?deckId= */
+/** Pre-build pages for catalog + tournament decks. User-created decks are handled by /forge?deckId= */
 export function generateStaticParams() {
-  return deckCatalog.map((deck) => ({ id: deck.id }));
+  return getDecks().map((deck) => ({ id: deck.id }));
 }
 
 interface Props {

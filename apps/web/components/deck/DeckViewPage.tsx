@@ -20,6 +20,7 @@ import {
   type DeckViewMode,
 } from '@/lib/deck/sortFilter';
 import { useLocalStorageState } from '@/lib/useLocalStorageState';
+import { DeckStats } from '@/components/deck/DeckStats';
 
 interface DeckViewPageProps {
   deck: {
@@ -158,6 +159,8 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
         viewMode={activeView.id}
         views={viewRegistry}
       />
+
+      <DeckStats items={initialItems} />
 
       <section aria-live="polite" className="space-y-3 pb-4">
         <p className="text-xs text-text-muted">{visibleCards.length} cards shown</p>

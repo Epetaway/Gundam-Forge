@@ -77,6 +77,22 @@ export function PlaytestGameEnhanced({
     isMuted,
   } = useSoundEffects();
 
+  // Mobile Detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobileSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on mount
+    checkMobileSize();
+
+    // Listen for resize
+    window.addEventListener('resize', checkMobileSize);
+    return () => window.removeEventListener('resize', checkMobileSize);
+  }, []);
+
   // Initialize Game Engine
   useEffect(() => {
     try {
@@ -272,6 +288,25 @@ export function PlaytestGameEnhanced({
         <div className="text-center">
           <p className="text-xl font-bold text-red-500">Error</p>
           <p className="text-white mt-2">{error || 'Failed to load game'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mobile Not Supported
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-surface to-surface-elevated">
+        <div className="text-center px-4">
+          <p className="text-2xl font-bold text-foreground mb-2">📱 Mobile Not Supported</p>
+          <p className="text-white mb-4">The Gundam TCG Playtester is only available on tablet and desktop devices.</p>
+          <p className="text-white/70 text-sm">Please access this feature using a tablet or computer for the best experience.</p>
+          <Link
+            href="/decks"
+            className="inline-block mt-6 px-4 py-2 bg-cobalt-600 hover:bg-cobalt-700 text-white rounded font-semibold transition"
+          >
+            ← Back to Decks
+          </Link>
         </div>
       </div>
     );
