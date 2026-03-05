@@ -20,6 +20,12 @@ export default function HomePage(): JSX.Element {
   const archetypes = allArchetypes.slice(0, 6);
   const colorDistribution = getColorDistribution(events, decks);
   const latestEventDate = events[0]?.date ?? null;
+  // Map archetype name → tournament deck ID for "View Deck" links
+  const tournamentDeckByArchetype = new Map<string, string>(
+    decks
+      .filter((d) => d.source === 'tournament')
+      .map((d) => [d.archetype, d.id]),
+  );
   return (
     <>
       <section className="relative overflow-hidden border-b border-border">
@@ -192,7 +198,9 @@ export default function HomePage(): JSX.Element {
                 <CardDescription>Meta share across all tracked events.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                {archetypes.map((record, idx) => (
+                {archetypes.map((record, idx) => {
+                  const deckId = tournamentDeckByArchetype.get(record.archetype);
+                  return (
                   <div className="rounded-md border border-border bg-surface-interactive px-3 py-2.5" key={record.archetype}>
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -200,7 +208,17 @@ export default function HomePage(): JSX.Element {
                         <p className="text-sm font-semibold truncate">{record.archetype}</p>
                         <ArchetypeBadge archetype={record.archetype} />
                       </div>
-                      <Badge variant="accent" className="shrink-0 text-[10px]">{record.topThree} top 3</Badge>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {deckId && (
+                          <Link
+                            href={`/decks/${deckId}`}
+                            className="font-mono text-[10px] text-cobalt-400 hover:text-cobalt-300 transition-colors"
+                          >
+                            View Deck →
+                          </Link>
+                        )}
+                        <Badge variant="accent" className="text-[10px]">{record.topThree} top 3</Badge>
+                      </div>
                     </div>
                     <div className="h-1 rounded-full bg-surface-muted overflow-hidden mb-1.5">
                       <div
@@ -213,7 +231,8 @@ export default function HomePage(): JSX.Element {
                       <span>{(record.winRate * 100).toFixed(1)}% win rate</span>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
 
@@ -261,22 +280,34 @@ function Stat({ label, value }: { label: string; value: string }): JSX.Element {
   );
 }
 
-const ARCHETYPE_COLORS: Record<string, string> = {
-  aggro: 'bg-red-500/15 text-red-400 border-red-500/20',
-  control: 'bg-cobalt-600/20 text-cobalt-400 border-cobalt-500/20',
-  midrange: 'bg-green-500/15 text-green-400 border-green-500/20',
-  ramp: 'bg-green-500/15 text-green-400 border-green-500/20',
-  combo: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
-  burn: 'bg-red-500/15 text-red-400 border-red-500/20',
-  toolbox: 'bg-steel-400/15 text-steel-600 border-steel-400/20',
-};
+const ARCHETYPE_TYPE_STYLES: Array<[RegExp, string]> = [
+  [/aggro|rush|beatdown|blitz/i, 'bg-red-500/15 text-red-400 border-red-500/20'],
+  [/control|wall|lockdown/i, 'bg-cobalt-600/20 text-cobalt-400 border-cobalt-500/20'],
+  [/midrange|tempo/i, 'bg-green-500/15 text-green-400 border-green-500/20'],
+  [/ramp|resource/i, 'bg-green-500/15 text-green-400 border-green-500/20'],
+  [/combo|link|pair/i, 'bg-amber-500/15 text-amber-400 border-amber-500/20'],
+  [/burn/i, 'bg-red-500/15 text-red-400 border-red-500/20'],
+  [/toolbox|toolkit/i, 'bg-steel-400/15 text-steel-600 border-steel-400/20'],
+];
+
+function detectArchetypeType(name: string): string {
+  for (const [re, cls] of ARCHETYPE_TYPE_STYLES) {
+    if (re.test(name)) return cls;
+  }
+  return 'bg-steel-400/15 text-steel-600 border-steel-400/20';
+}
+
+// Short label: last word of the deck name, or whole name if one word
+function archetypeLabel(name: string): string {
+  const parts = name.split(/\s+/);
+  return parts[parts.length - 1] ?? name;
+}
 
 function ArchetypeBadge({ archetype }: { archetype: string }): JSX.Element {
-  const key = archetype.toLowerCase();
-  const cls = ARCHETYPE_COLORS[key] ?? 'bg-steel-400/15 text-steel-600 border-steel-400/20';
+  const cls = detectArchetypeType(archetype);
   return (
     <span className={`inline-flex items-center rounded border px-1.5 py-px font-mono text-[9px] uppercase tracking-wider ${cls}`}>
-      {archetype}
+      {archetypeLabel(archetype)}
     </span>
   );
 }

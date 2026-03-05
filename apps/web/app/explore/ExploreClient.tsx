@@ -85,7 +85,10 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
                 updatedAgo={relativeTime(deck.updatedAt ?? deck.id)}
                 colors={deck.colors || []}
                 archetype={deck.archetype}
-                tags={deck.archetype ? [deck.archetype] : []}
+                tags={[
+                  ...(deck.archetype ? [deck.archetype] : []),
+                  ...(deck.source === 'tournament' ? ['Tournament'] : []),
+                ]}
                 avatarUrl={undefined}
                 onClick={() => router.push(`/decks/${deck.id}`)}
                 onMenu={() => {}}

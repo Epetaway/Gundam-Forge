@@ -1,5 +1,6 @@
 import type { CardColor, CardDefinition } from '@gundam-forge/shared';
 import { cardsById } from '@/lib/data/cards';
+import liveDecksData from './decks-live.json';
 
 export interface DeckEntry {
   cardId: string;
@@ -17,6 +18,9 @@ export interface DeckRecord {
   views: number;
   entries: DeckEntry[];
   updatedAt?: string;
+  source?: 'catalog' | 'tournament';
+  eventId?: string;
+  placement?: number;
 }
 
 export const deckCatalog: DeckRecord[] = [
@@ -363,12 +367,14 @@ const resolveEntry = (entry: DeckEntry): (DeckEntry & { card?: CardDefinition })
   card: cardsById.get(entry.cardId),
 });
 
+const liveDecks = liveDecksData as unknown as DeckRecord[];
+
 export function getDecks(): DeckRecord[] {
-  return deckCatalog;
+  return [...deckCatalog, ...liveDecks];
 }
 
 export function getDeckById(id: string): DeckRecord | undefined {
-  return deckCatalog.find((deck) => deck.id === id);
+  return deckCatalog.find((deck) => deck.id === id) ?? liveDecks.find((deck) => deck.id === id);
 }
 
 export function getResolvedEntries(deck: DeckRecord): Array<DeckEntry & { card?: CardDefinition }> {

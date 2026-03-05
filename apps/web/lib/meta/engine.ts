@@ -50,30 +50,72 @@ function calculateWinRate(records: EventPlacementRecord[]): number {
   return wins / total;
 }
 
+// GCG color names as they appear in Limitless deck names (e.g. "Blue Purple Midrange")
+const GCG_COLORS = ['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'] as const;
+
+// Jaccard-like overlap of a deck's colors against colors extracted from a tournament deck name.
+// Returns 0–1; 1 means perfect match, 0 means no shared colors.
+function colorOverlap(deckColors: readonly string[], deckName: string): number {
+  const nameColors = GCG_COLORS.filter((c) => deckName.includes(c));
+  if (nameColors.length === 0 || deckColors.length === 0) return 0;
+  const deckSet = new Set(deckColors);
+  const shared = nameColors.filter((c) => deckSet.has(c)).length;
+  return shared / Math.max(deckColors.length, nameColors.length);
+}
+
 export function rankTrendingDecks(decks: DeckRecord[], events: EventRecord[], limit: number = 8): TrendingDeckRecord[] {
+  // Map Limitless deckId → placements (catalog deck lookup)
   const placementMap = new Map<string, EventPlacementRecord[]>();
+  // Map archetype name → placements (tournament deck lookup)
+  const archetypeMap = new Map<string, EventPlacementRecord[]>();
 
   for (const event of events) {
     for (const placement of event.placements) {
-      const bucket = placementMap.get(placement.deckId) ?? [];
-      bucket.push(placement);
-      placementMap.set(placement.deckId, bucket);
+      const idBucket = placementMap.get(placement.deckId) ?? [];
+      idBucket.push(placement);
+      placementMap.set(placement.deckId, idBucket);
+
+      const archBucket = archetypeMap.get(placement.archetype) ?? [];
+      archBucket.push(placement);
+      archetypeMap.set(placement.archetype, archBucket);
     }
   }
 
   return decks
     .map((deck) => {
-      const placements = placementMap.get(deck.id) ?? [];
+      // Tournament decks match by archetype name; catalog decks by Limitless deckId
+      const isTournament = deck.source === 'tournament';
+      const placements = isTournament
+        ? (archetypeMap.get(deck.archetype) ?? [])
+        : (placementMap.get(deck.id) ?? []);
+
       const winRate = calculateWinRate(placements);
       const eventAppearances = placements.length;
       const weightedPlacements = events.reduce((score, event) => {
-        const eventPlacement = event.placements.find((placement) => placement.deckId === deck.id);
-        if (!eventPlacement) return score;
-        return score + placementScore(eventPlacement.placement) * ageWeight(event.date);
+        const match = isTournament
+          ? event.placements.find((p) => p.archetype === deck.archetype)
+          : event.placements.find((p) => p.deckId === deck.id);
+        if (!match) return score;
+        return score + placementScore(match.placement) * ageWeight(event.date);
       }, 0);
+
+      // Color-overlap boost only for catalog decks with no exact match
+      const colorBoost =
+        !isTournament && weightedPlacements === 0
+          ? events.reduce((score, event) => {
+              for (const p of event.placements) {
+                const overlap = colorOverlap(deck.colors, p.deckName);
+                if (overlap >= 0.5) {
+                  score += placementScore(p.placement) * ageWeight(event.date) * overlap * 0.4;
+                }
+              }
+              return score;
+            }, 0)
+          : 0;
+
       const socialMomentum = deck.likes * 3 + deck.views * 0.4;
       const performanceBoost = winRate * 100 + eventAppearances * 6;
-      const trendingScore = socialMomentum + weightedPlacements + performanceBoost;
+      const trendingScore = socialMomentum + weightedPlacements + colorBoost + performanceBoost;
 
       return {
         ...deck,
@@ -102,7 +144,7 @@ export function rankArchetypes(events: EventRecord[]): ArchetypeMetaRecord[] {
   return Array.from(map.entries())
     .map(([archetype, records]) => {
       const placements = records.length;
-      const topThree = records.filter((record) => record.placement <= 3).length;
+      const topThree = records.filter((record) => typeof record.placement === 'number' && record.placement <= 3).length;
       const winRate = calculateWinRate(records);
       const score = topThree * 10 + placements * 2 + winRate * 100;
       return {
@@ -125,8 +167,12 @@ export function getColorDistribution(events: EventRecord[], decks: DeckRecord[])
   for (const event of events) {
     for (const placement of event.placements) {
       const deck = deckMap.get(placement.deckId);
-      if (!deck) continue;
-      for (const color of deck.colors) {
+      const colors = deck
+        ? deck.colors
+        : // Fallback: extract color words from the Limitless deck name
+          GCG_COLORS.filter((c) => placement.deckName.includes(c));
+
+      for (const color of colors) {
         colorCount.set(color, (colorCount.get(color) ?? 0) + 1);
         total++;
       }

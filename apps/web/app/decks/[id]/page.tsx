@@ -1,12 +1,11 @@
 // Required for static export: generateStaticParams
-import { deckCatalog } from '@/lib/data/decks';
 import { notFound } from 'next/navigation';
 import { DeckViewPage } from '@/components/deck/DeckViewPage';
-import { getDeckById, getResolvedEntries } from '@/lib/data/decks';
+import { getDecks, getDeckById, getResolvedEntries } from '@/lib/data/decks';
 import { toDeckViewItem } from '@/lib/deck/sortFilter';
 
 export function generateStaticParams() {
-  return deckCatalog.map(deck => ({ id: deck.id }));
+  return getDecks().map(deck => ({ id: deck.id }));
 }
 
 interface DeckViewPageProps {
