@@ -160,7 +160,7 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **✅ COMPLETE** |
 | **Phase 13** | **Performance & Scalability** | **5** | **Perf 5→8** | **✅ COMPLETE** |
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **✅ COMPLETE** |
-| **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **🟡 IN PROGRESS (15.1-15.2 done)** |
+| **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **✅ COMPLETE** |
 | **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **🔄 UPCOMING** |
 | **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **🔄 UPCOMING** |
 | **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **🔄 UPCOMING** |
@@ -194,8 +194,8 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 - ✅ **15.1 complete**: duplication audit across `packages/shared/src/` and `apps/web/lib/game/`
 - ✅ **15.2 complete**: runtime `GameEngine` consolidated behind shared package export/facade
 - ✅ **15.3 complete**: declarative shared card ability registry extracted and wired to web ability executor
-- ⏳ **15.4 pending**: trigger queue registry integration
-- ⏳ **15.5 pending**: MetaGameContext types
+- ✅ **15.4 complete**: trigger queue now registry-aware with optional registered ability execution hook
+- ✅ **15.5 complete**: shared MetaGameContext types added (abilities ↔ packages ↔ archetypes)
 
 **Key Tasks**:
 - **15.1**: Audit duplication between `packages/shared/src/` and `apps/web/lib/game/`
