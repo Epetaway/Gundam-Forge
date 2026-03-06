@@ -193,7 +193,7 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 **Progress (March 6, 2026)**:
 - ✅ **15.1 complete**: duplication audit across `packages/shared/src/` and `apps/web/lib/game/`
 - ✅ **15.2 complete**: runtime `GameEngine` consolidated behind shared package export/facade
-- 🔄 **15.3 in progress**: card abilities registry extraction
+- ✅ **15.3 complete**: declarative shared card ability registry extracted and wired to web ability executor
 - ⏳ **15.4 pending**: trigger queue registry integration
 - ⏳ **15.5 pending**: MetaGameContext types
 
