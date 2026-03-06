@@ -10,34 +10,16 @@
  */
 
 import type { GameState, CardInstance, PlayerState } from './game-engine';
+import {
+  AbilityType,
+  AbilityTrigger,
+  DEFAULT_CARD_ABILITY_REGISTRY,
+  type CardAbility,
+} from '@gundam-forge/shared';
 
-export enum AbilityType {
-  DRAW = 'DRAW',
-  DAMAGE_SHIELDS = 'DAMAGE_SHIELDS',
-  DAMAGE_BASE = 'DAMAGE_BASE',
-  CREATE_TOKEN = 'CREATE_TOKEN',
-  HEAL = 'HEAL',
-  SEARCH_DECK = 'SEARCH_DECK',
-  CONDITIONAL = 'CONDITIONAL',
-}
-
-export enum AbilityTrigger {
-  DEPLOY = 'DEPLOY', // When unit enters play
-  ATTACK = 'ATTACK', // When unit attacks
-  BLOCK = 'BLOCK', // When unit blocks
-  DESTROY = 'DESTROY', // When unit is destroyed
-  END_OF_TURN = 'END_OF_TURN', // End of turn
-}
-
-export interface CardAbility {
-  id: string;
-  name: string;
-  trigger: AbilityTrigger;
-  type: AbilityType;
-  text: string;
-  parameters: Record<string, any>;
+type ExecutableCardAbility = CardAbility & {
   condition?: (gameState: GameState, source: CardInstance) => boolean;
-}
+};
 
 export interface AbilityExecutionResult {
   executed: boolean;
@@ -143,7 +125,7 @@ export class AbilityExecutor {
    * Execute an ability
    */
   static executeAbility(
-    ability: CardAbility,
+    ability: ExecutableCardAbility,
     gameState: GameState,
     source: CardInstance,
     target: PlayerState | null = null,
@@ -193,7 +175,7 @@ export class AbilityExecutor {
     player: PlayerState,
     ability: CardAbility,
   ): AbilityExecutionResult {
-    const amount = ability.parameters.amount || 1;
+    const amount = Number(ability.parameters.amount ?? 1);
     let cardsDrawn = 0;
 
     for (let i = 0; i < amount && player.deck.length > 0; i++) {
@@ -220,7 +202,7 @@ export class AbilityExecutor {
     player: PlayerState,
     ability: CardAbility,
   ): AbilityExecutionResult {
-    const amount = ability.parameters.amount || 1;
+    const amount = Number(ability.parameters.amount ?? 1);
 
     // Remove shields
     const shieldsDestroyed = Math.min(amount, player.shields.length);
@@ -241,7 +223,7 @@ export class AbilityExecutor {
     player: PlayerState,
     ability: CardAbility,
   ): AbilityExecutionResult {
-    const amount = ability.parameters.amount || 1;
+    const amount = Number(ability.parameters.amount ?? 1);
     const damageDealt = Math.min(amount, player.baseHealth);
 
     player.baseHealth -= damageDealt;
@@ -261,7 +243,7 @@ export class AbilityExecutor {
     player: PlayerState,
     ability: CardAbility,
   ): AbilityExecutionResult {
-    const amount = ability.parameters.amount || 1;
+    const amount = Number(ability.parameters.amount ?? 1);
     const oldHealth = player.baseHealth;
 
     player.baseHealth = Math.min(
@@ -286,7 +268,7 @@ export class AbilityExecutor {
     player: PlayerState,
     ability: CardAbility,
   ): AbilityExecutionResult {
-    const count = ability.parameters.count || 1;
+    const count = Number(ability.parameters.count ?? 1);
 
     // In a full implementation, would create actual token units
     // For now, just notify of intent
@@ -303,44 +285,5 @@ export class AbilityExecutor {
  * Ability library - common card abilities
  */
 export const ABILITY_LIBRARY: Record<string, CardAbility> = {
-  DRAW_1: {
-    id: 'ability-draw-1',
-    name: 'Draw 1',
-    trigger: AbilityTrigger.DEPLOY,
-    type: AbilityType.DRAW,
-    text: 'Draw 1 card',
-    parameters: { amount: 1 },
-  },
-  DRAW_2: {
-    id: 'ability-draw-2',
-    name: 'Draw 2',
-    trigger: AbilityTrigger.DEPLOY,
-    type: AbilityType.DRAW,
-    text: 'Draw 2 cards',
-    parameters: { amount: 2 },
-  },
-  DAMAGE_2_SHIELDS: {
-    id: 'ability-damage-shields-2',
-    name: 'Damage Shields 2',
-    trigger: AbilityTrigger.ATTACK,
-    type: AbilityType.DAMAGE_SHIELDS,
-    text: 'When this unit attacks, deal 2 damage to shields',
-    parameters: { amount: 2 },
-  },
-  DAMAGE_1_BASE: {
-    id: 'ability-damage-base-1',
-    name: 'Damage Base 1',
-    trigger: AbilityTrigger.ATTACK,
-    type: AbilityType.DAMAGE_BASE,
-    text: 'When this unit attacks, deal 1 damage directly to base',
-    parameters: { amount: 1 },
-  },
-  HEAL_3: {
-    id: 'ability-heal-3',
-    name: 'Heal 3',
-    trigger: AbilityTrigger.DEPLOY,
-    type: AbilityType.HEAL,
-    text: 'Heal 3 health',
-    parameters: { amount: 3 },
-  },
+  ...DEFAULT_CARD_ABILITY_REGISTRY,
 };

@@ -6,6 +6,7 @@ export { GameEngine } from './playtest-game-engine';
 export * from './deckIntentPackages';
 export * from './mechanics-card-mapping';
 export * from './synergyScoring';
+export * from './card-ability-registry';
 export {
   GundamPlaytestEngine,
   createSeededRng,
