@@ -1,10 +1,9 @@
 # Gundam Forge — Comprehensive Execution Roadmap
 
-**Last Audit:** March 3, 2026 | **FINAL UPDATE:** 100% PRODUCTION READY ✅
-**Current Production Readiness:** 100/100 (All 14 phases complete)
-**Final Session:** Completed Phases 1-14, all 45+ tasks implemented and validated
-**Target:** 89–90/100 across all pages and features → **EXCEEDED: 100/100** ✅
-**Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`)
+**Last Audit:** March 6, 2026 | **UPDATE:** Phases 1-14 Complete ✅ | Phases 15-18 Upcoming 🚀
+**Production Readiness:** 100/100 (Phases 1-14) | 16-week enhancement plan approved
+**Focus:** Game logic unification + meta-aware system + official Bandai rules + UI/UX
+**Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`) · Zero breaking changes
 
 ---
 
@@ -161,8 +160,96 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 12** | **Visual Polish & Design System** | **5** | **Polish 6→8.5** | **✅ COMPLETE** |
 | **Phase 13** | **Performance & Scalability** | **5** | **Perf 5→8** | **✅ COMPLETE** |
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **✅ COMPLETE** |
+| **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **🟡 IN PROGRESS (15.1-15.2 done)** |
+| **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **🔄 UPCOMING** |
+| **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **🔄 UPCOMING** |
+| **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **🔄 UPCOMING** |
 
-**TOTAL: 45+ tasks | 100% COMPLETE | 100/100 Production Ready** ✅
+**TOTAL: 45+ completed + 20+ upcoming | Production Ready 100/100**
+
+---
+
+## 🚀 UPCOMING: Phases 15-18 — Strategic Enhancements (Director-Approved March 6, 2026)
+
+### Strategic Vision
+Gundam-Forge transitions from feature-complete to **meta-intelligent deck builder** with:
+- **Phase 15**: Unify game logic (single source of truth + official Bandai rules)
+- **Phase 16**: Auto-detect meta trends (archetype performance + community APIs)
+- **Phase 17**: Playstyle recommendations (meta-aware suggestions + AAA accessibility)
+- **Phase 18**: Infrastructure scalability (modular packages + CI/CD hardening)
+
+**Key Director Decisions**:
+- 🎯 Rules: Official Bandai GCG (not custom homebrew)
+- 🎯 Meta: Auto-detection (not manual moderator entry)
+- 🎯 Deployment: GitHub Pages, zero build errors, QA-gated
+- 🎯 Compatibility: Zero user-facing breaking changes
+
+---
+
+### Phase 15 — Game Logic Unification (Weeks 1-4)
+
+**Objective**: Consolidate duplicated game logic, establish single source of truth
+
+**Progress (March 6, 2026)**:
+- ✅ **15.1 complete**: duplication audit across `packages/shared/src/` and `apps/web/lib/game/`
+- ✅ **15.2 complete**: runtime `GameEngine` consolidated behind shared package export/facade
+- 🔄 **15.3 in progress**: card abilities registry extraction
+- ⏳ **15.4 pending**: trigger queue registry integration
+- ⏳ **15.5 pending**: MetaGameContext types
+
+**Key Tasks**:
+- **15.1**: Audit duplication between `packages/shared/src/` and `apps/web/lib/game/`
+- **15.2**: Consolidate engine into single unified implementation
+- **15.3**: Extract card abilities → declarative CardAbilityRegistry
+- **15.4**: Refactor trigger-queue to use registry
+- **15.5**: Create MetaGameContext type (abilities ↔ meta)
+
+**Verification**: 0 lint, 0 type errors, 84/84 tests pass, playtest UX identical
+
+---
+
+### Phase 16 — Meta-Aware Data System (Weeks 5-8)
+
+**Objective**: Track real-time Gundam TCG trends, auto-detect archetype performance
+
+**Key Tasks**:
+- **16.1**: Extend Supabase schema (archetype_stats, card_performance, meta_snapshots)
+- **16.2**: Create meta auto-detection pipeline (community APIs)
+- **16.3**: Build MetaTrendService (query ranks, trends, recommendations)
+- **16.4**: Link deck packages to archetype performance
+- **16.5**: Create moderator meta dashboard
+
+**Verification**: Meta updates live in <5 min, 100 concurrent API requests, zero RLS leaks
+
+---
+
+### Phase 17 — UI/UX & Playstyle Features (Weeks 9-12)
+
+**Objective**: Playstyle recommendations based on meta, improved UX, AAA accessibility
+
+**Key Tasks**:
+- **17.1**: Meta suggestions in deck builder (sidebar + badges)
+- **17.2**: Playstyle improvement hints post-validation
+- **17.3**: New `/decks/compare` feature (2-3 deck comparison)
+- **17.4**: Mobile UX refinements (touch optimization, landscape)
+- **17.5**: Accessibility audit to WCAG 2.1 AAA (from AA)
+
+**Verification**: 5-user UAT, Lighthouse ≥95, no regressions, LCP unchanged
+
+---
+
+### Phase 18 — Architecture & Infrastructure (Weeks 13-16)
+
+**Objective**: Modularity, performance optimization, CI/CD hardening
+
+**Key Tasks**:
+- **18.1**: Extract design tokens → reusable package
+- **18.2**: Modularize 15 sync scripts into pluggable pipeline
+- **18.3**: Standardize API layer (error handling, logging)
+- **18.4**: Performance sweep (target: FCP <1.5s)
+- **18.5**: CI/CD enhancements + GitHub Pages validation
+
+**Verification**: npm run qa 100%, FCP <1.5s, CI/CD <10min, setup <15min for new devs
 
 ---
 

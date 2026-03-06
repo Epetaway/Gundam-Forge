@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GameEngine } from '@/lib/game/game-engine';
+import { GameEngine } from '@/lib/game';
 import { DeckDefinition } from '@/lib/game/game-engine';
 
 // Mock deck definition (creates exactly targetCardCount cards)

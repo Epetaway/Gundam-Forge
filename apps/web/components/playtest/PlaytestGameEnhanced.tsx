@@ -13,7 +13,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { GameEngine } from '@/lib/game/game-engine';
+import { GameEngine } from '@/lib/game';
 import { Autoplayer } from '@/lib/game/autoplayer';
 import { Battlefield } from './Battlefield';
 import { GameStartFlow } from './GameStartFlow';
