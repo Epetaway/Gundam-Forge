@@ -11,6 +11,12 @@
  */
 
 import type { CardInstance, PlayerState, GameState } from './game-engine';
+import {
+  AbilityTrigger,
+  getAbilitiesForCard,
+  type CardAbility,
+  type CardAbilityRegistry,
+} from '@gundam-forge/shared';
 
 /**
  * Trigger type with resolution priority
@@ -39,6 +45,16 @@ export interface QueuedTrigger {
   description: string;
   createdAt: number;
   isOptional: boolean; // Player can choose to resolve or not
+  registeredAbilities: CardAbility[];
+}
+
+export interface TriggerQueueOptions {
+  abilityRegistry?: CardAbilityRegistry;
+  executeRegisteredAbility?: (
+    ability: CardAbility,
+    gameState: GameState,
+    trigger: QueuedTrigger,
+  ) => void;
 }
 
 /**
@@ -49,6 +65,13 @@ export class TriggerQueueManager {
   private queue: QueuedTrigger[] = [];
   private triggerIdCounter = 0;
   private resolvedTriggers: QueuedTrigger[] = [];
+  private abilityRegistry?: CardAbilityRegistry;
+  private executeRegisteredAbility?: TriggerQueueOptions['executeRegisteredAbility'];
+
+  constructor(options?: TriggerQueueOptions) {
+    this.abilityRegistry = options?.abilityRegistry;
+    this.executeRegisteredAbility = options?.executeRegisteredAbility;
+  }
 
   /**
    * Get next trigger ID
@@ -71,6 +94,12 @@ export class TriggerQueueManager {
     isOptional: boolean = false,
   ): QueuedTrigger {
     const priority = this.getPriorityForTriggerType(type);
+    const mappedTrigger = this.mapTriggerTypeToAbilityTrigger(type);
+    const registeredAbilities = mappedTrigger
+      ? getAbilitiesForCard(sourceCardId, this.abilityRegistry).filter(
+          (ability) => ability.trigger === mappedTrigger,
+        )
+      : [];
 
     const trigger: QueuedTrigger = {
       id: this.getTriggerId(),
@@ -84,12 +113,28 @@ export class TriggerQueueManager {
       description,
       createdAt: Date.now(),
       isOptional,
+      registeredAbilities,
     };
 
     this.queue.push(trigger);
     this.sortQueue();
 
     return trigger;
+  }
+
+  private mapTriggerTypeToAbilityTrigger(type: TriggerType): AbilityTrigger | null {
+    switch (type) {
+      case 'DEPLOY':
+        return AbilityTrigger.DEPLOY;
+      case 'ATTACK':
+        return AbilityTrigger.ATTACK;
+      case 'DESTROYED':
+        return AbilityTrigger.DESTROY;
+      case 'END_OF_TURN':
+        return AbilityTrigger.END_OF_TURN;
+      default:
+        return null;
+    }
   }
 
   /**
@@ -152,6 +197,14 @@ export class TriggerQueueManager {
 
     // Execute trigger
     trigger.resolve(gameState);
+
+    // Optional bridge to registry-based execution.
+    // Existing behavior remains unchanged unless executor is provided.
+    if (this.executeRegisteredAbility) {
+      for (const ability of trigger.registeredAbilities) {
+        this.executeRegisteredAbility(ability, gameState, trigger);
+      }
+    }
 
     // Track resolved trigger
     this.resolvedTriggers.push(trigger);
@@ -260,6 +313,7 @@ export function createDeployTrigger(
     description: `Deploy: ${description}`,
     createdAt: Date.now(),
     isOptional: false,
+    registeredAbilities: [],
   };
 }
 
@@ -285,6 +339,7 @@ export function createBurstTrigger(
     description: `Burst: ${description}`,
     createdAt: Date.now(),
     isOptional: false,
+    registeredAbilities: [],
   };
 }
 
@@ -309,5 +364,6 @@ export function createDestroyedTrigger(
     description: `Destroyed: ${description}`,
     createdAt: Date.now(),
     isOptional: false,
+    registeredAbilities: [],
   };
 }
