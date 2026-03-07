@@ -32,6 +32,15 @@ export interface DeckIntentPackage {
 
   /** Secondary colors: Colors with some support for this package (1-2 cards) */
   secondaryColors?: PackageColor[];
+
+  /** Linked archetype IDs used by meta trend systems */
+  archetypeIds?: string[];
+
+  /** Snapshot tier hint from meta ingestion pipeline */
+  metaTier?: 1 | 2 | 3 | 4;
+
+  /** Current trend direction from latest snapshot */
+  trendDirection?: 'up' | 'flat' | 'down';
 }
 
 /**
@@ -48,6 +57,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['end_turn', 'shield_value', 'sustained_defense'],
     primaryColors: ['Blue', 'Green'],
     secondaryColors: ['White'],
+    archetypeIds: ['wing-zero', 'seed-freedom'],
+    metaTier: 1,
+    trendDirection: 'flat',
   },
 
   'shield-pressure': {
@@ -59,6 +71,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['kill_trigger', 'shield_damage', 'multi_shield_break'],
     primaryColors: ['Red', 'Green'],
     secondaryColors: ['White'],
+    archetypeIds: ['zeon-rush', 'seed-aggro'],
+    metaTier: 1,
+    trendDirection: 'up',
   },
 
   'buff-chain-support': {
@@ -70,6 +85,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['main_phase', 'attack_amplification', 'kill_enablement'],
     primaryColors: ['White', 'Blue'],
     secondaryColors: ['Green'],
+    archetypeIds: ['seed-freedom'],
+    metaTier: 1,
+    trendDirection: 'flat',
   },
 
   'ace-sync': {
@@ -81,6 +99,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['pair_trigger', 'link_trigger', 'pilot_synergy'],
     primaryColors: ['Red', 'Purple', 'Blue'],
     secondaryColors: ['White'],
+    archetypeIds: ['cyber-newtype', 'barbatos-synergy'],
+    metaTier: 2,
+    trendDirection: 'up',
   },
 
   'tempo-deploy': {
@@ -92,6 +113,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['on_deploy', 'tempo_chain', 'unit_search'],
     primaryColors: ['Blue', 'Green', 'White'],
     secondaryColors: ['Red'],
+    archetypeIds: ['wing-zero', 'seed-freedom'],
+    metaTier: 1,
+    trendDirection: 'flat',
   },
 
   'attack-value-engine': {
@@ -103,6 +127,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['on_attack', 'draw_engine', 'resource_generation'],
     primaryColors: ['Red', 'Purple'],
     secondaryColors: ['Blue', 'Green'],
+    archetypeIds: ['zeon-rush', 'cyber-newtype'],
+    metaTier: 2,
+    trendDirection: 'up',
   },
 
   'action-step-tricks': {
@@ -114,6 +141,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['action_step_timing', 'reactive_play', 'instant_tricks'],
     primaryColors: ['Blue', 'Red'],
     secondaryColors: ['Purple', 'White'],
+    archetypeIds: ['cyber-newtype', 'seed-freedom'],
+    metaTier: 2,
+    trendDirection: 'flat',
   },
 
   'evasion-and-preempt': {
@@ -125,6 +155,9 @@ export const DECK_INTENT_PACKAGES: Record<string, DeckIntentPackage> = {
     triggerTags: ['bypass_blocker', 'first_damage', 'direct_attack'],
     primaryColors: ['Red', 'Purple', 'Green'],
     secondaryColors: ['Blue'],
+    archetypeIds: ['zeon-rush', 'barbatos-synergy'],
+    metaTier: 3,
+    trendDirection: 'down',
   },
 };
 
