@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type {
@@ -88,7 +89,17 @@ export class EventsLiveAdapter implements MetaSourceAdapter {
   private readonly filePath: string;
 
   constructor(filePath?: string) {
-    this.filePath = filePath || resolve(process.cwd(), 'apps/web/lib/data/events-live.json');
+    if (filePath) {
+      this.filePath = filePath;
+      return;
+    }
+
+    const candidates = [
+      resolve(process.cwd(), 'apps/web/lib/data/events-live.json'),
+      resolve(process.cwd(), 'lib/data/events-live.json'),
+    ];
+
+    this.filePath = candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
   }
 
   async fetch(): Promise<MetaSourcePayload> {
