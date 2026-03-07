@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@gundam-forge/design-system": ["../../packages/design-system/src/index.ts"],
       "@gundam-forge/shared": ["../../packages/shared/src/index.ts"],
       "@gundam-forge/data-sync": ["../../packages/data-sync/src/index.ts"]
     }

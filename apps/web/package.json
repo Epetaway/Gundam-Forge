@@ -12,6 +12,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@gundam-forge/design-system": "0.0.1",
     "@gundam-forge/data-sync": "0.0.1",
     "@gundam-forge/shared": "0.0.1",
     "@radix-ui/react-dialog": "^1.1.15",
