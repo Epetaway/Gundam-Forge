@@ -1,9 +1,7 @@
-"use client";
 import Link from "next/link";
 import { Layers } from "lucide-react";
 import { DeckPreviewCard } from "./DeckPreviewCard";
 import { Button } from "@/components/ui/Button";
-import { useRouter } from "next/navigation";
 
 export interface TrendingDeckData {
   id: string;
@@ -21,8 +19,6 @@ export interface TrendingDeckData {
 }
 
 export function TrendingDecksClient({ decks }: { decks: TrendingDeckData[] }) {
-  const router = useRouter();
-
   if (decks.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-12 text-center">
@@ -42,8 +38,7 @@ export function TrendingDecksClient({ decks }: { decks: TrendingDeckData[] }) {
         <DeckPreviewCard
           key={deck.id}
           {...deck}
-          onClick={() => router.push(`/decks/${deck.id}`)}
-          onMenu={() => {}}
+          href={`/decks/${deck.id}`}
         />
       ))}
     </div>
