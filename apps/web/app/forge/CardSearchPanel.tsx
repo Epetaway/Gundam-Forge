@@ -12,6 +12,10 @@ import { UnifiedCardTile } from '@/components/cards/UnifiedCardTile';
 import { cn } from '@/lib/utils/cn';
 import { debounce } from '@/lib/utils/debounce';
 import { analyzeDeckIntent } from '@/lib/deck/analyzeDeckIntent';
+import { AdvancedSearchInput } from '@/components/search/AdvancedSearchInput';
+import { EffectKeywordPills } from '@/components/search/EffectKeywordPills';
+import { filterCardsAdvanced } from '@/lib/search/advancedCardFilter';
+import { getPopularEffects } from '@/lib/search/searchSuggestions';
 
 const CARD_TYPES = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 const CARD_COLORS = ['All', 'Red', 'Blue', 'Green', 'White', 'Purple', 'Colorless'];
@@ -303,6 +307,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
   });
   const [keywordFilters, setKeywordFilters] = useState<string[]>([]);
   const [triggerFilters, setTriggerFilters] = useState<string[]>([]);
+  const [effectKeywordFilters, setEffectKeywordFilters] = useState<string[]>([]);
 
   const [previewCardId, setPreviewCardId] = useState<string | null>(null);
   const previewCard = previewCardId ? (allCards.find((c) => c.id === previewCardId) ?? null) : null;
@@ -359,6 +364,9 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
     setGroupModeOverridden(true);
   };
 
+  // ── Popular effect keywords for quick filtering ──────────────────────────
+  const popularEffects = useMemo(() => getPopularEffects(allCards, 12), []);
+
   // ── Deck intent analysis ──────────────────────────────────────────────────
   const deckAnalysis = useMemo(() => {
     if (!currentDeckCards || currentDeckCards.length <= 5) return null;
@@ -382,33 +390,18 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
       if (typeFilter !== 'All' && card.type !== typeFilter) return false;
       if (colorFilter !== 'All' && card.color !== colorFilter) return false;
       if (setFilter !== 'All' && card.set !== setFilter) return false;
-      
-      // Keyword filter: card must have ALL selected keywords
-      if (keywordFilters.length > 0) {
-        const cardKeywords = (card.keywords ?? []).map((k) => k.toLowerCase().split(' ')[0]);
-        const hasAllKeywords = keywordFilters.every((reqKw) =>
-          cardKeywords.some((ck) => ck === reqKw || ck.startsWith(reqKw))
-        );
-        if (!hasAllKeywords) return false;
-      }
-      
-      // Trigger filter: card must have ALL selected triggers
-      if (triggerFilters.length > 0) {
-        const cardTriggers = (card.triggers ?? []).map((t) => t.toLowerCase());
-        const hasAllTriggers = triggerFilters.every((reqTrigger) =>
-          cardTriggers.includes(reqTrigger)
-        );
-        if (!hasAllTriggers) return false;
-      }
-      
       return true;
     });
 
-    if (q) {
-      eligible = eligible.filter((card) => {
-        const haystack = `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase();
-        return haystack.includes(q);
+    // Use advanced search with effect keywords, query, and existing filters
+    if (q || effectKeywordFilters.length > 0 || keywordFilters.length > 0 || triggerFilters.length > 0) {
+      const scored = filterCardsAdvanced(eligible, {
+        query: q,
+        effectKeywords: effectKeywordFilters,
+        keywords: keywordFilters,
+        triggers: triggerFilters,
       });
+      eligible = scored.map(s => s.card);
     }
 
     if (mechanicsPackages.length > 0) {
@@ -416,7 +409,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
     }
 
     return eligible;
-  }, [query, typeFilter, colorFilter, setFilter, keywordFilters, triggerFilters, deckColorOnly, deckColors, includeEX, deckClans, mechanicsPackages]);
+  }, [query, typeFilter, colorFilter, setFilter, keywordFilters, triggerFilters, effectKeywordFilters, deckColorOnly, deckColors, includeEX, deckClans, mechanicsPackages]);
 
   const showSynergy = mechanicsPackages.length > 0;
 
@@ -463,18 +456,33 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
     >
       {/* ── Search + filters ─────────────────────────────────────────────── */}
       <div className="space-y-2 border-b border-border p-3" style={{ maxWidth: '100%' }}>
-        <label className="sr-only" htmlFor="card-search-input">Search cards</label>
-        <input
-          id="card-search-input"
-          className="w-full rounded border border-border bg-surface p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-          placeholder="Search cards…"
+        <AdvancedSearchInput
           value={rawQuery}
-          onChange={(e) => { setRawQuery(e.target.value); debouncedSetQuery(e.target.value); }}
-          aria-label="Search cards by name, ID, or text"
+          onChange={(val) => { setRawQuery(val); debouncedSetQuery(val); }}
+          cards={allCards}
+          placeholder="Search cards... (try 'draw', 'Zeon', or 'deal damage')"
+          debounceMs={150}
+          showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
         />
 
+        {/* Effect Keyword Pills */}
+        {popularEffects.length > 0 && (
+          <EffectKeywordPills
+            effects={popularEffects}
+            activeEffects={effectKeywordFilters}
+            onEffectClick={(effect) => {
+              setEffectKeywordFilters(prev =>
+                prev.includes(effect)
+                  ? prev.filter(e => e !== effect)
+                  : [...prev, effect]
+              );
+            }}
+            maxVisible={12}
+          />
+        )}
+
         {/* Active Filters Summary */}
-        {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || deckColorOnly || includeEX) && (
+        {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX) && (
           <div className="rounded-lg border border-cobalt-500/30 bg-cobalt-900/10 p-2 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-cobalt-300">Active Filters</span>
@@ -489,6 +497,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                   setSetFilter(initialSetId && SETS_LIST.includes(initialSetId) ? initialSetId : 'All');
                   setKeywordFilters([]);
                   setTriggerFilters([]);
+                  setEffectKeywordFilters([]);
                   setDeckColorOnly(false);
                   setIncludeEX(intentIncludeEX);
                 }}
@@ -532,6 +541,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                 <span key={tr} className="inline-flex items-center gap-1 rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs text-emerald-300 border border-emerald-500/30">
                   {tr.replace('-', ' ')}
                   <button type="button" className="hover:text-emerald-100 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
+                </span>
+              ))}
+              {effectKeywordFilters.map((effect) => (
+                <span key={effect} className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                  {effect.replace('_', ' ')}
+                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setEffectKeywordFilters(effectKeywordFilters.filter((e) => e !== effect))} aria-label={`Clear ${effect} effect filter`}>×</button>
                 </span>
               ))}
               {deckColorOnly && deckColors.length > 0 && (
