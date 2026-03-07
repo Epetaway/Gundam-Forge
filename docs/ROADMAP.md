@@ -161,7 +161,7 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 13** | **Performance & Scalability** | **5** | **Perf 5→8** | **✅ COMPLETE** |
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **✅ COMPLETE** |
 | **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **✅ COMPLETE** |
-| **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **🔄 UPCOMING** |
+| **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **🟡 IN PROGRESS (16.1 done)** |
 | **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **🔄 UPCOMING** |
 | **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **🔄 UPCOMING** |
 
@@ -211,6 +211,13 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 ### Phase 16 — Meta-Aware Data System (Weeks 5-8)
 
 **Objective**: Track real-time Gundam TCG trends, auto-detect archetype performance
+
+**Progress (March 6, 2026)**:
+- ✅ **16.1 complete**: Supabase meta tracking added (`meta_snapshots`, `archetype_stats_history`, `card_performance`)
+- 🔄 **16.2 in progress**: auto-detection pipeline scaffolding
+- ⏳ **16.3 pending**: MetaTrendService
+- ⏳ **16.4 pending**: deck package ↔ archetype performance links
+- ⏳ **16.5 pending**: moderator meta dashboard
 
 **Key Tasks**:
 - **16.1**: Extend Supabase schema (archetype_stats, card_performance, meta_snapshots)
