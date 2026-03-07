@@ -18,16 +18,20 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: QA gate (lint + build)
+        run: npm run qa
 
       - name: Download card images
         run: npm run fetch-assets
@@ -36,10 +40,16 @@ jobs:
           USE_MOCK_PRICES: 'true'
 
       - name: Build project
-        run: npm run build
+        run: npm --workspace @gundam-forge/web run build
         env:
           NEXT_OUTPUT_MODE: 'export'
           NEXT_PUBLIC_BASE_PATH: '/Gundam-Forge'
+
+      - name: Validate export artifact
+        run: |
+          test -d apps/web/out
+          test -f apps/web/out/index.html
+          test -f apps/web/out/404.html
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
