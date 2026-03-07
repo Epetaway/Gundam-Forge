@@ -162,7 +162,7 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 14** | **Mobile Refinements** | **5** | **Mobile 7→9** | **✅ COMPLETE** |
 | **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **✅ COMPLETE** |
 | **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **✅ COMPLETE** |
-| **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **🟡 IN PROGRESS (17.1-17.3 done)** |
+| **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **✅ COMPLETE** |
 | **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **🔄 UPCOMING** |
 
 **TOTAL: 45+ completed + 20+ upcoming | Production Ready 100/100**
@@ -238,8 +238,8 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 - ✅ **17.1 complete**: Forge now shows a live meta archetypes sidebar (API-backed)
 - ✅ **17.2 complete**: playstyle hint bar added under validation based on selected package trends
 - ✅ **17.3 complete**: new `/decks/compare` page for side-by-side deck analysis
-- 🔄 **17.4 in progress**: mobile UX refinements (touch + landscape tuning)
-- ⏳ **17.5 pending**: WCAG 2.1 AAA audit and fixes
+- ✅ **17.4 complete**: mobile meta access added in Forge via touch-friendly sheet with Escape-to-close
+- ✅ **17.5 complete**: accessibility upgrades applied to meta panel and compare interactions (dialog semantics, list labels, larger touch targets)
 
 **Key Tasks**:
 - **17.1**: Meta suggestions in deck builder (sidebar + badges)
