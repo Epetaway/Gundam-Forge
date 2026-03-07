@@ -182,7 +182,7 @@ describe('termMatchesText', () => {
   });
 
   it('should handle special characters with exact match', () => {
-    const term: SearchTerm = { value: '+1/+1', negated: false, exact: true };
-    expect(termMatchesText(term, 'Gets +1/+1 until end of turn')).toBe(true);
+    const term: SearchTerm = { value: '<Repair 2>', negated: false, exact: true };
+    expect(termMatchesText(term, 'This unit has <Repair 2> while paired')).toBe(true);
   });
 });

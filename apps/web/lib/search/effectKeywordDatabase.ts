@@ -12,7 +12,6 @@ export type EffectCategory =
   | 'resource'
   | 'search'
   | 'recovery'
-  | 'counters'
   | 'buffs'
   | 'debuffs'
   | 'movement'
@@ -42,7 +41,7 @@ export const EFFECT_KEYWORDS: EffectKeyword[] = [
     keyword: 'draw',
     label: 'Draw',
     category: 'draw',
-    patterns: [/\bdraw\s+\d+/i, /\bdraw\s+a\s+card/i, /\bdraw\s+cards/i],
+    patterns: [/\bdraw\s+\d+/i, /\bdraw\s+a\s+card/i],
     aliases: ['draw_card', 'draw_cards'],
   },
 
@@ -51,21 +50,15 @@ export const EFFECT_KEYWORDS: EffectKeyword[] = [
     keyword: 'deal_damage',
     label: 'Deal Damage',
     category: 'damage',
-    patterns: [/\bdeal\s+\d+\s+damage/i, /\bdeals?\s+\d+\s+damage/i],
+    patterns: [/\bdeal\s+\d+\s+damage/i, /\bdeals?\s+damage/i, /\bdeal\s+damage/i],
     aliases: ['damage', 'deal', 'direct_damage'],
   },
   {
-    keyword: 'combat_damage',
-    label: 'Combat Damage',
+    keyword: 'damage_all',
+    label: 'Damage All',
     category: 'damage',
-    patterns: [/\bcombat\s+damage/i, /\bin\s+combat/i],
-    aliases: ['battle_damage'],
-  },
-  {
-    keyword: 'burn',
-    label: 'Burn',
-    category: 'damage',
-    patterns: [/\bburn\s+\d+/i],
+    patterns: [/\bdeal\s+\d+\s+damage\s+to\s+all/i, /\bdamage\s+to\s+all/i],
+    aliases: ['board_damage', 'mass_damage'],
   },
 
   // --- DESTRUCTION EFFECTS ---
@@ -73,191 +66,143 @@ export const EFFECT_KEYWORDS: EffectKeyword[] = [
     keyword: 'destroy',
     label: 'Destroy',
     category: 'destruction',
-    patterns: [/\bdestroy\s+(target|a|that|all|up\s+to)/i, /\bis\s+destroyed/i],
-    aliases: ['destroy_card', 'remove'],
+    patterns: [/\bdestroy/i, /\bdestroys/i, /\bdestroyed/i],
+    aliases: ['destroy_unit', 'removal'],
   },
   {
-    keyword: 'trash',
-    label: 'Trash',
+    keyword: 'discard',
+    label: 'Discard',
     category: 'destruction',
-    patterns: [/\btrash\s+(target|a|that|all|this|it)/i, /\bis\s+trashed/i, /\binto\s+the\s+trash/i],
-    aliases: ['discard', 'trash_card', 'send_to_trash'],
-  },
-  {
-    keyword: 'exile',
-    label: 'Exile',
-    category: 'destruction',
-    patterns: [/\bexile\s+(target|a|that|all)/i, /\bis\s+exiled/i],
-    aliases: ['banish', 'remove_from_game'],
+    patterns: [/\bdiscard\s+\d+/i, /\bthen,?\s+discard/i, /\bdiscard\s+a?\s+card/i],
+    aliases: ['hand_discard'],
   },
 
   // --- RESOURCE EFFECTS ---
   {
-    keyword: 'gain_g',
-    label: 'Gain G',
+    keyword: 'place_resource',
+    label: 'Place Resource',
     category: 'resource',
-    patterns: [/\bgain\s+\d+\s+【G】/i, /\bgains?\s+\d+\s+【G】/i],
-    aliases: ['gain_resource', 'ramp', 'resource_gain'],
+    patterns: [/\bplace\s+\d+\s+(rested\s+)?resource/i],
+    aliases: ['ramp', 'resource_ramp', 'gain_resource'],
   },
   {
-    keyword: 'reduce_cost',
-    label: 'Reduce Cost',
+    keyword: '0_cost',
+    label: '0 Cost',
     category: 'cost_reduction',
-    patterns: [/\bcosts?\s+\d+\s+less/i, /\breduce.*cost/i, /\bcost\s+reduction/i],
-    aliases: ['cost_reduction', 'cheaper'],
-  },
-  {
-    keyword: 'free_play',
-    label: 'Free Play',
-    category: 'cost_reduction',
-    patterns: [/\bwithout\s+paying.*cost/i, /\bfor\s+free/i],
-    aliases: ['play_free', 'no_cost'],
+    patterns: [/\b0\s+lv/i, /\b0\s+cost/i, /\bas\s+if\s+it\s+has\s+0/i],
+    aliases: ['free_play', 'zero_cost'],
   },
 
   // --- SEARCH EFFECTS ---
   {
-    keyword: 'search',
-    label: 'Search',
+    keyword: 'choose_from_trash',
+    label: 'Choose from Trash',
     category: 'search',
-    patterns: [/\bsearch\s+your\s+(deck|library|hand)/i, /\bsearches?\s+for/i],
-    aliases: ['search_deck', 'tutor'],
+    patterns: [/\bchoose\s+\d+\s+card.*from.*trash/i, /\bchoose\s+.*from\s+your\s+trash/i],
+    aliases: ['search_trash', 'graveyard_search'],
   },
   {
-    keyword: 'reveal',
-    label: 'Reveal',
-    category: 'search',
-    patterns: [/\breveal\s+(the|a|cards?|top)/i],
-  },
-  {
-    keyword: 'look_at',
+    keyword: 'look',
     label: 'Look At',
     category: 'search',
-    patterns: [/\blook\s+at\s+(the|your|top)/i],
-    aliases: ['scry', 'peek'],
+    patterns: [/\blook\s+at/i],
+    aliases: ['peek', 'scry'],
   },
 
   // --- RECOVERY EFFECTS ---
   {
-    keyword: 'recover',
-    label: 'Recover',
-    category: 'recovery',
-    patterns: [/\brecover\s+\d+/i, /\brecovers?\s+\d+/i],
-    aliases: ['heal', 'gain_life', 'life_gain'],
-  },
-  {
-    keyword: 'return_from_trash',
-    label: 'Return from Trash',
-    category: 'recovery',
-    patterns: [/\breturn.*from.*trash/i, /\breturn.*from.*graveyard/i],
-    aliases: ['reanimate', 'recursion', 'return'],
-  },
-  {
     keyword: 'return_to_hand',
     label: 'Return to Hand',
     category: 'recovery',
-    patterns: [/\breturn.*to.*hand/i, /\breturn.*to\s+(its|your|their)\s+owner's\s+hand/i],
-    aliases: ['bounce', 'return'],
+    patterns: [/\breturn.*to.*owner'?s?\s+hand/i, /\breturn.*to.*hand/i],
+    aliases: ['bounce'],
   },
   {
     keyword: 'return_to_deck',
     label: 'Return to Deck',
     category: 'recovery',
-    patterns: [/\breturn.*to.*deck/i, /\bshuffle.*into.*deck/i],
+    patterns: [/\breturn.*to.*owner'?s?\s+deck/i, /\breturn.*to.*deck/i],
     aliases: ['shuffle_back'],
   },
+  {
+    keyword: 'choose_from_trash_return',
+    label: 'Recover from Trash',
+    category: 'recovery',
+    patterns: [/\bchoose.*from.*trash.*return/i, /\breturn.*from.*trash/i],
+    aliases: ['recursion', 'graveyard_return'],
+  },
 
-  // --- COUNTER EFFECTS ---
-  {
-    keyword: 'add_counters',
-    label: 'Add Counters',
-    category: 'counters',
-    patterns: [/\bput\s+\d+.*counter/i, /\badd\s+\d+.*counter/i],
-    aliases: ['counter', 'plus_counter'],
-  },
-  {
-    keyword: 'remove_counters',
-    label: 'Remove Counters',
-    category: 'counters',
-    patterns: [/\bremove\s+\d+.*counter/i, /\btake\s+off.*counter/i],
-    aliases: ['minus_counter'],
-  },
+  // --- COUNTER EFFECTS (not in Gundam TCG, removing) ---
 
   // --- BUFF EFFECTS ---
   {
-    keyword: 'buff_power',
-    label: 'Buff Power',
+    keyword: 'buff_hp',
+    label: 'Buff HP',
     category: 'buffs',
-    patterns: [/\bgets?\s+\+\d+\/\+\d+/i, /\bgain\s+\+\d+\s+power/i, /\bpower\s+increases?/i],
-    aliases: ['pump', 'boost', 'power_boost'],
+    patterns: [/\bhp\+\d+/i, /\bgets?\s+hp\+\d+/i, /\bgains?\s+hp\+\d+/i],
+    aliases: ['hp_boost', 'increase_hp'],
+  },
+  {
+    keyword: 'buff_ap',
+    label: 'Buff AP',
+    category: 'buffs',
+    patterns: [/\bap\+\d+/i, /\bgets?\s+ap\+\d+/i, /\bgains?\s+ap\+\d+/i],
+    aliases: ['ap_boost', 'increase_ap', 'power_boost'],
   },
   {
     keyword: 'grant_keyword',
     label: 'Grant Keyword',
     category: 'buffs',
-    patterns: [/\bgains?\s+<[^>]+>/i, /\bhas\s+<[^>]+>/i],
+    patterns: [/\bgains?\s+<[^>]+>/i, /\bhas\s+<[^>]+>/i, /\ball\s+your.*gain\s+</i],
     aliases: ['give_ability', 'grant_ability'],
   },
 
-  // --- DEBUFF EFFECTS ---
+  // --- DEBUFF/CONTROL EFFECTS ---
   {
-    keyword: 'debuff_power',
-    label: 'Debuff Power',
+    keyword: 'rest',
+    label: 'Rest Unit',
     category: 'debuffs',
-    patterns: [/\bgets?\s+-\d+\/-\d+/i, /\blose\s+\d+\s+power/i, /\bpower\s+decreases?/i],
-    aliases: ['weaken', 'shrink'],
-  },
-  {
-    keyword: 'cannot_attack',
-    label: 'Cannot Attack',
-    category: 'debuffs',
-    patterns: [/\bcannot\s+attack/i, /\bcan't\s+attack/i],
-    aliases: ['prevent_attack', 'disable'],
-  },
-  {
-    keyword: 'cannot_block',
-    label: 'Cannot Block',
-    category: 'debuffs',
-    patterns: [/\bcannot\s+block/i, /\bcan't\s+block/i],
-    aliases: ['prevent_block'],
+    patterns: [/\brest\s+(it|this\s+unit|that\s+unit)/i, /\bchoose.*rest\s+it/i],
+    aliases: ['tap', 'exhaust'],
   },
 
-  // --- MOVEMENT EFFECTS ---
+  // --- MOVEMENT/TOKEN EFFECTS ---
   {
-    keyword: 'move_zone',
-    label: 'Move Zone',
+    keyword: 'set_active',
+    label: 'Set Active',
     category: 'movement',
-    patterns: [/\bmove.*to\s+(battlefield|hand|deck|trash)/i],
-    aliases: ['relocate'],
+    patterns: [/\bset.*(as\s+)?active/i, /\bset\s+this\s+unit\s+as\s+active/i],
+    aliases: ['untap', 'wake'],
   },
   {
-    keyword: 'swap_zones',
-    label: 'Swap Zones',
+    keyword: 'deploy_token',
+    label: 'Deploy Token',
     category: 'movement',
-    patterns: [/\bswap\s+(their|its)\s+(positions?|zones?)/i, /\bexchange/i],
-    aliases: ['exchange'],
+    patterns: [/\bdeploy\s+\d+.*token/i, /\bcreate.*token/i],
+    aliases: ['create_token', 'token'],
+  },
+  {
+    keyword: 'pair',
+    label: 'Pair Unit',
+    category: 'movement',
+    patterns: [/\bpair\s+it\s+with/i, /\bpaired\s+with/i],
+    aliases: ['link'],
   },
 
   // --- PROTECTION EFFECTS ---
   {
-    keyword: 'indestructible',
-    label: 'Indestructible',
+    keyword: 'cant_be_destroyed',
+    label: "Can't be Destroyed",
     category: 'protection',
-    patterns: [/\bcan'?t\s+be\s+destroyed/i, /\bcannot\s+be\s+destroyed/i, /\bindestructible/i],
-    aliases: ['protection', 'immune'],
+    patterns: [/\bcan'?t\s+be\s+destroyed/i, /\bcannot\s+be\s+destroyed/i],
+    aliases: ['indestructible', 'protection'],
   },
   {
-    keyword: 'hexproof',
-    label: 'Hexproof',
+    keyword: 'cant_be_blocked',
+    label: "Can't be Blocked",
     category: 'protection',
-    patterns: [/\bcan'?t\s+be\s+targeted/i, /\bcannot\s+be\s+targeted/i, /\bhexproof/i],
-    aliases: ['untargetable', 'shroud'],
-  },
-  {
-    keyword: 'prevent_damage',
-    label: 'Prevent Damage',
-    category: 'protection',
-    patterns: [/\bprevent.*damage/i, /\bdamage.*prevented/i],
-    aliases: ['damage_prevention'],
+    patterns: [/\bcan'?t\s+be\s+blocked/i, /\bcannot\s+be\s+blocked/i],
+    aliases: ['evasion', 'unblockable'],
   },
 ];
 
@@ -309,7 +254,6 @@ export const EFFECT_CATEGORIES: EffectCategory[] = [
   'resource',
   'search',
   'recovery',
-  'counters',
   'buffs',
   'debuffs',
   'movement',
@@ -327,7 +271,6 @@ export const CATEGORY_LABELS: Record<EffectCategory, string> = {
   resource: 'Resource',
   search: 'Search',
   recovery: 'Recovery',
-  counters: 'Counters',
   buffs: 'Buffs',
   debuffs: 'Debuffs',
   movement: 'Movement',
