@@ -51,7 +51,10 @@ export function MetaArchetypesSidebar(): JSX.Element {
   }, []);
 
   return (
-    <aside className="w-72 rounded-lg border border-steel-700 bg-surface-950/90 p-3 shadow-xl backdrop-blur">
+    <aside
+      className="w-72 rounded-lg border border-steel-700 bg-surface-950/90 p-3 shadow-xl backdrop-blur"
+      aria-label="Current meta archetype trends"
+    >
       <header className="mb-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-cobalt-300">Meta Archetypes</p>
         <p className="text-[11px] text-steel-400">
@@ -61,7 +64,7 @@ export function MetaArchetypesSidebar(): JSX.Element {
 
       {error && <p className="rounded bg-red-500/10 px-2 py-1 text-xs text-red-300">{error}</p>}
 
-      <ul className="space-y-1.5">
+      <ul className="space-y-1.5" role="list" aria-label="Top archetypes">
         {(data?.topArchetypes ?? []).slice(0, 6).map((entry) => {
           const badge = trendBadge(entry.trendDirection);
           return (

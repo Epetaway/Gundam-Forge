@@ -35,6 +35,7 @@ export default function DeckComparePage({ searchParams }: ComparePageProps): JSX
 
   const [first, second] = selected;
   const overlap = first && second ? overlapCount(first, second) : 0;
+  const topDeckOptions = allDecks.slice(0, 20);
 
   return (
     <Container className="space-y-6 py-8">
@@ -43,6 +44,25 @@ export default function DeckComparePage({ searchParams }: ComparePageProps): JSX
         title="Compare Decks"
         description="Side-by-side snapshot of deck structure and meta positioning. Pass `?ids=deck-a,deck-b` to compare specific lists."
       />
+
+      <section className="rounded-lg border border-steel-700 bg-surface-900/70 p-4">
+        <h2 className="text-sm font-semibold text-surface-foreground">Quick Select</h2>
+        <p className="mt-1 text-xs text-steel-400">Use these links to compare popular decks.</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {topDeckOptions.slice(0, 6).map((deck, index, arr) => {
+            const against = arr[(index + 1) % arr.length];
+            return (
+              <a
+                key={`${deck.id}-${against.id}`}
+                href={`/decks/compare?ids=${deck.id},${against.id}`}
+                className="min-h-11 rounded border border-steel-700 bg-surface-950 px-3 py-2 text-sm text-surface-foreground transition-colors hover:border-cobalt-500/60"
+              >
+                {deck.name} vs {against.name}
+              </a>
+            );
+          })}
+        </div>
+      </section>
 
       {selected.length === 0 ? (
         <div className="rounded border border-steel-700 bg-surface-900/60 p-4 text-sm text-steel-300">
