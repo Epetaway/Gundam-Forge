@@ -1,6 +1,6 @@
 import type { CardDefinition } from '@gundam-forge/shared';
 import type { CatalogFilters } from '@/lib/data/cards';
-import { withBasePath } from '@/lib/utils/basePath';
+import { fetchApiDataOrThrow } from '@/lib/api/client';
 
 interface CardsApiResponse {
   cards: CardDefinition[];
@@ -21,13 +21,6 @@ function buildCardParams(filters: CatalogFilters): URLSearchParams {
 export async function fetchCards(filters: CatalogFilters = {}): Promise<CardDefinition[]> {
   const params = buildCardParams(filters);
   const path = params.size > 0 ? `/api/cards?${params.toString()}` : '/api/cards';
-  const url = withBasePath(path);
-  const response = await fetch(url, { cache: 'no-store' });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch cards (${response.status})`);
-  }
-
-  const payload = (await response.json()) as CardsApiResponse;
+  const payload = await fetchApiDataOrThrow<CardsApiResponse>(path);
   return payload.cards;
 }

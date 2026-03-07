@@ -19,6 +19,12 @@ interface TrendsResponse {
   validationErrors?: string[];
 }
 
+interface ApiEnvelope<T> {
+  ok: true;
+  data: T;
+  requestId?: string;
+}
+
 function trendBadge(trend?: TrendDirection): { label: string; className: string } {
   if (trend === 'up') return { label: 'UP', className: 'text-green-400 bg-green-500/15' };
   if (trend === 'down') return { label: 'DOWN', className: 'text-red-400 bg-red-500/15' };
@@ -35,8 +41,8 @@ export function MetaArchetypesSidebar(): JSX.Element {
     async function load() {
       try {
         const res = await fetch('/api/meta/trends', { cache: 'no-store' });
-        const json = (await res.json()) as TrendsResponse;
-        if (!cancelled) setData(json);
+        const json = (await res.json()) as ApiEnvelope<TrendsResponse>;
+        if (!cancelled) setData(json.data);
       } catch (err) {
         if (!cancelled) {
           setError(`Failed to load trends: ${String(err)}`);

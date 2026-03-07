@@ -1,6 +1,6 @@
 import type { DeckRecord } from '@/lib/data/decks';
 import type { DeckQueryFilters } from '@/lib/query/keys';
-import { withBasePath } from '@/lib/utils/basePath';
+import { fetchApiDataOrThrow } from '@/lib/api/client';
 
 interface DecksApiResponse {
   decks: DeckRecord[];
@@ -20,13 +20,6 @@ function buildDeckParams(filters: DeckQueryFilters): URLSearchParams {
 export async function fetchDecks(filters: DeckQueryFilters = {}): Promise<DeckRecord[]> {
   const params = buildDeckParams(filters);
   const path = params.size > 0 ? `/api/decks?${params.toString()}` : '/api/decks';
-  const url = withBasePath(path);
-  const response = await fetch(url, { cache: 'no-store' });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch decks (${response.status})`);
-  }
-
-  const payload = (await response.json()) as DecksApiResponse;
+  const payload = await fetchApiDataOrThrow<DecksApiResponse>(path);
   return payload.decks;
 }
