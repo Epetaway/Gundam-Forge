@@ -18,6 +18,8 @@
     "validate-cards": "tsx scripts/validate-cards.ts",
     "build-card-catalog": "tsx scripts/build-card-catalog.ts",
     "fetch-meta": "tsx scripts/fetch-meta.ts",
+    "pipeline:list": "tsx scripts/run-pipeline.ts --list",
+    "pipeline:all": "tsx scripts/run-pipeline.ts --all",
     "test": "vitest run",
     "test:watch": "vitest"
   },
