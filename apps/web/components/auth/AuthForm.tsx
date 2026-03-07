@@ -125,12 +125,29 @@ export function AuthForm({ mode }: AuthFormProps): JSX.Element {
           </Button>
         </form>
 
-        <p className="text-sm text-steel-600">
-          {isLogin ? 'Need an account?' : 'Already registered?'}{' '}
-          <Link className="font-medium text-cobalt-600 hover:text-cobalt-700" href={isLogin ? '/auth/register' : '/auth/login'}>
-            {isLogin ? 'Register' : 'Sign in'}
-          </Link>
-        </p>
+        {isLogin ? (
+          <div className="space-y-2">
+            <p className="text-sm text-steel-600">
+              Need an account?{' '}
+              <Link className="font-medium text-cobalt-600 hover:text-cobalt-700" href="/auth/register">
+                Register
+              </Link>
+            </p>
+            <p className="text-sm text-steel-600">
+              Forgot your password?{' '}
+              <Link className="font-medium text-cobalt-600 hover:text-cobalt-700" href="/auth/reset-password">
+                Reset it
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-steel-600">
+            Already registered?{' '}
+            <Link className="font-medium text-cobalt-600 hover:text-cobalt-700" href="/auth/login">
+              Sign in
+            </Link>
+          </p>
+        )}
       </CardContent>
     </Card>
   );
