@@ -20,7 +20,7 @@ import { getStoredDeck, updateDeckEntries, updateDeckMeta } from '@/lib/deck/sto
 import { useLocalStorageState } from '@/lib/useLocalStorageState';
 import { ImportResultsSummary } from './ImportResultsSummary';
 import type { CardMatchResult } from './cardMatching';
-import { validateDeck } from '@gundam-forge/shared';
+import { getPackagesByIds, validateDeck } from '@gundam-forge/shared';
 import type { CardDefinition, CardColor, DeckIntent } from '@gundam-forge/shared';
 import { CardSearchPanel } from './CardSearchPanel';
 import { cards as allCards, cardsById, allSets } from '@/lib/data/cards';
@@ -93,6 +93,42 @@ Unrecognized cards are listed as warnings.`;
 interface ValidationBarProps {
   entries: { cardId: string; qty: number }[];
   allCards: CardDefinition[];
+}
+
+interface PlaystyleHintBarProps {
+  packageIds: string[];
+}
+
+function PlaystyleHintBar({ packageIds }: PlaystyleHintBarProps) {
+  const hints = React.useMemo(() => {
+    const packages = getPackagesByIds(packageIds);
+    return packages
+      .filter((pkg) => pkg.archetypeIds && pkg.archetypeIds.length > 0)
+      .map((pkg) => {
+        const trend = pkg.trendDirection ?? 'flat';
+        const trendText = trend === 'up' ? 'trending up' : trend === 'down' ? 'trending down' : 'stable';
+        return {
+          id: pkg.id,
+          label: pkg.label,
+          tier: pkg.metaTier,
+          trendText,
+          archetypes: pkg.archetypeIds ?? [],
+        };
+      });
+  }, [packageIds]);
+
+  if (hints.length === 0) return null;
+
+  const primary = hints[0];
+
+  return (
+    <div className="border-b border-border bg-cobalt-900/20 px-3 py-2 text-xs text-cobalt-200">
+      <span className="font-semibold">Playstyle Hint:</span>{' '}
+      {primary.label} is {primary.trendText}
+      {primary.tier ? ` (Tier ${primary.tier})` : ''}.{' '}
+      {primary.archetypes.length > 0 ? `Linked archetypes: ${primary.archetypes.slice(0, 3).join(', ')}.` : ''}
+    </div>
+  );
 }
 
 function ValidationBar({ entries, allCards }: ValidationBarProps) {
@@ -1224,6 +1260,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           entries={Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty }))}
           allCards={allCards as CardDefinition[]}
         />
+
+        <PlaystyleHintBar packageIds={deckMeta.deckIntent?.packages ?? []} />
 
         {/*
          * Mobile toolbar — single compact row replacing the old mobile action bar.
