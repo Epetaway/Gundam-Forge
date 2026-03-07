@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import {
   runMetaPipeline,
@@ -6,6 +6,7 @@ import {
   validateMetaPayload,
   type MetaSourcePayload,
 } from '@gundam-forge/data-sync';
+import { apiError, apiOk, HttpError, toApiErrorResponse } from '@/lib/api/server';
 
 const metaPayloadSchema = z.object({
   source: z.string().min(1),
@@ -42,65 +43,76 @@ function isAuthorized(req: NextRequest): boolean {
 }
 
 export async function GET() {
-  const result = await runMetaPipeline([new EventsLiveAdapter()], { dryRun: true });
-  return NextResponse.json({
-    ok: result.validation.ok,
-    dryRunReport: result.dryRunReport,
-    validationErrors: result.validation.errors,
-    sample: result.mergedPayload,
-  });
+  try {
+    const result = await runMetaPipeline([new EventsLiveAdapter()], { dryRun: true });
+    return apiOk({
+      ok: result.validation.ok,
+      dryRunReport: result.dryRunReport,
+      validationErrors: result.validation.errors,
+      sample: result.mergedPayload,
+    });
+  } catch (error) {
+    return toApiErrorResponse('/api/admin/meta', error);
+  }
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-  }
+  try {
+    if (!isAuthorized(req)) {
+      return apiError('Unauthorized', 401, req, { code: 'UNAUTHORIZED' });
+    }
 
-  const body = await req.json().catch(() => null);
-  if (!body) {
-    return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
-  }
+    const body = await req.json().catch(() => null);
+    if (!body) {
+      throw new HttpError('Invalid JSON body', 400, { code: 'INVALID_JSON' });
+    }
 
-  // Mode A: explicit payload ingestion
-  if (body.payload) {
-    const parsed = metaPayloadSchema.safeParse(body.payload);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { ok: false, error: 'Payload validation failed', details: parsed.error.flatten() },
-        { status: 400 },
+    if (body.payload) {
+      const parsed = metaPayloadSchema.safeParse(body.payload);
+      if (!parsed.success) {
+        throw new HttpError('Payload validation failed', 400, {
+          code: 'PAYLOAD_VALIDATION_FAILED',
+          details: parsed.error.flatten(),
+        });
+      }
+
+      const payload = parsed.data as MetaSourcePayload;
+      const validation = validateMetaPayload(payload);
+      if (!validation.ok) {
+        throw new HttpError('Pipeline validation failed', 400, {
+          code: 'PIPELINE_VALIDATION_FAILED',
+          details: validation.errors,
+        });
+      }
+
+      return apiOk(
+        {
+          mode: 'manual-payload',
+          ingested: {
+            source: payload.source,
+            snapshotDate: payload.snapshotDate,
+            archetypes: payload.archetypes.length,
+            cardPerformance: payload.cardPerformance.length,
+          },
+          note: 'Database persistence endpoint wiring is ready; write step is handled by phase 16.3 service integration.',
+        },
+        req,
       );
     }
 
-    const payload = parsed.data as MetaSourcePayload;
-    const validation = validateMetaPayload(payload);
-    if (!validation.ok) {
-      return NextResponse.json(
-        { ok: false, error: 'Pipeline validation failed', details: validation.errors },
-        { status: 400 },
-      );
-    }
+    const result = await runMetaPipeline([new EventsLiveAdapter()], { dryRun: body.dryRun !== false });
 
-    return NextResponse.json({
-      ok: true,
-      mode: 'manual-payload',
-      ingested: {
-        source: payload.source,
-        snapshotDate: payload.snapshotDate,
-        archetypes: payload.archetypes.length,
-        cardPerformance: payload.cardPerformance.length,
+    return apiOk(
+      {
+        ok: result.validation.ok,
+        mode: 'auto-detect',
+        dryRunReport: result.dryRunReport,
+        validationErrors: result.validation.errors,
+        mergedPayload: result.mergedPayload,
       },
-      note: 'Database persistence endpoint wiring is ready; write step is handled by phase 16.3 service integration.',
-    });
+      req,
+    );
+  } catch (error) {
+    return toApiErrorResponse('/api/admin/meta', error, req);
   }
-
-  // Mode B: auto-detect ingestion from events-live source
-  const result = await runMetaPipeline([new EventsLiveAdapter()], { dryRun: body.dryRun !== false });
-
-  return NextResponse.json({
-    ok: result.validation.ok,
-    mode: 'auto-detect',
-    dryRunReport: result.dryRunReport,
-    validationErrors: result.validation.errors,
-    mergedPayload: result.mergedPayload,
-  });
 }

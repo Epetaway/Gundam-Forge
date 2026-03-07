@@ -23,6 +23,14 @@ type ApiResponse = {
   };
 };
 
+type ApiEnvelope<T> = {
+  ok: boolean;
+  data?: T;
+  error?: string;
+  code?: string;
+  requestId?: string;
+};
+
 const EXAMPLE_PAYLOAD = {
   payload: {
     source: 'manual-admin',
@@ -62,8 +70,8 @@ export default function AdminMetaPage() {
         headers,
         body: JSON.stringify({ dryRun: true }),
       });
-      const json = (await res.json()) as ApiResponse;
-      setResponse(json);
+      const json = (await res.json()) as ApiEnvelope<ApiResponse>;
+      setResponse(json.data ?? { ok: false, error: json.error ?? 'Unknown API error' });
     } finally {
       setLoading(false);
     }
@@ -78,8 +86,8 @@ export default function AdminMetaPage() {
         headers,
         body: JSON.stringify(parsed),
       });
-      const json = (await res.json()) as ApiResponse;
-      setResponse(json);
+      const json = (await res.json()) as ApiEnvelope<ApiResponse>;
+      setResponse(json.data ?? { ok: false, error: json.error ?? 'Unknown API error' });
     } catch (error) {
       setResponse({ ok: false, error: `Invalid JSON payload: ${String(error)}` });
     } finally {
