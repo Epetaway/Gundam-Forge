@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { Layers, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -22,7 +21,6 @@ interface ExploreClientProps {
 type ExploreSort = 'trending' | 'winRate' | 'mostViewed';
 
 export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX.Element {
-  const router = useRouter();
   const [sort, setSort] = React.useState<ExploreSort>('trending');
   const events = React.useMemo(() => getEvents(), []);
   const { data: decks = initialDecks, isFetching } = useDecksQuery({ initialData: initialDecks });
@@ -90,7 +88,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
                   ...(deck.source === 'tournament' ? ['Tournament'] : []),
                 ]}
                 avatarUrl={undefined}
-                onClick={() => router.push(`/decks/${deck.id}`)}
+                href={`/decks/${deck.id}`}
                 onMenu={() => {}}
               />
             );

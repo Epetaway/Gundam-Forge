@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from "react";
 
 const COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
@@ -56,6 +57,7 @@ export interface DeckPreviewCardProps {
   avatarUrl?: string;
   archetype?: string;
   onClick?: () => void;
+  href?: string;
   onMenu?: (e: React.MouseEvent) => void;
 }
 
@@ -72,6 +74,7 @@ export function DeckPreviewCard({
   avatarUrl,
   archetype,
   onClick,
+  href,
   onMenu,
   isLoading,
 }: DeckPreviewCardProps & { isLoading?: boolean }) {
@@ -96,6 +99,8 @@ export function DeckPreviewCard({
           aria-hidden="true"
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
           style={{ filter: "contrast(1.1) saturate(1.15)" }}
+          loading="lazy"
+          decoding="async"
           draggable={false}
         />
         {/* Dark overlay gradient */}
@@ -113,17 +118,19 @@ export function DeckPreviewCard({
         </div>
 
         {/* Menu button — must be z-20 to stay above the click overlay below */}
-        <button
-          className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onMenu?.(e);
-          }}
-          aria-label="Deck options"
-          type="button"
-        >
-          <span className="text-lg" aria-hidden="true">⋮</span>
-        </button>
+        {onMenu ? (
+          <button
+            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMenu(e);
+            }}
+            aria-label="Deck options"
+            type="button"
+          >
+            <span className="text-lg" aria-hidden="true">⋮</span>
+          </button>
+        ) : null}
       </div>
 
       {/* Content Section */}
@@ -135,6 +142,8 @@ export function DeckPreviewCard({
               src={avatarUrl}
               alt={author}
               className="h-8 w-8 rounded-full object-cover border border-border/50"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-text-subtle" aria-hidden="true">
@@ -208,7 +217,14 @@ export function DeckPreviewCard({
       </div>
 
       {/* Full-card click overlay — last in DOM so it stacks on top; z-10 below menu (z-20) */}
-      {onClick && (
+      {href ? (
+        <Link
+          href={href}
+          className="absolute inset-0 z-10 cursor-pointer rounded-lg"
+          aria-label={`Open deck: ${title}`}
+          tabIndex={0}
+        />
+      ) : onClick ? (
         <button
           type="button"
           className="absolute inset-0 z-10 cursor-pointer rounded-lg"
@@ -216,7 +232,7 @@ export function DeckPreviewCard({
           aria-label={`Open deck: ${title}`}
           tabIndex={0}
         />
-      )}
+      ) : null}
     </article>
   );
 }
