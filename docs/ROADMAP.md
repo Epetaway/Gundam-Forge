@@ -1,6 +1,6 @@
 # Gundam Forge — Comprehensive Execution Roadmap
 
-**Last Audit:** March 7, 2026 | **UPDATE:** Phases 1-17 Complete ✅ | Phase 18 In Progress 🚀
+**Last Audit:** March 7, 2026 | **UPDATE:** Phases 1-18 Complete ✅ | Strategic Enhancements Delivered 🚀
 **Production Readiness:** 100/100 (Phases 1-14) | 16-week enhancement plan approved
 **Focus:** Game logic unification + meta-aware system + official Bandai rules + UI/UX
 **Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`) · Zero breaking changes
@@ -163,13 +163,13 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 15** | **Game Logic Unification** | **5** | **Consolidate engine** | **✅ COMPLETE** |
 | **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **✅ COMPLETE** |
 | **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **✅ COMPLETE** |
-| **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **🔄 IN PROGRESS** |
+| **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **✅ COMPLETE** |
 
-**TOTAL: 45+ completed + 20+ upcoming | Production Ready 100/100**
+**TOTAL: 50+ completed | Production Ready 100/100**
 
 ---
 
-## 🚀 ACTIVE: Phases 15-18 — Strategic Enhancements (Director-Approved March 6, 2026)
+## 🚀 COMPLETE: Phases 15-18 — Strategic Enhancements (Director-Approved March 6, 2026)
 
 ### Strategic Vision
 Gundam-Forge transitions from feature-complete to **meta-intelligent deck builder** with:
@@ -261,6 +261,7 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 - ✅ **18.2 complete**: script orchestration modularized with pluggable pipeline runner (`scripts/run-pipeline.ts`) and task registry (`scripts/pipeline-tasks.ts`) covering all sync/validation scripts
 - ✅ **18.3 complete**: API layer standardized with shared response envelope, typed client fetch wrappers, and centralized error logging/handling across route handlers
 - ✅ **18.4 complete**: performance sweep reduced home route client payload from 3.39 kB to 179 B by removing unnecessary client-router hydration for trending deck cards; added lazy/async image decoding on deck previews
+- ✅ **18.5 complete**: GitHub Pages workflow hardened with Node 20, deterministic `npm ci`, explicit QA gate, export artifact validation, and build timeout guard
 
 **Key Tasks**:
 - **18.1**: Extract design tokens → reusable package
