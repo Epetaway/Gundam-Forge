@@ -1,17 +1,17 @@
 # Gundam Forge — Comprehensive Execution Roadmap
 
-**Last Audit:** March 7, 2026 | **UPDATE:** Phase 19 In Progress 🚀 | User Accounts & Authentication
-**Production Readiness:** 100/100 (Phases 1-18) | Now expanding: Full user system with deck sync
-**Focus:** Secure authentication + user profiles + deck persistence + social features
+**Last Audit:** March 7, 2026 | **UPDATE:** Phase 19 Near Complete (4/5) | Phase 20 Planned 🚀
+**Production Readiness:** 100/100 (Phases 1-18) | Now adding: Advanced card search & effect filtering
+**Focus:** Multi-term search + effect keywords (draw, trash, damage) + clan filtering + autocomplete
 **Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`) · Zero breaking changes
 
 ---
 
-## 🎯 PRODUCTION STATUS — PHASE 19 IN PROGRESS 🚀
+## 🎯 PRODUCTION STATUS — PHASE 19 NEAR COMPLETE (4/5) | PHASE 20 PLANNED 🔄
 
-**Phases 1-18 Complete (100%) | Phase 19: User Accounts & Auth (0/5 tasks)**
+**Phases 1-18 Complete (100%) | Phase 19: User Accounts (4/5 tasks) | Phase 20: Advanced Search (Planned)**
 
-This document tracks the complete execution of the Gundam Forge production-readiness roadmap. **Phases 1-18 delivered March 2026**. The core platform is production-ready at 100/100. **Phase 19 adds user accounts, authentication, deck persistence, and social features**.
+This document tracks the complete execution of the Gundam Forge production-readiness roadmap. **Phases 1-18 delivered March 2026**. The core platform is production-ready at 100/100. **Phase 19 adds user accounts, authentication, deck persistence, and social features (4/5 complete)**. **Phase 20 will add advanced card search with effect keywords, clan filtering, and autocomplete**.
 
 ### Execution Timeline
 - **Session 1 (Prior):** Phases 1-11 initial work + Phase 12 (visual polish)
@@ -24,7 +24,11 @@ This document tracks the complete execution of the Gundam Forge production-readi
   - Phase 15-17: Advanced features (deck intent, meta tracking, event system) ✅
   - Phase 18: Architecture & Infrastructure (design system, API standardization) ✅
 - **Session 4 (March 7, 2026 — Current):**
-  - Phase 19: User Accounts & Authentication (5 tasks planned) 🔄 IN PROGRESS
+  - Phase 19.1: Production auth & email verification (commit db578fc) ✅
+  - Phase 19.2: Comprehensive user profiles (commit 0014921) ✅
+  - Phase 19.3: Automatic deck sync from localStorage (commit f93364c) ✅
+  - Phase 19.4: Public/private deck sharing (commit 411bd12) ✅
+  - Phase 20: Advanced Card Search & Effect Filtering (planned) 📝
 
 ### Key Achievements (Phases 1-18)
 - **Frontend Completeness:** 100% of user-facing features implemented
@@ -38,12 +42,19 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - **Content:** 12 seed decks, 7 events, 19 static routes + dynamic variations
 - **Code Quality:** 0 lint errors, 0 type errors, 51/51 routes building
 
-### Phase 19 Focus (Current)
-- **User Authentication:** Secure signup/login, email verification, password reset, session management
-- **User Profiles:** Three-tier system (Basic + Extended Stats + Social features)
-- **Deck Persistence:** Automatic migration from localStorage to cloud, bidirectional sync
-- **Deck Sharing:** Public/private toggle, shareable links, deck cloning, social meta tags
-- **Security:** Optional 2FA (TOTP), backup recovery codes, admin role enforcement
+### Phase 19 Progress (4/5 Complete)
+- **User Authentication:** ✅ Secure signup/login, email verification, password reset, session management
+- **User Profiles:** ✅ Three-tier system (Basic + Extended Stats + Social features)
+- **Deck Persistence:** ✅ Automatic migration from localStorage to cloud, bidirectional sync
+- **Deck Sharing:** ✅ Public/private toggle, shareable links, deck cloning, social meta tags
+- **Security:** ⏳ Optional 2FA (TOTP), backup recovery codes (pending)
+
+### Phase 20 Focus (Planned)
+- **Advanced Card Search:** Multi-term search with AND/OR logic, negation, exact phrases
+- **Effect Keywords:** Search by card effects (draw, trash, damage, destroy, etc.)
+- **Clan Filtering:** Intuitive clan search ("Zeon", "Earth Federation", etc.)
+- **Autocomplete:** Debounced suggestions grouped by Effects, Clans, Cards
+- **UI Components:** SearchSuggestionDropdown, EffectKeywordPills, AdvancedSearchInput
 
 ### Recent Commits
 **Phase 18 (Complete — March 7, 2026):**
@@ -448,6 +459,182 @@ Add optional two-factor authentication for account protection:
 - ✅ 2FA enrollment rate target: 15%+ of users (tracked via analytics)
 - ✅ Zero regressions: existing deck builder flows unchanged
 - ✅ QA gate passes after each task (npm run qa)
+
+---
+
+### Phase 20 — Advanced Card Search & Effect Filtering (Weeks 21-24)
+
+**Objective**: Enable intuitive multi-term search with effect keywords (draw, trash, damage), clan filtering, and autocomplete suggestions for both Forge deck builder and Cards browser
+
+**Status**: 📝 PLANNED (March 7, 2026)
+
+**Current Limitations**:
+- Basic text search only searches card ID, name, and text fields
+- Keyword/trigger filters use predefined dropdowns (not searchable)
+- No support for searching multiple effects simultaneously (e.g., "draw trash")
+- No autocomplete or search suggestions
+- Clan search requires using deck intent filters in Forge
+- No ability to search for specific card text phrases
+
+**User Requirements**:
+1. Search by clan type: "Zeon", "Earth Federation", etc.
+2. Search by effect keywords in card text: "draw", "trash", "deal damage", "destroy"
+3. Find cards with specific mechanics or abilities
+4. Multi-term search with AND/OR logic
+5. Autocomplete suggestions grouped by category (Effects, Clans, Cards)
+
+**Key Tasks**:
+
+#### **20.1 — Build Effect Keyword Extraction & Database**
+Create comprehensive effect keyword system for card filtering:
+- Parse card text to extract common effect verbs and phrases
+- Categorize effects: Draw, Damage, Destruction, Resource, Search, Recovery, Counters, Buffs/Debuffs
+- Build effect keyword database with aliases (e.g., "trash" = "discard")
+- Enrich card catalog with `effectKeywords` field at module load
+- Support partial matching (e.g., "dam" matches "damage")
+
+**Deliverables**:
+- Add `apps/web/lib/search/extractEffectKeywords.ts` — Effect extraction from card text
+- Add `apps/web/lib/search/effectKeywordDatabase.ts` — Categorized effect constants
+- Update `apps/web/lib/data/cards.ts` — Enrich cards with `effectKeywords` field
+
+**Verification**: All cards have effect keywords indexed, extraction completes in <50ms on load
+
+---
+
+#### **20.2 — Implement Advanced Search Parser & Filter Engine**
+Build intelligent search engine with multi-term support:
+- Parse search queries into structured format (terms, operators, negation)
+- Support search syntax:
+  - Multiple terms: `draw trash` (implicit AND - finds cards with BOTH)
+  - OR logic: `draw | trash` (finds cards with EITHER)
+  - Negation: `draw -destroy` (draw effects WITHOUT destroy)
+  - Exact phrases: `"deal 2 damage"` (exact text match)
+- Multi-field filtering with relevance scoring (Name > Clans > Effects > Text > Traits)
+- Generate autocomplete suggestions (Effects, Clans, Card Names)
+- Debounced suggestions (200ms) with result count preview
+
+**Deliverables**:
+- Add `apps/web/lib/search/searchParser.ts` — Query parser with operator support
+- Add `apps/web/lib/search/advancedCardFilter.ts` — Multi-field filtering with scoring
+- Add `apps/web/lib/search/searchSuggestions.ts` — Autocomplete suggestion generator
+- Add `apps/web/lib/search/__tests__/searchParser.test.ts` — Test suite for parser
+
+**Verification**: Parse complex queries correctly, filter 1000+ cards in <100ms, suggestions appear within 200ms
+
+---
+
+#### **20.3 — Create Search UI Components**
+Build reusable search components with autocomplete and effect pills:
+- SearchSuggestionDropdown — Autocomplete dropdown with keyboard navigation
+- EffectKeywordPills — Clickable effect badges for quick filtering
+- AdvancedSearchInput — Enhanced search input with active pills display
+- Full keyboard support (Arrow keys, Enter, Escape)
+- Mobile-responsive design
+- Accessibility (ARIA labels, focus management)
+
+**Deliverables**:
+- Add `apps/web/components/search/SearchSuggestionDropdown.tsx` — Autocomplete UI
+- Add `apps/web/components/search/EffectKeywordPills.tsx` — Effect pill buttons
+- Add `apps/web/components/search/AdvancedSearchInput.tsx` — Enhanced search input
+
+**Verification**: Keyboard navigation works, suggestions visible on mobile, screen reader compatible
+
+---
+
+#### **20.4 — Integrate Advanced Search into Forge & Cards Browser**
+Wire up advanced search components to existing pages:
+- Replace basic search in Forge deck builder with `AdvancedSearchInput`
+- Add `EffectKeywordPills` below search bar in Forge
+- Update Cards browser with advanced search UI
+- Add effect pills to filter sidebar in Cards browser
+- Maintain existing keyword/trigger filters (move to "Advanced Filters" collapsible)
+- Add "Search Tips" help section explaining syntax
+
+**Deliverables**:
+- Update `apps/web/app/forge/CardSearchPanel.tsx` — Integrate advanced search components
+- Update `apps/web/app/cards/CardsClient.tsx` — Add advanced search UI and filters
+- Add `docs/CARD_SEARCH_GUIDE.md` — User documentation with search syntax examples
+
+**Verification**: Search "draw" shows all draw cards, "Zeon damage" finds Zeon cards with damage, multi-term search works
+
+---
+
+#### **20.5 — Testing, Performance & Documentation**
+Optimize and validate advanced search implementation:
+- Add comprehensive test suite for search parser edge cases
+- Performance optimization: memoization, caching, debouncing
+- QA validation: all search features, keyboard nav, mobile responsiveness
+- Load testing: verify no performance regression on large catalogs
+- Update documentation with search syntax examples
+
+**Deliverables**:
+- Complete test coverage in `apps/web/lib/search/__tests__/`
+- Performance benchmarks: search <100ms, autocomplete <200ms
+- User guide with examples:
+  - Find all draw effects: `draw`
+  - Find Zeon cards with damage: `Zeon damage`
+  - Find cards that draw but don't destroy: `draw -destroy`
+  - Find exact phrase: `"deal 2 damage"`
+- Accessibility audit (WCAG 2.1 AA compliance)
+
+**Verification**: All tests pass, search performs well on 1000+ cards, user documentation complete
+
+---
+
+**Phase 20 Rollout Plan**:
+1. Week 21: Tasks 20.1-20.2 (keyword extraction + search engine)
+2. Week 22: Task 20.3 (UI components)
+3. Week 23: Task 20.4 (integration into Forge & Cards)
+4. Week 24: Task 20.5 (testing + optimization + docs)
+
+**Search Syntax Design Decisions**:
+- Use implicit AND for multiple terms (simpler for users)
+- Support `|` for OR logic (advanced users)
+- Use `-` prefix for negation (familiar from Google search)
+- Quoted phrases for exact match (standard search convention)
+
+**Performance Targets**:
+- Index effect keywords at module load (one-time cost <50ms)
+- Cache parsed queries and filter results (React.useMemo)
+- Search results render in <100ms for 1000+ cards
+- Autocomplete suggestions appear within 200ms of typing
+- Virtualize large result lists (already implemented)
+
+**Constraints**:
+- Static export: All search happens client-side (no server-side indexing)
+- Existing functionality: Must not break current keyword/trigger filters
+- Performance: No regression on card catalog load time
+- Mobile: Search must work seamlessly on phone screens
+
+**Success Criteria**:
+- ✅ Users can find cards by effect keywords (draw, trash, damage, destroy, etc.)
+- ✅ Clan search works intuitively ("Zeon", "Earth Federation")
+- ✅ Multi-term search with AND/OR logic functions correctly
+- ✅ Autocomplete shows relevant suggestions grouped by category
+- ✅ Effect pills provide one-click filtering
+- ✅ Full keyboard navigation support (arrows, Enter, Esc)
+- ✅ Mobile responsive design with touch-friendly UI
+- ✅ No performance regression (search <100ms, autocomplete <200ms)
+- ✅ QA gate passes after each task (npm run qa)
+- ✅ User documentation complete with examples
+
+**Files to Create** (10 new files):
+- `apps/web/lib/search/extractEffectKeywords.ts`
+- `apps/web/lib/search/effectKeywordDatabase.ts`
+- `apps/web/lib/search/searchParser.ts`
+- `apps/web/lib/search/advancedCardFilter.ts`
+- `apps/web/lib/search/searchSuggestions.ts`
+- `apps/web/components/search/SearchSuggestionDropdown.tsx`
+- `apps/web/components/search/EffectKeywordPills.tsx`
+- `apps/web/components/search/AdvancedSearchInput.tsx`
+- `apps/web/lib/search/__tests__/searchParser.test.ts`
+- `docs/CARD_SEARCH_GUIDE.md`
+
+**Files to Modify** (3 existing files):
+- `apps/web/lib/data/cards.ts` — Add effect keyword enrichment
+- `apps/web/app/forge/CardSearchPanel.tsx` — Integrate advanced search
+- `apps/web/app/cards/CardsClient.tsx` — Add search UI
 
 ---
 

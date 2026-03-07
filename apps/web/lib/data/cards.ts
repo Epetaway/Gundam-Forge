@@ -38,6 +38,7 @@ export function getCardList({ q, limit, cursor, color, type, set }: { q?: string
 import cardsCatalogJson from '@/lib/data/cards.catalog.json';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { withBasePath } from '@/lib/utils/basePath';
+import { extractEffectKeywords } from '@/lib/search/extractEffectKeywords';
 
 export type CatalogFilters = {
   query?: string;
@@ -103,6 +104,11 @@ function enrichCard(card: CardDefinition): void {
       }
     }
     card.clans = [...clanSet];
+  }
+
+  // Enrich with effect keywords for advanced search
+  if (!(card as any).effectKeywords) {
+    (card as any).effectKeywords = extractEffectKeywords(text);
   }
 }
 
