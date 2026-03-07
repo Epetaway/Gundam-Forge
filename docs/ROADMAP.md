@@ -1,40 +1,61 @@
 # Gundam Forge — Comprehensive Execution Roadmap
 
-**Last Audit:** March 7, 2026 | **UPDATE:** Phases 1-18 Complete ✅ | Strategic Enhancements Delivered 🚀
-**Production Readiness:** 100/100 (Phases 1-14) | 16-week enhancement plan approved
-**Focus:** Game logic unification + meta-aware system + official Bandai rules + UI/UX
+**Last Audit:** March 7, 2026 | **UPDATE:** Phase 19 In Progress 🚀 | User Accounts & Authentication
+**Production Readiness:** 100/100 (Phases 1-18) | Now expanding: Full user system with deck sync
+**Focus:** Secure authentication + user profiles + deck persistence + social features
 **Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`) · Zero breaking changes
 
 ---
 
-## 🎯 FINAL COMPLETION SUMMARY — 100% PRODUCTION READY ✅
+## 🎯 PRODUCTION STATUS — PHASE 19 IN PROGRESS 🚀
 
-**All 14 Phases Delivered | All 45+ Tasks Complete | Zero Blockers**
+**Phases 1-18 Complete (100%) | Phase 19: User Accounts & Auth (0/5 tasks)**
 
-This document tracks the complete execution of the Gundam Forge production-readiness roadmap. As of March 3, 2026, **ALL planned phases have been implemented, tested, and validated**. The platform is **production-ready at 100/100**.
+This document tracks the complete execution of the Gundam Forge production-readiness roadmap. **Phases 1-18 delivered March 2026**. The core platform is production-ready at 100/100. **Phase 19 adds user accounts, authentication, deck persistence, and social features**.
 
 ### Execution Timeline
 - **Session 1 (Prior):** Phases 1-11 initial work + Phase 12 (visual polish)
-- **Session 2 (Current — Final):** 
+- **Session 2 (March 3, 2026):** 
   - Phase 13: Performance & Scalability (5/5 tasks) ✅
   - Phase 14: Mobile Refinements (5/5 tasks) ✅
   - Phase 1: Quick Wins completion (1.3: Auth button gating) ✅
   - Phase 2-6: Verification & token migration (Battlefield) ✅
+- **Session 3 (March 7, 2026):**
+  - Phase 15-17: Advanced features (deck intent, meta tracking, event system) ✅
+  - Phase 18: Architecture & Infrastructure (design system, API standardization) ✅
+- **Session 4 (March 7, 2026 — Current):**
+  - Phase 19: User Accounts & Authentication (5 tasks planned) 🔄 IN PROGRESS
 
-### Key Achievements
+### Key Achievements (Phases 1-18)
 - **Frontend Completeness:** 100% of user-facing features implemented
 - **Performance:** Virtual scrolling (400+ cards), synergy cache (10× speedup), lazy loading
 - **Mobile:** 44px touch targets, IP safe areas, swipe gestures, landscape optimization
 - **Accessibility:** WCAG 2.5.5 compliant, keyboard navigation, skip links, semantic HTML
 - **Design System:** Unified token palette (cobalt, steel, surface), consistent component library
+- **Meta System:** Event-driven archetype tracking, trending decks, win-rate analysis
+- **Deck Intent:** Wizard-to-Forge filter persistence, zone-aware EX card filtering
+- **Architecture:** Extracted design-system package, pluggable sync pipeline, standardized API layer
 - **Content:** 12 seed decks, 7 events, 19 static routes + dynamic variations
 - **Code Quality:** 0 lint errors, 0 type errors, 51/51 routes building
 
-### Commits (Final Session)
-1. `8b7d0e9` — Phase 13: Performance & Scalability (5 tasks)
-2. `62dec9e` — Phase 14.5: Landscape orientation testing
-3. `8fe25fe` — ROADMAP: Phase 12-14 completion status
-4. `a474f74` — Phases 1, 2, 5, 6: Production-ready finalization
+### Phase 19 Focus (Current)
+- **User Authentication:** Secure signup/login, email verification, password reset, session management
+- **User Profiles:** Three-tier system (Basic + Extended Stats + Social features)
+- **Deck Persistence:** Automatic migration from localStorage to cloud, bidirectional sync
+- **Deck Sharing:** Public/private toggle, shareable links, deck cloning, social meta tags
+- **Security:** Optional 2FA (TOTP), backup recovery codes, admin role enforcement
+
+### Recent Commits
+**Phase 18 (Complete — March 7, 2026):**
+1. `[hash]` — Phase 18.1: Extract reusable design-system package
+2. `[hash]` — Phase 18.2: Add pluggable sync pipeline runner  
+3. `[hash]` — Phase 18.3: Standardize API error handling and logging
+4. `[hash]` — Phase 18.4: Reduce home-page hydration footprint
+5. `[hash]` — Phase 18.5: Harden GitHub Pages CI/CD pipeline
+
+**Phase 19 (In Progress — March 7, 2026):**
+- Roadmap updated with comprehensive Phase 19 plan
+- Next: Begin 19.1 implementation (production auth enablement)
 
 ### QA Status: ✅ ALL PASSING
 - **Lint:** 0 errors across all workspaces
@@ -43,7 +64,7 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - **Routes:** 51/51 pages generating correctly
 - **Performance:** No regressions post-Phase 14
 
-### Delivery Readiness
+### Delivery Readiness (Phases 1-18)
 - ✅ Static export optimized (GitHub Pages compatible)
 - ✅ Responsive across all viewport sizes (mobile-first)
 - ✅ Performance optimized (progressive loading, caching)
@@ -51,7 +72,15 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - ✅ Maintainable (design tokens, component library, test coverage)
 - ✅ Production security (auth in coming-soon state, no credentials exposed)
 
-**READY FOR PRODUCTION DEPLOYMENT** 🚀
+### Phase 19 Additions (In Development)
+- 🔄 User authentication system (Supabase Auth with email verification)
+- 🔄 Comprehensive user profiles (basic + extended stats + social)
+- 🔄 Deck persistence & cloud sync (localStorage → Supabase migration)
+- 🔄 Public deck sharing (visibility controls + shareable links)
+- 🔄 Two-factor authentication (TOTP with backup codes)
+
+**CORE PLATFORM: PRODUCTION READY** ✅  
+**USER SYSTEM: IN DEVELOPMENT** 🔄
 
 ---
 
@@ -271,6 +300,154 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 - **18.5**: CI/CD enhancements + GitHub Pages validation
 
 **Verification**: npm run qa 100%, FCP <1.5s, CI/CD <10min, setup <15min for new devs
+
+---
+
+### Phase 19 — User Accounts & Authentication System (Weeks 17-20)
+
+**Objective**: Enable secure user authentication, comprehensive profiles, automatic deck persistence, and social features
+
+**Status**: 🔄 IN PROGRESS (March 7, 2026)
+
+**Foundation Already In Place**:
+- ✅ Supabase client configured with graceful degradation
+- ✅ Database schema with `profiles` table, RLS policies for decks
+- ✅ Auth forms created (login/register) with "Coming Soon" production gate
+- ✅ Profile page structure with placeholder UI
+- ✅ Deck ownership (`user_id` foreign key) ready in schema
+
+**Key Tasks**:
+
+#### **19.1 — Enable Production Auth & Email Verification**
+Remove production gates from auth pages, configure Supabase Auth with:
+- Email/password authentication with magic link option
+- Email verification flow (confirm email before full access)
+- Password reset via secure email link
+- Rate limiting on auth endpoints (5 attempts/15min)
+- Session management with refresh tokens (7-day expiry)
+- Auto-logout on token expiration
+
+**Deliverables**: 
+- Update [apps/web/app/auth/login/page.tsx](apps/web/app/auth/login/page.tsx) - remove production gate
+- Update [apps/web/app/auth/register/page.tsx](apps/web/app/auth/register/page.tsx) - remove production gate
+- Add [apps/web/app/auth/reset-password/page.tsx](apps/web/app/auth/reset-password/page.tsx) - password reset flow
+- Add [apps/web/app/auth/verify-email/page.tsx](apps/web/app/auth/verify-email/page.tsx) - email confirmation handler
+- Update [apps/web/components/layout/AppShell.tsx](apps/web/components/layout/AppShell.tsx) - show user menu when authenticated
+- Add [apps/web/lib/supabase/auth-helpers.ts](apps/web/lib/supabase/auth-helpers.ts) - session utilities, guards
+- Configure Supabase Auth settings (email templates, rate limits, SMTP)
+
+**Verification**: Signup → receive email → confirm → login → session persists across page refresh
+
+---
+
+#### **19.2 — Build Comprehensive User Profiles**
+Implement three-tier profile system (Basic + Extended Stats + Social):
+- **Basic**: username (unique), display_name, avatar_url, bio (500 chars), join date
+- **Extended Stats**: total decks count, public decks count, favorite archetype (auto-derived from most-built), most-used colors
+- **Social**: follower/following counts, profile view counter, public profile URL (`/pilots/[username]`)
+- Profile edit form with real-time validation (username format, bio length)
+- Avatar upload to Supabase Storage with size/format validation (max 2MB, jpg/png/webp)
+
+**Deliverables**:
+- Update [apps/web/app/profile/page.tsx](apps/web/app/profile/page.tsx) - remove production gate, show real profile
+- Update [apps/web/app/profile/profile-panel.tsx](apps/web/app/profile/profile-panel.tsx) - display all profile data + edit mode
+- Add [apps/web/app/pilots/[username]/page.tsx](apps/web/app/pilots/[username]/page.tsx) - public profile view
+- Add [apps/web/components/profile/ProfileEditForm.tsx](apps/web/components/profile/ProfileEditForm.tsx) - edit modal/drawer
+- Add [apps/web/components/profile/ProfileStats.tsx](apps/web/components/profile/ProfileStats.tsx) - stats cards
+- Add [apps/web/lib/api/profiles.ts](apps/web/lib/api/profiles.ts) - profile CRUD operations
+- Add [apps/web/app/api/profiles/[id]/route.ts](apps/web/app/api/profiles/[id]/route.ts) - profile API endpoint
+- Update [supabase/migrations/020_add_profile_stats.sql](supabase/migrations/020_add_profile_stats.sql) - add stats columns
+- Add Supabase Storage bucket `avatars` with RLS policies
+
+**Verification**: Edit profile → upload avatar → save → view public profile → stats update automatically
+
+---
+
+#### **19.3 — Automatic Deck Sync from Local Storage**
+Migrate existing browser-stored decks to user account on first login:
+- Detect local decks in localStorage on auth state change
+- Prompt user: "Sync X local decks to your account?"
+- Batch upload with progress indicator (async, no blocking)
+- Mark local decks as `synced: true` to avoid duplicates
+- Support bidirectional sync: server → client on login (download user's decks)
+- Conflict resolution: if deck with same name exists, append " (2)" suffix
+
+**Deliverables**:
+- Add [apps/web/lib/deck/sync-engine.ts](apps/web/lib/deck/sync-engine.ts) - sync orchestrator
+- Add [apps/web/components/deck/DeckSyncPrompt.tsx](apps/web/components/deck/DeckSyncPrompt.tsx) - sync UI modal
+- Update [apps/web/lib/data/decks.ts](apps/web/lib/data/decks.ts) - add `syncDeckToServer()`, `fetchUserDecks()`
+- Add [apps/web/app/api/decks/sync/route.ts](apps/web/app/api/decks/sync/route.ts) - batch deck upload endpoint
+- Update [apps/web/components/providers/AuthProvider.tsx](apps/web/components/providers/AuthProvider.tsx) - trigger sync on auth
+- Add migration guide in [docs/DECK_SYNC_MIGRATION.md](docs/DECK_SYNC_MIGRATION.md)
+
+**Verification**: Build deck locally → logout → login → see sync prompt → sync → decks appear in profile
+
+---
+
+#### **19.4 — Public/Private Deck Sharing**
+Enable deck visibility controls and shareable links:
+- Toggle `is_public` on user decks (default: private)
+- Public decks visible at `/decks/[id]` to all users (anon + authenticated)
+- Private decks only visible to owner (RLS policy already exists)
+- Shareable link generation with copy button
+- Deck detail page shows owner profile link + creation date
+- Explore page filters: "My Decks", "Public Decks", "Official Decks"
+- Add deck clone/import from public decks (one-click copy)
+
+**Deliverables**:
+- Update [apps/web/app/decks/[id]/page.tsx](apps/web/app/decks/[id]/page.tsx) - show owner info, public indicator
+- Add [apps/web/components/deck/DeckVisibilityToggle.tsx](apps/web/components/deck/DeckVisibilityToggle.tsx) - public/private switch
+- Add [apps/web/components/deck/DeckShareCard.tsx](apps/web/components/deck/DeckShareCard.tsx) - shareable link UI
+- Update [apps/web/app/explore/ExploreClient.tsx](apps/web/app/explore/ExploreClient.tsx) - add visibility filters
+- Add [apps/web/lib/api/decks.ts](apps/web/lib/api/decks.ts) - `toggleDeckVisibility()`, `cloneDeck()`
+- Update [apps/web/app/api/decks/[id]/route.ts](apps/web/app/api/decks/[id]/route.ts) - PATCH for visibility
+- Add social meta tags for deck sharing (OpenGraph, Twitter Cards)
+
+**Verification**: Create deck → make public → copy link → paste in incognito → deck loads → clone works
+
+---
+
+#### **19.5 — Enhanced Security: 2FA (TOTP) Support**
+Add optional two-factor authentication for account protection:
+- Enable TOTP (Time-based One-Time Password) via Supabase Auth
+- QR code generation for authenticator apps (Google Authenticator, Authy, 1Password)
+- Backup codes (10 single-use recovery codes, downloadable as .txt)
+- 2FA enrollment flow in profile settings
+- Force 2FA verification on login when enabled
+- Admin flag: `require_2fa` for elevated privileges (moderator/admin roles)
+
+**Deliverables**:
+- Add [apps/web/app/profile/security/page.tsx](apps/web/app/profile/security/page.tsx) - security settings page
+- Add [apps/web/components/profile/TwoFactorSetup.tsx](apps/web/components/profile/TwoFactorSetup.tsx) - 2FA enrollment flow
+- Add [apps/web/components/profile/BackupCodes.tsx](apps/web/components/profile/BackupCodes.tsx) - recovery codes UI
+- Add [apps/web/app/auth/verify-2fa/page.tsx](apps/web/app/auth/verify-2fa/page.tsx) - TOTP verification step
+- Update [apps/web/lib/supabase/auth-helpers.ts](apps/web/lib/supabase/auth-helpers.ts) - 2FA utilities
+- Add [supabase/migrations/021_add_2fa_settings.sql](supabase/migrations/021_add_2fa_settings.sql) - 2FA metadata columns
+- Configure Supabase Auth MFA settings
+
+**Verification**: Enable 2FA → scan QR → verify code → logout → login → prompted for 2FA → success
+
+---
+
+**Phase 19 Rollout Plan**:
+1. Week 17: Tasks 19.1-19.2 (auth + profiles)
+2. Week 18: Task 19.3 (deck sync)
+3. Week 19: Task 19.4 (public sharing)
+4. Week 20: Task 19.5 (2FA) + full integration testing
+
+**Constraints**:
+- Static export: Auth/profiles work via Supabase client SDK (no server-side rendering)
+- Existing local deck storage: Must not lose user data during migration
+- Performance: Deck sync must not block UI (async with progress)
+- Security: All user data protected by RLS policies, no exposed credentials
+
+**Success Criteria**:
+- ✅ 100% of local decks successfully migrate to user accounts
+- ✅ Profile pages load in <1.5s (with avatar optimization)
+- ✅ Public decks shareable via direct links (OpenGraph meta tags render)
+- ✅ 2FA enrollment rate target: 15%+ of users (tracked via analytics)
+- ✅ Zero regressions: existing deck builder flows unchanged
+- ✅ QA gate passes after each task (npm run qa)
 
 ---
 
