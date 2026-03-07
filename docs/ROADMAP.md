@@ -258,6 +258,7 @@ Gundam-Forge transitions from feature-complete to **meta-intelligent deck builde
 
 **Progress (March 7, 2026)**:
 - ✅ **18.1 complete**: design-system tokens extracted to reusable `@gundam-forge/design-system` package with compatibility re-exports in `apps/web/lib/design-system`
+- ✅ **18.2 complete**: script orchestration modularized with pluggable pipeline runner (`scripts/run-pipeline.ts`) and task registry (`scripts/pipeline-tasks.ts`) covering all sync/validation scripts
 
 **Key Tasks**:
 - **18.1**: Extract design tokens → reusable package
