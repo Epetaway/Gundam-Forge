@@ -41,11 +41,25 @@ export function MetaArchetypesSidebar(): JSX.Element {
     async function load() {
       try {
         const res = await fetch('/api/meta/trends', { cache: 'no-store' });
+        if (!res.ok) {
+          // Fallback to static data if API is unavailable (e.g., static export on GitHub Pages)
+          const fallbackRes = await fetch('/data/trends.json');
+          const json = (await fallbackRes.json()) as ApiEnvelope<TrendsResponse>;
+          if (!cancelled) setData(json.data);
+          return;
+        }
         const json = (await res.json()) as ApiEnvelope<TrendsResponse>;
         if (!cancelled) setData(json.data);
       } catch (err) {
-        if (!cancelled) {
-          setError(`Failed to load trends: ${String(err)}`);
+        // Final fallback: try static data on any error
+        try {
+          const fallbackRes = await fetch('/data/trends.json');
+          const json = (await fallbackRes.json()) as ApiEnvelope<TrendsResponse>;
+          if (!cancelled) setData(json.data);
+        } catch {
+          if (!cancelled) {
+            setError(`Failed to load trends: ${String(err)}`);
+          }
         }
       }
     }
