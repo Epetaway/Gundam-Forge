@@ -2,6 +2,9 @@ import { Container } from '@/components/layout/Container';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { getDecks, type DeckRecord } from '@/lib/data/decks';
 
+// Force static generation for GitHub Pages
+export const dynamic = 'force-static';
+
 interface ComparePageProps {
   searchParams?: {
     ids?: string;
