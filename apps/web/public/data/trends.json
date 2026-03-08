@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "data": {
+    "ok": true,
+    "snapshotDate": "2026-03-08",
+    "topArchetypes": [
+      {
+        "archetypeId": "Zeon Rush",
+        "rank": 1,
+        "winRate": 0.58,
+        "playRate": 0.18,
+        "trendDirection": "up"
+      },
+      {
+        "archetypeId": "Earth Federation Control",
+        "rank": 2,
+        "winRate": 0.54,
+        "playRate": 0.16,
+        "trendDirection": "flat"
+      },
+      {
+        "archetypeId": "Gundam Midrange",
+        "rank": 3,
+        "winRate": 0.52,
+        "playRate": 0.14,
+        "trendDirection": "down"
+      },
+      {
+        "archetypeId": "Neo Zeon Aggro",
+        "rank": 4,
+        "winRate": 0.50,
+        "playRate": 0.12,
+        "trendDirection": "flat"
+      },
+      {
+        "archetypeId": "AEUG Tempo",
+        "rank": 5,
+        "winRate": 0.48,
+        "playRate": 0.11,
+        "trendDirection": "up"
+      },
+      {
+        "archetypeId": "Titans Combo",
+        "rank": 6,
+        "winRate": 0.46,
+        "playRate": 0.09,
+        "trendDirection": "down"
+      }
+    ],
+    "validationErrors": []
+  }
+}
