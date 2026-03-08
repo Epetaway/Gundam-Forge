@@ -66,12 +66,7 @@ export function UnifiedCardTile({
           loading="lazy"
         />
 
-        {/* Synergy badge — deckbuilder mode only */}
-        {showSynergy && 'synergyScore' in card && scoredCard.synergyScore !== undefined && (
-          <div className="absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-cobalt-600 text-xs font-bold text-white">
-            {Math.round(scoredCard.synergyScore)}
-          </div>
-        )}
+        {/* Synergy score intentionally hidden in grid tiles to reduce visual noise. */}
 
         {/* Overlay and label */}
         <div className="pointer-events-none absolute inset-0 hidden bg-black/40 opacity-0 transition-opacity duration-200 group-hover:block group-hover:opacity-100" />

@@ -149,7 +149,7 @@ export function AdvancedSearchInput({
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
           placeholder={placeholder}
-          className="w-full px-4 py-2.5 bg-surface-800 border border-steel-700 rounded-lg text-steel-100 placeholder-steel-500 focus:outline-none focus:ring-2 focus:ring-cobalt-500 focus:border-transparent transition-all"
+          className="w-full rounded-md border border-border bg-surface px-3 py-2.5 pl-10 pr-10 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
           aria-label="Search cards"
           aria-autocomplete="list"
           aria-controls={isDropdownOpen ? 'search-suggestions' : undefined}
@@ -159,7 +159,7 @@ export function AdvancedSearchInput({
 
         {/* Search Icon */}
         <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <svg className="w-5 h-5 text-steel-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 text-text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -169,10 +169,10 @@ export function AdvancedSearchInput({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-steel-500 hover:text-steel-300 transition-colors"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-text-subtle transition-colors hover:bg-surface-interactive hover:text-text-primary"
             aria-label="Clear search"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -191,8 +191,8 @@ export function AdvancedSearchInput({
 
       {/* Search Syntax Help */}
       {showHelp && (
-        <div className="mt-2 p-3 bg-surface-900 border border-steel-800 rounded text-xs text-steel-400 space-y-1">
-          <div><strong className="text-steel-300">Search Tips:</strong></div>
+        <div className="mt-2 space-y-1 rounded-md border border-border bg-surface-interactive/40 p-3 text-xs text-text-muted">
+          <div><strong className="text-text-secondary">Search Tips:</strong></div>
           <div>• Multiple terms: <code className="text-cobalt-400">draw trash</code> (finds cards with BOTH)</div>
           <div>• OR logic: <code className="text-cobalt-400">draw | trash</code> (finds cards with EITHER)</div>
           <div>• Exclude: <code className="text-cobalt-400">draw -destroy</code> (draw but NOT destroy)</div>
