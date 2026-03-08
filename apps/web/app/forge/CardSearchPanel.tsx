@@ -454,32 +454,8 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
       style={{ minWidth: 0, height: '100%' }}
       aria-label="Card search panel"
     >
-      {/* ── Search + filters ─────────────────────────────────────────────── */}
-      <div className="space-y-2 border-b border-border p-3" style={{ maxWidth: '100%' }}>
-        <AdvancedSearchInput
-          value={rawQuery}
-          onChange={(val) => { setRawQuery(val); debouncedSetQuery(val); }}
-          cards={allCards}
-          placeholder="Search cards... (try 'draw', 'Zeon', or 'deal damage')"
-          debounceMs={150}
-          showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
-        />
-
-        {/* Effect Keyword Pills */}
-        {popularEffects.length > 0 && (
-          <EffectKeywordPills
-            effects={popularEffects}
-            activeEffects={effectKeywordFilters}
-            onEffectClick={(effect) => {
-              setEffectKeywordFilters(prev =>
-                prev.includes(effect)
-                  ? prev.filter(e => e !== effect)
-                  : [...prev, effect]
-              );
-            }}
-            maxVisible={12}
-          />
-        )}
+      {/* ── Filters + search ─────────────────────────────────────────────── */}
+      <div className="space-y-3 border-b border-border p-3" style={{ maxWidth: '100%' }}>
 
         {/* Active Filters Summary */}
         {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX) && (
@@ -898,12 +874,40 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
           )}
         </div>
 
+        {/* Search (placed under filters by request) */}
+        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/20 p-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Search</p>
+          <AdvancedSearchInput
+            value={rawQuery}
+            onChange={(val) => { setRawQuery(val); debouncedSetQuery(val); }}
+            cards={allCards}
+            placeholder="Search cards... (try 'draw', 'Zeon', or 'deal damage')"
+            debounceMs={150}
+            showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
+          />
+
+          {popularEffects.length > 0 && (
+            <EffectKeywordPills
+              effects={popularEffects}
+              activeEffects={effectKeywordFilters}
+              onEffectClick={(effect) => {
+                setEffectKeywordFilters(prev =>
+                  prev.includes(effect)
+                    ? prev.filter(e => e !== effect)
+                    : [...prev, effect]
+                );
+              }}
+              maxVisible={10}
+            />
+          )}
+        </div>
+
         {/* Results count + group mode toggle */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-white" aria-live="polite">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-text-secondary" aria-live="polite">
             {filtered.length} card{filtered.length !== 1 ? 's' : ''}
           </p>
-          <div className="flex rounded border border-border overflow-hidden text-[10px] font-semibold">
+          <div className="flex overflow-hidden rounded border border-border text-[10px] font-semibold">
             {([['none', 'List'], ['clan', 'By Clan'], ['type', 'By Type']] as [GroupMode, string][]).map(([mode, label]) => (
               <button
                 key={mode}
@@ -912,7 +916,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                   'px-2 py-1 transition-colors',
                   groupMode === mode
                     ? 'bg-cobalt-600 text-white'
-                    : 'bg-surface-interactive text-white hover:text-foreground',
+                    : 'bg-surface-interactive text-text-secondary hover:text-foreground',
                 )}
                 onClick={() => handleGroupMode(mode)}
                 aria-pressed={groupMode === mode}

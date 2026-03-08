@@ -71,11 +71,11 @@ export function SearchSuggestionDropdown({
     return (
       <div
         ref={dropdownRef}
-        className="absolute top-full left-0 right-0 mt-1 bg-surface-800 border border-steel-700 rounded-lg shadow-lg z-50 p-4"
+        className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-border bg-surface-elevated p-4 shadow-lg"
         role="status"
         aria-live="polite"
       >
-        <div className="text-steel-300 text-sm">Loading suggestions...</div>
+        <div className="text-sm text-text-secondary">Loading suggestions...</div>
       </div>
     );
   }
@@ -84,11 +84,11 @@ export function SearchSuggestionDropdown({
     return (
       <div
         ref={dropdownRef}
-        className="absolute top-full left-0 right-0 mt-1 bg-surface-800 border border-steel-700 rounded-lg shadow-lg z-50 p-4"
+        className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-border bg-surface-elevated p-4 shadow-lg"
         role="status"
         aria-live="polite"
       >
-        <div className="text-steel-400 text-sm">No suggestions found</div>
+        <div className="text-sm text-text-muted">No suggestions found</div>
       </div>
     );
   }
@@ -98,14 +98,14 @@ export function SearchSuggestionDropdown({
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-full left-0 right-0 mt-1 bg-surface-800 border border-steel-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50"
+      className="absolute left-0 right-0 top-full z-50 mt-1 max-h-96 overflow-y-auto rounded-md border border-border bg-surface-elevated shadow-lg"
       role="listbox"
       aria-label="Search suggestions"
     >
       {suggestions.map((group, groupIndex) => (
         <div key={`group-${groupIndex}`} className="py-2">
           {/* Group Header */}
-          <div className="px-4 py-1 text-xs font-semibold text-steel-400 uppercase tracking-wide">
+          <div className="px-4 py-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
             {group.label}
           </div>
 
@@ -125,7 +125,7 @@ export function SearchSuggestionDropdown({
                   className={`
                     w-full px-4 py-2 text-left flex items-center justify-between gap-2
                     transition-colors duration-150
-                    ${isSelected ? 'bg-cobalt-600 text-white' : 'text-steel-100 hover:bg-surface-700'}
+                    ${isSelected ? 'bg-cobalt-600 text-white' : 'text-text-primary hover:bg-surface-interactive'}
                   `}
                   role="option"
                   aria-selected={isSelected}
@@ -133,14 +133,14 @@ export function SearchSuggestionDropdown({
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{suggestion.label}</div>
                     {suggestion.category && (
-                      <div className="text-xs text-steel-400 capitalize">
+                      <div className="text-xs capitalize text-text-muted">
                         {suggestion.category.replace(/_/g, ' ')}
                       </div>
                     )}
                   </div>
 
                   {suggestion.count !== undefined && (
-                    <div className="text-xs text-steel-400 px-2 py-1 bg-surface-900 rounded">
+                    <div className="rounded bg-surface px-2 py-1 text-xs text-text-muted">
                       {suggestion.count}
                     </div>
                   )}

@@ -44,7 +44,7 @@ export function EffectKeywordPills({
       {groupedEffects.map((group, groupIndex) => (
         <div key={`category-${groupIndex}`}>
           {group.category && (
-            <div className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
               {CATEGORY_LABELS[group.category]}
             </div>
           )}
@@ -59,13 +59,12 @@ export function EffectKeywordPills({
                   type="button"
                   onClick={() => onEffectClick(effect.value)}
                   className={`
-                    px-3 py-1.5 rounded-full text-sm font-medium
+                    flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium
                     transition-all duration-150
-                    flex items-center gap-2
                     ${
                       isActive
                         ? 'bg-cobalt-600 text-white ring-2 ring-cobalt-400'
-                        : 'bg-surface-700 text-steel-200 hover:bg-surface-600'
+                        : 'bg-surface-interactive text-text-secondary hover:bg-surface-muted'
                     }
                   `}
                   aria-pressed={isActive}
@@ -75,7 +74,7 @@ export function EffectKeywordPills({
                     <span
                       className={`
                         text-xs px-1.5 py-0.5 rounded
-                        ${isActive ? 'bg-cobalt-700' : 'bg-surface-800'}
+                        ${isActive ? 'bg-cobalt-700' : 'bg-surface text-text-muted'}
                       `}
                     >
                       {effect.count}
@@ -88,7 +87,7 @@ export function EffectKeywordPills({
             {group.effects.length > maxVisible && (
               <button
                 type="button"
-                className="px-3 py-1.5 rounded-full text-sm font-medium bg-surface-700 text-steel-400 hover:bg-surface-600"
+                className="rounded-full bg-surface-interactive px-3 py-1.5 text-sm font-medium text-text-muted hover:bg-surface-muted"
                 aria-label={`${group.effects.length - maxVisible} more effects`}
               >
                 +{group.effects.length - maxVisible} more
@@ -135,7 +134,7 @@ export function EffectKeywordBadges({ effects }: { effects: string[] }) {
       {effects.map((effect) => (
         <span
           key={effect}
-          className="px-2 py-1 text-xs font-medium bg-surface-700 text-steel-300 rounded"
+          className="rounded bg-surface-interactive px-2 py-1 text-xs font-medium text-text-secondary"
         >
           {effect.replace(/_/g, ' ')}
         </span>
