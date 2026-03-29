@@ -16,10 +16,7 @@ function parseQueryParams(searchParams: URLSearchParams) {
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    const searchParams =
-      process.env.NEXT_OUTPUT_MODE === 'export'
-        ? new URLSearchParams()
-        : new URL(request.url).searchParams;
+    const searchParams = new URL(request.url).searchParams;
     const { q, limit, cursor, excludeTypes, filters } = parseQueryParams(searchParams);
     const { results, nextCursor, total } = getCardList({ q, limit, cursor, excludeTypes, ...filters });
 

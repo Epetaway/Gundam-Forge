@@ -11,7 +11,7 @@ import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
-import { getCardImage } from '@/lib/data/cards';
+import { getCardImage, getCards } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
 import { filtersToSearchParams, getFilterMismatchKeys, parseDelimitedInput } from '@/lib/filters/cardFilters';
 import { cn } from '@/lib/utils/cn';
@@ -232,8 +232,8 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   );
 
   const { data: cardsResult } = useCardsQuery({ filters, initialData: initialCards });
-  const filtered = cardsResult?.cards ?? initialCards;
-  const serverTotal = cardsResult?.total ?? filtered.length;
+  const filtered = useMemo(() => getCards(filters), [filters]);
+  const serverTotal = cardsResult?.total;
 
   const sorted = useMemo(() => sortCards(filtered, sortBy), [filtered, sortBy]);
   const pageSize = view === 'grid' ? GRID_PAGE_SIZE : LIST_PAGE_SIZE;
@@ -505,7 +505,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               {/* Results count */}
               <span className="flex-none text-sm text-steel-600">
                 <span className="font-semibold text-foreground">{sorted.length}</span> cards
-                <span className="ml-1 text-xs text-steel-500">(source total {serverTotal})</span>
+                {typeof serverTotal === 'number' ? (
+                  <span className="ml-1 text-xs text-steel-500">(server total {serverTotal})</span>
+                ) : (
+                  <span className="ml-1 text-xs text-steel-500">(local verified)</span>
+                )}
               </span>
 
               <div className="hidden sm:flex sm:flex-1" />
