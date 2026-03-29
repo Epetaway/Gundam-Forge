@@ -630,6 +630,22 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             </div>
           </div>
 
+          {/* Info + trust badge */}
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+            <div className="text-steel-500">Use the Filters panel for advanced criteria.</div>
+            <div className="rounded-full border border-emerald-200 bg-emerald-50/70 px-2 py-0.5 text-emerald-700">
+              ✓ Shared source
+            </div>
+          </div>
+
+          {/* Info + trust badge */}
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+            <div className="text-steel-500">Shared source with Deckbuilder</div>
+            <div className="rounded-full border border-emerald-200 bg-emerald-50/70 px-2 py-0.5 font-medium text-emerald-700">
+              ✓ Verified source
+            </div>
+          </div>
+
           {/* Active filter chips */}
           {activeChips.length > 0 ? (
             <div className="flex flex-wrap items-center gap-1.5 pb-2">
@@ -655,8 +671,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </button>
             </div>
           ) : null}
-
-          <div className="pb-2 text-[11px] text-steel-500">Use the Filters panel for advanced criteria.</div>
         </Container>
       </div>
 
@@ -759,22 +773,22 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </button>
             </div>
 
-            <div className="mt-3 space-y-3 pb-20">
+            <div className="mt-2 space-y-2 pb-20">
               {/* Search — mobile only, desktop has it in toolbar */}
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600 sm:hidden">
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600 sm:hidden">
                 Search
                 <input
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="mt-1 h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, query: event.target.value }))}
                   placeholder="Card name, ID, text"
                   value={draft.query}
                 />
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Color
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Color</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, color: event.target.value as CardColor | 'All' }))}
                   value={draft.color}
                 >
@@ -787,10 +801,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Type
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Type</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, type: event.target.value as CardType | 'All' }))}
                   value={draft.type}
                 >
@@ -798,10 +812,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Set
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Set</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, setCode: event.target.value }))}
                   value={draft.setCode}
                 >
@@ -810,11 +824,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <div className="grid grid-cols-2 gap-2">
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                  Min Cost
+              <div className="grid grid-cols-2 gap-1.5">
+                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                  <span className="mb-1">Min Cost</span>
                   <select
-                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                     onChange={(event) => setDraft((c) => ({ ...c, minCost: event.target.value }))}
                     value={draft.minCost}
                   >
@@ -823,10 +837,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   </select>
                 </label>
 
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                  Max Cost
+                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                  <span className="mb-1">Max Cost</span>
                   <select
-                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                     onChange={(event) => setDraft((c) => ({ ...c, maxCost: event.target.value }))}
                     value={draft.maxCost}
                   >
@@ -836,11 +850,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </label>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                  Min Level
+              <div className="grid grid-cols-2 gap-1.5">
+                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                  <span className="mb-1">Min Level</span>
                   <select
-                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                     onChange={(event) => setDraft((c) => ({ ...c, minLevel: event.target.value }))}
                     value={draft.minLevel}
                   >
@@ -849,10 +863,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   </select>
                 </label>
 
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                  Max Level
+                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                  <span className="mb-1">Max Level</span>
                   <select
-                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                     onChange={(event) => setDraft((c) => ({ ...c, maxLevel: event.target.value }))}
                     value={draft.maxLevel}
                   >
@@ -862,10 +876,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </label>
               </div>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Keyword
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Keyword</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, keyword: event.target.value as KeywordOption }))}
                   value={draft.keyword}
                 >
@@ -873,10 +887,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Match Mode
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Match Mode</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, matchMode: event.target.value as FilterMatchMode }))}
                   value={draft.matchMode}
                 >
@@ -885,10 +899,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Deck Role
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Deck Role</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, deckRole: event.target.value as CardDeckRole | 'All' }))}
                   value={draft.deckRole}
                 >
@@ -899,10 +913,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Zone
+              <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Zone</span>
                 <select
-                  className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, zone: event.target.value }))}
                   value={draft.zone}
                 >
@@ -911,14 +925,14 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Clans
+              <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Clans</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
                   <div className="flex flex-wrap gap-1.5">
                     {clanOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
                           draft.clans.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -934,14 +948,14 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </div>
               </div>
 
-              <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Traits
+              <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Traits</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
                   <div className="flex flex-wrap gap-1.5">
                     {traitOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
                           draft.traits.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -957,14 +971,14 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </div>
               </div>
 
-              <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Mechanics
+              <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1">Mechanics</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
                   <div className="flex flex-wrap gap-1.5">
                     {mechanicOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
                           draft.mechanics.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -980,14 +994,14 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </div>
               </div>
 
-              <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
-                Triggers
+              <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                <span className="mb-1\">Triggers</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
                   <div className="flex flex-wrap gap-1.5">
                     {triggerOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
                           draft.triggers.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -1004,7 +1018,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </div>
             </div>
 
-            <div className="sticky bottom-0 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-surface/95 px-4 pt-3 backdrop-blur-sm">
+            <div className="sticky bottom-0 -mx-4 mt-2 flex items-center gap-2 border-t border-border bg-surface/95 px-4 py-2 backdrop-blur-sm">
               <Button
                 className="flex-1"
                 onClick={() =>
