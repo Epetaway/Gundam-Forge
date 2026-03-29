@@ -293,9 +293,32 @@ export const AUTOPLAYER_CONFIG = {
   // Resource generation per turn
   resourcesPerTurn: 1,
 
-  // Max units to play per turn
-  maxUnitsPerTurn: 1,
+  // Max units to play per turn (token cost escalation naturally limits actual plays)
+  maxUnitsPerTurn: 6,
 
   // Minimum resources to keep (for blocking)
   minResourcesReserve: 1,
 };
+
+/**
+ * TOKEN DECK AI CONFIGURATION
+ * Rules for the AI opponent's unit token cost escalation mechanic.
+ *
+ * Token units have base cost 0. Each subsequent token played in the same turn
+ * costs 1 more than the previous. Resets to 0 at the start of each new turn.
+ *
+ *   1st token this turn = 0 cost
+ *   2nd token this turn = 1 cost
+ *   3rd token this turn = 2 cost
+ *   etc.
+ */
+export const TOKEN_DECK_AI_CONFIG = {
+  // Base cost for the first token played per turn
+  baseTokenCost: 0,
+
+  // Cost increase for each additional token played in the same turn
+  costEscalationPerToken: 1,
+
+  // Hard cap on tokens per turn (board space of 6 also limits this)
+  maxTokensPerTurn: 6,
+} as const;
