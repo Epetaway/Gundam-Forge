@@ -14,10 +14,6 @@ describe('cardFilters serialization', () => {
       color: 'Red' as const,
       type: 'Pilot' as const,
       set: 'ST01',
-      minCost: 2,
-      maxCost: 6,
-      minLevel: 3,
-      maxLevel: 5,
       keyword: 'Rush',
       zone: 'Space',
       deckRole: 'main' as const,
@@ -73,10 +69,6 @@ describe('filter mismatch detection', () => {
       color: undefined,
       type: undefined,
       set: undefined,
-      minCost: undefined,
-      maxCost: undefined,
-      minLevel: undefined,
-      maxLevel: undefined,
       keyword: undefined,
       zone: undefined,
       deckRole: undefined,
@@ -99,10 +91,10 @@ describe('filter mismatch detection', () => {
 
   it('returns mismatched keys when applied filters differ from selected filters', () => {
     const keys = getFilterMismatchKeys(
-      { color: 'Red', deckRole: 'main', minCost: 2, keywords: ['repair'] },
-      { color: 'Blue', deckRole: 'resource', minCost: 4, keywords: ['repair', 'support'] },
+      { color: 'Red', deckRole: 'main', keywords: ['repair'] },
+      { color: 'Blue', deckRole: 'resource', keywords: ['repair', 'support'] },
     );
 
-    expect(keys).toEqual(['color', 'minCost', 'deckRole', 'keywords']);
+    expect(keys).toEqual(['color', 'deckRole', 'keywords']);
   });
 });
