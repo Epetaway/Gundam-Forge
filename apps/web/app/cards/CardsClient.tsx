@@ -37,6 +37,10 @@ interface FilterDraft {
   color: CardColor | 'All';
   type: CardType | 'All';
   setCode: string;
+  minCost: string;
+  maxCost: string;
+  minLevel: string;
+  maxLevel: string;
   keyword: KeywordOption;
   zone: string;
   deckRole: CardDeckRole | 'All';
@@ -80,6 +84,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const colorParam = searchParams.get('color');
   const typeParam = searchParams.get('type');
   const setParam = searchParams.get('set');
+  const minCostParam = searchParams.get('minCost');
+  const maxCostParam = searchParams.get('maxCost');
+  const minLevelParam = searchParams.get('minLevel');
+  const maxLevelParam = searchParams.get('maxLevel');
   const queryParam = searchParams.get('q');
   const zoneParam = searchParams.get('zone');
   const deckRoleParam = searchParams.get('deckRole');
@@ -96,6 +104,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const [color, setColor] = useState<CardColor | 'All'>(initialColor);
   const [type, setType] = useState<CardType | 'All'>(initialType);
   const [setCode, setSetCode] = useState(setParam ?? 'All');
+  const [minCost, setMinCost] = useState<string>(minCostParam ?? '');
+  const [maxCost, setMaxCost] = useState<string>(maxCostParam ?? '');
+  const [minLevel, setMinLevel] = useState<string>(minLevelParam ?? '');
+  const [maxLevel, setMaxLevel] = useState<string>(maxLevelParam ?? '');
   const [keyword, setKeyword] = useState<KeywordOption>(
     KEYWORD_OPTIONS.includes(keywordParam as KeywordOption) ? (keywordParam as KeywordOption) : 'All'
   );
@@ -124,6 +136,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     color: 'All',
     type: 'All',
     setCode: 'All',
+    minCost: '',
+    maxCost: '',
+    minLevel: '',
+    maxLevel: '',
     keyword: 'All',
     zone: 'All',
     deckRole: 'All',
@@ -136,6 +152,16 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   const allSets = useMemo(
     () => Array.from(new Set(initialCards.map((card) => card.set))).sort(),
+    [initialCards],
+  );
+
+  const allCosts = useMemo(
+    () => Array.from(new Set(initialCards.map((card) => card.cost))).sort((a, b) => a - b),
+    [initialCards],
+  );
+
+  const allLevels = useMemo(
+    () => Array.from(new Set(initialCards.map((card) => card.level ?? card.cost))).sort((a, b) => a - b),
     [initialCards],
   );
 
@@ -171,6 +197,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       set: setCode,
+      minCost: minCost === '' ? undefined : Number(minCost),
+      maxCost: maxCost === '' ? undefined : Number(maxCost),
+      minLevel: minLevel === '' ? undefined : Number(minLevel),
+      maxLevel: maxLevel === '' ? undefined : Number(maxLevel),
       keyword,
       zone,
       deckRole,
@@ -190,6 +220,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     color,
     type,
     setCode,
+    minCost,
+    maxCost,
+    minLevel,
+    maxLevel,
     keyword,
     zone,
     deckRole,
@@ -206,6 +240,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       set: setCode,
+      minCost: minCost === '' ? undefined : Number(minCost),
+      maxCost: maxCost === '' ? undefined : Number(maxCost),
+      minLevel: minLevel === '' ? undefined : Number(minLevel),
+      maxLevel: maxLevel === '' ? undefined : Number(maxLevel),
       keyword,
       zone,
       deckRole,
@@ -221,6 +259,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       setCode,
       type,
       keyword,
+      minCost,
+      maxCost,
+      minLevel,
+      maxLevel,
       zone,
       deckRole,
       matchMode,
@@ -241,7 +283,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   useEffect(() => {
     setDisplayCount(pageSize);
-  }, [pageSize, query, color, type, setCode, sortBy, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [pageSize, query, color, type, setCode, sortBy, minCost, maxCost, minLevel, maxLevel, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   // Focus trap for filter drawer
   useEffect(() => {
@@ -290,6 +332,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     if (applied.color && applied.color !== 'All') chips.push(`Color: ${applied.color}`);
     if (applied.type && applied.type !== 'All') chips.push(`Type: ${applied.type}`);
     if (applied.set && applied.set !== 'All') chips.push(`Set: ${applied.set}`);
+    if (Number.isFinite(applied.minCost) || Number.isFinite(applied.maxCost)) {
+      chips.push(`Cost: ${applied.minCost ?? 0}-${applied.maxCost ?? 'max'}`);
+    }
+    if (Number.isFinite(applied.minLevel) || Number.isFinite(applied.maxLevel)) {
+      chips.push(`Level: ${applied.minLevel ?? 0}-${applied.maxLevel ?? 'max'}`);
+    }
     if (applied.keyword && applied.keyword !== 'All') chips.push(`Keyword: ${applied.keyword}`);
     if (applied.zone && applied.zone !== 'All') chips.push(`Zone: ${applied.zone}`);
     if (applied.deckRole && applied.deckRole !== 'All') chips.push(`Deck role: ${applied.deckRole}`);
@@ -321,6 +369,26 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     }
     if (setCode !== 'All') {
       chips.push({ id: `set:${setCode}`, label: `Set: ${setCode}`, clear: () => setSetCode('All') });
+    }
+    if (minCost !== '' || maxCost !== '') {
+      chips.push({
+        id: `cost:${minCost}-${maxCost}`,
+        label: `Cost: ${minCost || '0'}-${maxCost || 'max'}`,
+        clear: () => {
+          setMinCost('');
+          setMaxCost('');
+        },
+      });
+    }
+    if (minLevel !== '' || maxLevel !== '') {
+      chips.push({
+        id: `lvl:${minLevel}-${maxLevel}`,
+        label: `Level: ${minLevel || '0'}-${maxLevel || 'max'}`,
+        clear: () => {
+          setMinLevel('');
+          setMaxLevel('');
+        },
+      });
     }
     if (keyword !== 'All') {
       chips.push({ id: `kw:${keyword}`, label: `Keyword: ${keyword}`, clear: () => setKeyword('All') });
@@ -363,7 +431,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       });
     }
     return chips;
-  }, [color, query, setCode, type, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [color, query, setCode, type, minCost, maxCost, minLevel, maxLevel, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   const clearAll = (): void => {
     setRawQuery('');
@@ -371,6 +439,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setColor('All');
     setType('All');
     setSetCode('All');
+    setMinCost('');
+    setMaxCost('');
+    setMinLevel('');
+    setMaxLevel('');
     setKeyword('All');
     setZone('All');
     setDeckRole('All');
@@ -387,6 +459,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       setCode,
+      minCost,
+      maxCost,
+      minLevel,
+      maxLevel,
       keyword,
       zone,
       deckRole,
@@ -405,6 +481,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setColor(draft.color);
     setType(draft.type);
     setSetCode(draft.setCode);
+    setMinCost(draft.minCost);
+    setMaxCost(draft.maxCost);
+    setMinLevel(draft.minLevel);
+    setMaxLevel(draft.maxLevel);
     setKeyword(draft.keyword);
     setZone(draft.zone);
     setDeckRole(draft.deckRole);
@@ -620,10 +700,60 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             </div>
           ) : null}
 
-          <div className="hidden border-t border-border/70 pb-2 pt-2 lg:block">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-steel-600">
-              Desktop Quick Filters
-            </p>
+          <div className="hidden rounded-xl border border-border/70 bg-gradient-to-br from-surface to-surface-interactive/40 p-3 shadow-sm lg:block">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
+                Filter Studio
+              </p>
+              <p className="text-[11px] text-steel-500">Refine by Gundam traits, mechanics, and stat bands</p>
+            </div>
+            <div className="mb-2 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Min Cost</p>
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setMinCost(event.target.value)}
+                  value={minCost}
+                >
+                  <option value="">Any</option>
+                  {allCosts.map((cost) => <option key={`min-cost-${cost}`} value={String(cost)}>{cost}</option>)}
+                </select>
+              </div>
+              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Max Cost</p>
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setMaxCost(event.target.value)}
+                  value={maxCost}
+                >
+                  <option value="">Any</option>
+                  {allCosts.map((cost) => <option key={`max-cost-${cost}`} value={String(cost)}>{cost}</option>)}
+                </select>
+              </div>
+              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Min Level</p>
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setMinLevel(event.target.value)}
+                  value={minLevel}
+                >
+                  <option value="">Any</option>
+                  {allLevels.map((level) => <option key={`min-level-${level}`} value={String(level)}>{level}</option>)}
+                </select>
+              </div>
+              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Max Level</p>
+                <select
+                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  onChange={(event) => setMaxLevel(event.target.value)}
+                  value={maxLevel}
+                >
+                  <option value="">Any</option>
+                  {allLevels.map((level) => <option key={`max-level-${level}`} value={String(level)}>{level}</option>)}
+                </select>
+              </div>
+            </div>
+
             <div className="grid gap-2 xl:grid-cols-2">
               <div className="rounded-md border border-border bg-surface-interactive/40 p-2">
                 <div className="mb-1 flex items-center justify-between">
@@ -827,7 +957,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             className="fixed inset-0 z-40 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div ref={drawerRef} className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-md border border-border bg-surface p-4 shadow-2xl sm:inset-auto sm:right-4 sm:top-24 sm:w-72 sm:rounded-md" role="dialog" aria-modal="true" aria-label="Filter cards">
+          <div ref={drawerRef} className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl border border-border bg-gradient-to-b from-surface to-surface-interactive/60 p-4 shadow-2xl sm:inset-auto sm:right-4 sm:top-24 sm:w-80 sm:rounded-2xl" role="dialog" aria-modal="true" aria-label="Filter cards">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">Filters</h3>
               <button
@@ -885,6 +1015,58 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   {allSets.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
               </label>
+
+              <div className="grid grid-cols-2 gap-2">
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
+                  Min Cost
+                  <select
+                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    onChange={(event) => setDraft((c) => ({ ...c, minCost: event.target.value }))}
+                    value={draft.minCost}
+                  >
+                    <option value="">Any</option>
+                    {allCosts.map((cost) => <option key={`drawer-min-cost-${cost}`} value={String(cost)}>{cost}</option>)}
+                  </select>
+                </label>
+
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
+                  Max Cost
+                  <select
+                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    onChange={(event) => setDraft((c) => ({ ...c, maxCost: event.target.value }))}
+                    value={draft.maxCost}
+                  >
+                    <option value="">Any</option>
+                    {allCosts.map((cost) => <option key={`drawer-max-cost-${cost}`} value={String(cost)}>{cost}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
+                  Min Level
+                  <select
+                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    onChange={(event) => setDraft((c) => ({ ...c, minLevel: event.target.value }))}
+                    value={draft.minLevel}
+                  >
+                    <option value="">Any</option>
+                    {allLevels.map((level) => <option key={`drawer-min-level-${level}`} value={String(level)}>{level}</option>)}
+                  </select>
+                </label>
+
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
+                  Max Level
+                  <select
+                    className="h-10 rounded-md border border-border bg-surface-interactive px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                    onChange={(event) => setDraft((c) => ({ ...c, maxLevel: event.target.value }))}
+                    value={draft.maxLevel}
+                  >
+                    <option value="">Any</option>
+                    {allLevels.map((level) => <option key={`drawer-max-level-${level}`} value={String(level)}>{level}</option>)}
+                  </select>
+                </label>
+              </div>
 
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Keyword

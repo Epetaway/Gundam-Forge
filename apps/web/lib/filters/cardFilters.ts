@@ -8,6 +8,10 @@ export interface CatalogFilters {
   color?: CardColor | 'All';
   type?: CardType | 'All';
   set?: string;
+  minCost?: number;
+  maxCost?: number;
+  minLevel?: number;
+  maxLevel?: number;
   keyword?: string;
   zone?: string;
   deckRole?: CardDeckRole | 'All';
@@ -38,11 +42,20 @@ function encodeListParam(params: URLSearchParams, key: string, values?: string[]
 }
 
 export function filtersFromSearchParams(searchParams: URLSearchParams): CatalogFilters {
+  const minCost = searchParams.get('minCost');
+  const maxCost = searchParams.get('maxCost');
+  const minLevel = searchParams.get('minLevel');
+  const maxLevel = searchParams.get('maxLevel');
+
   const filters: CatalogFilters = {
     query: searchParams.get('q') ?? undefined,
     color: (searchParams.get('color') as CardColor | 'All' | null) ?? undefined,
     type: (searchParams.get('type') as CardType | 'All' | null) ?? undefined,
     set: searchParams.get('set') ?? undefined,
+    minCost: minCost ? Number.parseInt(minCost, 10) : undefined,
+    maxCost: maxCost ? Number.parseInt(maxCost, 10) : undefined,
+    minLevel: minLevel ? Number.parseInt(minLevel, 10) : undefined,
+    maxLevel: maxLevel ? Number.parseInt(maxLevel, 10) : undefined,
     keyword: searchParams.get('keyword') ?? undefined,
     zone: searchParams.get('zone') ?? undefined,
     deckRole: (searchParams.get('deckRole') as CardDeckRole | 'All' | null) ?? undefined,
@@ -67,6 +80,10 @@ export function filtersToSearchParams(filters: CatalogFilters): URLSearchParams 
   if (filters.color && filters.color !== 'All') params.set('color', filters.color);
   if (filters.type && filters.type !== 'All') params.set('type', filters.type);
   if (filters.set && filters.set !== 'All') params.set('set', filters.set);
+  if (Number.isFinite(filters.minCost)) params.set('minCost', String(filters.minCost));
+  if (Number.isFinite(filters.maxCost)) params.set('maxCost', String(filters.maxCost));
+  if (Number.isFinite(filters.minLevel)) params.set('minLevel', String(filters.minLevel));
+  if (Number.isFinite(filters.maxLevel)) params.set('maxLevel', String(filters.maxLevel));
   if (filters.keyword && filters.keyword !== 'All') params.set('keyword', filters.keyword);
   if (filters.zone && filters.zone !== 'All') params.set('zone', filters.zone);
   if (filters.deckRole && filters.deckRole !== 'All') params.set('deckRole', filters.deckRole);
@@ -117,6 +134,10 @@ export interface ComparableFilters {
   color?: string;
   type?: string;
   set?: string;
+  minCost?: number;
+  maxCost?: number;
+  minLevel?: number;
+  maxLevel?: number;
   keyword?: string;
   zone?: string;
   deckRole?: string;
@@ -128,11 +149,18 @@ export interface ComparableFilters {
 }
 
 export function normalizeComparableFilters(filters: ComparableFilters): ComparableFilters {
+  const finiteOrUndefined = (value: number | undefined): number | undefined =>
+    Number.isFinite(value) ? value : undefined;
+
   return {
     query: normalizeScalar(filters.query),
     color: normalizeScalar(filters.color),
     type: normalizeScalar(filters.type),
     set: normalizeScalar(filters.set),
+    minCost: finiteOrUndefined(filters.minCost),
+    maxCost: finiteOrUndefined(filters.maxCost),
+    minLevel: finiteOrUndefined(filters.minLevel),
+    maxLevel: finiteOrUndefined(filters.maxLevel),
     keyword: normalizeScalar(filters.keyword),
     zone: normalizeScalar(filters.zone),
     deckRole: normalizeScalar(filters.deckRole),
@@ -152,6 +180,10 @@ export function getFilterMismatchKeys(selected: ComparableFilters, applied: Comp
     'color',
     'type',
     'set',
+    'minCost',
+    'maxCost',
+    'minLevel',
+    'maxLevel',
     'keyword',
     'zone',
     'deckRole',
