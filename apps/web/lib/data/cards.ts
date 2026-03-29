@@ -17,6 +17,10 @@ function hasKeyword(card: CardDefinition, keyword: string): boolean {
   return (card.keywords ?? []).some((entry) => entry.toLowerCase().includes(normalized));
 }
 
+function normalizeColorValue(value: string | undefined): string {
+  return (value ?? '').trim().toLowerCase();
+}
+
 function isExCard(card: CardDefinition): boolean {
   if (card.isExCard) return true;
   if ((card.traits ?? []).some((trait) => trait.toLowerCase().includes('ex'))) return true;
@@ -104,17 +108,23 @@ function enrichCard(card: CardDefinition): void {
 
 cards.forEach(enrichCard);
 
-export function getCards(filters: CatalogFilters = {}): CardDefinition[] {
+function applyCardFilters(source: CardDefinition[], filters: CatalogFilters = {}): CardDefinition[] {
   const query = filters.query?.trim().toLowerCase();
   const matchMode = toMatchMode(filters.matchMode);
 
-  return cards.filter((card) => {
+  return source.filter((card) => {
     if (query) {
       const haystack = `${card.id} ${card.name} ${card.text ?? ''} ${(card.traits ?? []).join(' ')} ${(card.clans ?? []).join(' ')}`.toLowerCase();
       if (!haystack.includes(query)) return false;
     }
 
-    if (filters.color && filters.color !== 'All' && card.color !== filters.color) return false;
+    if (
+      filters.color &&
+      filters.color !== 'All' &&
+      normalizeColorValue(card.color) !== normalizeColorValue(filters.color)
+    ) {
+      return false;
+    }
     if (filters.type && filters.type !== 'All' && card.type !== filters.type) return false;
     if (filters.set && filters.set !== 'All' && card.set !== filters.set) return false;
     if (Number.isFinite(filters.minCost) && card.cost < (filters.minCost as number)) return false;
@@ -132,6 +142,14 @@ export function getCards(filters: CatalogFilters = {}): CardDefinition[] {
 
     return true;
   });
+}
+
+export function getCards(filters: CatalogFilters = {}): CardDefinition[] {
+  return applyCardFilters(cards, filters);
+}
+
+export function getCardsFromSource(source: CardDefinition[], filters: CatalogFilters = {}): CardDefinition[] {
+  return applyCardFilters(source, filters);
 }
 
 export function getCardById(id: string): CardDefinition | undefined {

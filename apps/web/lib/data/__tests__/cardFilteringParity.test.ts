@@ -59,4 +59,16 @@ describe('card filtering parity', () => {
     const excluded = getCards({ minCost: card!.cost + 1, maxCost: card!.cost + 1 });
     expect(excluded.some((entry) => entry.id === card!.id)).toBe(false);
   });
+
+  it('handles purple color queries deterministically', () => {
+    const hasPurpleInCatalog = cards.some((card) => card.color === 'Purple');
+    const purpleOnly = getCards({ color: 'Purple' });
+
+    if (hasPurpleInCatalog) {
+      expect(purpleOnly.every((card) => card.color === 'Purple')).toBe(true);
+      return;
+    }
+
+    expect(purpleOnly).toEqual([]);
+  });
 });

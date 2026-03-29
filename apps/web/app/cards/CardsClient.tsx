@@ -11,17 +11,17 @@ import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
-import { getCardImage, getCards } from '@/lib/data/cards';
+import { getCardImage, getCardsFromSource } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
-import { filtersToSearchParams, getFilterMismatchKeys, parseDelimitedInput } from '@/lib/filters/cardFilters';
+import { filtersToSearchParams, parseDelimitedInput } from '@/lib/filters/cardFilters';
 import { cn } from '@/lib/utils/cn';
 import { getActiveDeckId, getStoredDeck, updateDeckEntries } from '@/lib/deck/storage';
 import { debounce } from '@/lib/utils/debounce';
 
-const colorOptions: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const KEYWORD_OPTIONS = ['All', 'Rush', 'Breach', 'Burst', 'Suppression', 'Repair', 'Support', 'Link', 'Pair'] as const;
 type KeywordOption = typeof KEYWORD_OPTIONS[number];
-const typeOptions: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
+const CANONICAL_COLORS: CardColor[] = ['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
+const CANONICAL_TYPES: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 
 type CatalogView = 'grid' | 'list';
 type SortKey = 'name' | 'cost-asc' | 'cost-desc' | 'set';
@@ -80,6 +80,25 @@ function sortCards(cards: CardDefinition[], sortBy: SortKey): CardDefinition[] {
 export default function CardsClient({ initialCards }: CardsClientProps): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const colorCounts = useMemo(() => {
+    const counts = new Map<CardColor, number>();
+    for (const color of CANONICAL_COLORS) counts.set(color, 0);
+    for (const card of initialCards) {
+      counts.set(card.color, (counts.get(card.color) ?? 0) + 1);
+    }
+    return counts;
+  }, [initialCards]);
+
+  const colorOptions = useMemo<Array<CardColor | 'All'>>(
+    () => ['All', ...CANONICAL_COLORS.filter((color) => (colorCounts.get(color) ?? 0) > 0)],
+    [colorCounts],
+  );
+
+  const typeOptions = useMemo<Array<CardType | 'All'>>(
+    () => ['All', ...CANONICAL_TYPES.filter((type) => initialCards.some((card) => card.type === type))],
+    [initialCards],
+  );
 
   const colorParam = searchParams.get('color');
   const typeParam = searchParams.get('type');
@@ -149,6 +168,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     mechanics: [],
     triggers: [],
   });
+
+  useEffect(() => {
+    if (color !== 'All' && !colorOptions.includes(color)) {
+      setColor('All');
+    }
+  }, [color, colorOptions]);
 
   const allSets = useMemo(
     () => Array.from(new Set(initialCards.map((card) => card.set))).sort(),
@@ -274,7 +299,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   );
 
   const { data: cardsResult } = useCardsQuery({ filters, initialData: initialCards });
-  const filtered = useMemo(() => getCards(filters), [filters]);
+  const filtered = useMemo(() => getCardsFromSource(initialCards, filters), [initialCards, filters]);
   const serverTotal = cardsResult?.total;
 
   const sorted = useMemo(() => sortCards(filtered, sortBy), [filtered, sortBy]);
@@ -322,39 +347,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   const cardLookup = useMemo(() => new Map(sorted.map((card) => [card.id, card])), [sorted]);
   const inspectCard = inspectCardId ? cardLookup.get(inspectCardId) : undefined;
-
-  const serverAppliedChips = useMemo<string[]>(() => {
-    const applied = cardsResult?.appliedFilters;
-    if (!applied) return [];
-
-    const chips: string[] = [];
-    if (applied.query?.trim()) chips.push(`Search: "${applied.query.trim()}"`);
-    if (applied.color && applied.color !== 'All') chips.push(`Color: ${applied.color}`);
-    if (applied.type && applied.type !== 'All') chips.push(`Type: ${applied.type}`);
-    if (applied.set && applied.set !== 'All') chips.push(`Set: ${applied.set}`);
-    if (Number.isFinite(applied.minCost) || Number.isFinite(applied.maxCost)) {
-      chips.push(`Cost: ${applied.minCost ?? 0}-${applied.maxCost ?? 'max'}`);
-    }
-    if (Number.isFinite(applied.minLevel) || Number.isFinite(applied.maxLevel)) {
-      chips.push(`Level: ${applied.minLevel ?? 0}-${applied.maxLevel ?? 'max'}`);
-    }
-    if (applied.keyword && applied.keyword !== 'All') chips.push(`Keyword: ${applied.keyword}`);
-    if (applied.zone && applied.zone !== 'All') chips.push(`Zone: ${applied.zone}`);
-    if (applied.deckRole && applied.deckRole !== 'All') chips.push(`Deck role: ${applied.deckRole}`);
-    if (applied.matchMode === 'broad') chips.push('Match mode: broaden');
-    for (const clan of applied.clans ?? []) chips.push(`Clan: ${clan}`);
-    for (const trait of applied.traits ?? []) chips.push(`Trait: ${trait}`);
-    for (const mechanic of applied.keywords ?? []) chips.push(`Mechanic: ${mechanic}`);
-    for (const trigger of applied.triggers ?? []) chips.push(`Trigger: ${trigger}`);
-
-    return chips;
-  }, [cardsResult?.appliedFilters]);
-
-  const filterMismatchKeys = useMemo<string[]>(() => {
-    const applied = cardsResult?.appliedFilters;
-    if (!applied) return [];
-    return getFilterMismatchKeys(filters, applied);
-  }, [cardsResult?.appliedFilters, filters]);
 
   const activeChips = useMemo<ActiveChip[]>(() => {
     const chips: ActiveChip[] = [];
@@ -496,13 +488,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setMobileFiltersOpen(false);
   };
 
-  const toggleSelection = (
-    setter: React.Dispatch<React.SetStateAction<string[]>>,
-    value: string,
-  ): void => {
-    setter((current) => (current.includes(value) ? current.filter((entry) => entry !== value) : [...current, value]));
-  };
-
   const toggleDraftSelection = (group: 'clans' | 'traits' | 'mechanics' | 'triggers', value: string): void => {
     setDraft((current) => {
       const selected = current[group];
@@ -588,7 +573,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 {typeof serverTotal === 'number' ? (
                   <span className="ml-1 text-xs text-steel-500">(server total {serverTotal})</span>
                 ) : (
-                  <span className="ml-1 text-xs text-steel-500">(local verified)</span>
+                  <span className="ml-1 text-xs text-steel-500">(source {initialCards.length})</span>
                 )}
               </span>
 
@@ -671,203 +656,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             </div>
           ) : null}
 
-          {serverAppliedChips.length > 0 ? (
-            <div className="mb-2 rounded-md border border-emerald-200 bg-emerald-50/70 px-2 py-1.5">
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-900">
-                  Server filters active
-                </p>
-                {filterMismatchKeys.length > 0 ? (
-                  <span className="rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900">
-                    Mismatch: {filterMismatchKeys.join(', ')}
-                  </span>
-                ) : (
-                  <span className="rounded-full border border-emerald-300 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-900">
-                    Synced
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {serverAppliedChips.map((chip) => (
-                  <span
-                    className="rounded-full border border-emerald-300 bg-white px-2 py-1 text-[11px] font-medium text-emerald-900"
-                    key={`server-${chip}`}
-                  >
-                    {chip}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          <div className="hidden rounded-xl border border-border/70 bg-gradient-to-br from-surface to-surface-interactive/40 p-3 shadow-sm lg:block">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-steel-600">
-                Filter Studio
-              </p>
-              <p className="text-[11px] text-steel-500">Refine by Gundam traits, mechanics, and stat bands</p>
-            </div>
-            <div className="mb-2 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Min Cost</p>
-                <select
-                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                  onChange={(event) => setMinCost(event.target.value)}
-                  value={minCost}
-                >
-                  <option value="">Any</option>
-                  {allCosts.map((cost) => <option key={`min-cost-${cost}`} value={String(cost)}>{cost}</option>)}
-                </select>
-              </div>
-              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Max Cost</p>
-                <select
-                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                  onChange={(event) => setMaxCost(event.target.value)}
-                  value={maxCost}
-                >
-                  <option value="">Any</option>
-                  {allCosts.map((cost) => <option key={`max-cost-${cost}`} value={String(cost)}>{cost}</option>)}
-                </select>
-              </div>
-              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Min Level</p>
-                <select
-                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                  onChange={(event) => setMinLevel(event.target.value)}
-                  value={minLevel}
-                >
-                  <option value="">Any</option>
-                  {allLevels.map((level) => <option key={`min-level-${level}`} value={String(level)}>{level}</option>)}
-                </select>
-              </div>
-              <div className="rounded-md border border-border bg-surface-interactive/60 p-2">
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-steel-600">Max Level</p>
-                <select
-                  className="h-9 w-full rounded-md border border-border bg-surface px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                  onChange={(event) => setMaxLevel(event.target.value)}
-                  value={maxLevel}
-                >
-                  <option value="">Any</option>
-                  {allLevels.map((level) => <option key={`max-level-${level}`} value={String(level)}>{level}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid gap-2 xl:grid-cols-2">
-              <div className="rounded-md border border-border bg-surface-interactive/40 p-2">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-steel-600">Clans</span>
-                  {selectedClans.length > 0 ? (
-                    <button className="text-[11px] text-steel-500 hover:text-foreground" onClick={() => setSelectedClans([])} type="button">
-                      Clear
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {clanOptions.slice(0, 20).map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium',
-                        selectedClans.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface text-steel-700 hover:border-accent/40',
-                      )}
-                      key={`desktop-clan-${option}`}
-                      onClick={() => toggleSelection(setSelectedClans, option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-md border border-border bg-surface-interactive/40 p-2">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-steel-600">Traits</span>
-                  {selectedTraits.length > 0 ? (
-                    <button className="text-[11px] text-steel-500 hover:text-foreground" onClick={() => setSelectedTraits([])} type="button">
-                      Clear
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {traitOptions.slice(0, 24).map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium',
-                        selectedTraits.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface text-steel-700 hover:border-accent/40',
-                      )}
-                      key={`desktop-trait-${option}`}
-                      onClick={() => toggleSelection(setSelectedTraits, option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-md border border-border bg-surface-interactive/40 p-2">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-steel-600">Mechanics</span>
-                  {selectedMechanics.length > 0 ? (
-                    <button className="text-[11px] text-steel-500 hover:text-foreground" onClick={() => setSelectedMechanics([])} type="button">
-                      Clear
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {mechanicOptions.slice(0, 20).map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium',
-                        selectedMechanics.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface text-steel-700 hover:border-accent/40',
-                      )}
-                      key={`desktop-mechanic-${option}`}
-                      onClick={() => toggleSelection(setSelectedMechanics, option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-md border border-border bg-surface-interactive/40 p-2">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-steel-600">Triggers</span>
-                  {selectedTriggers.length > 0 ? (
-                    <button className="text-[11px] text-steel-500 hover:text-foreground" onClick={() => setSelectedTriggers([])} type="button">
-                      Clear
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {triggerOptions.slice(0, 20).map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium',
-                        selectedTriggers.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface text-steel-700 hover:border-accent/40',
-                      )}
-                      key={`desktop-trigger-${option}`}
-                      onClick={() => toggleSelection(setSelectedTriggers, option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="pb-2 text-[11px] text-steel-500">Use the Filters panel for advanced criteria.</div>
         </Container>
       </div>
 
@@ -957,7 +746,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             className="fixed inset-0 z-40 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div ref={drawerRef} className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl border border-border bg-gradient-to-b from-surface to-surface-interactive/60 p-4 shadow-2xl sm:inset-auto sm:right-4 sm:top-24 sm:w-80 sm:rounded-2xl" role="dialog" aria-modal="true" aria-label="Filter cards">
+          <div ref={drawerRef} className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-border bg-gradient-to-b from-surface to-surface-interactive/60 p-4 shadow-2xl md:inset-y-0 md:left-auto md:right-0 md:top-0 md:bottom-0 md:h-full md:max-h-none md:w-[360px] md:rounded-none md:rounded-l-2xl" role="dialog" aria-modal="true" aria-label="Filter cards">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">Filters</h3>
               <button
@@ -970,7 +759,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </button>
             </div>
 
-            <div className="mt-3 space-y-3">
+            <div className="mt-3 space-y-3 pb-20">
               {/* Search — mobile only, desktop has it in toolbar */}
               <label className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600 sm:hidden">
                 Search
@@ -989,7 +778,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   onChange={(event) => setDraft((c) => ({ ...c, color: event.target.value as CardColor | 'All' }))}
                   value={draft.color}
                 >
-                  {colorOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                  <option value="All">All Colors</option>
+                  {colorOptions.filter((option) => option !== 'All').map((option) => (
+                    <option key={option} value={option}>
+                      {option} ({colorCounts.get(option as CardColor) ?? 0})
+                    </option>
+                  ))}
                 </select>
               </label>
 
@@ -1119,90 +913,124 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
               <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Clans
-                <div className="flex flex-wrap gap-1.5">
-                  {clanOptions.map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
-                        draft.clans.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
-                      )}
-                      key={option}
-                      onClick={() => toggleDraftSelection('clans', option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
+                <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {clanOptions.map((option) => (
+                      <button
+                        className={cn(
+                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          draft.clans.includes(option)
+                            ? 'border-accent bg-accent/15 text-accent'
+                            : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
+                        )}
+                        key={option}
+                        onClick={() => toggleDraftSelection('clans', option)}
+                        type="button"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Traits
-                <div className="flex flex-wrap gap-1.5">
-                  {traitOptions.map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
-                        draft.traits.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
-                      )}
-                      key={option}
-                      onClick={() => toggleDraftSelection('traits', option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
+                <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {traitOptions.map((option) => (
+                      <button
+                        className={cn(
+                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          draft.traits.includes(option)
+                            ? 'border-accent bg-accent/15 text-accent'
+                            : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
+                        )}
+                        key={option}
+                        onClick={() => toggleDraftSelection('traits', option)}
+                        type="button"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Mechanics
-                <div className="flex flex-wrap gap-1.5">
-                  {mechanicOptions.map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
-                        draft.mechanics.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
-                      )}
-                      key={option}
-                      onClick={() => toggleDraftSelection('mechanics', option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
+                <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {mechanicOptions.map((option) => (
+                      <button
+                        className={cn(
+                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          draft.mechanics.includes(option)
+                            ? 'border-accent bg-accent/15 text-accent'
+                            : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
+                        )}
+                        key={option}
+                        onClick={() => toggleDraftSelection('mechanics', option)}
+                        type="button"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-1 text-xs font-semibold uppercase tracking-wide text-steel-600">
                 Triggers
-                <div className="flex flex-wrap gap-1.5">
-                  {triggerOptions.map((option) => (
-                    <button
-                      className={cn(
-                        'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
-                        draft.triggers.includes(option)
-                          ? 'border-accent bg-accent/15 text-accent'
-                          : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
-                      )}
-                      key={option}
-                      onClick={() => toggleDraftSelection('triggers', option)}
-                      type="button"
-                    >
-                      {option}
-                    </button>
-                  ))}
+                <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {triggerOptions.map((option) => (
+                      <button
+                        className={cn(
+                          'rounded-full border px-2 py-1 text-[11px] font-medium normal-case',
+                          draft.triggers.includes(option)
+                            ? 'border-accent bg-accent/15 text-accent'
+                            : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
+                        )}
+                        key={option}
+                        onClick={() => toggleDraftSelection('triggers', option)}
+                        type="button"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-2">
+            <div className="sticky bottom-0 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-surface/95 px-4 pt-3 backdrop-blur-sm">
+              <Button
+                className="flex-1"
+                onClick={() =>
+                  setDraft({
+                    query: '',
+                    color: 'All',
+                    type: 'All',
+                    setCode: 'All',
+                    minCost: '',
+                    maxCost: '',
+                    minLevel: '',
+                    maxLevel: '',
+                    keyword: 'All',
+                    zone: 'All',
+                    deckRole: 'All',
+                    matchMode: 'strict',
+                    clans: [],
+                    traits: [],
+                    mechanics: [],
+                    triggers: [],
+                  })
+                }
+                variant="ghost"
+              >
+                Reset
+              </Button>
               <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)} variant="secondary">
                 Cancel
               </Button>
