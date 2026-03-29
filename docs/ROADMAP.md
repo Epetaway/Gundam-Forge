@@ -1,13 +1,13 @@
 # Gundam Forge — Comprehensive Execution Roadmap
 
-**Last Audit:** March 7, 2026 | **UPDATE:** Phase 19 Near Complete (4/5) | Phase 20 COMPLETE ✅
-**Production Readiness:** 100/100 (Phases 1-18) | Phase 19: User Accounts (4/5) | Phase 20: Advanced Search (5/5) ✅
-**Focus:** Advanced card search with effect keywords (draw, trash, damage) + clan filtering + autocomplete SHIPPED
+**Last Audit:** March 29, 2026 | **UPDATE:** Phase 21 COMPLETE ✅ (Gundam filtering trust overhaul)
+**Production Readiness:** 100/100 (Phases 1-20) | Phase 21: Canonical Filtering + Trust Indicators (5/5) ✅
+**Focus:** End-to-end Gundam-aware filtering consistency (UI/API/data parity) with backend-applied filter visibility and mismatch detection
 **Constraint:** Static export (GitHub Pages) · QA gate after every task (`npm run qa`) · Zero breaking changes
 
 ---
 
-## 🎯 PRODUCTION STATUS — PHASE 19 NEAR COMPLETE (4/5) | PHASE 20 COMPLETE ✅
+## 🎯 PRODUCTION STATUS — PHASE 20 COMPLETE ✅ | PHASE 21 COMPLETE ✅
 
 **Phases 1-18 Complete (100%) | Phase 19: User Accounts (4/5 tasks) | Phase 20: Advanced Search (5/5 tasks) ✅**
 
@@ -23,7 +23,7 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - **Session 3 (March 7, 2026):**
   - Phase 15-17: Advanced features (deck intent, meta tracking, event system) ✅
   - Phase 18: Architecture & Infrastructure (design system, API standardization) ✅
-- **Session 4 (March 7, 2026 — Current):**
+- **Session 4 (March 7, 2026):**
   - Phase 19.1: Production auth & email verification (commit db578fc) ✅
   - Phase 19.2: Comprehensive user profiles (commit 0014921) ✅
   - Phase 19.3: Automatic deck sync from localStorage (commit f93364c) ✅
@@ -33,6 +33,12 @@ This document tracks the complete execution of the Gundam Forge production-readi
   - Phase 20.3: Search UI components (commit 02ace91) ✅
   - Phase 20.4: Integrate into Forge deck builder (commit d35122e) ✅
   - Phase 20.5: Testing, performance & documentation (commit pending) ✅
+- **Session 5 (March 29, 2026 — Current):**
+  - Phase 21.1: Shared canonical filter contract + URL serialization (commit 8ccc56b) ✅
+  - Phase 21.2: API/data filtering parity (Gundam dimensions + strict/broad mode) (commit 8ccc56b) ✅
+  - Phase 21.3: Desktop + mobile multi-select filter UX (commit 8ccc56b) ✅
+  - Phase 21.4: Server-applied filter metadata + trust strip (commit 8ccc56b) ✅
+  - Phase 21.5: Filter mismatch detector + parity tests + EX filter fix (commit 8ccc56b) ✅
 
 ### Key Achievements (Phases 1-18)
 - **Frontend Completeness:** 100% of user-facing features implemented
@@ -66,6 +72,9 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - **UI Components:** SearchSuggestionDropdown, EffectKeywordPills, AdvancedSearchInput
 
 ### Recent Commits
+**Phase 21 (Complete — March 29, 2026):**
+- `8ccc56b` — Gundam-aware canonical filtering overhaul: shared filter contract, API parity, multi-select UI, server trust indicators, mismatch detection, parity tests
+
 **Phase 18 (Complete — March 7, 2026):**
 1. `[hash]` — Phase 18.1: Extract reusable design-system package
 2. `[hash]` — Phase 18.2: Add pluggable sync pipeline runner  
@@ -77,12 +86,13 @@ This document tracks the complete execution of the Gundam Forge production-readi
 - Roadmap updated with comprehensive Phase 19 plan
 - Next: Begin 19.1 implementation (production auth enablement)
 
-### QA Status: ✅ ALL PASSING
+### QA Status: ✅ ALL PASSING (Phase 21)
 - **Lint:** 0 errors across all workspaces
 - **TypeScript:** 0 errors (strict mode enabled)
 - **Build:** ✓ Compiled successfully
-- **Routes:** 51/51 pages generating correctly
+- **Routes:** 51/51 pages generating correctly (`/cards` includes new filtering UX)
 - **Performance:** No regressions post-Phase 14
+- **Filtering Tests:** ✅ Contract + parity tests passing (11/11 focused tests)
 
 ### Delivery Readiness (Phases 1-18)
 - ✅ Static export optimized (GitHub Pages compatible)
@@ -213,8 +223,11 @@ The following features are **confirmed implemented and working correctly** per c
 | **Phase 16** | **Meta-Aware Data System** | **5** | **Auto-detect trends** | **✅ COMPLETE** |
 | **Phase 17** | **UI/UX & Playstyle** | **5** | **Recommendations + AAA A11y** | **✅ COMPLETE** |
 | **Phase 18** | **Infrastructure & Performance** | **5** | **Modular + Optimized** | **✅ COMPLETE** |
+| **Phase 19** | **User Accounts** | **5** | **Auth + profiles + sync + sharing + 2FA** | **⏳ 4/5** |
+| **Phase 20** | **Advanced Search** | **5** | **Effect/clan autocomplete search shipped** | **✅ COMPLETE** |
+| **Phase 21** | **Filtering Accuracy & Trust** | **5** | **Canonical filters + mismatch detection** | **✅ COMPLETE** |
 
-**TOTAL: 50+ completed | Production Ready 100/100**
+**TOTAL: 60+ completed | Production Ready 100/100**
 
 ---
 
