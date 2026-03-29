@@ -1,51 +1,9 @@
-export function getCardById(id: string) {
-  return cardsById.get(id);
-}
-
-export function getCardList({ q, limit, cursor, color, type, set }: { q?: string; limit?: number; cursor?: string; color?: string; type?: string; set?: string }) {
-  // Simple cursor pagination: cursor is card id, returns next N after
-  let filtered = cards;
-  if (q) {
-    const query = q.trim().toLowerCase();
-    filtered = filtered.filter(card => `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase().includes(query));
-  }
-  // Add filter support (color, type, set)
-  if (color && color !== 'All') {
-    filtered = filtered.filter(card => card.color === color);
-  }
-  if (type && type !== 'All') {
-    filtered = filtered.filter(card => card.type === type);
-  }
-  if (set && set !== 'All') {
-    filtered = filtered.filter(card => card.set === set);
-  }
-  let startIdx = 0;
-  if (cursor) {
-    const idx = filtered.findIndex(card => card.id === cursor);
-    if (idx >= 0) startIdx = idx + 1;
-  }
-  const results = filtered.slice(startIdx, startIdx + (limit || 30)).map(card => ({
-    id: card.id,
-    name: card.name,
-    cost: card.cost,
-    type: card.type,
-    faction: (card as any).faction ?? 'N/A',
-    thumbnailUrl: card.imageUrl || '',
-  }));
-  const nextCursor = filtered[startIdx + (limit || 30)]?.id;
-  return { results, nextCursor };
-}
 import cardsCatalogJson from '@/lib/data/cards.catalog.json';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { withBasePath } from '@/lib/utils/basePath';
 import { extractEffectKeywords } from '@/lib/search/extractEffectKeywords';
-
-export type CatalogFilters = {
-  query?: string;
-  color?: CardColor | 'All';
-  type?: CardType | 'All';
-  set?: string;
-};
+import type { CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
+import { matchesSelectedValues } from '@/lib/filters/cardFilters';
 
 type CardImageRef = Pick<CardDefinition, 'id' | 'imageUrl' | 'placeholderArt'>;
 
@@ -53,6 +11,38 @@ export const cards = cardsCatalogJson as CardDefinition[];
 export const cardsById = new Map(cards.map((card) => [card.id, card]));
 export const cardsRecord = Object.fromEntries(cards.map((card) => [card.id, card])) as Record<string, CardDefinition>;
 export const allSets = Array.from(new Set(cards.map((card) => card.set))).sort();
+
+function hasKeyword(card: CardDefinition, keyword: string): boolean {
+  const normalized = keyword.toLowerCase();
+  return (card.keywords ?? []).some((entry) => entry.toLowerCase().includes(normalized));
+}
+
+function isExCard(card: CardDefinition): boolean {
+  if (card.isExCard) return true;
+  if ((card.traits ?? []).some((trait) => trait.toLowerCase().includes('ex'))) return true;
+  return card.id.toLowerCase().startsWith('ex');
+}
+
+function inDeckRole(card: CardDefinition, deckRole: NonNullable<CatalogFilters['deckRole']>): boolean {
+  if (deckRole === 'All') return true;
+
+  const ex = isExCard(card);
+  if (deckRole === 'ex') {
+    return ex;
+  }
+
+  if (deckRole === 'resource') {
+    if (typeof card.isResource === 'boolean') return card.isResource;
+    return card.type === 'Resource' || card.type === 'Base' || card.type === 'Command' || ex;
+  }
+
+  if (typeof card.isMainDeck === 'boolean') return card.isMainDeck;
+  return (card.type === 'Unit' || card.type === 'Pilot' || card.type === 'Command') && !ex;
+}
+
+function toMatchMode(mode: CatalogFilters['matchMode']): FilterMatchMode {
+  return mode === 'broad' ? 'broad' : 'strict';
+}
 
 // --- Card Enrichment ---
 // Populates keywords, triggers, and clans by parsing card text and traits.
@@ -116,19 +106,67 @@ cards.forEach(enrichCard);
 
 export function getCards(filters: CatalogFilters = {}): CardDefinition[] {
   const query = filters.query?.trim().toLowerCase();
+  const matchMode = toMatchMode(filters.matchMode);
 
   return cards.filter((card) => {
     if (query) {
-      const haystack = `${card.id} ${card.name} ${card.text ?? ''}`.toLowerCase();
+      const haystack = `${card.id} ${card.name} ${card.text ?? ''} ${(card.traits ?? []).join(' ')} ${(card.clans ?? []).join(' ')}`.toLowerCase();
       if (!haystack.includes(query)) return false;
     }
 
     if (filters.color && filters.color !== 'All' && card.color !== filters.color) return false;
     if (filters.type && filters.type !== 'All' && card.type !== filters.type) return false;
     if (filters.set && filters.set !== 'All' && card.set !== filters.set) return false;
+    if (filters.zone && filters.zone !== 'All' && (card.zone ?? '').toLowerCase() !== filters.zone.toLowerCase()) return false;
+    if (filters.keyword && filters.keyword !== 'All' && !hasKeyword(card, filters.keyword)) return false;
+    if (filters.deckRole && filters.deckRole !== 'All' && !inDeckRole(card, filters.deckRole)) return false;
+    if (!matchesSelectedValues(card.clans, filters.clans ?? [], matchMode)) return false;
+    if (!matchesSelectedValues(card.traits, filters.traits ?? [], matchMode)) return false;
+    if (!matchesSelectedValues(card.keywords, filters.keywords ?? [], matchMode)) return false;
+    if (!matchesSelectedValues(card.triggers, filters.triggers ?? [], matchMode)) return false;
 
     return true;
   });
+}
+
+export function getCardById(id: string): CardDefinition | undefined {
+  return cardsById.get(id);
+}
+
+export function getCardList({
+  q,
+  limit,
+  cursor,
+  excludeTypes,
+  ...filters
+}: (CatalogFilters & { q?: string; limit?: number; cursor?: string; excludeTypes?: string[] })): {
+  results: CardDefinition[];
+  nextCursor?: string;
+  total: number;
+} {
+  const effectiveFilters: CatalogFilters = {
+    ...filters,
+    query: filters.query ?? q,
+  };
+
+  let filtered = getCards(effectiveFilters);
+  if (excludeTypes && excludeTypes.length > 0) {
+    filtered = filtered.filter((card) => !excludeTypes.includes(card.type));
+  }
+
+  // Keep cursor deterministic by sorting by id.
+  filtered = [...filtered].sort((a, b) => a.id.localeCompare(b.id));
+
+  const pageSize = Number.isFinite(limit) && (limit ?? 0) > 0 ? (limit as number) : 30;
+  let startIdx = 0;
+  if (cursor) {
+    const idx = filtered.findIndex((card) => card.id === cursor);
+    if (idx >= 0) startIdx = idx + 1;
+  }
+
+  const results = filtered.slice(startIdx, startIdx + pageSize);
+  const nextCursor = filtered[startIdx + pageSize]?.id;
+  return { results, nextCursor, total: filtered.length };
 }
 
 export function getCard(id: string): CardDefinition | undefined {

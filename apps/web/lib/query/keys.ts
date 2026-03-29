@@ -1,4 +1,4 @@
-import type { CatalogFilters } from '@/lib/data/cards';
+import type { CatalogFilters } from '@/lib/filters/cardFilters';
 
 export interface DeckQueryFilters {
   query?: string;

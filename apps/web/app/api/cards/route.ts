@@ -1,21 +1,17 @@
 import { apiOk, toApiErrorResponse } from '@/lib/api/server';
-import type { CardColor, CardType } from '@gundam-forge/shared';
 import { getCardList } from '@/lib/data/cards';
+import { filtersFromSearchParams } from '@/lib/filters/cardFilters';
 
-const CARD_COLORS: Array<CardColor | 'All'> = ['All', 'Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
-const CARD_TYPES: Array<CardType | 'All'> = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 export const dynamic = 'force-static';
 export const revalidate = false;
 
 function parseQueryParams(searchParams: URLSearchParams) {
+  const filters = filtersFromSearchParams(searchParams);
   const q = searchParams.get('q') ?? undefined;
-  const color = searchParams.get('color');
-  const type = searchParams.get('type');
-  const set = searchParams.get('set');
   const limit = parseInt(searchParams.get('limit') || '30', 10);
   const cursor = searchParams.get('cursor') || undefined;
   const excludeTypes = searchParams.get('excludeTypes')?.split(',') || [];
-  return { q, color, type, set, limit, cursor, excludeTypes };
+  return { q, limit, cursor, excludeTypes, filters };
 }
 
 export async function GET(request: Request): Promise<Response> {
@@ -24,14 +20,19 @@ export async function GET(request: Request): Promise<Response> {
       process.env.NEXT_OUTPUT_MODE === 'export'
         ? new URLSearchParams()
         : new URL(request.url).searchParams;
-    const { q, limit, cursor, excludeTypes } = parseQueryParams(searchParams);
-    let { results, nextCursor } = getCardList({ q, limit, cursor });
+    const { q, limit, cursor, excludeTypes, filters } = parseQueryParams(searchParams);
+    const { results, nextCursor, total } = getCardList({ q, limit, cursor, excludeTypes, ...filters });
 
-    if (excludeTypes && excludeTypes.length > 0) {
-      results = results.filter((card) => !excludeTypes.includes(card.type));
-    }
-
-    return apiOk({ cards: results, nextCursor }, request);
+    return apiOk(
+      {
+        cards: results,
+        nextCursor,
+        total,
+        limit,
+        appliedFilters: filters,
+      },
+      request,
+    );
   } catch (error) {
     return toApiErrorResponse('/api/cards', error, request);
   }

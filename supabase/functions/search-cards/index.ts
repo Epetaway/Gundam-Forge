@@ -50,10 +50,13 @@ serve(async (req: Request) => {
       dbQuery = dbQuery.eq('type', cardType);
     }
 
-    // Exclude EX, EX Base, and Resource cards from main deck search unless explicitly requested
+    // Exclude non-main-deck cards unless explicitly requested.
+    // EX cards are represented by traits/metadata, not by a dedicated card type in schema.
     const excludeEX = url.searchParams.get('includeEX') !== 'true';
     if (excludeEX) {
-      dbQuery = dbQuery.not('type', 'in', ['EX', 'EX Base', 'Resource']);
+      dbQuery = dbQuery
+        .not('type', 'in', '(\'Resource\',\'Base\')')
+        .not('traits', 'cs', '{"EX"}');
     }
 
     const { data, error, count } = await dbQuery;
