@@ -102,6 +102,7 @@ export interface PlayerState {
   shieldsDrawnThisTurn: number;
   deckShuffleSeed: number;
   mulliganTaken: boolean;
+  tokensPlayedThisTurn: number;  // escalating cost counter: resets to 0 each Start Phase
 }
 
 export interface GameLogEntry {
@@ -200,7 +201,7 @@ export class GameEngine {
         id: tokenCard.id,
         name: tokenCard.name,
         type: tokenCard.type,
-        cost: tokenCard.type === 'Resource' ? 0 : 1,
+        cost: 0,  // Token units have base cost 0; escalation is computed live in handlePlayCard
         ap: (tokenCard as any).ap,
         hp: (tokenCard as any).hp,
         traits: ['Token'],
@@ -335,6 +336,7 @@ export class GameEngine {
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
       mulliganTaken: false,
+      tokensPlayedThisTurn: 0,
     };
 
     return player;
@@ -432,6 +434,7 @@ export class GameEngine {
       shieldsDrawnThisTurn: 0,
       deckShuffleSeed: rngSeed,
       mulliganTaken: false,
+      tokensPlayedThisTurn: 0,
     };
   }
 
@@ -672,9 +675,10 @@ export class GameEngine {
       this.state.turnNumber++;
     }
 
-    // Start phase: ready all cards for the active player
+    // Start phase: ready all cards for the active player and reset per-turn counters
     if (nextPhase === 'start') {
       this.readyZone(this.state.activePlayerId);
+      this.state.players[this.state.activePlayerId].tokensPlayedThisTurn = 0;
     }
 
     // Reset per-turn flags
@@ -721,28 +725,44 @@ export class GameEngine {
       };
     }
 
+    // Determine effective cost.
+    // Token Units use escalating cost: the Nth token played this turn costs (N-1) resources.
+    //   1st token = 0, 2nd = 1, 3rd = 2, etc. — resets to 0 each Start Phase.
+    // All other cards use their defined cost normally.
+    const isTokenUnit =
+      cardDef.type === 'Unit' && (cardDef.traits ?? []).includes('Token');
+    const effectiveCost = isTokenUnit
+      ? (player.tokensPlayedThisTurn ?? 0)
+      : (cardDef.cost ?? 0);
+
     // Check cost against ready resources (tapped resources can't be spent)
-    const readyResources = player.resources.filter(r => r.state === 'ready');
-    if (cardDef.cost && readyResources.length < cardDef.cost) {
+    const readyResources = player.resources.filter((r) => r.state === 'ready');
+    if (effectiveCost > 0 && readyResources.length < effectiveCost) {
       return {
         valid: false,
-        error: `Not enough ready resources`,
-        rulesTrace: `Need ${cardDef.cost} ready resource(s), have ${readyResources.length}`,
+        error: 'Not enough ready resources',
+        rulesTrace: isTokenUnit
+          ? `Token unit #${(player.tokensPlayedThisTurn ?? 0) + 1} this turn costs ${effectiveCost} resource(s), have ${readyResources.length}`
+          : `Need ${effectiveCost} ready resource(s), have ${readyResources.length}`,
       };
     }
 
     player.hand = player.hand.filter((c) => c.instanceId !== cardInstanceId);
 
-    // Spend resources based on card cost
-    // Resources are rested (tapped) when spent and untapped at start of turn
-    if (cardDef.cost && cardDef.cost > 0) {
+    // Spend resources
+    if (effectiveCost > 0) {
       let spent = 0;
-      for (let i = player.resources.length - 1; i >= 0 && spent < cardDef.cost; i--) {
+      for (let i = player.resources.length - 1; i >= 0 && spent < effectiveCost; i--) {
         if (player.resources[i].state === 'ready') {
-          player.resources[i].state = 'rest'; // Tap/rest the resource
+          player.resources[i].state = 'rest';
           spent++;
         }
       }
+    }
+
+    // Increment token counter so the next token costs 1 more
+    if (isTokenUnit) {
+      player.tokensPlayedThisTurn = (player.tokensPlayedThisTurn ?? 0) + 1;
     }
 
     let targetZone: ZoneType = 'battle';

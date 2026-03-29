@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Printer } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Printer, Swords } from 'lucide-react';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -680,6 +680,8 @@ interface DeckSettingsBarProps {
   onExport: () => void;
   onPrintProxy: () => void;
   canPrintProxy?: boolean;
+  onPlaytest?: () => void;
+  canPlaytest?: boolean;
   /** Validation state for live feedback badge */
   validationIsValid?: boolean;
   validationMainDeckCards?: number;
@@ -702,6 +704,8 @@ function DeckSettingsBar({
   onExport,
   onPrintProxy,
   canPrintProxy = false,
+  onPlaytest,
+  canPlaytest = false,
   validationIsValid = false,
   validationMainDeckCards = 0,
   validationHasOverLimit = false,
@@ -815,6 +819,17 @@ function DeckSettingsBar({
           >
             <Download className="h-3 w-3" aria-hidden="true" />
             Export
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded border border-cobalt-600 bg-cobalt-600/10 px-2 py-0.5 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onPlaytest}
+            aria-label="Playtest this deck against the AI"
+            title={canPlaytest ? 'Playtest deck vs AI' : 'Save a valid 50-card deck to playtest'}
+            disabled={!canPlaytest}
+          >
+            <Swords className="h-3 w-3" aria-hidden="true" />
+            Playtest
           </button>
         </div>
       </div>
@@ -1304,6 +1319,12 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     };
   }, [sidebarOpen]);
 
+  const handlePlaytest = React.useCallback(() => {
+    if (deckId) {
+      window.location.href = `/playtest?deckId=${deckId}`;
+    }
+  }, [deckId]);
+
   const deckSettingsBar = React.useMemo(() => {
     const validationResult = validateDeck(
       Object.entries(deck).map(([cardId, qty]) => ({ cardId, qty })),
@@ -1323,6 +1344,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         onExport={handleExport}
         onPrintProxy={handlePrintProxy}
         canPrintProxy={deckViewItems.length > 0}
+        onPlaytest={handlePlaytest}
+        canPlaytest={!!deckId && validationResult.isValid}
         validationIsValid={validationResult.isValid}
         validationMainDeckCards={validationResult.metrics.mainDeckCards}
         validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
@@ -1330,7 +1353,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         lastSaved={lastSaved}
       />
     );
-  }, [deck, handleExport, handlePrintProxy, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards, deckId, saving, lastSaved, deckViewItems.length]);
+  }, [deck, handleExport, handlePrintProxy, handlePlaytest, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards, deckId, saving, lastSaved, deckViewItems.length]);
 
   if (!mounted) return null;
 

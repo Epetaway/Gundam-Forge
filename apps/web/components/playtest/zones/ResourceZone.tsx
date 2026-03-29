@@ -1,16 +1,14 @@
 /**
- * Resource Area Zone Component
- * Shows face-up resources in play
- * Resources can be tapped/rested for 90° rotation
+ * Resource Zone — compact horizontal strip of resource tiles
+ * Official GCG layout: resources sit in a row behind the battle area.
+ * Ready resources stand upright; rested resources tip sideways.
  */
 
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
-import { getCardById } from '@/lib/data/cards';
-import { CardStack } from '../CardStack';
 
 interface ResourceZoneProps {
   resources: CardInstance[];
@@ -23,60 +21,112 @@ export function ResourceZone({
   cardDatabase,
   isOpponent,
 }: ResourceZoneProps) {
-  const [selectedResource, setSelectedResource] = useState<string | null>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-resources' : 'resources',
     data: { zone: isOpponent ? 'opponent-resources' : 'resources' },
   });
 
+  const readyCount = resources.filter((r) => r.state === 'ready').length;
+  const restCount = resources.filter((r) => r.state === 'rest').length;
+
   return (
     <div
       ref={isOpponent ? undefined : setNodeRef}
-      className={`border-2 rounded-lg bg-surface-elevated p-3 transition-colors ${
-        !isOpponent && isOver ? 'border-cyan-500 bg-cyan-900/20' : 'border-border'
+      className={`flex items-center gap-1 py-0.5 min-h-[32px] flex-wrap transition-colors duration-200 ${
+        !isOpponent && isOver ? 'bg-cyan-950/20 rounded-lg px-1' : ''
       }`}
     >
-      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
-        Resources In Play
-      </div>
-
-      {/* Resources Grid */}
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        {resources.length > 0 ? (
-          resources.map((resource) => {
-            const isResting = resource.state === 'rest';
+      {resources.length === 0 ? (
+        <span
+          className="text-[9px]"
+          style={{ color: 'rgba(100,116,139,0.4)' }}
+        >
+          No resources
+        </span>
+      ) : (
+        <>
+          {resources.map((res) => {
+            const card = cardDatabase[res.cardId];
+            const isResting = res.state === 'rest';
             return (
-              <div
-                key={resource.instanceId}
-                className={`flex justify-center transition-all duration-200 ${isResting ? 'opacity-60' : 'opacity-100'} ${selectedResource === resource.instanceId ? 'ring-2 ring-yellow-400 rounded' : ''}`}
-                style={{
-                  transform: isResting ? 'rotate(90deg)' : 'rotate(0deg)',
-                }}
-                onClick={() => setSelectedResource(resource.instanceId)}
-              >
-                <CardStack
-                  cards={resource}
-                  cardDatabase={cardDatabase}
-                  variant="compact"
-                  showCount={false}
-                />
-              </div>
+              <ResourcePip
+                key={res.instanceId}
+                card={card}
+                isResting={isResting}
+                label={card?.name ?? res.cardId}
+              />
             );
-          })
-        ) : (
-          <div className="col-span-2 text-white text-xs italic py-2 text-center">
-            No resources in play
-          </div>
-        )}
-      </div>
+          })}
+          {/* Count summary */}
+          <span
+            className="ml-1 text-[9px] leading-none whitespace-nowrap"
+            style={{ color: 'rgba(100,116,139,0.6)' }}
+          >
+            {readyCount}✦&nbsp;{restCount > 0 ? `/ ${restCount}○` : ''}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
 
-      {/* Count Badge */}
-      <div className="bg-cyan-900/50 border border-cyan-600 rounded p-1.5 text-center">
-        <div className="text-xs font-bold text-cyan-300">
-          {resources.filter(r => r.state === 'ready').length} ready /{' '}
-          {resources.filter(r => r.state === 'rest').length} resting
+function ResourcePip({
+  card,
+  isResting,
+  label,
+}: {
+  card: any;
+  isResting: boolean;
+  label: string;
+}) {
+  return (
+    <div
+      className="flex-shrink-0 relative transition-all duration-300"
+      title={`${label} (${isResting ? 'rested' : 'ready'})`}
+      style={{
+        width: '22px',
+        height: '30px',
+        transform: isResting ? 'rotate(90deg)' : 'none',
+        opacity: isResting ? 0.5 : 1,
+      }}
+    >
+      {card?.imageUrl ? (
+        <img
+          src={card.imageUrl}
+          alt={card.name ?? ''}
+          className="w-full h-full object-cover rounded-sm"
+        />
+      ) : (
+        <div
+          className="w-full h-full rounded-sm flex items-center justify-center"
+          style={{
+            border: isResting
+              ? '1px solid rgba(71,85,105,0.4)'
+              : '1px solid rgba(59,130,246,0.45)',
+            background: isResting
+              ? 'rgba(30,41,59,0.5)'
+              : 'linear-gradient(160deg, rgba(30,58,138,0.5) 0%, rgba(15,23,42,0.7) 100%)',
+          }}
+        >
+          <span
+            className="text-[7px] font-bold"
+            style={{ color: isResting ? '#475569' : '#60a5fa' }}
+          >
+            R
+          </span>
         </div>
-      </div>
+      )}
+
+      {/* Ready glow dot */}
+      {!isResting && (
+        <div
+          className="absolute -top-[2px] -right-[2px] w-[6px] h-[6px] rounded-full"
+          style={{
+            background: '#3b82f6',
+            boxShadow: '0 0 4px rgba(59,130,246,0.6)',
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -52,7 +52,12 @@
       "Bash(node -e \"const d = require\\(''./apps/web/lib/data/events-live.json''\\); const archetypes = [...new Set\\(d.flatMap\\(e => e.placements.map\\(p => p.archetype\\)\\)\\)].sort\\(\\); console.log\\(''Unique archetypes:'', archetypes.join\\(''\\\\n''\\)\\)\")",
       "Bash(node -e \":*)",
       "Bash(npx tsx scripts/debug-limitless.ts)",
-      "Bash(node -e \"const d = JSON.parse\\(require\\(''fs''\\).readFileSync\\(''apps/web/lib/data/decks-live.json'',''utf-8''\\)\\); console.log\\(''Count:'', d.length\\); console.log\\(''First deck:''\\); console.log\\(JSON.stringify\\(d[0], null, 2\\).slice\\(0, 600\\)\\);\")"
+      "Bash(node -e \"const d = JSON.parse\\(require\\(''fs''\\).readFileSync\\(''apps/web/lib/data/decks-live.json'',''utf-8''\\)\\); console.log\\(''Count:'', d.length\\); console.log\\(''First deck:''\\); console.log\\(JSON.stringify\\(d[0], null, 2\\).slice\\(0, 600\\)\\);\")",
+      "WebSearch",
+      "Bash(jq \".[] | select\\(.type == \"\"Token\"\" or .type == \"\"token\"\" or .name | contains\\(\"\"Token\"\"\\)\\) | {id, name, type, cost, ap, hp}\" /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/data/cards.json)",
+      "Bash(jq '[.[] | select\\(.type == \"\"Token\"\"\\)] | length' /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/data/cards.json)",
+      "Bash(jq '.[] | select\\(.type == \"\"Unit\"\"\\) | {id, name, type, cost, power, color, text, set, rarity} | select\\(.id | startswith\\(\"\"GD\"\"\\)\\) | limit\\(3; .\\)' /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/data/cards.json)",
+      "Bash(ls /Users/earlhickson/Development/Gundam-Forge/apps/web/app/decks/[id]/)"
     ]
   }
 }

@@ -108,44 +108,59 @@ export class Autoplayer {
 
   /**
    * Decide main phase actions
-   * Priority: Play units -> Declare attacks
+   * Priority: Play token units (escalating cost) -> Declare attacks
+   *
+   * Token cost escalation: 1st token = 0 cost, 2nd = 1 cost, 3rd = 2 cost, etc.
+   * Simulates the cost internally so all playable tokens are queued in one decision pass.
    */
   private decideMainPhaseActions(player: PlayerState, actions: GameAction[]): string {
     let reasoning = 'Main Phase: ';
 
-    // Play units if possible and we have board space
-    const unitsInPlay = player.battleArea.length;
-    if (unitsInPlay < 6) {
-      const playableUnit = this.findPlayableUnit(player);
-      if (playableUnit) {
-        const cardDef = this.cardDatabase[playableUnit.cardId];
-        const cost = cardDef?.cost ?? 1;
-        if (player.resources.length >= cost) {
-          actions.push({
-            type: 'PLAY_CARD',
-            playerId: this.playerId,
-            timestamp: Date.now(),
-            payload: { cardInstanceId: playableUnit.instanceId },
-          });
-          reasoning += `Played unit (cost ${cost}). `;
-        }
-      }
+    // Track which cards are already queued to avoid double-queueing
+    const queuedInstanceIds = new Set(
+      actions
+        .filter((a) => a.type === 'PLAY_CARD')
+        .map((a) => a.payload?.cardInstanceId as string),
+    );
+
+    // Simulate escalating token cost from the current engine state
+    let simTokensPlayed = player.tokensPlayedThisTurn ?? 0;
+    let availableResources = player.resources.filter((r) => r.state === 'ready').length;
+
+    // Greedily queue tokens while board space and resources allow
+    while (player.battleArea.length + queuedInstanceIds.size < 6) {
+      const effectiveCost = simTokensPlayed; // 0-indexed: 1st free, 2nd costs 1, etc.
+
+      if (effectiveCost > availableResources) break;
+
+      const candidate = this.findPlayableTokenUnit(player, queuedInstanceIds);
+      if (!candidate) break;
+
+      actions.push({
+        type: 'PLAY_CARD',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+        payload: { cardInstanceId: candidate.instanceId },
+      });
+
+      queuedInstanceIds.add(candidate.instanceId);
+      availableResources -= effectiveCost;
+      simTokensPlayed++;
+      reasoning += `Queued token (cost ${effectiveCost}). `;
     }
 
-    // Declare attacks
-    if (player.battleArea.length > 0) {
-      const readyUnits = player.battleArea.filter((u) => u.state === 'ready');
-      if (readyUnits.length > 0) {
-        for (const unit of readyUnits) {
-          actions.push({
-            type: 'DECLARE_ATTACK',
-            playerId: this.playerId,
-            timestamp: Date.now(),
-            payload: { attackerInstanceId: unit.instanceId },
-          });
-        }
-        reasoning += `Declared ${readyUnits.length} attacker${readyUnits.length !== 1 ? 's' : ''}. `;
-      }
+    // Declare attacks with all ready units
+    const readyUnits = player.battleArea.filter((u) => u.state === 'ready');
+    for (const unit of readyUnits) {
+      actions.push({
+        type: 'DECLARE_ATTACK',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+        payload: { attackerInstanceId: unit.instanceId },
+      });
+    }
+    if (readyUnits.length > 0) {
+      reasoning += `Declared ${readyUnits.length} attacker${readyUnits.length !== 1 ? 's' : ''}. `;
     }
 
     if (actions.length === 0) {
@@ -156,7 +171,24 @@ export class Autoplayer {
   }
 
   /**
-   * Find a playable unit in hand
+   * Find a Token Unit in hand that hasn't been queued yet.
+   * Token units are identified by having 'Token' in their traits.
+   */
+  private findPlayableTokenUnit(
+    player: PlayerState,
+    excludeIds: Set<string>,
+  ): CardInstance | null {
+    return (
+      player.hand.find((c) => {
+        if (excludeIds.has(c.instanceId)) return false;
+        const def = this.cardDatabase[c.cardId];
+        return def && def.type === 'Unit' && (def.traits ?? []).includes('Token');
+      }) ?? null
+    );
+  }
+
+  /**
+   * Find a playable unit in hand (fallback for non-token units)
    * Prefers lowest cost first
    */
   private findPlayableUnit(player: PlayerState): CardInstance | null {
@@ -165,7 +197,6 @@ export class Autoplayer {
       return def && def.type === 'Unit';
     });
 
-    // Sort by cost (lowest first)
     units.sort((a, b) => {
       const costA = this.cardDatabase[a.cardId]?.cost ?? 0;
       const costB = this.cardDatabase[b.cardId]?.cost ?? 0;
@@ -202,12 +233,12 @@ export class Autoplayer {
 export const AUTOPLAYER_TOKEN_DECK = {
   name: 'Autoplayer Token Deck',
   cards: [
-    // Basic units - low cost, low power
+    // Token units — base cost 0; escalating cost is computed live by the engine
     {
       id: 'TOKEN-UNIT-001',
       name: 'Colorless Token Unit 1',
       type: 'Unit' as const,
-      cost: 1,
+      cost: 0,
       ap: 2,
       hp: 1,
       keywords: [],
@@ -217,7 +248,7 @@ export const AUTOPLAYER_TOKEN_DECK = {
       id: 'TOKEN-UNIT-002',
       name: 'Colorless Token Unit 2',
       type: 'Unit' as const,
-      cost: 2,
+      cost: 0,
       ap: 3,
       hp: 2,
       keywords: [],
@@ -227,7 +258,7 @@ export const AUTOPLAYER_TOKEN_DECK = {
       id: 'TOKEN-UNIT-003',
       name: 'Colorless Token Unit 3',
       type: 'Unit' as const,
-      cost: 3,
+      cost: 0,
       ap: 4,
       hp: 3,
       keywords: [],

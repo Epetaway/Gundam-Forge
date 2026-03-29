@@ -1,21 +1,22 @@
 /**
- * Battlefield Component
- * PHASE 1 IMPLEMENTATION: Official Gundam TCG Playmat Layout with Responsive CSS Grid
- * 
- * Implements the exact zone layout from the official playmat image with proper responsive behavior:
- * 
- * DESKTOP (≥1024px):
- * ┌──────────────────────────────────────────────────────┐
- * │ OPPONENT FIELD (minimal view)                        │
- * ├──────────────────────────────────────────────────────┤
- * │ SHIELDS │ BASE │ BATTLE (2x spans) │ RESOURCES │ LOG │
- * │ TRASH   │ ──── │ BATTLE (cont.)   │ DECK      │     │
- * └──────────────────────────────────────────────────────┘
- * │ HAND TRAY (bottom, arc layout)                       │
- * └──────────────────────────────────────────────────────┘
- * 
- * TABLET (640px-1023px): Stacked 2-column layout
- * MOBILE (<640px): Single column, vertical scroll
+ * Battlefield — Official Gundam TCG two-halves playmat layout
+ *
+ * Layout (top → bottom):
+ *   [Targeting Banner] ← appears only when player is choosing attack target
+ *   ─────────────────────────────────────────────────────
+ *   OPPONENT HALF
+ *     utility row:  name · HP · hand count · deck/trash piles
+ *     resources:    horizontal strip (ready/rested)
+ *     battle area:  flex row of portrait unit tiles (flex-1)
+ *     shields+base: face-down shield row + base card  ← front line
+ *   ─── Turn N · PHASE · Your/Opponent Turn ─────────────  (center divider)
+ *   PLAYER HALF
+ *     shields+base: base card + face-down shield row  ← front line
+ *     battle area:  flex row of portrait unit tiles (flex-1)
+ *     resources:    horizontal strip
+ *     utility row:  deck/res-deck/trash piles · status message
+ *   ─────────────────────────────────────────────────────
+ *   HAND TRAY
  */
 
 'use client';
@@ -23,14 +24,11 @@
 import React, { useState, useEffect } from 'react';
 import type { CardInstance } from '@/lib/game/game-engine';
 import { ShieldZone } from './zones/ShieldZone';
-import { BaseZone } from './zones/BaseZone';
 import { BattleZone } from './zones/BattleZone';
-import { ResourceDeckZone } from './zones/ResourceDeckZone';
 import { ResourceZone } from './zones/ResourceZone';
-import { TrashZone } from './zones/TrashZone';
-import { DeckZone } from './zones/DeckZone';
-import { GameLog } from './GameLog';
 import { HandTray } from './HandTray';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BattlefieldProps {
   playerState: {
@@ -44,10 +42,7 @@ interface BattlefieldProps {
     base: CardInstance | null;
     resources: CardInstance[];
     resourceDeck: CardInstance[];
-    exZone: {
-      exBase?: CardInstance;
-      exResources: CardInstance[];
-    };
+    exZone: { exBase?: CardInstance; exResources: CardInstance[] };
     baseHealth: number;
     maxBaseHealth: number;
   };
@@ -69,6 +64,7 @@ interface BattlefieldProps {
   gamePhase: string;
   cardDatabase: Record<string, any>;
   selectedCard: CardInstance | null;
+  turnNumber?: number;
   onUnitSelected?: (unit: CardInstance, isOpponent: boolean) => void;
   onCardPlayRequested?: (card: CardInstance) => void;
   onShieldDamaged?: (shieldCount: number) => void;
@@ -76,40 +72,179 @@ interface BattlefieldProps {
   onAttackDeclared?: (attackerInstanceId: string, targetInstanceId?: string) => void;
 }
 
-/**
- * Main Battlefield Component
- * Manages all zones with CSS Grid layout matching official playmat
- * Fully responsive: desktop, tablet, mobile
- */
+// ─── Inline helpers ────────────────────────────────────────────────────────────
+
+/** Small face-down pile icon used in the utility rows (deck, trash, etc.) */
+function ZonePile({
+  label,
+  count,
+  accent,
+}: {
+  label: string;
+  count: number;
+  accent?: string;
+}) {
+  const accentColor = accent ?? 'rgba(71,85,105,0.5)';
+  return (
+    <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
+      <div
+        className="flex items-center justify-center w-8 h-[44px] rounded text-[11px] font-bold"
+        style={{
+          border: `1px solid ${accentColor}`,
+          background: 'rgba(15,23,42,0.6)',
+          color: count > 0 ? '#cbd5e1' : '#334155',
+          boxShadow: count > 0 ? `inset 0 0 8px ${accentColor}22` : 'none',
+        }}
+      >
+        {count}
+      </div>
+      <span
+        className="text-[8px] leading-none"
+        style={{ color: 'rgba(71,85,105,0.7)' }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+/** Compact portrait card — base card or placeholder */
+function BaseCard({
+  base,
+  cardDatabase,
+  baseHealth,
+  maxBaseHealth,
+}: {
+  base: CardInstance | null;
+  cardDatabase: Record<string, any>;
+  baseHealth: number;
+  maxBaseHealth: number;
+}) {
+  const card = base ? cardDatabase[base.cardId] : null;
+  const hpPct =
+    maxBaseHealth > 0 ? Math.max(0, (baseHealth / maxBaseHealth) * 100) : 0;
+  const hpColor =
+    hpPct > 50 ? '#10b981' : hpPct > 25 ? '#f59e0b' : '#ef4444';
+
+  if (!base) {
+    return (
+      <div
+        className="flex-shrink-0 rounded border-2 border-dashed flex items-center justify-center"
+        style={{
+          width: '44px',
+          height: '60px',
+          borderColor: 'rgba(71,85,105,0.25)',
+        }}
+      >
+        <span className="text-[8px]" style={{ color: 'rgba(71,85,105,0.5)' }}>
+          BASE
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="flex-shrink-0 relative rounded-lg overflow-hidden border-2"
+      style={{
+        width: '44px',
+        height: '60px',
+        borderColor: 'rgba(52,211,153,0.35)',
+        boxShadow: '0 2px 8px rgba(16,185,129,0.12)',
+      }}
+      title={`Base: ${card?.name ?? base.cardId} — HP:${baseHealth}/${maxBaseHealth}`}
+    >
+      {card?.imageUrl ? (
+        <img
+          src={card.imageUrl}
+          alt={card.name ?? ''}
+          className="w-full h-full object-cover object-top"
+        />
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{
+            background:
+              'linear-gradient(160deg, rgba(6,78,59,0.6) 0%, rgba(15,23,42,0.9) 100%)',
+          }}
+        >
+          <span
+            className="text-[8px] font-bold"
+            style={{ color: '#34d399' }}
+          >
+            BASE
+          </span>
+        </div>
+      )}
+
+      {/* Gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)',
+        }}
+      />
+
+      {/* HP bar */}
+      <div
+        className="absolute bottom-0 left-0 right-0"
+        style={{ height: '3px', background: 'rgba(0,0,0,0.6)' }}
+      >
+        <div
+          className="h-full transition-all duration-500"
+          style={{ width: `${hpPct}%`, backgroundColor: hpColor }}
+        />
+      </div>
+
+      {/* HP number */}
+      <span
+        className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-bold"
+        style={{ color: '#e2e8f0', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+      >
+        {baseHealth}
+      </span>
+    </div>
+  );
+}
+
+// ─── Status message ────────────────────────────────────────────────────────────
+
+function getStatusMessage(isPlayerTurn: boolean, gamePhase: string): string {
+  if (!isPlayerTurn) return 'Opponent is thinking…';
+  switch (gamePhase) {
+    case 'draw':
+      return 'Draw Phase — click Draw Card';
+    case 'resource':
+      return 'Resource Phase — place a resource';
+    case 'main':
+      return 'Main Phase — play cards or attack';
+    case 'end':
+      return 'End Phase — click Next Phase →';
+    default:
+      return '';
+  }
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
+
 export function Battlefield({
   playerState,
   opponentState,
   isPlayerTurn,
-  gameLog,
   gamePhase,
   cardDatabase,
   selectedCard,
+  turnNumber,
   onUnitSelected,
   onCardPlayRequested,
   onShieldDamaged,
   onSelectCard,
   onAttackDeclared,
 }: BattlefieldProps) {
-  const [selectedZone, setSelectedZone] = useState<string | null>(null);
-  const [draggedCard, setDraggedCard] = useState<CardInstance | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  // Targeting mode state
   const [attackingUnit, setAttackingUnit] = useState<CardInstance | null>(null);
 
-  // Detect mobile for hand tray rendering
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Escape key cancels targeting mode
+  // Escape cancels targeting mode
   useEffect(() => {
     if (!attackingUnit) return;
     const handler = (e: KeyboardEvent) => {
@@ -119,83 +254,69 @@ export function Battlefield({
     return () => window.removeEventListener('keydown', handler);
   }, [attackingUnit]);
 
-  // Get contextual status message based on phase and turn
-  const getStatusMessage = (): string => {
-    if (!isPlayerTurn) {
-      return 'Opponent is thinking...';
-    }
-
-    switch (gamePhase) {
-      case 'start':
-        return 'Start Phase — ready your units. Click "End Phase" when done.';
-      case 'draw':
-        return 'Draw Phase — drawing your card...';
-      case 'resource':
-        return 'Resource Phase — click "Place Resource" to move a card from your resource deck.';
-      case 'main':
-        return 'Main Phase — play cards from your hand, attack with ready units, or end your turn.';
-      case 'end':
-        return 'End Phase — tidying up. Click "Next Phase" to continue.';
-      default:
-        return '';
-    }
-  };
+  const isTargeting = !!attackingUnit;
 
   return (
-    <div className="w-full h-full overflow-hidden flex flex-col bg-gradient-to-br from-surface-muted via-surface to-surface-elevated relative" style={{ display: 'flex', flexDirection: 'column' }}>
-      {/* OPPONENT STATUS - Compact strip (player POV only) */}
-      <div className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-surface/60 px-4 py-2 relative z-10">
-        <div className="flex items-center gap-6 flex-wrap">
-          <span className="text-xs text-foreground font-semibold uppercase tracking-wider">
-            {opponentState.name}'s Field
+    <div
+      className="w-full h-full flex flex-col overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(ellipse at 50% 50%, #060e20 0%, #03060e 100%)',
+      }}
+    >
+      {/* ── TARGETING BANNER ─────────────────────────────────────── */}
+      {isTargeting && (
+        <div
+          className="flex-shrink-0 flex items-center gap-3 px-4 py-1.5 z-20"
+          style={{
+            background: 'rgba(120,53,15,0.6)',
+            borderBottom: '1px solid rgba(217,119,6,0.4)',
+          }}
+          role="status"
+          aria-live="assertive"
+        >
+          <span
+            className="text-xs font-bold uppercase tracking-wider whitespace-nowrap"
+            style={{ color: '#fcd34d' }}
+          >
+            ⚔ Targeting
           </span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-cobalt-400 inline-block" />
-            <span className="text-foreground font-bold text-sm">{opponentState.shields.length}</span>
-            <span className="text-steel-600 text-xs">shields</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-cobalt-500 inline-block" />
-            <span className="text-foreground font-bold text-sm">{opponentState.battleArea.length}</span>
-            <span className="text-steel-600 text-xs">units</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-cobalt-600 inline-block" />
-            <span className="text-foreground font-bold text-sm">{opponentState.resources.length}</span>
-            <span className="text-steel-600 text-xs">resources</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-steel-500 inline-block" />
-            <span className="text-foreground font-bold text-sm">{opponentState.hand.length}</span>
-            <span className="text-steel-600 text-xs">in hand</span>
-          </div>
-
-        </div>
-      </div>
-
-      {/* TARGETING MODE BANNER */}
-      {attackingUnit && (
-        <div className="flex-shrink-0 border-b-2 border-amber-500/60 bg-amber-900/20 px-4 py-2 flex items-center gap-3 z-20 relative" role="status" aria-live="assertive">
-          <span className="text-amber-300 font-bold text-xs uppercase tracking-wider">Targeting Mode</span>
-          <span className="text-amber-200 text-xs">
-            Attacking with <strong>{cardDatabase[attackingUnit.cardId]?.name ?? attackingUnit.cardId}</strong> — click an opponent unit or Attack Base
+          <span className="text-xs truncate" style={{ color: '#fde68a' }}>
+            <strong>
+              {cardDatabase[attackingUnit!.cardId]?.name ??
+                attackingUnit!.cardId}
+            </strong>
+            {' '}— click an opponent unit or Attack Base
           </span>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 flex-shrink-0">
             <button
               type="button"
-              className="rounded border border-amber-500/50 bg-amber-600/20 px-2 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-600/40 transition-colors"
+              className="rounded px-2.5 py-1 text-xs font-semibold transition-colors"
+              style={{
+                border: '1px solid rgba(217,119,6,0.5)',
+                background: 'rgba(146,64,14,0.4)',
+                color: '#fde68a',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'rgba(146,64,14,0.7)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'rgba(146,64,14,0.4)';
+              }}
               onClick={() => {
-                onAttackDeclared?.(attackingUnit.instanceId, undefined);
+                onAttackDeclared?.(attackingUnit!.instanceId, undefined);
                 setAttackingUnit(null);
               }}
             >
-              ⚔ Attack Base
+              Attack Base
             </button>
             <button
               type="button"
-              className="rounded border border-border px-2 py-1 text-xs text-white hover:text-foreground transition-colors"
+              className="rounded px-2 py-1 text-xs transition-colors"
+              style={{ color: '#94a3b8' }}
               onClick={() => setAttackingUnit(null)}
-              aria-label="Cancel attack"
             >
               Cancel (Esc)
             </button>
@@ -203,83 +324,137 @@ export function Battlefield({
         </div>
       )}
 
-      {/* OPPONENT BATTLE AREA - Unit display with AP/HP stats */}
-      {opponentState.battleArea.length > 0 && (
-        <div className={`flex-shrink-0 border-b px-4 py-2 ${attackingUnit ? 'border-amber-500/40 bg-amber-900/10' : 'border-border/50 bg-surface/40'}`}>
-          <div className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${attackingUnit ? 'text-amber-400' : 'text-white'}`}>
-            {attackingUnit ? '⚔ Select Target — ' : ''}{opponentState.name}&apos;s Battle Area
+      {/* ── MAIN FIELD ───────────────────────────────────────────── */}
+      <div className="flex-1 min-h-0 flex flex-col px-2 py-1 gap-0">
+
+        {/* ═══ OPPONENT HALF ═════════════════════════════════════ */}
+        <div
+          className="flex-1 min-h-0 flex flex-col gap-1 rounded-t-xl px-3 py-1.5"
+          style={{
+            background: 'rgba(127,29,29,0.04)',
+            border: '1px solid rgba(127,29,29,0.12)',
+            borderBottom: 'none',
+          }}
+        >
+          {/* Utility row */}
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <span
+              className="text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
+              style={{ color: 'rgba(252,165,165,0.5)' }}
+            >
+              {opponentState.name}
+            </span>
+            <span className="text-[9px]" style={{ color: 'rgba(100,116,139,0.6)' }}>
+              HP {opponentState.baseHealth}/{opponentState.maxBaseHealth}
+            </span>
+            <span className="text-[9px]" style={{ color: 'rgba(71,85,105,0.5)' }}>
+              · Hand: {opponentState.hand.length}
+            </span>
+            <div className="ml-auto flex items-center gap-1.5">
+              <ZonePile label="Deck" count={opponentState.deck.length} />
+              <ZonePile label="Trash" count={opponentState.discardPile.length} />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {opponentState.battleArea.map((unit) => {
-              const card = cardDatabase[unit.cardId];
-              const isTargetable = !!attackingUnit;
-              return (
-                <button
-                  key={unit.instanceId}
-                  type="button"
-                  className={`flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all ${
-                    isTargetable
-                      ? 'cursor-pointer border-amber-500/70 bg-amber-900/20 text-amber-200 ring-1 ring-amber-500/40 hover:ring-2 hover:ring-amber-400 hover:bg-amber-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400'
-                      : unit.state === 'rest'
-                        ? 'border-steel-700/60 bg-surface-muted text-white cursor-default'
-                        : 'border-red-700/50 bg-red-900/10 text-white cursor-default'
-                  }`}
-                  title={`${card?.name ?? unit.cardId} — AP:${card?.ap ?? 0} HP:${card?.hp ?? 0}${unit.state === 'rest' ? ' (resting)' : ' (ready)'}${isTargetable ? ' — Click to target' : ''}`}
-                  onClick={() => {
-                    if (isTargetable) {
-                      onAttackDeclared?.(attackingUnit.instanceId, unit.instanceId);
-                      setAttackingUnit(null);
-                    } else {
-                      onUnitSelected?.(unit, true);
-                    }
-                  }}
-                  aria-label={isTargetable ? `Attack ${card?.name ?? unit.cardId}` : card?.name ?? unit.cardId}
-                >
-                  {isTargetable && (
-                    <span className="text-amber-400 font-bold text-[10px]">⚔</span>
-                  )}
-                  <div className="relative h-8 w-6 flex-shrink-0 overflow-hidden rounded">
-                    {card?.imageUrl ? (
-                      <img
-                        src={card.imageUrl}
-                        alt={card?.name ?? ''}
-                        className={`h-full w-full object-cover ${unit.state === 'rest' ? 'opacity-60' : ''}`}
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-surface-elevated text-[8px] text-white">
-                        {unit.cardId.slice(0, 3)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="max-w-[80px] truncate font-medium leading-none">
-                      {card?.name ?? unit.cardId}
-                    </div>
-                    <div className="mt-0.5 flex gap-1.5 font-mono text-[10px]">
-                      <span className="text-red-400" title="Attack Points">⚔{card?.ap ?? 0}</span>
-                      <span className="text-blue-400" title="Hit Points">🛡{card?.hp ?? 0}</span>
-                      {unit.damageMarkers > 0 && (
-                        <span className="text-amber-400">Dmg:{unit.damageMarkers}</span>
-                      )}
-                      {unit.state === 'rest' && <span className="text-white italic">rest</span>}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+
+          {/* Resources */}
+          <div className="flex-shrink-0">
+            <ResourceZone
+              resources={opponentState.resources}
+              cardDatabase={cardDatabase}
+              isOpponent
+            />
+          </div>
+
+          {/* Battle area — flex-1 */}
+          <div className="flex-1 min-h-0 flex items-center overflow-x-auto">
+            <BattleZone
+              units={opponentState.battleArea}
+              cardDatabase={cardDatabase}
+              isOpponent
+              isTargeting={isTargeting}
+              onUnitSelected={(unit) => {
+                if (isTargeting) {
+                  onAttackDeclared?.(attackingUnit!.instanceId, unit.instanceId);
+                  setAttackingUnit(null);
+                } else {
+                  onUnitSelected?.(unit, true);
+                }
+              }}
+              gamePhase={gamePhase}
+              isPlayerTurn={isPlayerTurn}
+            />
+          </div>
+
+          {/* Shields + Base — front line (closest to center divider) */}
+          <div className="flex-shrink-0 flex items-end gap-2 pb-1">
+            <ShieldZone
+              shields={opponentState.shields}
+              cardDatabase={cardDatabase}
+              isOpponent
+              baseHealth={opponentState.baseHealth}
+              maxBaseHealth={opponentState.maxBaseHealth}
+            />
+            <BaseCard
+              base={opponentState.base}
+              cardDatabase={cardDatabase}
+              baseHealth={opponentState.baseHealth}
+              maxBaseHealth={opponentState.maxBaseHealth}
+            />
           </div>
         </div>
-      )}
 
-      {/* MAIN GAME AREA - Responsive CSS Grid playmat */}
-      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 relative z-10 min-h-0">
-        {/* LEFT COLUMN - Player zones (Shields, Base, Resources, Trash) */}
-        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto md:overflow-y-auto pb-2 min-h-0">
-          {/* Shield Area */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Shield Area
-            </div>
+        {/* ═══ CENTER DIVIDER ════════════════════════════════════ */}
+        <div
+          className="flex-shrink-0 flex items-center gap-3 py-1"
+          style={{ minHeight: '28px' }}
+        >
+          <div
+            className="flex-1 h-px"
+            style={{
+              background:
+                'linear-gradient(to right, transparent, rgba(59,130,246,0.25), rgba(59,130,246,0.1))',
+            }}
+          />
+          <div
+            className="px-3 py-[3px] rounded-full text-[10px] font-semibold whitespace-nowrap flex-shrink-0"
+            style={{
+              border: '1px solid rgba(59,130,246,0.2)',
+              background: 'rgba(15,25,60,0.65)',
+              color: isPlayerTurn
+                ? 'rgba(147,197,253,0.85)'
+                : 'rgba(252,165,165,0.8)',
+            }}
+          >
+            {turnNumber != null ? `Turn ${turnNumber} · ` : ''}
+            {gamePhase.toUpperCase()} ·{' '}
+            {isPlayerTurn ? 'Your Turn' : 'Opponent'}
+          </div>
+          <div
+            className="flex-1 h-px"
+            style={{
+              background:
+                'linear-gradient(to left, transparent, rgba(59,130,246,0.25), rgba(59,130,246,0.1))',
+            }}
+          />
+        </div>
+
+        {/* ═══ PLAYER HALF ═══════════════════════════════════════ */}
+        <div
+          className="flex-1 min-h-0 flex flex-col gap-1 rounded-b-xl px-3 py-1.5"
+          style={{
+            background: 'rgba(29,78,216,0.04)',
+            border: '1px solid rgba(29,78,216,0.12)',
+            borderTop: 'none',
+          }}
+        >
+          {/* Shields + Base — front line (closest to center divider) */}
+          <div className="flex-shrink-0 flex items-start gap-2 pt-1">
+            <BaseCard
+              base={playerState.base}
+              cardDatabase={cardDatabase}
+              baseHealth={playerState.baseHealth}
+              maxBaseHealth={playerState.maxBaseHealth}
+            />
             <ShieldZone
               shields={playerState.shields}
               cardDatabase={cardDatabase}
@@ -290,56 +465,18 @@ export function Battlefield({
             />
           </div>
 
-          {/* Base Area */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Base
-            </div>
-            <BaseZone
-              baseCard={playerState.base}
-              cardDatabase={cardDatabase}
-              baseHealth={playerState.baseHealth}
-              maxBaseHealth={playerState.maxBaseHealth}
-              isOpponent={false}
-            />
-          </div>
-
-          {/* Resource Deck Area */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Resource Deck
-            </div>
-            <ResourceDeckZone
-              resourceDeck={playerState.resourceDeck || []}
-              isOpponent={false}
-            />
-          </div>
-
-          {/* Trash Area */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Trash
-            </div>
-            <TrashZone
-              trash={playerState.discardPile}
-              cardDatabase={cardDatabase}
-              isOpponent={false}
-            />
-          </div>
-        </div>
-
-        {/* CENTER COLUMN - Battle Area (takes most space) */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-            Battle Area
-          </div>
-          <div className="flex-1 overflow-auto">
+          {/* Battle area — flex-1 */}
+          <div className="flex-1 min-h-0 flex items-center overflow-x-auto">
             <BattleZone
               units={playerState.battleArea}
               cardDatabase={cardDatabase}
               isOpponent={false}
               onUnitSelected={(unit) => {
-                if (isPlayerTurn && gamePhase === 'main' && unit.state === 'ready') {
+                if (
+                  isPlayerTurn &&
+                  gamePhase === 'main' &&
+                  unit.state === 'ready'
+                ) {
                   setAttackingUnit(unit);
                 } else {
                   onUnitSelected?.(unit, false);
@@ -350,15 +487,9 @@ export function Battlefield({
               attackingUnitId={attackingUnit?.instanceId}
             />
           </div>
-        </div>
 
-        {/* RIGHT COLUMN - Resources, Deck, Log */}
-        <div className="w-full md:w-48 flex-shrink-0 space-y-2 md:space-y-4 overflow-y-auto pb-2 min-h-0">
-          {/* Resources In Play */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Resources
-            </div>
+          {/* Resources */}
+          <div className="flex-shrink-0">
             <ResourceZone
               resources={playerState.resources}
               cardDatabase={cardDatabase}
@@ -366,58 +497,53 @@ export function Battlefield({
             />
           </div>
 
-          {/* Deck Area */}
-          <div>
-            <div className="text-[10px] md:text-xs font-bold text-white uppercase mb-1 tracking-wider">
-              Deck
-            </div>
-            <DeckZone
-              deckSize={playerState.deck.length}
-              resourceDeckSize={playerState.resourceDeck.length}
-              isOpponent={false}
+          {/* Utility row */}
+          <div className="flex-shrink-0 flex items-center gap-1.5 pb-0.5">
+            <ZonePile
+              label="Deck"
+              count={playerState.deck.length}
+              accent="rgba(59,130,246,0.35)"
             />
-          </div>
-
-          {/* Game Log Preview - hidden on mobile to save space */}
-          <div className="hidden md:block border border-border rounded-lg bg-surface-elevated/50 overflow-hidden">
-            <div className="text-xs font-bold text-white uppercase p-2 border-b border-border">
-              Recent Actions
-            </div>
-            <div className="max-h-40 overflow-y-auto">
-              {gameLog.slice(-5).reverse().map((entry, i) => (
-                <div
-                  key={i}
-                  className="text-[10px] text-white px-2 py-1 border-b border-surface last:border-b-0 leading-relaxed"
-                >
-                  <span className="font-mono text-white mr-1">[T{entry.state.turnNumber ?? '?'}]</span>
-                  {entry.description || entry.actionType}
-                </div>
-              ))}
-            </div>
+            <ZonePile
+              label="Res.Deck"
+              count={(playerState.resourceDeck ?? []).length}
+              accent="rgba(6,182,212,0.35)"
+            />
+            <ZonePile
+              label="Trash"
+              count={playerState.discardPile.length}
+              accent="rgba(239,68,68,0.25)"
+            />
+            <span
+              className="ml-auto text-[10px] italic"
+              style={{ color: 'rgba(100,116,139,0.6)' }}
+            >
+              {getStatusMessage(isPlayerTurn, gamePhase)}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* PLAYER HAND - Always visible, flexible height */}
-      <div className="flex flex-col flex-shrink-0 relative z-30 w-full">
-        {/* Contextual Status Bar */}
-        <div className="text-xs text-white text-center py-1.5 bg-surface/50 border-t border-b border-border/50 flex-shrink-0">
-          {getStatusMessage()}
+      {/* ── HAND TRAY ────────────────────────────────────────────── */}
+      <div
+        className="flex-shrink-0 px-2 pt-1.5 pb-2"
+        style={{ borderTop: '1px solid rgba(59,130,246,0.15)' }}
+      >
+        <div
+          className="text-[9px] font-semibold uppercase mb-1 px-1"
+          style={{ color: 'rgba(71,85,105,0.7)', letterSpacing: '0.05em' }}
+        >
+          Hand ({playerState.hand.length}/10)
         </div>
-
-        {/* Hand Label and Cards */}
-        <div className="border-t-2 border-cobalt-500/30 bg-surface/30 px-2 py-3 w-full flex-shrink-0">
-          <div className="text-xs font-bold text-white uppercase mb-1 px-2">Hand ({playerState.hand.length}/10)</div>
-          <HandTray
-            cards={playerState.hand}
-            cardDatabase={cardDatabase}
-            selectedCard={selectedCard || null}
-            onSelectCard={onSelectCard || (() => {})}
-            onPlayCard={onCardPlayRequested || (() => {})}
-            gamePhase={gamePhase}
-            isPlayerTurn={isPlayerTurn}
-          />
-        </div>
+        <HandTray
+          cards={playerState.hand}
+          cardDatabase={cardDatabase}
+          selectedCard={selectedCard}
+          onSelectCard={onSelectCard ?? (() => {})}
+          onPlayCard={onCardPlayRequested ?? (() => {})}
+          gamePhase={gamePhase}
+          isPlayerTurn={isPlayerTurn}
+        />
       </div>
     </div>
   );

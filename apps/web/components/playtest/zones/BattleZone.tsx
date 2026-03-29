@@ -1,7 +1,7 @@
 /**
- * Battle Area Zone Component
- * Largest zone where units fight during battle phase
- * Supports 5+ units per row with attack/defense display
+ * Battle Zone — horizontal row of portrait card tiles
+ * Official GCG layout: units fill a flex row, each shown as a portrait tile
+ * with card art, AP/HP stats, and state indicators.
  */
 
 'use client';
@@ -9,8 +9,6 @@
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { CardInstance } from '@/lib/game/game-engine';
-import { getCardById } from '@/lib/data/cards';
-import { CardStack } from '../CardStack';
 
 interface BattleZoneProps {
   units: CardInstance[];
@@ -20,6 +18,8 @@ interface BattleZoneProps {
   gamePhase?: string;
   isPlayerTurn?: boolean;
   attackingUnitId?: string;
+  /** When true (targeting mode, opponent side), all units become clickable attack targets */
+  isTargeting?: boolean;
 }
 
 export function BattleZone({
@@ -30,96 +30,238 @@ export function BattleZone({
   gamePhase = '',
   isPlayerTurn = false,
   attackingUnitId,
+  isTargeting = false,
 }: BattleZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-battle' : 'battle',
     data: { zone: isOpponent ? 'opponent-battle' : 'battle' },
   });
 
+  const canShowAttackButton =
+    !isOpponent && isPlayerTurn && gamePhase === 'main';
+
   return (
     <div
       ref={isOpponent ? undefined : setNodeRef}
-      className={`border-2 rounded-lg bg-surface-elevated p-4 h-full flex flex-col transition-colors ${
-        !isOpponent && isOver ? 'border-green-500 bg-green-900/20' : 'border-border'
+      className={`flex-1 min-h-0 flex items-center px-1 min-w-0 transition-colors duration-200 ${
+        !isOpponent && isOver
+          ? 'bg-emerald-950/25 rounded-lg'
+          : ''
       }`}
     >
-      <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
-        {isOpponent ? 'Opponent' : 'Your'} Battle Area
-      </div>
-
-      {/* Battle Grid */}
-      <div className="flex-1 grid gap-3 overflow-y-auto max-h-96">
-        {units.length > 0 ? (
-          units.map((unit) => {
+      {units.length === 0 ? (
+        <div
+          className={`w-full flex items-center justify-center text-xs font-medium py-2 ${
+            !isOpponent && isOver
+              ? 'text-emerald-400/60'
+              : isOpponent
+              ? 'text-red-300/15'
+              : 'text-blue-300/15'
+          }`}
+        >
+          {!isOpponent && isOver ? '⊕ Drop to play' : 'Empty'}
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-1.5 items-center py-1">
+          {units.map((unit) => {
+            const card = cardDatabase[unit.cardId];
             const isAttacking = unit.instanceId === attackingUnitId;
+            const isResting = unit.state === 'rest';
+            const canAttack =
+              canShowAttackButton && !isResting && !attackingUnitId;
+
             return (
-            <div
-              key={unit.instanceId}
-              className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer relative group ${
-                isAttacking
-                  ? 'border-amber-400 bg-amber-900/20 ring-2 ring-amber-400/50'
-                  : 'border-steel-600 bg-gradient-to-b from-surface-muted to-surface-elevated hover:border-cobalt-500'
-              }`}
-              onClick={() => onUnitSelected?.(unit)}
-            >
-              <div className="flex-shrink-0">
-                <CardStack
-                  cards={unit}
-                  cardDatabase={cardDatabase}
-                  variant="normal"
-                  showCount={false}
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-foreground truncate">
-                  {getCardById(unit.cardId)?.name || unit.cardId}
-                </div>
-                <div className="flex gap-4 mt-1 text-base font-bold">
-                  <div className="text-red-400">⚔️ {(getCardById(unit.cardId) as any)?.ap ?? 0}</div>
-                  <div className="text-blue-400">🛡️ {(getCardById(unit.cardId) as any)?.hp ?? 0}</div>
-                </div>
-                {unit.damageMarkers > 0 && (
-                  <div className="mt-1 text-sm text-red-400 font-bold">Damage: {unit.damageMarkers}</div>
-                )}
-                {unit.state === 'rest' && (
-                  <div className="mt-1 text-sm text-white italic">RESTING</div>
-                )}
-              </div>
+              <UnitTile
+                key={unit.instanceId}
+                unit={unit}
+                card={card}
+                isAttacking={isAttacking}
+                isResting={isResting}
+                isTargetable={isTargeting}
+                canAttack={canAttack}
+                onUnitSelected={onUnitSelected}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
-              {/* Attack button (player turn, main phase, unit ready) */}
-              {!isOpponent && isPlayerTurn && gamePhase === 'main' && unit.state === 'ready' && (
-                isAttacking ? (
-                  <span className="ml-auto rounded border border-amber-400/60 bg-amber-900/30 px-2 py-1 text-xs font-bold text-amber-300 whitespace-nowrap">
-                    ⚔ Attacking…
-                  </span>
-                ) : !attackingUnitId ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUnitSelected?.(unit);
-                    }}
-                    className="ml-auto px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded transition-colors whitespace-nowrap"
-                    title="Declare attack with this unit"
-                    aria-label={`Attack with ${getCardById(unit.cardId)?.name ?? unit.cardId}`}
-                  >
-                    ⚔ Attack
-                  </button>
-                ) : null
-              )}
-            </div>
-          );
-          })
-        ) : (
-          <div className="flex items-center justify-center h-32 text-white text-sm font-medium">
-            Battle area empty
-          </div>
-        )}
+interface UnitTileProps {
+  unit: CardInstance;
+  card: any;
+  isAttacking: boolean;
+  isResting: boolean;
+  isTargetable: boolean;
+  canAttack: boolean;
+  onUnitSelected?: (unit: CardInstance) => void;
+}
+
+function UnitTile({
+  unit,
+  card,
+  isAttacking,
+  isResting,
+  isTargetable,
+  canAttack,
+  onUnitSelected,
+}: UnitTileProps) {
+  const ap = card?.ap ?? 0;
+  const hp = card?.hp ?? 0;
+  const dmg = unit.damageMarkers ?? 0;
+  const remainingHp = Math.max(0, hp - dmg);
+  const hpDamaged = dmg > 0;
+
+  let borderStyle = 'border-cobalt-700/40 hover:border-cobalt-500/60';
+  if (isAttacking)
+    borderStyle = 'border-amber-400 ring-2 ring-amber-400/40 shadow-amber-500/20 shadow-md';
+  else if (isTargetable)
+    borderStyle =
+      'border-amber-500/50 ring-1 ring-amber-400/30 cursor-pointer hover:ring-2 hover:ring-amber-400/70 hover:border-amber-400/70';
+  else if (isResting)
+    borderStyle = 'border-slate-700/35 opacity-70';
+
+  return (
+    <div
+      className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 group select-none ${borderStyle}`}
+      style={{ width: '52px', height: '72px' }}
+      title={`${card?.name ?? unit.cardId} — AP:${ap} HP:${remainingHp}/${hp}${isResting ? ' (resting)' : ' (ready)'}${isTargetable ? ' — Click to target' : ''}`}
+      onClick={() => onUnitSelected?.(unit)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onUnitSelected?.(unit);
+        }
+      }}
+      aria-label={
+        isTargetable
+          ? `Attack ${card?.name ?? unit.cardId}`
+          : card?.name ?? unit.cardId
+      }
+    >
+      {/* Card art */}
+      {card?.imageUrl ? (
+        <img
+          src={card.imageUrl}
+          alt={card.name ?? ''}
+          className={`absolute inset-0 w-full h-full object-cover object-top ${
+            isResting ? 'opacity-55 saturate-50' : ''
+          }`}
+        />
+      ) : (
+        <div
+          className={`absolute inset-0 flex items-center justify-center text-[9px] font-mono ${
+            isResting ? 'opacity-55' : ''
+          }`}
+          style={{
+            background: 'linear-gradient(160deg, #1e293b 0%, #0f172a 100%)',
+            color: '#64748b',
+          }}
+        >
+          {(unit.cardId ?? '').slice(0, 5)}
+        </div>
+      )}
+
+      {/* Bottom gradient overlay for stat readability */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)',
+        }}
+      />
+
+      {/* AP / HP stats */}
+      <div className="absolute bottom-[3px] left-[3px] right-[3px] flex justify-between items-end pointer-events-none">
+        <span
+          className="text-[8px] font-bold leading-tight px-0.5 rounded"
+          style={{
+            color: '#fca5a5',
+            background: 'rgba(0,0,0,0.55)',
+          }}
+        >
+          ⚔{ap}
+        </span>
+        <span
+          className="text-[8px] font-bold leading-tight px-0.5 rounded"
+          style={{
+            color: hpDamaged ? '#fbbf24' : '#93c5fd',
+            background: 'rgba(0,0,0,0.55)',
+          }}
+        >
+          {remainingHp}/{hp}
+        </span>
       </div>
 
-      {/* Unit Count */}
-      <div className="mt-2 pt-2 border-t border-border text-xs text-white">
-        Units in battle: {units.length}
-      </div>
+      {/* REST badge */}
+      {isResting && (
+        <div className="absolute top-[3px] right-[3px] pointer-events-none">
+          <span
+            className="text-[7px] font-bold leading-tight rounded px-[3px] py-[1px]"
+            style={{
+              background: 'rgba(30,41,59,0.85)',
+              color: '#94a3b8',
+            }}
+          >
+            REST
+          </span>
+        </div>
+      )}
+
+      {/* ATK badge */}
+      {isAttacking && (
+        <div className="absolute top-[3px] left-[3px] pointer-events-none">
+          <span
+            className="text-[7px] font-bold leading-tight rounded px-[3px] py-[1px]"
+            style={{
+              background: 'rgba(146,64,14,0.85)',
+              color: '#fde68a',
+            }}
+          >
+            ATK
+          </span>
+        </div>
+      )}
+
+      {/* Target crosshair on hover (opponent in targeting mode) */}
+      {isTargetable && (
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <span
+            className="text-lg drop-shadow-lg"
+            style={{ color: '#fbbf24', textShadow: '0 0 8px rgba(251,191,36,0.5)' }}
+          >
+            ⚔
+          </span>
+        </div>
+      )}
+
+      {/* Attack overlay (player units, main phase, ready, no current attacker) */}
+      {canAttack && (
+        <button
+          type="button"
+          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ background: 'rgba(127,29,29,0.45)' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onUnitSelected?.(unit);
+          }}
+          aria-label={`Attack with ${card?.name ?? unit.cardId}`}
+        >
+          <span
+            className="text-[10px] font-bold rounded px-1.5 py-0.5"
+            style={{
+              background: 'rgba(153,27,27,0.8)',
+              color: '#fecaca',
+            }}
+          >
+            ⚔ Attack
+          </span>
+        </button>
+      )}
     </div>
   );
 }
