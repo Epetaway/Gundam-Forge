@@ -1,10 +1,86 @@
 [
   {
-    "id": "tournament-blue-green-earth-federation",
-    "name": "Blue Green Earth Federation",
-    "description": "Tournament-winning list from The Eagle's Nest S4W2.5 Online Locals (2026-01-24). Piloted by Mowcow to placement #19.",
-    "archetype": "Blue Green Earth Federation",
-    "owner": "Mowcow",
+    "id": "tournament-aeug",
+    "name": "AEUG",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by JaShadow01 to placement #27.",
+    "archetype": "AEUG",
+    "owner": "JaShadow01",
+    "colors": [],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD01-086",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-079",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-046",
+        "qty": 2
+      },
+      {
+        "cardId": "GD02-072",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-075",
+        "qty": 3
+      },
+      {
+        "cardId": "ST04-001",
+        "qty": 2
+      },
+      {
+        "cardId": "GD02-069",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-071",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-034",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-098",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-097",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-118",
+        "qty": 4
+      },
+      {
+        "cardId": "ST03-013",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-109",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-129",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 27
+  },
+  {
+    "id": "tournament-blue-green-cyclops-team",
+    "name": "Blue Green Cyclops Team",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by ConePwns to placement #32.",
+    "archetype": "Blue Green Cyclops Team",
+    "owner": "ConePwns",
     "colors": [
       "Blue",
       "Green"
@@ -13,12 +89,95 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "GD01-008",
+        "cardId": "ST03-008",
         "qty": 4
       },
       {
+        "cardId": "GD03-020",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-024",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-027",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-030",
+        "qty": 4
+      },
+      {
+        "cardId": "ST03-006",
+        "qty": 2
+      },
+      {
+        "cardId": "GD01-026",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-017",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-031",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-089",
+        "qty": 2
+      },
+      {
+        "cardId": "ST03-011",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-090",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-108",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-107",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-100",
+        "qty": 2
+      },
+      {
+        "cardId": "GD01-126",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 32
+  },
+  {
+    "id": "tournament-blue-green-earth-federation",
+    "name": "Blue Green Earth Federation",
+    "description": "Tournament-winning list from Gundam TCG ARG - Online Tournament 1st edition (2026-03-18). Piloted by Malmi to placement #19.",
+    "archetype": "Blue Green Earth Federation",
+    "owner": "Malmi",
+    "colors": [
+      "Blue",
+      "Green"
+    ],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
         "cardId": "GD01-011",
         "qty": 4
+      },
+      {
+        "cardId": "ST03-008",
+        "qty": 3
       },
       {
         "cardId": "GD02-021",
@@ -29,32 +188,20 @@
         "qty": 4
       },
       {
-        "cardId": "GD02-031",
+        "cardId": "GD03-031",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-023",
         "qty": 4
       },
       {
         "cardId": "ST01-001",
-        "qty": 3
+        "qty": 4
       },
       {
         "cardId": "GD01-006",
         "qty": 2
-      },
-      {
-        "cardId": "GD01-001",
-        "qty": 1
-      },
-      {
-        "cardId": "ST08-006",
-        "qty": 3
-      },
-      {
-        "cardId": "GD02-027",
-        "qty": 1
-      },
-      {
-        "cardId": "GD01-024",
-        "qty": 3
       },
       {
         "cardId": "GD02-088",
@@ -65,41 +212,33 @@
         "qty": 4
       },
       {
-        "cardId": "ST08-011",
-        "qty": 3
+        "cardId": "GD03-088",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-101",
+        "qty": 4
       },
       {
         "cardId": "GD01-100",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-103",
-        "qty": 1
+        "qty": 3
       },
       {
         "cardId": "GD01-126",
-        "qty": 2
-      },
-      {
-        "cardId": "ST01-015",
-        "qty": 1
-      },
-      {
-        "cardId": "ST08-015",
-        "qty": 1
+        "qty": 3
       }
     ],
-    "updatedAt": "2026-01-24T00:00:00Z",
+    "updatedAt": "2026-03-18T00:00:00Z",
     "source": "tournament",
-    "eventId": "696320c7ba66621ba08b9956",
+    "eventId": "69b94b45ccdfe3b78e575b92",
     "placement": 19
   },
   {
     "id": "tournament-blue-purple-midrange",
     "name": "Blue Purple Midrange",
-    "description": "Tournament-winning list from Eagle's Nest S4GW5.0 GD03 Webcam Locals (2026-02-26). Piloted by Gshadow007 to placement #1.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW9.0 GD03 Webcam Locals (2026-03-26). Piloted by Geicokiller to placement #1.",
     "archetype": "Blue Purple Midrange",
-    "owner": "Gshadow007",
+    "owner": "Geicokiller",
     "colors": [
       "Blue",
       "Purple"
@@ -112,20 +251,24 @@
         "qty": 4
       },
       {
+        "cardId": "ST05-004",
+        "qty": 4
+      },
+      {
         "cardId": "GD01-008",
         "qty": 4
       },
       {
-        "cardId": "GD02-013",
-        "qty": 4
+        "cardId": "GD03-063",
+        "qty": 2
       },
       {
         "cardId": "GD02-054",
         "qty": 4
       },
       {
-        "cardId": "GD01-018",
-        "qty": 3
+        "cardId": "ST05-006",
+        "qty": 2
       },
       {
         "cardId": "GD03-056",
@@ -140,24 +283,28 @@
         "qty": 2
       },
       {
-        "cardId": "GD03-001",
-        "qty": 2
-      },
-      {
         "cardId": "GD02-055",
         "qty": 2
       },
       {
-        "cardId": "ST05-010",
-        "qty": 4
+        "cardId": "GD03-001",
+        "qty": 1
+      },
+      {
+        "cardId": "ST05-001",
+        "qty": 1
       },
       {
         "cardId": "ST01-010",
         "qty": 4
       },
       {
+        "cardId": "ST05-010",
+        "qty": 4
+      },
+      {
         "cardId": "ST05-014",
-        "qty": 3
+        "qty": 2
       },
       {
         "cardId": "GD01-100",
@@ -165,16 +312,12 @@
       },
       {
         "cardId": "ST02-016",
-        "qty": 3
-      },
-      {
-        "cardId": "ST01-015",
-        "qty": 1
+        "qty": 4
       }
     ],
-    "updatedAt": "2026-02-26T00:00:00Z",
+    "updatedAt": "2026-03-26T00:00:00Z",
     "source": "tournament",
-    "eventId": "699bba2dc9dc8186f760ac0a",
+    "eventId": "69c300f536f5b5c303dbcdeb",
     "placement": 1
   },
   {
@@ -267,9 +410,9 @@
   {
     "id": "tournament-blue-red-unicorn",
     "name": "Blue Red Unicorn",
-    "description": "Tournament-winning list from The Eagle's Nest S4W0.0 MSA Gundam Stress Test (2026-01-10). Piloted by spicy117 to placement #79.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW9.0 GD03 Webcam Locals (2026-03-26). Piloted by chrinyian to placement #6.",
     "archetype": "Blue Red Unicorn",
-    "owner": "spicy117",
+    "owner": "chrinyian",
     "colors": [
       "Blue",
       "Red"
@@ -278,36 +421,16 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "ST01-005",
+        "cardId": "GD01-005",
         "qty": 4
-      },
-      {
-        "cardId": "GD01-008",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-060",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-018",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-020",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-010",
-        "qty": 1
       },
       {
         "cardId": "GD01-044",
         "qty": 4
       },
       {
-        "cardId": "GD01-005",
-        "qty": 4
+        "cardId": "GD03-016",
+        "qty": 2
       },
       {
         "cardId": "GD01-003",
@@ -315,7 +438,11 @@
       },
       {
         "cardId": "GD01-002",
-        "qty": 2
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-034",
+        "qty": 3
       },
       {
         "cardId": "GD01-093",
@@ -327,32 +454,44 @@
       },
       {
         "cardId": "ST03-013",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-100",
         "qty": 4
       },
       {
-        "cardId": "ST04-016",
+        "cardId": "GD01-116",
         "qty": 3
       },
       {
-        "cardId": "ST02-016",
-        "qty": 2
+        "cardId": "GD03-101",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-109",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-111",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-100",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-126",
+        "qty": 3
       }
     ],
-    "updatedAt": "2026-01-10T00:00:00Z",
+    "updatedAt": "2026-03-26T00:00:00Z",
     "source": "tournament",
-    "eventId": "6948ba8f4500833d8701560a",
-    "placement": 79
+    "eventId": "69c300f536f5b5c303dbcdeb",
+    "placement": 6
   },
   {
     "id": "tournament-blue-white-academy-tempo",
     "name": "Blue White Academy Tempo",
-    "description": "Tournament-winning list from Rancho Special Event Gundam Domingo 07/12 (2025-12-07). Piloted by Gustavo Fernandez to placement #26.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW6.0 GD03 Webcam Locals (2026-03-05). Piloted by BunnyFooFoo998 to placement #3.",
     "archetype": "Blue White Academy Tempo",
-    "owner": "Gustavo Fernandez",
+    "owner": "BunnyFooFoo998",
     "colors": [
       "Blue",
       "White"
@@ -361,106 +500,145 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "ST01-008",
-        "qty": 1
-      },
-      {
-        "cardId": "GD01-083",
-        "qty": 2
-      },
-      {
-        "cardId": "ST01-009",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-085",
-        "qty": 2
-      },
-      {
-        "cardId": "ST01-005",
-        "qty": 1
+        "cardId": "GD01-086",
+        "qty": 4
       },
       {
         "cardId": "GD01-076",
         "qty": 4
       },
       {
-        "cardId": "GD01-014",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-086",
-        "qty": 1
-      },
-      {
-        "cardId": "ST01-001",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-001",
-        "qty": 2
-      },
-      {
-        "cardId": "ST01-006",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-067",
-        "qty": 1
-      },
-      {
-        "cardId": "GD02-074",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-087",
-        "qty": 2
-      },
-      {
-        "cardId": "ST01-010",
+        "cardId": "GD02-079",
         "qty": 4
+      },
+      {
+        "cardId": "GD01-070",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-005",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-002",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-010",
+        "qty": 2
       },
       {
         "cardId": "ST01-011",
         "qty": 4
       },
       {
-        "cardId": "GD01-096",
-        "qty": 1
-      },
-      {
-        "cardId": "GD01-098",
-        "qty": 1
+        "cardId": "GD01-088",
+        "qty": 4
       },
       {
         "cardId": "GD01-118",
         "qty": 4
       },
       {
-        "cardId": "GD01-119",
-        "qty": 1
-      },
-      {
-        "cardId": "ST01-014",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-122",
-        "qty": 2
+        "cardId": "GD03-101",
+        "qty": 4
       },
       {
         "cardId": "GD01-100",
+        "qty": 4
+      },
+      {
+        "cardId": "ST02-016",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-05T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a6f6376a05f00a8c4a33cf",
+    "placement": 3
+  },
+  {
+    "id": "tournament-blue-white-aeug",
+    "name": "Blue White AEUG",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by kyros200 to placement #25.",
+    "archetype": "Blue White AEUG",
+    "owner": "kyros200",
+    "colors": [
+      "Blue",
+      "White"
+    ],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD02-080",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-079",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-086",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-069",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-075",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-075",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-072",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-066",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-071",
+        "qty": 2
+      },
+      {
+        "cardId": "GD02-098",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-010",
+        "qty": 2
+      },
+      {
+        "cardId": "GD02-097",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-120",
         "qty": 1
       },
       {
-        "cardId": "GD01-130",
-        "qty": 3
+        "cardId": "GD01-100",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-015",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-129",
+        "qty": 1
       }
     ],
-    "updatedAt": "2025-12-07T00:00:00Z",
+    "updatedAt": "2026-03-21T00:00:00Z",
     "source": "tournament",
-    "eventId": "6932d1591b3b036ef6db9af4",
-    "placement": 26
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 25
   },
   {
     "id": "tournament-blue-white-control",
@@ -647,9 +825,9 @@
   {
     "id": "tournament-blue-white-tempo",
     "name": "Blue White Tempo",
-    "description": "Tournament-winning list from Eagle's Nest S3GW10.0 GD02+ST06 W-a-R (2025-12-11). Piloted by ResyEmpa to placement #2.",
+    "description": "Tournament-winning list from Eagle's Nest GD03 Webcam NTC 2025 Mission 3 (2026-02-07). Piloted by wayneleo818 to placement #5.",
     "archetype": "Blue White Tempo",
-    "owner": "ResyEmpa",
+    "owner": "wayneleo818",
     "colors": [
       "Blue",
       "White"
@@ -658,59 +836,130 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "ST01-005",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-008",
-        "qty": 4
-      },
-      {
-        "cardId": "GD02-013",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-085",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-018",
+        "cardId": "ST01-009",
         "qty": 3
       },
       {
-        "cardId": "ST01-001",
+        "cardId": "GD01-086",
         "qty": 4
       },
       {
-        "cardId": "GD01-020",
+        "cardId": "GD02-079",
         "qty": 3
-      },
-      {
-        "cardId": "GD01-073",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-001",
-        "qty": 1
       },
       {
         "cardId": "ST04-001",
-        "qty": 3
+        "qty": 4
       },
       {
-        "cardId": "ST01-010",
+        "cardId": "GD01-068",
         "qty": 4
+      },
+      {
+        "cardId": "GD01-067",
+        "qty": 2
+      },
+      {
+        "cardId": "GD01-066",
+        "qty": 3
       },
       {
         "cardId": "ST04-010",
         "qty": 4
       },
       {
-        "cardId": "ST04-013",
-        "qty": 3
+        "cardId": "ST01-010",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-011",
+        "qty": 1
+      },
+      {
+        "cardId": "GD01-118",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-120",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-100",
+        "qty": 4
       },
       {
         "cardId": "ST04-012",
+        "qty": 2
+      },
+      {
+        "cardId": "ST02-016",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-02-07T00:00:00Z",
+    "source": "tournament",
+    "eventId": "696e38479c739a2ff7bf35e5",
+    "placement": 5
+  },
+  {
+    "id": "tournament-blue-white-the-o",
+    "name": "Blue White The-O",
+    "description": "Tournament-winning list from FREE Sunday Gundam Fight 22/03/2026 (2026-03-22). Piloted by Nova2 to placement #3.",
+    "archetype": "Blue White The-O",
+    "owner": "Nova2",
+    "colors": [
+      "Blue",
+      "White"
+    ],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "ST01-009",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-079",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-086",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-001",
+        "qty": 3
+      },
+      {
+        "cardId": "ST04-001",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-003",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-002",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-010",
+        "qty": 3
+      },
+      {
+        "cardId": "ST04-010",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-084",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-118",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-014",
         "qty": 2
       },
       {
@@ -718,18 +967,22 @@
         "qty": 2
       },
       {
-        "cardId": "ST02-016",
+        "cardId": "ST04-012",
+        "qty": 2
+      },
+      {
+        "cardId": "ST01-015",
         "qty": 3
       },
       {
         "cardId": "GD01-129",
-        "qty": 1
+        "qty": 2
       }
     ],
-    "updatedAt": "2025-12-11T00:00:00Z",
+    "updatedAt": "2026-03-22T00:00:00Z",
     "source": "tournament",
-    "eventId": "6929c351e12a3ec47627ca66",
-    "placement": 2
+    "eventId": "69bfe3acd478313a15a3096c",
+    "placement": 3
   },
   {
     "id": "tournament-blue-white-unicorn-control",
@@ -815,6 +1068,245 @@
     "placement": 3
   },
   {
+    "id": "tournament-blue-white-unicorn-tempo",
+    "name": "Blue White Unicorn Tempo",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by Pineapple_FL to placement #54.",
+    "archetype": "Blue White Unicorn Tempo",
+    "owner": "Pineapple_FL",
+    "colors": [
+      "Blue",
+      "White"
+    ],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD01-086",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-079",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-073",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-072",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-001",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-016",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-002",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-010",
+        "qty": 3
+      },
+      {
+        "cardId": "ST04-010",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-088",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-120",
+        "qty": 1
+      },
+      {
+        "cardId": "GD01-118",
+        "qty": 1
+      },
+      {
+        "cardId": "GD03-101",
+        "qty": 4
+      },
+      {
+        "cardId": "ST01-014",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-012",
+        "qty": 2
+      },
+      {
+        "cardId": "GD01-100",
+        "qty": 2
+      },
+      {
+        "cardId": "ST02-016",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-015",
+        "qty": 1
+      },
+      {
+        "cardId": "GD01-123",
+        "qty": 1
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 54
+  },
+  {
+    "id": "tournament-celestial-being",
+    "name": "Celestial Being",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by AppleTheMeister to placement #61.",
+    "archetype": "Celestial Being",
+    "owner": "AppleTheMeister",
+    "colors": [],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD03-063",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-006",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-004",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-005",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-001",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-055",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-057",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-049",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-024",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-011",
+        "qty": 4
+      },
+      {
+        "cardId": "ST07-009",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-094",
+        "qty": 2
+      },
+      {
+        "cardId": "ST07-015",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 61
+  },
+  {
+    "id": "tournament-cyclops-team",
+    "name": "Cyclops Team",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by Juju_2707 to placement #52.",
+    "archetype": "Cyclops Team",
+    "owner": "Juju_2707",
+    "colors": [],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD01-048",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-032",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-024",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-027",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-031",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-048",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-017",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-020",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-035",
+        "qty": 1
+      },
+      {
+        "cardId": "GD03-089",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-092",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-090",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-108",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-107",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-126",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 52
+  },
+  {
     "id": "tournament-lockuro-aggro",
     "name": "Lockuro Aggro",
     "description": "Tournament-winning list from Eagle's Nest S4GW3.0 GD03 Webcam Locals (2026-01-29). Piloted by Levant9424 to placement #7.",
@@ -897,19 +1389,19 @@
   {
     "id": "tournament-one-year-war-rush",
     "name": "One Year War Rush",
-    "description": "Tournament-winning list from Eagle's Nest S3GW10.0 GD02+ST06 W-a-R (2025-12-11). Piloted by Kdrazcal to placement #1.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW7.0 GD03 Webcam Locals (2026-03-12). Piloted by Michae1 to placement #1.",
     "archetype": "One Year War Rush",
-    "owner": "Kdrazcal",
+    "owner": "Michae1",
     "colors": [],
     "likes": 0,
     "views": 0,
     "entries": [
       {
-        "cardId": "GD01-008",
+        "cardId": "ST01-005",
         "qty": 4
       },
       {
-        "cardId": "GD01-035",
+        "cardId": "GD01-008",
         "qty": 4
       },
       {
@@ -917,8 +1409,8 @@
         "qty": 4
       },
       {
-        "cardId": "ST01-005",
-        "qty": 3
+        "cardId": "GD01-035",
+        "qty": 4
       },
       {
         "cardId": "GD01-026",
@@ -950,96 +1442,104 @@
       },
       {
         "cardId": "GD01-100",
-        "qty": 1
+        "qty": 2
+      },
+      {
+        "cardId": "ST01-015",
+        "qty": 2
       },
       {
         "cardId": "ST02-016",
+        "qty": 2
+      }
+    ],
+    "updatedAt": "2026-03-12T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a8f903f39e6e70969fc1ed",
+    "placement": 1
+  },
+  {
+    "id": "tournament-other",
+    "name": "Other",
+    "description": "Tournament-winning list from Eagle's Nest S4GW8.0 GD03 Webcam Locals (2026-03-19). Piloted by KotyAngeloff to placement #1.",
+    "archetype": "Other",
+    "owner": "KotyAngeloff",
+    "colors": [],
+    "likes": 0,
+    "views": 0,
+    "entries": [
+      {
+        "cardId": "GD01-044",
         "qty": 4
+      },
+      {
+        "cardId": "GD01-003",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-036",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-034",
+        "qty": 2
+      },
+      {
+        "cardId": "GD01-093",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-091",
+        "qty": 4
+      },
+      {
+        "cardId": "ST03-013",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-116",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-101",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-111",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-109",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-100",
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-107",
+        "qty": 3
+      },
+      {
+        "cardId": "ST03-015",
+        "qty": 3
       },
       {
         "cardId": "ST01-015",
         "qty": 2
       }
     ],
-    "updatedAt": "2025-12-11T00:00:00Z",
+    "updatedAt": "2026-03-19T00:00:00Z",
     "source": "tournament",
-    "eventId": "6929c351e12a3ec47627ca66",
-    "placement": 1
-  },
-  {
-    "id": "tournament-other",
-    "name": "Other",
-    "description": "Tournament-winning list from FREE Sunday Gundam Fight 22/02/2026 (2026-02-22). Piloted by Gallet to placement #1.",
-    "archetype": "Other",
-    "owner": "Gallet",
-    "colors": [],
-    "likes": 0,
-    "views": 0,
-    "entries": [
-      {
-        "cardId": "ST07-007",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-004",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-005",
-        "qty": 4
-      },
-      {
-        "cardId": "GD03-022",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-001",
-        "qty": 4
-      },
-      {
-        "cardId": "GD03-057",
-        "qty": 4
-      },
-      {
-        "cardId": "GD03-049",
-        "qty": 3
-      },
-      {
-        "cardId": "ST07-012",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-011",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-009",
-        "qty": 4
-      },
-      {
-        "cardId": "ST07-014",
-        "qty": 4
-      },
-      {
-        "cardId": "GD03-114",
-        "qty": 3
-      },
-      {
-        "cardId": "ST07-015",
-        "qty": 4
-      }
-    ],
-    "updatedAt": "2026-02-22T00:00:00Z",
-    "source": "tournament",
-    "eventId": "699a07f23ef65252b0573d2b",
+    "eventId": "69b34dc7f39e6e7096a024dd",
     "placement": 1
   },
   {
     "id": "tournament-purple-white-control",
     "name": "Purple White Control",
-    "description": "Tournament-winning list from MSA Stress Test Tournament v1 (2025-12-29). Piloted by Galima to placement #27.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW9.0 GD03 Webcam Locals (2026-03-26). Piloted by Huycoveries to placement #7.",
     "archetype": "Purple White Control",
-    "owner": "Galima",
+    "owner": "Huycoveries",
     "colors": [
       "White",
       "Purple"
@@ -1048,32 +1548,20 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "ST01-009",
-        "qty": 2
+        "cardId": "GD02-054",
+        "qty": 4
       },
       {
         "cardId": "GD01-086",
         "qty": 4
       },
       {
-        "cardId": "GD02-054",
+        "cardId": "GD02-079",
         "qty": 4
       },
       {
-        "cardId": "ST05-006",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-079",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-073",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-072",
-        "qty": 2
+        "cardId": "GD03-056",
+        "qty": 4
       },
       {
         "cardId": "ST04-001",
@@ -1081,15 +1569,15 @@
       },
       {
         "cardId": "GD02-055",
-        "qty": 3
+        "qty": 2
       },
       {
-        "cardId": "ST05-001",
-        "qty": 2
+        "cardId": "GD01-066",
+        "qty": 4
       },
       {
         "cardId": "GD01-065",
-        "qty": 2
+        "qty": 3
       },
       {
         "cardId": "ST04-010",
@@ -1100,34 +1588,26 @@
         "qty": 4
       },
       {
-        "cardId": "ST01-011",
-        "qty": 2
-      },
-      {
         "cardId": "GD01-118",
-        "qty": 3
+        "qty": 4
       },
       {
-        "cardId": "ST05-013",
+        "cardId": "ST01-014",
+        "qty": 4
+      },
+      {
+        "cardId": "ST04-012",
         "qty": 1
-      },
-      {
-        "cardId": "ST05-014",
-        "qty": 3
-      },
-      {
-        "cardId": "ST05-015",
-        "qty": 3
       },
       {
         "cardId": "ST04-015",
-        "qty": 1
+        "qty": 4
       }
     ],
-    "updatedAt": "2025-12-29T00:00:00Z",
+    "updatedAt": "2026-03-26T00:00:00Z",
     "source": "tournament",
-    "eventId": "6950820cba66621ba08ab8ae",
-    "placement": 27
+    "eventId": "69c300f536f5b5c303dbcdeb",
+    "placement": 7
   },
   {
     "id": "tournament-r-g-clan",
@@ -1212,9 +1692,9 @@
   {
     "id": "tournament-red-blue-newtype-ping",
     "name": "Red Blue Newtype Ping",
-    "description": "Tournament-winning list from Eagle's Nest S3GW11.0 GD02+ST06 W-a-R (2025-12-18). Piloted by Cliffeyy to placement #2.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW6.0 GD03 Webcam Locals (2026-03-05). Piloted by Jinzo777 to placement #2.",
     "archetype": "Red Blue Newtype Ping",
-    "owner": "Cliffeyy",
+    "owner": "Jinzo777",
     "colors": [
       "Blue",
       "Red"
@@ -1223,43 +1703,31 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "GD01-008",
+        "cardId": "GD02-046",
         "qty": 4
-      },
-      {
-        "cardId": "GD02-013",
-        "qty": 4
-      },
-      {
-        "cardId": "ST01-005",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-004",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-018",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-020",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-001",
-        "qty": 2
       },
       {
         "cardId": "ST01-001",
-        "qty": 2
+        "qty": 4
+      },
+      {
+        "cardId": "GD02-006",
+        "qty": 4
       },
       {
         "cardId": "GD01-044",
         "qty": 4
       },
       {
+        "cardId": "GD03-003",
+        "qty": 3
+      },
+      {
         "cardId": "GD01-003",
+        "qty": 1
+      },
+      {
+        "cardId": "GD03-002",
         "qty": 3
       },
       {
@@ -1271,33 +1739,49 @@
         "qty": 4
       },
       {
-        "cardId": "ST03-013",
-        "qty": 4
+        "cardId": "GD03-084",
+        "qty": 3
       },
       {
-        "cardId": "ST02-014",
-        "qty": 1
+        "cardId": "ST03-013",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-109",
+        "qty": 3
+      },
+      {
+        "cardId": "GD01-111",
+        "qty": 2
       },
       {
         "cardId": "GD01-100",
+        "qty": 3
+      },
+      {
+        "cardId": "ST03-015",
         "qty": 2
       },
       {
         "cardId": "ST02-016",
-        "qty": 4
+        "qty": 2
+      },
+      {
+        "cardId": "ST01-015",
+        "qty": 1
       }
     ],
-    "updatedAt": "2025-12-18T00:00:00Z",
+    "updatedAt": "2026-03-05T00:00:00Z",
     "source": "tournament",
-    "eventId": "6929c373e12a3ec47627ca68",
+    "eventId": "69a6f6376a05f00a8c4a33cf",
     "placement": 2
   },
   {
-    "id": "tournament-red-green-zeon-aggro",
-    "name": "Red Green Zeon Aggro",
-    "description": "Tournament-winning list from Rancho Special Event Gundam Domingo 07/12 (2025-12-07). Piloted by Lao Julian Vazquez Zirulnikoff to placement #30.",
-    "archetype": "Red Green Zeon Aggro",
-    "owner": "Lao Julian Vazquez Zirulnikoff",
+    "id": "tournament-red-green-clan",
+    "name": "Red Green Clan",
+    "description": "Tournament-winning list from The Eagle's Nest S4W8.5 MSA Online Locals (2026-03-21). Piloted by SAMURAIGUY to placement #43.",
+    "archetype": "Red Green Clan",
+    "owner": "SAMURAIGUY",
     "colors": [
       "Green",
       "Red"
@@ -1306,110 +1790,141 @@
     "views": 0,
     "entries": [
       {
-        "cardId": "ST03-005",
+        "cardId": "ST06-008",
         "qty": 4
       },
       {
-        "cardId": "ST03-007",
+        "cardId": "ST06-007",
+        "qty": 4
+      },
+      {
+        "cardId": "ST06-005",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-039",
+        "qty": 3
+      },
+      {
+        "cardId": "GD02-024",
+        "qty": 4
+      },
+      {
+        "cardId": "ST06-001",
+        "qty": 4
+      },
+      {
+        "cardId": "ST02-001",
         "qty": 2
       },
+      {
+        "cardId": "GD03-034",
+        "qty": 3
+      },
+      {
+        "cardId": "ST06-009",
+        "qty": 4
+      },
+      {
+        "cardId": "ST06-010",
+        "qty": 4
+      },
+      {
+        "cardId": "ST02-010",
+        "qty": 2
+      },
+      {
+        "cardId": "ST03-013",
+        "qty": 4
+      },
+      {
+        "cardId": "GD03-109",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-126",
+        "qty": 4
+      }
+    ],
+    "updatedAt": "2026-03-21T00:00:00Z",
+    "source": "tournament",
+    "eventId": "69a906b36a05f00a8c4a480c",
+    "placement": 43
+  },
+  {
+    "id": "tournament-red-green-zeon-aggro",
+    "name": "Red Green Zeon Aggro",
+    "description": "Tournament-winning list from Eagle's Nest S4GW8.0 GD03 Webcam Locals (2026-03-19). Piloted by BunnyFooFoo998 to placement #7.",
+    "archetype": "Red Green Zeon Aggro",
+    "owner": "BunnyFooFoo998",
+    "colors": [
+      "Green",
+      "Red"
+    ],
+    "likes": 0,
+    "views": 0,
+    "entries": [
       {
         "cardId": "ST03-008",
         "qty": 4
       },
       {
-        "cardId": "ST03-004",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-048",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-035",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-050",
-        "qty": 1
-      },
-      {
-        "cardId": "GD01-035",
-        "qty": 1
-      },
-      {
         "cardId": "GD01-060",
-        "qty": 1
+        "qty": 2
       },
       {
         "cardId": "GD01-026",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-032",
-        "qty": 2
+        "qty": 4
       },
       {
         "cardId": "ST03-006",
-        "qty": 2
+        "qty": 4
       },
       {
-        "cardId": "ST03-009",
-        "qty": 2
+        "cardId": "GD01-030",
+        "qty": 4
       },
       {
-        "cardId": "GD02-048",
-        "qty": 2
+        "cardId": "GD03-048",
+        "qty": 4
       },
       {
-        "cardId": "GD02-039",
-        "qty": 1
-      },
-      {
-        "cardId": "GD01-031",
-        "qty": 1
+        "cardId": "GD03-035",
+        "qty": 4
       },
       {
         "cardId": "ST03-001",
-        "qty": 2
-      },
-      {
-        "cardId": "GD02-036",
-        "qty": 2
+        "qty": 3
       },
       {
         "cardId": "ST03-011",
         "qty": 4
       },
       {
-        "cardId": "GD02-091",
-        "qty": 2
+        "cardId": "GD03-092",
+        "qty": 4
       },
       {
         "cardId": "ST03-010",
-        "qty": 2
+        "qty": 3
       },
       {
         "cardId": "ST03-013",
         "qty": 2
       },
       {
-        "cardId": "GD02-107",
-        "qty": 1
-      },
-      {
-        "cardId": "ST03-016",
-        "qty": 3
+        "cardId": "GD03-109",
+        "qty": 4
       },
       {
         "cardId": "GD02-125",
-        "qty": 1
+        "qty": 4
       }
     ],
-    "updatedAt": "2025-12-07T00:00:00Z",
+    "updatedAt": "2026-03-19T00:00:00Z",
     "source": "tournament",
-    "eventId": "6932d1591b3b036ef6db9af4",
-    "placement": 30
+    "eventId": "69b34dc7f39e6e7096a024dd",
+    "placement": 7
   },
   {
     "id": "tournament-white-command-slinger-academy",
@@ -1492,9 +2007,9 @@
   {
     "id": "tournament-white-green-operation-meteor",
     "name": "White Green Operation Meteor",
-    "description": "Tournament-winning list from Eagle's Nest S4GW1.0 GD02+ST06 Webcam (2026-01-15). Piloted by spy to placement #1.",
+    "description": "Tournament-winning list from Eagle's Nest S4GW6.0 GD03 Webcam Locals (2026-03-05). Piloted by SdotAkuma to placement #1.",
     "archetype": "White Green Operation Meteor",
-    "owner": "spy",
+    "owner": "SdotAkuma",
     "colors": [
       "Green",
       "White"
@@ -1507,81 +2022,73 @@
         "qty": 4
       },
       {
-        "cardId": "GD02-079",
+        "cardId": "ST02-002",
         "qty": 4
       },
       {
-        "cardId": "GD01-073",
+        "cardId": "GD02-025",
         "qty": 4
-      },
-      {
-        "cardId": "ST04-001",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-068",
-        "qty": 2
       },
       {
         "cardId": "ST02-001",
-        "qty": 3
+        "qty": 4
       },
       {
         "cardId": "GD01-025",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-065",
-        "qty": 2
+        "qty": 4
       },
       {
         "cardId": "GD01-024",
         "qty": 4
       },
       {
-        "cardId": "ST04-010",
-        "qty": 4
-      },
-      {
-        "cardId": "ST02-010",
-        "qty": 3
-      },
-      {
-        "cardId": "GD01-090",
+        "cardId": "GD03-021",
         "qty": 2
       },
       {
-        "cardId": "GD01-118",
+        "cardId": "ST02-010",
         "qty": 4
       },
       {
-        "cardId": "ST04-013",
-        "qty": 1
+        "cardId": "GD01-090",
+        "qty": 4
       },
       {
-        "cardId": "ST01-014",
-        "qty": 1
-      },
-      {
-        "cardId": "ST04-012",
+        "cardId": "GD01-118",
         "qty": 3
       },
       {
+        "cardId": "GD01-107",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-012",
+        "qty": 4
+      },
+      {
+        "cardId": "GD01-109",
+        "qty": 1
+      },
+      {
         "cardId": "GD01-126",
+        "qty": 2
+      },
+      {
+        "cardId": "GD03-125",
         "qty": 4
       }
     ],
-    "updatedAt": "2026-01-15T00:00:00Z",
+    "updatedAt": "2026-03-05T00:00:00Z",
     "source": "tournament",
-    "eventId": "6952f9c1ba66621ba08ad7f6",
+    "eventId": "69a6f6376a05f00a8c4a33cf",
     "placement": 1
   },
   {
-    "id": "tournament-white-red-academy",
-    "name": "White Red Academy",
-    "description": "Tournament-winning list from Rancho Special Event Gundam Domingo 07/12 (2025-12-07). Piloted by MARTIN CARREIRO to placement #37.",
-    "archetype": "White Red Academy",
-    "owner": "MARTIN CARREIRO",
+    "id": "tournament-white-red-coordinator",
+    "name": "White Red Coordinator",
+    "description": "Tournament-winning list from FREE Sunday Gundam Fight 22/03/2026 (2026-03-22). Piloted by Gshadow007 to placement #2.",
+    "archetype": "White Red Coordinator",
+    "owner": "Gshadow007",
     "colors": [
       "Red",
       "White"
@@ -1589,115 +2096,28 @@
     "likes": 0,
     "views": 0,
     "entries": [
-      {
-        "cardId": "ST01-009",
-        "qty": 4
-      },
       {
         "cardId": "GD01-086",
         "qty": 4
       },
       {
-        "cardId": "ST04-007",
-        "qty": 4
+        "cardId": "GD01-054",
+        "qty": 2
+      },
+      {
+        "cardId": "GD02-079",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-006",
+        "qty": 3
       },
       {
         "cardId": "GD01-073",
-        "qty": 3
-      },
-      {
-        "cardId": "ST04-006",
         "qty": 2
       },
       {
         "cardId": "ST04-001",
-        "qty": 4
-      },
-      {
-        "cardId": "ST01-006",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-065",
-        "qty": 2
-      },
-      {
-        "cardId": "ST04-011",
-        "qty": 4
-      },
-      {
-        "cardId": "ST04-010",
-        "qty": 4
-      },
-      {
-        "cardId": "ST01-011",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-118",
-        "qty": 4
-      },
-      {
-        "cardId": "ST01-014",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-117",
-        "qty": 2
-      },
-      {
-        "cardId": "ST04-016",
-        "qty": 3
-      }
-    ],
-    "updatedAt": "2025-12-07T00:00:00Z",
-    "source": "tournament",
-    "eventId": "6932d1591b3b036ef6db9af4",
-    "placement": 37
-  },
-  {
-    "id": "tournament-white-red-coordinator",
-    "name": "White Red Coordinator",
-    "description": "Tournament-winning list from Eagle's Nest S4GW5.0 GD03 Webcam Locals (2026-02-26). Piloted by SdotAkuma to placement #4.",
-    "archetype": "White Red Coordinator",
-    "owner": "SdotAkuma",
-    "colors": [
-      "Red",
-      "White"
-    ],
-    "likes": 0,
-    "views": 0,
-    "entries": [
-      {
-        "cardId": "GD01-054",
-        "qty": 4
-      },
-      {
-        "cardId": "GD01-050",
-        "qty": 2
-      },
-      {
-        "cardId": "GD03-038",
-        "qty": 3
-      },
-      {
-        "cardId": "ST04-007",
-        "qty": 3
-      },
-      {
-        "cardId": "ST04-006",
-        "qty": 2
-      },
-      {
-        "cardId": "GD01-046",
-        "qty": 2
-      },
-      {
-        "cardId": "ST04-001",
-        "qty": 3
-      },
-      {
-        "cardId": "GD03-033",
         "qty": 4
       },
       {
@@ -1705,7 +2125,15 @@
         "qty": 4
       },
       {
-        "cardId": "GD03-091",
+        "cardId": "GD03-033",
+        "qty": 3
+      },
+      {
+        "cardId": "GD03-034",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-010",
         "qty": 4
       },
       {
@@ -1713,7 +2141,7 @@
         "qty": 4
       },
       {
-        "cardId": "ST04-010",
+        "cardId": "GD03-091",
         "qty": 3
       },
       {
@@ -1725,18 +2153,22 @@
         "qty": 3
       },
       {
-        "cardId": "GD01-127",
+        "cardId": "GD03-109",
+        "qty": 2
+      },
+      {
+        "cardId": "ST04-016",
         "qty": 3
       },
       {
         "cardId": "GD03-127",
-        "qty": 2
+        "qty": 1
       }
     ],
-    "updatedAt": "2026-02-26T00:00:00Z",
+    "updatedAt": "2026-03-22T00:00:00Z",
     "source": "tournament",
-    "eventId": "699bba2dc9dc8186f760ac0a",
-    "placement": 4
+    "eventId": "69bfe3acd478313a15a3096c",
+    "placement": 2
   },
   {
     "id": "tournament-white-red-tempo",

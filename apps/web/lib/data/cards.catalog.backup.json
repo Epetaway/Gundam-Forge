@@ -359,7 +359,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-002",
@@ -384,7 +387,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD01-003",
@@ -412,7 +418,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-004",
@@ -440,7 +449,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-005",
@@ -470,7 +482,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD01-006",
@@ -498,7 +513,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-007",
@@ -520,7 +538,10 @@
     "normalizedName": "noins aries",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD01-008",
@@ -548,7 +569,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-009",
@@ -573,7 +597,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-010",
@@ -598,7 +625,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-011",
@@ -619,7 +649,10 @@
     "normalizedName": "loto",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-012",
@@ -641,7 +674,10 @@
     "normalizedName": "zechs leo",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD01-013",
@@ -666,7 +702,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-014",
@@ -692,7 +731,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-015",
@@ -716,7 +758,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-016",
@@ -742,7 +787,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-017",
@@ -767,7 +815,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-018",
@@ -787,7 +838,10 @@
     "normalizedName": "rezel",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-019",
@@ -811,7 +865,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-020",
@@ -835,7 +892,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-021",
@@ -855,7 +915,10 @@
     "normalizedName": "pisces",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD01-022",
@@ -875,7 +938,10 @@
     "normalizedName": "cancer",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD01-023",
@@ -897,7 +963,10 @@
     "normalizedName": "chars gelgoog",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-024",
@@ -930,7 +999,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD01-025",
@@ -958,7 +1030,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-026",
@@ -984,7 +1059,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-027",
@@ -1013,7 +1091,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-028",
@@ -1035,7 +1116,10 @@
     "normalizedName": "gundam sandrock",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-029",
@@ -1064,7 +1148,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-030",
@@ -1085,7 +1172,10 @@
     "normalizedName": "rick dom",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-031",
@@ -1106,7 +1196,10 @@
     "normalizedName": "gelgoog",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-032",
@@ -1134,7 +1227,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-033",
@@ -1159,7 +1255,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-034",
@@ -1187,7 +1286,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-035",
@@ -1207,7 +1309,10 @@
     "normalizedName": "zaku ii",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-036",
@@ -1227,7 +1332,10 @@
     "normalizedName": "gouf",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-037",
@@ -1247,7 +1355,10 @@
     "normalizedName": "gogg",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-038",
@@ -1272,7 +1383,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-039",
@@ -1293,7 +1407,10 @@
     "normalizedName": "dopp",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-040",
@@ -1314,7 +1431,10 @@
     "normalizedName": "wing gundam",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-041",
@@ -1339,7 +1459,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-042",
@@ -1361,7 +1484,10 @@
     "normalizedName": "duos leo",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-043",
@@ -1386,7 +1512,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "GD01-044",
@@ -1411,7 +1540,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-045",
@@ -1436,7 +1568,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-046",
@@ -1465,7 +1600,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-047",
@@ -1495,7 +1633,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-048",
@@ -1523,7 +1664,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-049",
@@ -1548,7 +1692,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-050",
@@ -1573,7 +1720,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-051",
@@ -1599,7 +1749,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-052",
@@ -1623,7 +1776,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-053",
@@ -1647,7 +1803,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-054",
@@ -1672,7 +1831,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-055",
@@ -1696,7 +1858,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-056",
@@ -1717,7 +1882,10 @@
     "normalizedName": "geara doga sleeves",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-057",
@@ -1737,7 +1905,10 @@
     "normalizedName": "dreissen sleeves",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-058",
@@ -1761,7 +1932,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-059",
@@ -1785,7 +1959,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-060",
@@ -1805,7 +1982,10 @@
     "normalizedName": "zaku mariner",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-061",
@@ -1829,7 +2009,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-062",
@@ -1849,7 +2032,10 @@
     "normalizedName": "goohn",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-063",
@@ -1874,7 +2060,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-064",
@@ -1894,7 +2083,10 @@
     "normalizedName": "dinn",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-065",
@@ -1928,7 +2120,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-066",
@@ -1958,7 +2153,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-067",
@@ -1987,7 +2185,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-068",
@@ -2015,7 +2216,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-069",
@@ -2043,7 +2247,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-070",
@@ -2069,7 +2276,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-071",
@@ -2095,7 +2305,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-072",
@@ -2120,7 +2333,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-073",
@@ -2146,7 +2362,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-074",
@@ -2168,7 +2387,10 @@
     "normalizedName": "chuchus demi trainer",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-075",
@@ -2193,7 +2415,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-076",
@@ -2215,7 +2440,10 @@
     "normalizedName": "michaelis",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-077",
@@ -2236,7 +2464,10 @@
     "normalizedName": "strike gundam",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-078",
@@ -2260,7 +2491,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-079",
@@ -2281,7 +2515,10 @@
     "normalizedName": "skygrasper",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-080",
@@ -2303,7 +2540,10 @@
     "normalizedName": "cagallis skygrasper",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD01-081",
@@ -2327,7 +2567,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-082",
@@ -2353,7 +2596,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-083",
@@ -2374,7 +2620,10 @@
     "normalizedName": "guels dilanza",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-084",
@@ -2394,7 +2643,10 @@
     "normalizedName": "beguirpente",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-085",
@@ -2414,7 +2666,10 @@
     "normalizedName": "demi garrison",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-086",
@@ -2442,7 +2697,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vanadis Institute"
+    ]
   },
   {
     "id": "GD01-087",
@@ -2472,7 +2730,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-088",
@@ -2500,7 +2761,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD01-089",
@@ -2523,7 +2787,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-090",
@@ -2551,7 +2818,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-091",
@@ -2577,7 +2847,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD01-092",
@@ -2597,7 +2870,10 @@
     "normalizedName": "mquve",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-093",
@@ -2622,7 +2898,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-094",
@@ -2646,7 +2925,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-095",
@@ -2670,7 +2952,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-096",
@@ -2698,7 +2983,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Orb"
+    ]
   },
   {
     "id": "GD01-097",
@@ -2722,7 +3010,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-098",
@@ -2742,7 +3033,10 @@
     "normalizedName": "elan ceres enhanced person number 4",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-099",
@@ -2803,7 +3097,10 @@
     "normalizedName": "deep devotion",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD01-102",
@@ -2840,7 +3137,10 @@
     "normalizedName": "the stubborn cog",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-104",
@@ -2904,7 +3204,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-107",
@@ -2986,7 +3289,10 @@
     "normalizedName": "rasids orders",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "GD01-111",
@@ -3031,7 +3337,10 @@
     "normalizedName": "extreme hatred",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-113",
@@ -3051,7 +3360,10 @@
     "normalizedName": "the desert tiger",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-114",
@@ -3071,7 +3383,10 @@
     "normalizedName": "assault on torrington base",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-115",
@@ -3108,7 +3423,10 @@
     "normalizedName": "stealth stratagem",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-117",
@@ -3169,7 +3487,10 @@
     "normalizedName": "ironfisted discipline",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-120",
@@ -3229,7 +3550,10 @@
     "normalizedName": "covert operative",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD01-123",
@@ -3254,7 +3578,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-124",
@@ -3278,7 +3605,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD01-125",
@@ -3303,7 +3633,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD01-126",
@@ -3324,7 +3657,10 @@
     "normalizedName": "underground desert base",
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "GD01-127",
@@ -3352,7 +3688,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD01-128",
@@ -3376,7 +3715,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD01-129",
@@ -3400,7 +3742,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD01-130",
@@ -3424,7 +3769,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD02-001",
@@ -3453,7 +3801,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-002",
@@ -3510,7 +3861,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-004",
@@ -3536,7 +3890,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-005",
@@ -3567,7 +3924,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD02-006",
@@ -3597,7 +3957,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-007",
@@ -3623,7 +3986,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-008",
@@ -3649,7 +4015,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-009",
@@ -3679,7 +4048,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-010",
@@ -3706,7 +4078,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-011",
@@ -3731,7 +4106,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-012",
@@ -3756,7 +4134,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-013",
@@ -3777,7 +4158,10 @@
     "normalizedName": "hizack",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-014",
@@ -3802,7 +4186,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-015",
@@ -3824,7 +4211,10 @@
     "normalizedName": "marasai",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-016",
@@ -3846,7 +4236,10 @@
     "normalizedName": "barzam",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-017",
@@ -3876,7 +4269,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-018",
@@ -3902,7 +4298,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "GD02-019",
@@ -3928,7 +4327,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-020",
@@ -3958,7 +4360,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-021",
@@ -3985,7 +4390,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-022",
@@ -4018,7 +4426,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-023",
@@ -4051,7 +4462,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-024",
@@ -4080,7 +4494,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD02-025",
@@ -4110,7 +4527,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "GD02-026",
@@ -4137,7 +4557,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-027",
@@ -4167,7 +4590,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-028",
@@ -4193,7 +4619,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "GD02-029",
@@ -4219,7 +4648,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-030",
@@ -4244,7 +4676,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-031",
@@ -4271,7 +4706,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-032",
@@ -4296,7 +4734,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-033",
@@ -4325,7 +4766,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-034",
@@ -4352,7 +4796,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-035",
@@ -4377,7 +4824,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Side 6"
+    ]
   },
   {
     "id": "GD02-036",
@@ -4408,7 +4858,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-037",
@@ -4440,7 +4893,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-038",
@@ -4466,7 +4922,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD02-039",
@@ -4492,7 +4951,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-040",
@@ -4524,7 +4986,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-041",
@@ -4550,7 +5015,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD02-042",
@@ -4582,7 +5050,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-043",
@@ -4610,7 +5081,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-044",
@@ -4635,7 +5109,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-045",
@@ -4664,7 +5141,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD02-046",
@@ -4693,7 +5173,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-047",
@@ -4714,7 +5197,10 @@
     "normalizedName": "gaza c",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-048",
@@ -4740,7 +5226,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-049",
@@ -4768,7 +5257,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-050",
@@ -4793,7 +5285,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-051",
@@ -4817,7 +5312,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-052",
@@ -4841,7 +5339,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-053",
@@ -4873,7 +5374,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-054",
@@ -4902,7 +5406,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD02-055",
@@ -4934,7 +5441,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD02-056",
@@ -4963,7 +5473,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-057",
@@ -4993,7 +5506,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "UE",
+      "Vagan"
+    ]
   },
   {
     "id": "GD02-058",
@@ -5022,7 +5539,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD02-059",
@@ -5051,7 +5571,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-060",
@@ -5080,7 +5603,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-061",
@@ -5109,7 +5635,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD02-062",
@@ -5134,7 +5663,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD02-063",
@@ -5159,7 +5691,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-064",
@@ -5185,7 +5720,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-065",
@@ -5209,7 +5747,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-066",
@@ -5235,7 +5776,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "UE",
+      "Vagan"
+    ]
   },
   {
     "id": "GD02-067",
@@ -5260,7 +5805,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "UE",
+      "Vagan"
+    ]
   },
   {
     "id": "GD02-068",
@@ -5289,7 +5838,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD02-069",
@@ -5316,7 +5868,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-070",
@@ -5345,7 +5900,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-071",
@@ -5368,7 +5926,10 @@
     "normalizedName": "gundam mkii aeug",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-072",
@@ -5395,7 +5956,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-073",
@@ -5424,7 +5988,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-074",
@@ -5457,7 +6024,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD02-075",
@@ -5483,7 +6053,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-076",
@@ -5513,7 +6086,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD02-077",
@@ -5538,7 +6114,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-078",
@@ -5563,7 +6142,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD02-079",
@@ -5585,7 +6167,10 @@
     "normalizedName": "rick dias",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-080",
@@ -5606,7 +6191,10 @@
     "normalizedName": "nemo",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-081",
@@ -5632,7 +6220,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-082",
@@ -5661,7 +6252,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-083",
@@ -5686,7 +6280,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-084",
@@ -5711,7 +6308,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "GD02-085",
@@ -5737,7 +6337,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-086",
@@ -5758,7 +6361,10 @@
     "normalizedName": "jerid messa",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-087",
@@ -5790,7 +6396,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-088",
@@ -5815,7 +6424,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-089",
@@ -5846,7 +6458,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-090",
@@ -5873,7 +6488,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-091",
@@ -5898,7 +6516,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-092",
@@ -5926,7 +6547,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-093",
@@ -5953,7 +6577,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD02-094",
@@ -5980,7 +6607,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-095",
@@ -6011,7 +6641,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD02-096",
@@ -6040,7 +6673,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD02-097",
@@ -6064,7 +6700,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-098",
@@ -6089,7 +6728,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-099",
@@ -6116,7 +6758,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-100",
@@ -6184,7 +6829,10 @@
     "normalizedName": "mouars determination",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-103",
@@ -6254,7 +6902,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-106",
@@ -6279,7 +6930,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-107",
@@ -6345,7 +6999,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD02-110",
@@ -6438,7 +7095,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD02-114",
@@ -6462,7 +7122,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD02-115",
@@ -6486,7 +7149,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-116",
@@ -6510,7 +7176,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-117",
@@ -6558,7 +7227,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-119",
@@ -6582,7 +7254,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD02-120",
@@ -6603,7 +7278,10 @@
     "normalizedName": "aspiring pilot",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-121",
@@ -6632,7 +7310,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "GD02-122",
@@ -6656,7 +7337,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD02-123",
@@ -6683,7 +7367,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD02-124",
@@ -6711,7 +7398,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD02-125",
@@ -6736,7 +7426,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD02-126",
@@ -6760,7 +7453,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD02-127",
@@ -6788,7 +7484,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD02-128",
@@ -6815,7 +7514,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD02-129",
@@ -6839,7 +7541,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD02-130",
@@ -6866,7 +7571,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD03-001",
@@ -6900,7 +7608,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-002",
@@ -6926,7 +7637,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-003",
@@ -6953,7 +7667,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-004",
@@ -6979,7 +7696,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-005",
@@ -7012,7 +7732,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "GD03-006",
@@ -7039,7 +7762,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-007",
@@ -7067,7 +7793,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-008",
@@ -7096,7 +7825,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-009",
@@ -7122,7 +7854,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-010",
@@ -7152,7 +7887,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD03-011",
@@ -7178,7 +7916,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-012",
@@ -7201,7 +7942,10 @@
     "normalizedName": "messala ma mode",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-013",
@@ -7226,7 +7970,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-014",
@@ -7248,7 +7995,10 @@
     "normalizedName": "hizack custom",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-015",
@@ -7277,7 +8027,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-016",
@@ -7303,7 +8056,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD03-017",
@@ -7335,7 +8091,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-018",
@@ -7369,7 +8128,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD03-019",
@@ -7400,7 +8162,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-020",
@@ -7432,7 +8197,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-021",
@@ -7459,7 +8227,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD03-022",
@@ -7489,7 +8260,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-023",
@@ -7519,7 +8293,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-024",
@@ -7551,7 +8328,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-025",
@@ -7578,7 +8358,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD03-026",
@@ -7608,7 +8391,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-027",
@@ -7635,7 +8421,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-028",
@@ -7665,7 +8454,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "GD03-029",
@@ -7695,7 +8487,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD03-030",
@@ -7722,7 +8517,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-031",
@@ -7748,7 +8546,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-032",
@@ -7772,7 +8573,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD03-033",
@@ -7803,7 +8607,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-034",
@@ -7835,7 +8642,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD03-035",
@@ -7865,7 +8675,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-036",
@@ -7892,7 +8705,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "GD03-037",
@@ -7924,7 +8740,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "SRA"
+    ]
   },
   {
     "id": "GD03-038",
@@ -7954,7 +8773,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-039",
@@ -7983,7 +8805,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "GD03-040",
@@ -8015,7 +8840,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD03-041",
@@ -8044,7 +8872,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "SRA"
+    ]
   },
   {
     "id": "GD03-042",
@@ -8071,7 +8902,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-043",
@@ -8101,7 +8935,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "GD03-044",
@@ -8129,7 +8966,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD03-045",
@@ -8154,7 +8994,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD03-046",
@@ -8179,7 +9022,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-047",
@@ -8205,7 +9051,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-048",
@@ -8235,7 +9084,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-049",
@@ -8265,7 +9117,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-050",
@@ -8291,7 +9146,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-051",
@@ -8321,7 +9179,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD03-052",
@@ -8351,7 +9212,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-053",
@@ -8384,7 +9248,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-054",
@@ -8417,7 +9284,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-055",
@@ -8443,7 +9313,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD03-056",
@@ -8472,7 +9345,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-057",
@@ -8502,7 +9378,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-058",
@@ -8529,7 +9408,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "UE",
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-059",
@@ -8559,7 +9442,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-060",
@@ -8587,7 +9473,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-061",
@@ -8616,7 +9505,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-062",
@@ -8644,7 +9536,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Old UNE",
+      "Vulture"
+    ]
   },
   {
     "id": "GD03-063",
@@ -8669,7 +9565,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "GD03-064",
@@ -8695,7 +9594,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "UE",
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-065",
@@ -8721,7 +9624,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-066",
@@ -8746,7 +9652,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-067",
@@ -8775,7 +9684,11 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz",
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-068",
@@ -8804,7 +9717,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD03-069",
@@ -8837,7 +9753,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-070",
@@ -8864,7 +9783,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD03-071",
@@ -8890,7 +9812,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD03-072",
@@ -8923,7 +9848,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD03-073",
@@ -8953,7 +9881,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD03-074",
@@ -8983,7 +9914,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-075",
@@ -9010,7 +9944,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD03-076",
@@ -9040,7 +9977,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD03-077",
@@ -9070,7 +10010,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD03-078",
@@ -9100,7 +10043,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-079",
@@ -9123,7 +10069,10 @@
     "normalizedName": "gdefenser",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD03-080",
@@ -9152,7 +10101,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "GD03-081",
@@ -9179,7 +10131,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-082",
@@ -9205,7 +10160,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-083",
@@ -9234,7 +10192,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-084",
@@ -9262,7 +10223,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-085",
@@ -9288,7 +10252,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-086",
@@ -9313,7 +10280,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-087",
@@ -9337,7 +10307,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-088",
@@ -9369,7 +10342,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-089",
@@ -9395,7 +10371,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-090",
@@ -9428,7 +10407,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-091",
@@ -9456,7 +10438,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-092",
@@ -9483,7 +10468,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-093",
@@ -9507,7 +10495,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "SRA"
+    ]
   },
   {
     "id": "GD03-094",
@@ -9536,7 +10527,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-095",
@@ -9563,7 +10557,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "GD03-096",
@@ -9592,7 +10589,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vulture"
+    ]
   },
   {
     "id": "GD03-097",
@@ -9619,7 +10619,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "GD03-098",
@@ -9648,7 +10651,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-099",
@@ -9669,7 +10675,10 @@
     "normalizedName": "emma sheen",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD03-100",
@@ -9697,7 +10706,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-101",
@@ -9784,7 +10796,10 @@
     "normalizedName": "reccoas shadow",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-105",
@@ -9859,7 +10874,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-108",
@@ -9888,7 +10906,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-109",
@@ -9958,7 +10979,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "GD03-112",
@@ -10054,7 +11078,11 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian",
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-116",
@@ -10170,7 +11198,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-121",
@@ -10191,7 +11222,10 @@
     "normalizedName": "unheralded attack",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "GD03-122",
@@ -10216,7 +11250,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Superpower Bloc"
+    ]
   },
   {
     "id": "GD03-123",
@@ -10241,7 +11278,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Titans"
+    ]
   },
   {
     "id": "GD03-124",
@@ -10271,7 +11311,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "GD03-125",
@@ -10299,7 +11342,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "G Team"
+    ]
   },
   {
     "id": "GD03-126",
@@ -10328,7 +11374,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "GD03-127",
@@ -10357,7 +11406,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "GD03-128",
@@ -10384,7 +11436,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "GD03-129",
@@ -10412,7 +11467,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "GD03-130",
@@ -10440,7 +11498,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Vagan"
+    ]
   },
   {
     "id": "GD03-131",
@@ -10468,7 +11529,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "GD03-132",
@@ -10492,7 +11556,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "AEUG"
+    ]
   },
   {
     "id": "R-001",
@@ -11729,7 +12796,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-002",
@@ -11758,7 +12828,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-003",
@@ -11783,7 +12856,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-004",
@@ -11812,7 +12888,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-005",
@@ -11836,7 +12915,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-006",
@@ -11865,7 +12947,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST01-007",
@@ -11890,7 +12975,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST01-008",
@@ -11918,7 +13006,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST01-009",
@@ -11943,7 +13034,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST01-010",
@@ -11971,7 +13065,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-011",
@@ -11998,7 +13095,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST01-012",
@@ -12022,7 +13122,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-013",
@@ -12046,7 +13149,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-014",
@@ -12102,7 +13208,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST01-016",
@@ -12131,7 +13240,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST02-001",
@@ -12156,7 +13268,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-002",
@@ -12186,7 +13301,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-003",
@@ -12211,7 +13329,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-004",
@@ -12232,7 +13353,10 @@
     "normalizedName": "gundam sandrock",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-005",
@@ -12252,7 +13376,10 @@
     "normalizedName": "maganac",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Maganac Corps"
+    ]
   },
   {
     "id": "ST02-006",
@@ -12277,7 +13404,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST02-007",
@@ -12298,7 +13428,10 @@
     "normalizedName": "leo",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST02-008",
@@ -12322,7 +13455,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST02-009",
@@ -12343,7 +13479,10 @@
     "normalizedName": "tragos",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST02-010",
@@ -12372,7 +13511,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-011",
@@ -12397,7 +13539,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST02-012",
@@ -12420,7 +13565,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-013",
@@ -12440,7 +13588,10 @@
     "normalizedName": "peaceful timbre",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Operation Meteor"
+    ]
   },
   {
     "id": "ST02-014",
@@ -12491,7 +13642,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Academy"
+    ]
   },
   {
     "id": "ST02-016",
@@ -12516,7 +13670,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "ST03-001",
@@ -12544,7 +13701,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-002",
@@ -12569,7 +13729,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-003",
@@ -12590,7 +13753,10 @@
     "normalizedName": "geara zulu",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-004",
@@ -12611,7 +13777,10 @@
     "normalizedName": "gaza d sleeves",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-005",
@@ -12631,7 +13800,10 @@
     "normalizedName": "drac sleeves",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-006",
@@ -12653,7 +13825,10 @@
     "normalizedName": "chars zaku",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-007",
@@ -12673,7 +13848,10 @@
     "normalizedName": "zaku",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-008",
@@ -12701,7 +13879,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-009",
@@ -12726,7 +13907,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-010",
@@ -12751,7 +13935,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-011",
@@ -12777,7 +13964,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-012",
@@ -12797,7 +13987,10 @@
     "normalizedName": "indignation",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-013",
@@ -12844,7 +14037,10 @@
     "normalizedName": "the blue giant",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST03-015",
@@ -12869,7 +14065,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Neo Zeon"
+    ]
   },
   {
     "id": "ST03-016",
@@ -12893,7 +14092,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST04-001",
@@ -12921,7 +14123,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-002",
@@ -12951,7 +14156,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-003",
@@ -12972,7 +14180,10 @@
     "normalizedName": "moebius zero",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-004",
@@ -12996,7 +14207,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-005",
@@ -13016,7 +14230,10 @@
     "normalizedName": "strike dagger",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-006",
@@ -13041,7 +14258,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-007",
@@ -13066,7 +14286,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-008",
@@ -13086,7 +14309,10 @@
     "normalizedName": "ginn",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-009",
@@ -13111,7 +14337,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-010",
@@ -13140,7 +14369,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-011",
@@ -13168,7 +14400,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-012",
@@ -13212,7 +14447,10 @@
     "normalizedName": "hawk of endymion",
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-014",
@@ -13235,7 +14473,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST04-015",
@@ -13264,7 +14505,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "ST04-016",
@@ -13288,7 +14532,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "ZAFT"
+    ]
   },
   {
     "id": "ST05-001",
@@ -13314,7 +14561,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-002",
@@ -13337,7 +14587,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-003",
@@ -13359,7 +14612,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-004",
@@ -13381,7 +14637,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-005",
@@ -13404,7 +14663,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-006",
@@ -13426,7 +14688,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Teiwaz"
+    ]
   },
   {
     "id": "ST05-007",
@@ -13455,7 +14720,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "ST05-008",
@@ -13478,7 +14746,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "ST05-009",
@@ -13500,7 +14771,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "ST05-010",
@@ -13528,7 +14802,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-011",
@@ -13554,7 +14831,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST05-012",
@@ -13581,7 +14861,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Gjallarhorn"
+    ]
   },
   {
     "id": "ST05-013",
@@ -13652,7 +14935,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "ST06-001",
@@ -13681,7 +14967,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-002",
@@ -13707,7 +14996,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-003",
@@ -13733,7 +15025,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-004",
@@ -13755,7 +15050,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "ST06-005",
@@ -13784,7 +15082,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-006",
@@ -13806,7 +15107,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-007",
@@ -13832,7 +15136,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-008",
@@ -13852,7 +15159,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-009",
@@ -13879,7 +15189,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-010",
@@ -13906,7 +15219,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-011",
@@ -13929,7 +15245,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-012",
@@ -13972,7 +15291,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-014",
@@ -13998,7 +15320,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST06-015",
@@ -14027,7 +15352,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "ST07-001",
@@ -14054,7 +15382,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-002",
@@ -14077,7 +15408,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-003",
@@ -14100,7 +15434,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-004",
@@ -14127,7 +15464,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-005",
@@ -14154,7 +15494,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-006",
@@ -14177,7 +15520,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-007",
@@ -14201,7 +15547,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-008",
@@ -14224,7 +15573,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-009",
@@ -14252,7 +15604,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-010",
@@ -14276,7 +15631,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-011",
@@ -14304,7 +15662,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-012",
@@ -14328,7 +15689,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST07-013",
@@ -14400,7 +15764,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "CB"
+    ]
   },
   {
     "id": "ST08-001",
@@ -14427,7 +15794,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-002",
@@ -14454,7 +15824,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-003",
@@ -14477,7 +15850,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-004",
@@ -14504,7 +15880,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-005",
@@ -14527,7 +15906,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-006",
@@ -14556,7 +15938,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST08-007",
@@ -14579,7 +15964,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST08-008",
@@ -14606,7 +15994,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST08-009",
@@ -14632,7 +16023,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST08-010",
@@ -14660,7 +16054,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-011",
@@ -14687,7 +16084,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "ST08-012",
@@ -14714,7 +16114,10 @@
     ],
     "isMainDeck": true,
     "isResource": true,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-013",
@@ -14762,7 +16165,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Mafty"
+    ]
   },
   {
     "id": "ST08-015",
@@ -14789,7 +16195,10 @@
     ],
     "isMainDeck": false,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Federation"
+    ]
   },
   {
     "id": "T-001",
@@ -14865,7 +16274,10 @@
     "normalizedName": "leo",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "T-005",
@@ -14884,7 +16296,10 @@
     "normalizedName": "tallgeese",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "OZ"
+    ]
   },
   {
     "id": "T-006",
@@ -14903,7 +16318,10 @@
     "normalizedName": "chars zaku",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "T-007",
@@ -14922,7 +16340,10 @@
     "normalizedName": "zaku",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "T-008",
@@ -14945,7 +16366,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "T-009",
@@ -14965,7 +16389,10 @@
     "normalizedName": "launcher strike gundam",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "T-010",
@@ -14988,7 +16415,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Earth Alliance"
+    ]
   },
   {
     "id": "T-011",
@@ -15008,7 +16438,10 @@
     "normalizedName": "fatum00",
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Triple Ship Alliance"
+    ]
   },
   {
     "id": "T-012",
@@ -15029,7 +16462,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "New UNE"
+    ]
   },
   {
     "id": "T-013",
@@ -15053,7 +16489,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   },
   {
     "id": "T-014",
@@ -15077,7 +16516,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Civilian"
+    ]
   },
   {
     "id": "T-015",
@@ -15099,7 +16541,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "T-016",
@@ -15121,7 +16566,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "T-017",
@@ -15143,7 +16591,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Tekkadan"
+    ]
   },
   {
     "id": "T-018",
@@ -15165,7 +16616,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "T-019",
@@ -15187,7 +16641,10 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Clan"
+    ]
   },
   {
     "id": "T-020",
@@ -15209,6 +16666,9 @@
     ],
     "isMainDeck": true,
     "isResource": false,
-    "isExCard": false
+    "isExCard": false,
+    "clans": [
+      "Zeon"
+    ]
   }
 ]

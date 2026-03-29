@@ -80,12 +80,6 @@ export function DeckHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           {children}
-          <Button asChild size="sm" variant="primary">
-            <Link href={`/decks/${deckId}/playtest`}>
-              <Swords className="mr-1.5 h-3.5 w-3.5" />
-              Playtest
-            </Link>
-          </Button>
           <Button onClick={onShare} size="sm" variant="secondary">
             <Share2 className="mr-1.5 h-3.5 w-3.5" />
             Share
