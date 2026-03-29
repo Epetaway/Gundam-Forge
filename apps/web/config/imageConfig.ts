@@ -4,6 +4,8 @@
  * Centralized configuration for card image serving, fallbacks, and optimization
  */
 
+const IS_DEV = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
 export const IMAGE_CONFIG = {
   // Local image serving
   LOCAL: {
@@ -53,7 +55,7 @@ export const IMAGE_CONFIG = {
     maxRetries: 2,
     fallbackOnError: true,
     showPlaceholder: true,
-    logErrors: process.env.NODE_ENV === 'development',
+    logErrors: IS_DEV,
   },
 
   // Performance optimization

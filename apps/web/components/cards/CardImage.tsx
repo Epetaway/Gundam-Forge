@@ -11,9 +11,9 @@
 
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/cn';
 import {
   getProductionCardImageUrl,
   getCardImageFallback,
