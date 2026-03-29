@@ -196,9 +196,33 @@ export function getCard(id: string): CardDefinition | undefined {
   return cardsById.get(id);
 }
 
+/**
+ * Get production card image URL with automatic fallbacks
+ * 
+ * Priority:
+ * 1. Local /card_art/{id}.webp (bundled, reliable)
+ * 2. Existing imageUrl if valid (database value)
+ * 3. Fallback to CDN/placeholder (handled by component)
+ * 
+ * Note: Use CardImage component for automatic error handling
+ * and fallback chain. Direct img tags should use onError handlers.
+ */
 export function getCardImage(card: CardImageRef): string {
-  if (card.imageUrl?.startsWith('/card_art/')) return withBasePath(card.imageUrl);
-  if (card.imageUrl) return card.imageUrl;
-  if (card.placeholderArt) return card.placeholderArt;
+  // Prefer local card_art if available
+  if (card.imageUrl?.startsWith('/card_art/')) {
+    return withBasePath(card.imageUrl);
+  }
+  
+  // Otherwise use existing imageUrl if not a placeholder
+  if (card.imageUrl && !card.imageUrl.includes('placehold')) {
+    return card.imageUrl;
+  }
+  
+  // Fallback to legacy placeholder field if present
+  if (card.placeholderArt) {
+    return card.placeholderArt;
+  }
+  
+  // Default: local card_art - component will handle fallback chain if missing
   return withBasePath(`/card_art/${card.id}.webp`);
 }
