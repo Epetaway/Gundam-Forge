@@ -1,5 +1,824 @@
 [
   {
+    "id": "69c300f536f5b5c303dbcdeb",
+    "slug": "eagle-s-nest-s4gw9-0-gd03-webcam-locals-2026-03-26",
+    "name": "Eagle's Nest S4GW9.0 GD03 Webcam Locals",
+    "date": "2026-03-26",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 17,
+    "placements": [
+      {
+        "deckId": "amuro mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Geicokiller",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "SdotAkuma",
+        "placement": 2,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Coordinator Pilots",
+        "deckName": "White Red Coordinator",
+        "archetype": "White Red Coordinator",
+        "player": "sourmango",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show",
+        "deckName": "Blue White Academy Tempo",
+        "archetype": "Blue White Academy Tempo",
+        "player": "KotyAngeloff",
+        "placement": 4,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Muskrat",
+        "placement": 5,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "marida and bana",
+        "deckName": "Blue Red Unicorn",
+        "archetype": "Blue Red Unicorn",
+        "player": "chrinyian",
+        "placement": 6,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Kira and Mika",
+        "deckName": "Purple White Control",
+        "archetype": "Purple White Control",
+        "player": "Huycoveries",
+        "placement": 7,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "pappi",
+        "deckName": "Blue White The-O",
+        "archetype": "Blue White The-O",
+        "player": "Leo Pham",
+        "placement": 8,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69bfe3acd478313a15a3096c",
+    "slug": "free-sunday-gundam-fight-22-03-2026-2026-03-22",
+    "name": "FREE Sunday Gundam Fight 22/03/2026",
+    "date": "2026-03-22",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 11,
+    "placements": [
+      {
+        "deckId": "amuro mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Ystesia",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "Coordinator Pilots",
+        "deckName": "White Red Coordinator",
+        "archetype": "White Red Coordinator",
+        "player": "Gshadow007",
+        "placement": 2,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "pappi",
+        "deckName": "Blue White The-O",
+        "archetype": "Blue White The-O",
+        "player": "Nova2",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Dinodast",
+        "placement": 4,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "danieluzi",
+        "placement": 5,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "pappi",
+        "deckName": "Blue White The-O",
+        "archetype": "Blue White The-O",
+        "player": "Anogare",
+        "placement": 6,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "kiiyo",
+        "placement": 7,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "pilot and unit",
+        "deckName": "White Red Zaft",
+        "archetype": "White Red Zaft",
+        "player": "Koujex",
+        "placement": 8,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69a906b36a05f00a8c4a480c",
+    "slug": "the-eagle-s-nest-s4w8-5-msa-online-locals-2026-03-21",
+    "name": "The Eagle's Nest S4W8.5 MSA Online Locals",
+    "date": "2026-03-21",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 68,
+    "placements": [
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Arduillas",
+        "placement": 1,
+        "wins": 9,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "110100100",
+        "placement": 2,
+        "wins": 8,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Rixter117",
+        "placement": 3,
+        "wins": 8,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "Gbonow",
+        "placement": 4,
+        "wins": 7,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Levant9424",
+        "placement": 5,
+        "wins": 6,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Stormblessed",
+        "placement": 6,
+        "wins": 5,
+        "losses": 3,
+        "draws": 0
+      },
+      {
+        "deckId": "Unicorn Top",
+        "deckName": "Blue White Unicorn Control",
+        "archetype": "Blue White Unicorn Control",
+        "player": "DougGodinho",
+        "placement": 7,
+        "wins": 5,
+        "losses": 3,
+        "draws": 0
+      },
+      {
+        "deckId": "newtypes",
+        "deckName": "Red Blue Newtype Ping",
+        "archetype": "Red Blue Newtype Ping",
+        "player": "AlejandorC",
+        "placement": 8,
+        "wins": 5,
+        "losses": 3,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69b34dc7f39e6e7096a024dd",
+    "slug": "eagle-s-nest-s4gw8-0-gd03-webcam-locals-2026-03-19",
+    "name": "Eagle's Nest S4GW8.0 GD03 Webcam Locals",
+    "date": "2026-03-19",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 16,
+    "placements": [
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "KotyAngeloff",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Geicokiller",
+        "placement": 2,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Muskrat",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "danieluzi",
+        "placement": 4,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "SdotAkuma",
+        "placement": 5,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "sourmango",
+        "placement": 6,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "zeon pilots",
+        "deckName": "Red Green Zeon Aggro",
+        "archetype": "Red Green Zeon Aggro",
+        "player": "BunnyFooFoo998",
+        "placement": 7,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Nighthawkk",
+        "placement": 8,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69b94b45ccdfe3b78e575b92",
+    "slug": "gundam-tcg-arg-online-tournament-1st-edition-2026-03-18",
+    "name": "Gundam TCG ARG - Online Tournament 1st edition",
+    "date": "2026-03-18",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 21,
+    "placements": [
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Calabasus",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "Beta LR",
+        "deckName": "Blue White Control",
+        "archetype": "Blue White Control",
+        "player": "Ceol",
+        "placement": 2,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Ressort",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "Mauri",
+        "placement": 4,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "Rmichelea23",
+        "placement": 5,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "alastor_92",
+        "placement": 6,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "newtypes",
+        "deckName": "Red Blue Newtype Ping",
+        "archetype": "Red Blue Newtype Ping",
+        "player": "Argentis",
+        "placement": 7,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "boomatronic",
+        "placement": 8,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69b17c2e6a05f00a8c4a9d18",
+    "slug": "msa-steel-requien-closing-tournament-2026-03-13",
+    "name": "MSA Steel Requien Closing Tournament",
+    "date": "2026-03-13",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 51,
+    "placements": [
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "DoubtWithAZero",
+        "placement": 1,
+        "wins": 8,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Sekardblue",
+        "placement": 2,
+        "wins": 6,
+        "losses": 3,
+        "draws": 0
+      },
+      {
+        "deckId": "newtypes",
+        "deckName": "Red Blue Newtype Ping",
+        "archetype": "Red Blue Newtype Ping",
+        "player": "CasvalDC",
+        "placement": 3,
+        "wins": 6,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Koreatwo",
+        "placement": 4,
+        "wins": 5,
+        "losses": 3,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Dreizhen",
+        "placement": 5,
+        "wins": 6,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Coordinator Pilots",
+        "deckName": "White Red Coordinator",
+        "archetype": "White Red Coordinator",
+        "player": "SirLantz",
+        "placement": 6,
+        "wins": 5,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "OMGio",
+        "placement": 7,
+        "wins": 5,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "SamuelYip",
+        "placement": 8,
+        "wins": 4,
+        "losses": 3,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69a8f903f39e6e70969fc1ed",
+    "slug": "eagle-s-nest-s4gw7-0-gd03-webcam-locals-2026-03-12",
+    "name": "Eagle's Nest S4GW7.0 GD03 Webcam Locals",
+    "date": "2026-03-12",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 18,
+    "placements": [
+      {
+        "deckId": "Char/Amuro",
+        "deckName": "One Year War Rush",
+        "archetype": "One Year War Rush",
+        "player": "Michae1",
+        "placement": 1,
+        "wins": 5,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Gallet",
+        "placement": 2,
+        "wins": 4,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Coordinator Pilots",
+        "deckName": "White Red Coordinator",
+        "archetype": "White Red Coordinator",
+        "player": "KotyAngeloff",
+        "placement": 3,
+        "wins": 4,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show",
+        "deckName": "Blue White Academy Tempo",
+        "archetype": "Blue White Academy Tempo",
+        "player": "BunnyFooFoo998",
+        "placement": 4,
+        "wins": 4,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Lalinmvp",
+        "placement": 5,
+        "wins": 3,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "sourmango",
+        "placement": 6,
+        "wins": 3,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "Unicorn Top",
+        "deckName": "Blue White Unicorn Control",
+        "archetype": "Blue White Unicorn Control",
+        "player": "DomoUwU",
+        "placement": 7,
+        "wins": 3,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Levant9424",
+        "placement": 8,
+        "wins": 3,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69aca4e2f39e6e70969feba5",
+    "slug": "free-sunday-gundam-fight-08-03-2026-2026-03-08",
+    "name": "FREE Sunday Gundam Fight 08/03/2026",
+    "date": "2026-03-08",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 9,
+    "placements": [
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "Gallet",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "sourmango",
+        "placement": 2,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "kiiyo",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "type82c",
+        "placement": 4,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "amuro/mikazuki",
+        "deckName": "Blue Purple Midrange",
+        "archetype": "Blue Purple Midrange",
+        "player": "SirTheThird",
+        "placement": 5,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Nova2",
+        "placement": 6,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      {
+        "deckId": "Unicorn Top",
+        "deckName": "Blue White Unicorn Control",
+        "archetype": "Blue White Unicorn Control",
+        "player": "Zydzen",
+        "placement": 7,
+        "wins": 1,
+        "losses": 3,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "danieluzi",
+        "placement": 8,
+        "wins": 1,
+        "losses": 3,
+        "draws": 0
+      }
+    ]
+  },
+  {
+    "id": "69a6f6376a05f00a8c4a33cf",
+    "slug": "eagle-s-nest-s4gw6-0-gd03-webcam-locals-2026-03-05",
+    "name": "Eagle's Nest S4GW6.0 GD03 Webcam Locals",
+    "date": "2026-03-05",
+    "format": "standard",
+    "location": "Online",
+    "playerCount": 19,
+    "placements": [
+      {
+        "deckId": "show and green guys",
+        "deckName": "White Green Operation Meteor",
+        "archetype": "White Green Operation Meteor",
+        "player": "SdotAkuma",
+        "placement": 1,
+        "wins": 4,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "deckId": "newtypes",
+        "deckName": "Red Blue Newtype Ping",
+        "archetype": "Red Blue Newtype Ping",
+        "player": "Jinzo777",
+        "placement": 2,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "show",
+        "deckName": "Blue White Academy Tempo",
+        "archetype": "Blue White Academy Tempo",
+        "player": "BunnyFooFoo998",
+        "placement": 3,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Gallet",
+        "placement": 4,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "Ipixx",
+        "placement": 5,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Beta LR",
+        "deckName": "Blue White Control",
+        "archetype": "Blue White Control",
+        "player": "KingBirry",
+        "placement": 6,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "other",
+        "deckName": "Other",
+        "archetype": "Other",
+        "player": "KotyAngeloff",
+        "placement": 7,
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      {
+        "deckId": "Beta LR",
+        "deckName": "Blue White Control",
+        "archetype": "Blue White Control",
+        "player": "Judo",
+        "placement": 8,
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      }
+    ]
+  },
+  {
     "id": "699bba2dc9dc8186f760ac0a",
     "slug": "eagle-s-nest-s4gw5-0-gd03-webcam-locals-2026-02-26",
     "name": "Eagle's Nest S4GW5.0 GD03 Webcam Locals",
@@ -1177,643 +1996,6 @@
         "player": "Starcio",
         "placement": 8,
         "wins": 2,
-        "losses": 2,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "6929c373e12a3ec47627ca68",
-    "slug": "eagle-s-nest-s3gw11-0-gd02-st06-w-a-r-2025-12-18",
-    "name": "Eagle's Nest S3GW11.0 GD02+ST06 W-a-R",
-    "date": "2025-12-18",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 26,
-    "placements": [
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "Rixter117",
-        "placement": 1,
-        "wins": 5,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "newtypes",
-        "deckName": "Red Blue Newtype Ping",
-        "archetype": "Red Blue Newtype Ping",
-        "player": "Cliffeyy",
-        "placement": 2,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "kzVee",
-        "placement": 3,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "KotyAngeloff",
-        "placement": 4,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Angelluque",
-        "placement": 5,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Gbonow",
-        "placement": 6,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "SdotAkuma",
-        "placement": 7,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "aile and sinanju",
-        "deckName": "White Red Tempo",
-        "archetype": "White Red Tempo",
-        "player": "Renquim",
-        "placement": 8,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "6929c351e12a3ec47627ca66",
-    "slug": "eagle-s-nest-s3gw10-0-gd02-st06-w-a-r-2025-12-11",
-    "name": "Eagle's Nest S3GW10.0 GD02+ST06 W-a-R",
-    "date": "2025-12-11",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 23,
-    "placements": [
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Kdrazcal",
-        "placement": 1,
-        "wins": 4,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "corsica",
-        "deckName": "Blue White Tempo",
-        "archetype": "Blue White Tempo",
-        "player": "ResyEmpa",
-        "placement": 2,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "Gbonow",
-        "placement": 3,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/athrun aggro deck",
-        "deckName": "Blue Red Aggro",
-        "archetype": "Blue Red Aggro",
-        "player": "CalebWhite",
-        "placement": 4,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Michae1",
-        "placement": 5,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "jimmy",
-        "placement": 6,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "Normie3",
-        "placement": 7,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "Geicokiller",
-        "placement": 8,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "6932d1591b3b036ef6db9af4",
-    "slug": "rancho-special-event-gundam-domingo-07-12-2025-12-07",
-    "name": "Rancho Special Event Gundam Domingo 07/12",
-    "date": "2025-12-07",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 38,
-    "placements": [
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Max Distel",
-        "placement": 1,
-        "wins": 5,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "Gero Sicoli",
-        "placement": 2,
-        "wins": 5,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Gonzalo Cimato",
-        "placement": 3,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "Coordinator Pilots",
-        "deckName": "White Red Coordinator",
-        "archetype": "White Red Coordinator",
-        "player": "Santiago Argerami",
-        "placement": 4,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "Jean Hernandez",
-        "placement": 5,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Brian Ferreira",
-        "placement": 6,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "Matias Javier Gonzalez Orlando [Bokogod]",
-        "placement": 7,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "aile and sinanju",
-        "deckName": "White Red Tempo",
-        "archetype": "White Red Tempo",
-        "player": "Santiago Fernandez de la Torre",
-        "placement": 8,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "6929b6e91b3b036ef6db4fe2",
-    "slug": "eagle-s-nest-s3gw9-0-gd02-st06-w-a-r-2025-12-04",
-    "name": "Eagle's Nest S3GW9.0 GD02+ST06 W-a-R",
-    "date": "2025-12-04",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 23,
-    "placements": [
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "ndoan05",
-        "placement": 1,
-        "wins": 4,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "ChaChi",
-        "placement": 2,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "corsica",
-        "deckName": "Blue White Tempo",
-        "archetype": "Blue White Tempo",
-        "player": "ResyEmpa",
-        "placement": 3,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "KotyAngeloff",
-        "placement": 4,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "Gello",
-        "placement": 5,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Geicokiller",
-        "placement": 6,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Gbonow",
-        "placement": 7,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "Char/Amuro",
-        "deckName": "One Year War Rush",
-        "archetype": "One Year War Rush",
-        "player": "Michae1",
-        "placement": 8,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "6921ceb3b11d3f5498bc4830",
-    "slug": "eagle-s-nest-s3gw8-0-gd02-st06-w-a-r-2025-11-27",
-    "name": "Eagle's Nest S3GW8.0 GD02+ST06 W-a-R",
-    "date": "2025-11-27",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 22,
-    "placements": [
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "CyberJX7",
-        "placement": 1,
-        "wins": 5,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "KotyAngeloff",
-        "placement": 2,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "aile and sinanju",
-        "deckName": "White Red Tempo",
-        "archetype": "White Red Tempo",
-        "player": "Gbonow",
-        "placement": 3,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "CalebWhite",
-        "placement": 4,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "Gello",
-        "placement": 5,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "pilot and unit",
-        "deckName": "White Red Zaft",
-        "archetype": "White Red Zaft",
-        "player": "Lucas Vaz",
-        "placement": 6,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "corsica",
-        "deckName": "Blue White Tempo",
-        "archetype": "Blue White Tempo",
-        "player": "ThePackage",
-        "placement": 7,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "aile and sinanju",
-        "deckName": "White Red Tempo",
-        "archetype": "White Red Tempo",
-        "player": "Kokojoni",
-        "placement": 8,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "69154ca4b11d3f5498bbd2b3",
-    "slug": "eagle-s-nest-free-website-test-launch-event-2025-11-21",
-    "name": "Eagle's Nest FREE Website Test Launch Event",
-    "date": "2025-11-21",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 16,
-    "placements": [
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "David G",
-        "placement": 1,
-        "wins": 4,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "MichaelSeekers",
-        "placement": 2,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Gbonow",
-        "placement": 3,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "KingBirry",
-        "placement": 4,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "Coordinator Pilots",
-        "deckName": "White Red Coordinator",
-        "archetype": "White Red Coordinator",
-        "player": "rvgp12",
-        "placement": 5,
-        "wins": 3,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "freedom top end",
-        "deckName": "Blue White Freedom Blockers",
-        "archetype": "Blue White Freedom Blockers",
-        "player": "Geicokiller",
-        "placement": 6,
-        "wins": 2,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "Reking",
-        "placement": 7,
-        "wins": 2,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
-        "player": "D__U__N__N",
-        "placement": 8,
-        "wins": 2,
-        "losses": 2,
-        "draws": 0
-      }
-    ]
-  },
-  {
-    "id": "69154b8452eafbbc8116e2ff",
-    "slug": "eagle-s-nest-s3gw7-0-gd02-st06-w-a-r-2025-11-20",
-    "name": "Eagle's Nest S3GW7.0 GD02+ST06 W-a-R",
-    "date": "2025-11-20",
-    "format": "standard",
-    "location": "Online",
-    "playerCount": 27,
-    "placements": [
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "SdotAkuma",
-        "placement": 1,
-        "wins": 5,
-        "losses": 0,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "CyberJX7",
-        "placement": 2,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "show and green guys",
-        "deckName": "White Green Operation Meteor",
-        "archetype": "White Green Operation Meteor",
-        "player": "Angelluque",
-        "placement": 3,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "ChaChi",
-        "placement": 4,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "newtypes",
-        "deckName": "Red Blue Newtype Ping",
-        "archetype": "Red Blue Newtype Ping",
-        "player": "Ichibansan",
-        "placement": 5,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "OppaiHavoc",
-        "placement": 6,
-        "wins": 4,
-        "losses": 1,
-        "draws": 0
-      },
-      {
-        "deckId": "amuro/mikazuki",
-        "deckName": "Blue Purple Midrange",
-        "archetype": "Blue Purple Midrange",
-        "player": "BunnyFooFoo998",
-        "placement": 7,
-        "wins": 3,
-        "losses": 2,
-        "draws": 0
-      },
-      {
-        "deckId": "aile and sinanju",
-        "deckName": "White Red Tempo",
-        "archetype": "White Red Tempo",
-        "player": "Arson",
-        "placement": 8,
-        "wins": 3,
         "losses": 2,
         "draws": 0
       }

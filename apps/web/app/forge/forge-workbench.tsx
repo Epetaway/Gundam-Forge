@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Printer } from 'lucide-react';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -87,6 +87,213 @@ const IMPORT_FORMAT_HELP = `Accepted formats (one card per line):
 
 Recognized cards are added automatically.
 Unrecognized cards are listed as warnings.`;
+
+interface ProxyPrintCard {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  set?: string;
+  copyIndex: number;
+  copyTotal: number;
+}
+
+function escapeHtml(raw: string): string {
+  return raw
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function buildProxyPrintHtml(deckName: string, cards: ProxyPrintCard[]): string {
+  const safeDeckName = escapeHtml(deckName || 'Untitled Deck');
+  const generatedAt = new Date().toLocaleString();
+  const cardsMarkup = cards.map((card) => {
+    const safeName = escapeHtml(card.name);
+    const safeId = escapeHtml(card.id);
+    const safeSet = escapeHtml(card.set ?? 'Unknown Set');
+    const safeImg = card.imageUrl ? escapeHtml(card.imageUrl) : '';
+
+    return `
+      <article class="proxy-card">
+        ${safeImg
+          ? `<img src="${safeImg}" alt="${safeName}" loading="eager" referrerpolicy="no-referrer" />`
+          : `<div class="proxy-fallback">${safeName}</div>`}
+        <div class="proxy-meta">
+          <span class="proxy-title">${safeName}</span>
+          <span class="proxy-sub">${safeId} · ${safeSet}</span>
+        </div>
+        <span class="proxy-copy">${card.copyIndex}/${card.copyTotal}</span>
+      </article>
+    `;
+  }).join('');
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${safeDeckName} - Proxy Print</title>
+    <style>
+      @page {
+        size: legal portrait;
+        margin: 0.25in;
+      }
+
+      :root {
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Arial", sans-serif;
+        color: #101623;
+        background: white;
+      }
+
+      .header {
+        margin-bottom: 0.18in;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.25in;
+      }
+
+      .title {
+        font-size: 14pt;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .sub {
+        margin: 0;
+        font-size: 8.5pt;
+        color: #46536b;
+      }
+
+      .proxy-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 2.5in);
+        grid-auto-rows: 3.5in;
+        gap: 0.15in;
+        justify-content: center;
+      }
+
+      .proxy-card {
+        position: relative;
+        border: 1px solid #1b2a44;
+        border-radius: 0.08in;
+        overflow: hidden;
+        width: 2.5in;
+        height: 3.5in;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        background: #f8faff;
+      }
+
+      .proxy-card img,
+      .proxy-fallback {
+        width: 100%;
+        height: 100%;
+      }
+
+      .proxy-card img {
+        object-fit: cover;
+        display: block;
+      }
+
+      .proxy-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.12in;
+        font-size: 12pt;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .proxy-meta {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.05in 0.08in;
+        background: linear-gradient(to top, rgba(8, 14, 25, 0.92), rgba(8, 14, 25, 0.7));
+        color: #fff;
+      }
+
+      .proxy-title {
+        display: block;
+        font-size: 7pt;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .proxy-sub {
+        display: block;
+        margin-top: 0.01in;
+        font-size: 6pt;
+        line-height: 1.2;
+        color: #d0d9ea;
+      }
+
+      .proxy-copy {
+        position: absolute;
+        top: 0.05in;
+        right: 0.05in;
+        border-radius: 999px;
+        background: rgba(8, 14, 25, 0.85);
+        color: #fff;
+        font-size: 7pt;
+        font-weight: 700;
+        padding: 0.02in 0.06in;
+      }
+
+      @media screen {
+        body {
+          padding: 0.25in;
+          background: #f1f5fb;
+        }
+
+        .paper {
+          margin: 0 auto;
+          width: 8.5in;
+          min-height: 14in;
+          background: white;
+          padding: 0.2in;
+          box-shadow: 0 6px 24px rgba(16, 22, 35, 0.25);
+        }
+      }
+
+      @media print {
+        .paper {
+          width: auto;
+          min-height: auto;
+          padding: 0;
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="paper">
+      <header class="header">
+        <p class="title">${safeDeckName} · Proxy Deck</p>
+        <p class="sub">${cards.length} cards · Generated ${escapeHtml(generatedAt)}</p>
+      </header>
+      <section class="proxy-grid">
+        ${cardsMarkup}
+      </section>
+    </main>
+  </body>
+</html>`;
+}
 
 // ---------- validation bar ----------
 
@@ -471,6 +678,8 @@ interface DeckSettingsBarProps {
   onArchetypeChange: (a: string) => void;
   onSetIdChange: (s: string) => void;
   onExport: () => void;
+  onPrintProxy: () => void;
+  canPrintProxy?: boolean;
   /** Validation state for live feedback badge */
   validationIsValid?: boolean;
   validationMainDeckCards?: number;
@@ -491,6 +700,8 @@ function DeckSettingsBar({
   onArchetypeChange,
   onSetIdChange,
   onExport,
+  onPrintProxy,
+  canPrintProxy = false,
   validationIsValid = false,
   validationMainDeckCards = 0,
   validationHasOverLimit = false,
@@ -583,6 +794,17 @@ function DeckSettingsBar({
           >
             {validationIsValid ? '✓ Valid' : `${validationMainDeckCards}/50`}
           </span>
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 transition-colors hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onPrintProxy}
+            aria-label="Print proxy deck on legal paper"
+            title="Print proxy deck"
+            disabled={!canPrintProxy}
+          >
+            <Printer className="h-3 w-3" aria-hidden="true" />
+            Print Proxy
+          </button>
           <button
             type="button"
             className="flex items-center gap-1 rounded border border-border bg-surface-interactive px-2 py-0.5 text-xs text-steel-600 transition-colors hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
@@ -962,6 +1184,51 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     );
   }, [deck, showToast]);
 
+  // Build DeckViewItem list
+  const deckViewItems = React.useMemo(
+    () =>
+      Object.entries(deck).flatMap(([cardId, qty]) => {
+        const item = toDeckViewItem({ cardId, qty, card: cardsById.get(cardId) });
+        return item ? [item] : [];
+      }),
+    [deck],
+  );
+
+  const handlePrintProxy = React.useCallback(() => {
+    const printableCards = applyDeckFilterSort(deckViewItems, { query: '', sortBy: 'type' })
+      .flatMap((item) => Array.from({ length: item.qty }, (_, idx) => ({
+        id: item.id,
+        name: item.name,
+        imageUrl: item.imageUrl,
+        set: item.set,
+        copyIndex: idx + 1,
+        copyTotal: item.qty,
+      })));
+
+    if (printableCards.length === 0) {
+      showToast('Add cards before printing proxy sheets.', 'warn');
+      return;
+    }
+
+    const proxyWindow = window.open('about:blank', '_blank');
+    if (!proxyWindow) {
+      showToast('Could not open print window. Check popup settings.', 'warn');
+      return;
+    }
+
+    const html = buildProxyPrintHtml(deckMeta.name, printableCards);
+    const triggerPrint = () => {
+      proxyWindow.focus();
+      // Delay slightly to let the browser paint and resolve late image layout before opening print.
+      window.setTimeout(() => proxyWindow.print(), 120);
+    };
+
+    proxyWindow.addEventListener('load', triggerPrint, { once: true });
+    proxyWindow.document.open();
+    proxyWindow.document.write(html);
+    proxyWindow.document.close();
+  }, [deckMeta.name, deckViewItems, showToast]);
+
   // Import handler — returns imported count and notFound list; applies partial import
   const handleImport = React.useCallback((text: string): { imported: number; notFound: string[] } => {
     const entries = parseDeckList(text);
@@ -996,16 +1263,6 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
     return { imported: Object.keys(newDeck).length, notFound };
   }, []);
-
-  // Build DeckViewItem list
-  const deckViewItems = React.useMemo(
-    () =>
-      Object.entries(deck).flatMap(([cardId, qty]) => {
-        const item = toDeckViewItem({ cardId, qty, card: cardsById.get(cardId) });
-        return item ? [item] : [];
-      }),
-    [deck],
-  );
 
   const filteredDeckItems = React.useMemo(
     () => applyDeckFilterSort(deckViewItems, { query, sortBy }),
@@ -1064,6 +1321,8 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         onArchetypeChange={() => {}}
         onSetIdChange={handleSetIdChange}
         onExport={handleExport}
+        onPrintProxy={handlePrintProxy}
+        canPrintProxy={deckViewItems.length > 0}
         validationIsValid={validationResult.isValid}
         validationMainDeckCards={validationResult.metrics.mainDeckCards}
         validationHasOverLimit={validationResult.errors.some(e => e.includes('4 copies'))}
@@ -1071,7 +1330,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
         lastSaved={lastSaved}
       />
     );
-  }, [deck, handleExport, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards, deckId, saving, lastSaved]);
+  }, [deck, handleExport, handlePrintProxy, deckMeta.name, deckMeta.deckIntent?.colors, deckMeta.deckIntent?.packages, deckMeta.setId, handleNameChange, handleDeckIntentChange, handleSetIdChange, allCards, deckId, saving, lastSaved, deckViewItems.length]);
 
   if (!mounted) return null;
 
