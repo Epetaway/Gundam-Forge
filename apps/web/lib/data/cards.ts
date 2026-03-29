@@ -127,11 +127,6 @@ function applyCardFilters(source: CardDefinition[], filters: CatalogFilters = {}
     }
     if (filters.type && filters.type !== 'All' && card.type !== filters.type) return false;
     if (filters.set && filters.set !== 'All' && card.set !== filters.set) return false;
-    if (Number.isFinite(filters.minCost) && card.cost < (filters.minCost as number)) return false;
-    if (Number.isFinite(filters.maxCost) && card.cost > (filters.maxCost as number)) return false;
-    const cardLevel = card.level ?? card.cost;
-    if (Number.isFinite(filters.minLevel) && cardLevel < (filters.minLevel as number)) return false;
-    if (Number.isFinite(filters.maxLevel) && cardLevel > (filters.maxLevel as number)) return false;
     if (filters.zone && filters.zone !== 'All' && (card.zone ?? '').toLowerCase() !== filters.zone.toLowerCase()) return false;
     if (filters.keyword && filters.keyword !== 'All' && !hasKeyword(card, filters.keyword)) return false;
     if (filters.deckRole && filters.deckRole !== 'All' && !inDeckRole(card, filters.deckRole)) return false;

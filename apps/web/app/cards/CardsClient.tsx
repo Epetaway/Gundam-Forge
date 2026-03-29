@@ -37,10 +37,6 @@ interface FilterDraft {
   color: CardColor | 'All';
   type: CardType | 'All';
   setCode: string;
-  minCost: string;
-  maxCost: string;
-  minLevel: string;
-  maxLevel: string;
   keyword: KeywordOption;
   zone: string;
   deckRole: CardDeckRole | 'All';
@@ -103,10 +99,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const colorParam = searchParams.get('color');
   const typeParam = searchParams.get('type');
   const setParam = searchParams.get('set');
-  const minCostParam = searchParams.get('minCost');
-  const maxCostParam = searchParams.get('maxCost');
-  const minLevelParam = searchParams.get('minLevel');
-  const maxLevelParam = searchParams.get('maxLevel');
   const queryParam = searchParams.get('q');
   const zoneParam = searchParams.get('zone');
   const deckRoleParam = searchParams.get('deckRole');
@@ -123,10 +115,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const [color, setColor] = useState<CardColor | 'All'>(initialColor);
   const [type, setType] = useState<CardType | 'All'>(initialType);
   const [setCode, setSetCode] = useState(setParam ?? 'All');
-  const [minCost, setMinCost] = useState<string>(minCostParam ?? '');
-  const [maxCost, setMaxCost] = useState<string>(maxCostParam ?? '');
-  const [minLevel, setMinLevel] = useState<string>(minLevelParam ?? '');
-  const [maxLevel, setMaxLevel] = useState<string>(maxLevelParam ?? '');
   const [keyword, setKeyword] = useState<KeywordOption>(
     KEYWORD_OPTIONS.includes(keywordParam as KeywordOption) ? (keywordParam as KeywordOption) : 'All'
   );
@@ -155,10 +143,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     color: 'All',
     type: 'All',
     setCode: 'All',
-    minCost: '',
-    maxCost: '',
-    minLevel: '',
-    maxLevel: '',
     keyword: 'All',
     zone: 'All',
     deckRole: 'All',
@@ -177,16 +161,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   const allSets = useMemo(
     () => Array.from(new Set(initialCards.map((card) => card.set))).sort(),
-    [initialCards],
-  );
-
-  const allCosts = useMemo(
-    () => Array.from(new Set(initialCards.map((card) => card.cost))).sort((a, b) => a - b),
-    [initialCards],
-  );
-
-  const allLevels = useMemo(
-    () => Array.from(new Set(initialCards.map((card) => card.level ?? card.cost))).sort((a, b) => a - b),
     [initialCards],
   );
 
@@ -222,10 +196,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       set: setCode,
-      minCost: minCost === '' ? undefined : Number(minCost),
-      maxCost: maxCost === '' ? undefined : Number(maxCost),
-      minLevel: minLevel === '' ? undefined : Number(minLevel),
-      maxLevel: maxLevel === '' ? undefined : Number(maxLevel),
       keyword,
       zone,
       deckRole,
@@ -245,10 +215,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     color,
     type,
     setCode,
-    minCost,
-    maxCost,
-    minLevel,
-    maxLevel,
     keyword,
     zone,
     deckRole,
@@ -265,10 +231,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       set: setCode,
-      minCost: minCost === '' ? undefined : Number(minCost),
-      maxCost: maxCost === '' ? undefined : Number(maxCost),
-      minLevel: minLevel === '' ? undefined : Number(minLevel),
-      maxLevel: maxLevel === '' ? undefined : Number(maxLevel),
       keyword,
       zone,
       deckRole,
@@ -284,10 +246,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       setCode,
       type,
       keyword,
-      minCost,
-      maxCost,
-      minLevel,
-      maxLevel,
       zone,
       deckRole,
       matchMode,
@@ -308,7 +266,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   useEffect(() => {
     setDisplayCount(pageSize);
-  }, [pageSize, query, color, type, setCode, sortBy, minCost, maxCost, minLevel, maxLevel, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [pageSize, query, color, type, setCode, sortBy, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   // Focus trap for filter drawer
   useEffect(() => {
@@ -362,26 +320,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     if (setCode !== 'All') {
       chips.push({ id: `set:${setCode}`, label: `Set: ${setCode}`, clear: () => setSetCode('All') });
     }
-    if (minCost !== '' || maxCost !== '') {
-      chips.push({
-        id: `cost:${minCost}-${maxCost}`,
-        label: `Cost: ${minCost || '0'}-${maxCost || 'max'}`,
-        clear: () => {
-          setMinCost('');
-          setMaxCost('');
-        },
-      });
-    }
-    if (minLevel !== '' || maxLevel !== '') {
-      chips.push({
-        id: `lvl:${minLevel}-${maxLevel}`,
-        label: `Level: ${minLevel || '0'}-${maxLevel || 'max'}`,
-        clear: () => {
-          setMinLevel('');
-          setMaxLevel('');
-        },
-      });
-    }
     if (keyword !== 'All') {
       chips.push({ id: `kw:${keyword}`, label: `Keyword: ${keyword}`, clear: () => setKeyword('All') });
     }
@@ -423,7 +361,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       });
     }
     return chips;
-  }, [color, query, setCode, type, minCost, maxCost, minLevel, maxLevel, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [color, query, setCode, type, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   const clearAll = (): void => {
     setRawQuery('');
@@ -431,10 +369,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setColor('All');
     setType('All');
     setSetCode('All');
-    setMinCost('');
-    setMaxCost('');
-    setMinLevel('');
-    setMaxLevel('');
     setKeyword('All');
     setZone('All');
     setDeckRole('All');
@@ -451,10 +385,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       color,
       type,
       setCode,
-      minCost,
-      maxCost,
-      minLevel,
-      maxLevel,
       keyword,
       zone,
       deckRole,
@@ -473,10 +403,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setColor(draft.color);
     setType(draft.type);
     setSetCode(draft.setCode);
-    setMinCost(draft.minCost);
-    setMaxCost(draft.maxCost);
-    setMinLevel(draft.minLevel);
-    setMaxLevel(draft.maxLevel);
     setKeyword(draft.keyword);
     setZone(draft.zone);
     setDeckRole(draft.deckRole);
@@ -824,58 +750,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 </select>
               </label>
 
-              <div className="grid grid-cols-2 gap-1.5">
-                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
-                  <span className="mb-1">Min Cost</span>
-                  <select
-                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                    onChange={(event) => setDraft((c) => ({ ...c, minCost: event.target.value }))}
-                    value={draft.minCost}
-                  >
-                    <option value="">Any</option>
-                    {allCosts.map((cost) => <option key={`drawer-min-cost-${cost}`} value={String(cost)}>{cost}</option>)}
-                  </select>
-                </label>
-
-                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
-                  <span className="mb-1">Max Cost</span>
-                  <select
-                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                    onChange={(event) => setDraft((c) => ({ ...c, maxCost: event.target.value }))}
-                    value={draft.maxCost}
-                  >
-                    <option value="">Any</option>
-                    {allCosts.map((cost) => <option key={`drawer-max-cost-${cost}`} value={String(cost)}>{cost}</option>)}
-                  </select>
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-1.5">
-                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
-                  <span className="mb-1">Min Level</span>
-                  <select
-                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                    onChange={(event) => setDraft((c) => ({ ...c, minLevel: event.target.value }))}
-                    value={draft.minLevel}
-                  >
-                    <option value="">Any</option>
-                    {allLevels.map((level) => <option key={`drawer-min-level-${level}`} value={String(level)}>{level}</option>)}
-                  </select>
-                </label>
-
-                <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
-                  <span className="mb-1">Max Level</span>
-                  <select
-                    className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-                    onChange={(event) => setDraft((c) => ({ ...c, maxLevel: event.target.value }))}
-                    value={draft.maxLevel}
-                  >
-                    <option value="">Any</option>
-                    {allLevels.map((level) => <option key={`drawer-max-level-${level}`} value={String(level)}>{level}</option>)}
-                  </select>
-                </label>
-              </div>
-
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Keyword</span>
                 <select
@@ -995,7 +869,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </div>
 
               <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
-                <span className="mb-1\">Triggers</span>
+                <span className="mb-1">Triggers</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
                   <div className="flex flex-wrap gap-1.5">
                     {triggerOptions.map((option) => (
@@ -1027,10 +901,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                     color: 'All',
                     type: 'All',
                     setCode: 'All',
-                    minCost: '',
-                    maxCost: '',
-                    minLevel: '',
-                    maxLevel: '',
                     keyword: 'All',
                     zone: 'All',
                     deckRole: 'All',

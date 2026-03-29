@@ -42,22 +42,10 @@ describe('card filtering parity', () => {
     expect(broad.some((card) => card.id === cardWithTrait!.id)).toBe(true);
   });
 
-  it('applies cost and level ranges consistently', () => {
-    const card = cards.find((entry) => Number.isFinite(entry.cost));
-    expect(card).toBeDefined();
-
-    const level = card!.level ?? card!.cost;
-    const matched = getCards({
-      minCost: card!.cost,
-      maxCost: card!.cost,
-      minLevel: level,
-      maxLevel: level,
-    });
-
-    expect(matched.some((entry) => entry.id === card!.id)).toBe(true);
-
-    const excluded = getCards({ minCost: card!.cost + 1, maxCost: card!.cost + 1 });
-    expect(excluded.some((entry) => entry.id === card!.id)).toBe(false);
+  it('preserves gameplay cost values on filtered results', () => {
+    const filtered = getCards({ color: 'Red' });
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((entry) => Number.isFinite(entry.cost))).toBe(true);
   });
 
   it('handles purple color queries deterministically', () => {
