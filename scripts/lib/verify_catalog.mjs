@@ -1,0 +1,15 @@
+import fs from 'fs';
+const c = JSON.parse(fs.readFileSync('apps/web/lib/data/cards.catalog.json','utf8'));
+const s = {};
+c.forEach(x => { s[x.set||'?'] = (s[x.set||'?']||0)+1; });
+console.log('\n✅ FINAL CATALOG STATE\n');
+console.log('Total cards:', c.length);
+console.log('Sets:', Object.keys(s).length);
+console.log('\nCards by Set:');
+Object.keys(s).sort().forEach(k => console.log('  '+k+':', s[k]));
+const withImg = c.filter(x => x.imageUrl && x.imageUrl.indexOf('placehold') < 0).length;
+console.log('\nImage coverage:');
+console.log('  Real images:', withImg);
+console.log('  Placeholder/missing:', c.length - withImg);
+console.log('  Completeness: '+(withImg/c.length*100).toFixed(1)+'%');
+console.log('\nFile size:', (fs.readFileSync('apps/web/lib/data/cards.catalog.json','utf8').length/1024).toFixed(1), 'KB');
