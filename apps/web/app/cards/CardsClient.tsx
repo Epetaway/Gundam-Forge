@@ -931,6 +931,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   setDraft({
                     query: '',
                     color: 'All',
+                    selectedColors: [],
                     type: 'All',
                     setCode: 'All',
                     keyword: 'All',
