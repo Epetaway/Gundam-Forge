@@ -16,6 +16,7 @@ export interface OfficialDeck {
   slug: string;
   name: string;
   description: string;
+  imageUrl?: string;
   archetype: string;
   colors: string[];
   sourceUrl: string;

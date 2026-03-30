@@ -37,6 +37,7 @@ interface ScrapedDeck {
   slug: string;
   name: string;
   description: string;
+  imageUrl?: string;
   colors: string[];
   sourceUrl: string;
   cards: ScrapedCard[];
@@ -154,6 +155,14 @@ const scrapeDeckWithPlaywright = async (url: string): Promise<ScrapedDeck | null
       );
       const description = descEl?.textContent?.trim() || '';
 
+      // Extract official deck hero image metadata first
+      const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content')?.trim() || '';
+      const twitterImage = document.querySelector('meta[name="twitter:image"]')?.getAttribute('content')?.trim() || '';
+      const deckImageEl = document.querySelector(
+        '.deckMain img, .deckVisual img, .deckPhoto img, .deckImage img, .mainVisual img'
+      );
+      const deckImage = deckImageEl?.getAttribute('src')?.trim() || '';
+
       // Extract card list from the deck page
       // GCG deck pages typically show card images with card IDs and quantities
       const cards: Array<{ cardId: string; qty: number }> = [];
@@ -224,7 +233,12 @@ const scrapeDeckWithPlaywright = async (url: string): Promise<ScrapedDeck | null
         if (color && color.length < 20) colors.push(color);
       });
 
-      return { name, description, cards, colors };
+      const imageCandidate = ogImage || twitterImage || deckImage;
+      const imageUrl = imageCandidate.length > 0
+        ? (imageCandidate.startsWith('http') ? imageCandidate : new URL(imageCandidate, window.location.origin).toString())
+        : '';
+
+      return { name, description, imageUrl, cards, colors };
     });
 
     await browser.close();
@@ -255,6 +269,7 @@ const scrapeDeckWithPlaywright = async (url: string): Promise<ScrapedDeck | null
       slug,
       name: data.name,
       description: data.description,
+      imageUrl: data.imageUrl || undefined,
       colors: uniqueColors,
       sourceUrl: url,
       cards,
@@ -293,6 +308,15 @@ const scrapeDeckWithFetch = async (url: string): Promise<ScrapedDeck | null> => 
       .replace(/\s+/g, ' ')
       .trim();
 
+    const imageMatch =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    const imageCandidate = imageMatch?.[1]?.trim() || '';
+    const imageUrl = imageCandidate
+      ? (imageCandidate.startsWith('http') ? imageCandidate : new URL(imageCandidate, url).toString())
+      : undefined;
+
     // Extract card IDs from the HTML
     const cardIdRegex = /([A-Z]{2,4}\d{0,2}-\d{3,4})/g;
     const cardMap = new Map<string, number>();
@@ -326,6 +350,7 @@ const scrapeDeckWithFetch = async (url: string): Promise<ScrapedDeck | null> => 
       slug,
       name: name || `Official Deck ${slug}`,
       description,
+      imageUrl,
       colors,
       sourceUrl: url,
       cards,
@@ -342,6 +367,7 @@ interface ExistingDeck {
   slug: string;
   name: string;
   description: string;
+  imageUrl?: string;
   archetype: string;
   colors: string[];
   sourceUrl: string;
@@ -362,7 +388,8 @@ const loadExistingDecks = async (): Promise<Map<string, ExistingDeck>> => {
       const slug = slugMatch[1];
 
       const nameMatch = block.match(/name:\s*'([^']+)'|name:\s*"([^"]+)"/);
-      const descMatch = block.match(/description:\s*\n?\s*['"`]([\s\S]*?)['"`],?\s*\n\s*archetype/);
+      const descMatch = block.match(/description:\s*\n?\s*['"`]([\s\S]*?)['"`],?\s*\n\s*(imageUrl|archetype)/);
+      const imageUrlMatch = block.match(/imageUrl:\s*'([^']+)'/);
       const archetypeMatch = block.match(/archetype:\s*'([^']+)'/);
       const colorsMatch = block.match(/colors:\s*\[(.*?)\]/);
       const sourceUrlMatch = block.match(/sourceUrl:\s*'([^']+)'/);
@@ -388,6 +415,7 @@ const loadExistingDecks = async (): Promise<Map<string, ExistingDeck>> => {
         slug,
         name: nameMatch?.[1] || nameMatch?.[2] || slug,
         description: descMatch?.[1]?.replace(/\\'/g, "'").replace(/\\"/g, '"') || '',
+        imageUrl: imageUrlMatch?.[1] || undefined,
         archetype: archetypeMatch?.[1] || '',
         colors,
         sourceUrl: sourceUrlMatch?.[1] || '',
@@ -423,6 +451,7 @@ const mergeDecks = (
     const colors = deck.colors.length > 0 ? deck.colors : prev?.colors || [];
     const name = deck.name || prev?.name || deck.slug;
     const description = deck.description || prev?.description || '';
+    const imageUrl = deck.imageUrl || prev?.imageUrl;
     const archetype =
       prev?.archetype || inferArchetype(name, description, colors);
 
@@ -430,6 +459,7 @@ const mergeDecks = (
       slug: deck.slug,
       name,
       description,
+      imageUrl,
       archetype,
       colors,
       sourceUrl: deck.sourceUrl,
@@ -482,6 +512,7 @@ export interface OfficialDeck {
   slug: string;
   name: string;
   description: string;
+  imageUrl?: string;
   archetype: string;
   colors: string[];
   sourceUrl: string;
@@ -497,6 +528,9 @@ export const OFFICIAL_DECKS: OfficialDeck[] = [\n`;
     out += `    name: '${escapeTs(deck.name)}',\n`;
     out += `    description:\n`;
     out += `      '${escapeTs(deck.description)}',\n`;
+    if (deck.imageUrl) {
+      out += `    imageUrl: '${escapeTs(deck.imageUrl)}',\n`;
+    }
     out += `    archetype: '${escapeTs(deck.archetype)}',\n`;
     out += `    colors: [${deck.colors.map((c) => `'${c}'`).join(', ')}],\n`;
     out += `    sourceUrl: '${escapeTs(deck.sourceUrl)}',\n`;
@@ -652,6 +686,7 @@ const main = async () => {
           slug: existing.slug,
           name: existing.name,
           description: existing.description,
+          imageUrl: existing.imageUrl,
           colors: existing.colors,
           sourceUrl: existing.sourceUrl,
           cards: existing.cards,
@@ -669,6 +704,7 @@ const main = async () => {
           slug: existing.slug,
           name: existing.name,
           description: existing.description,
+          imageUrl: existing.imageUrl,
           colors: existing.colors,
           sourceUrl: existing.sourceUrl,
           cards: existing.cards,
