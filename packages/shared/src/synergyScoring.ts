@@ -12,6 +12,7 @@
 
 import type { CardDefinition } from './types';
 import { getPackagesByIds, getMechanicsFromPackages } from './deckIntentPackages';
+import { isExCard, isMainDeckCard } from './cardClassification';
 
 // ─── Simple LRU Cache ────────────────────────────────────────────────────────
 // Caches synergy scoring results to avoid recomputing for the same parameters
@@ -209,7 +210,7 @@ export function calculateCardSynergy(
   let totalScore = 0;
 
   // Hard penalty for EX cards when not included
-  if (!includeEX && card.isExCard) {
+  if (!includeEX && isExCard(card)) {
     reasons.push({
       code: 'EX_CARD_EXCLUDED',
       description: 'EX card excluded from main deck',
@@ -396,8 +397,8 @@ export function filterCardsByIntent(
 ): CardDefinition[] {
   return cards.filter((card) => {
     // Zone filtering
-    if (onlyMainDeck && !card.isMainDeck) return false;
-    if (!includeEX && card.isExCard) return false;
+    if (onlyMainDeck && !isMainDeckCard(card)) return false;
+    if (!includeEX && isExCard(card)) return false;
 
     // Color filtering (allow Colorless + selected colors)
     if (selectedColors.length > 0) {
