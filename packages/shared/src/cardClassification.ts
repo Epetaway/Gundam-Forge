@@ -13,12 +13,12 @@ export function isExCard(card: CardDefinition): boolean {
 /** Returns true if card belongs in the Resource deck (not drawn from). */
 export function isResourceCard(card: CardDefinition): boolean {
   if (typeof card.isResource === 'boolean') return card.isResource;
-  return card.type === 'Resource' || card.type === 'Base';
+  return card.type === 'Resource';
 }
 
 /** Returns true if card belongs in the main deck (drawable, playable). */
 export function isMainDeckCard(card: CardDefinition): boolean {
   if (typeof card.isMainDeck === 'boolean') return card.isMainDeck;
   const ex = isExCard(card);
-  return (card.type === 'Unit' || card.type === 'Pilot' || card.type === 'Command') && !ex;
+  return (card.type === 'Unit' || card.type === 'Pilot' || card.type === 'Command' || card.type === 'Base') && !ex;
 }
