@@ -30,7 +30,7 @@ const GRID_PAGE_SIZE = 60;
 const LIST_PAGE_SIZE = 80;
 
 const selectClassName =
-  'h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'min-h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 py-2 pr-8 text-left text-sm leading-tight text-foreground outline-none transition-colors whitespace-normal focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 interface FilterDraft {
   query: string;
@@ -714,7 +714,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Color</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, color: event.target.value as CardColor | 'All' }))}
                   value={draft.color}
                 >
@@ -730,7 +730,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Type</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, type: event.target.value as CardType | 'All' }))}
                   value={draft.type}
                 >
@@ -741,7 +741,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Set</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, setCode: event.target.value }))}
                   value={draft.setCode}
                 >
@@ -753,7 +753,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Keyword</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, keyword: event.target.value as KeywordOption }))}
                   value={draft.keyword}
                 >
@@ -764,7 +764,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Match Mode</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, matchMode: event.target.value as FilterMatchMode }))}
                   value={draft.matchMode}
                 >
@@ -776,7 +776,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Deck Role</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, deckRole: event.target.value as CardDeckRole | 'All' }))}
                   value={draft.deckRole}
                 >
@@ -790,7 +790,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Zone</span>
                 <select
-                  className="h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className={selectClassName}
                   onChange={(event) => setDraft((c) => ({ ...c, zone: event.target.value }))}
                   value={draft.zone}
                 >
