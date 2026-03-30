@@ -367,10 +367,36 @@ const resolveEntry = (entry: DeckEntry): (DeckEntry & { card?: CardDefinition })
   card: cardsById.get(entry.cardId),
 });
 
+/**
+ * Infer deck colors from card data when colors array is empty.
+ * Returns all non-Colorless colors found in the deck entries.
+ */
+function inferColors(entries: DeckEntry[]): CardColor[] {
+  const seen = new Set<CardColor>();
+  for (const entry of entries) {
+    const card = cardsById.get(entry.cardId);
+    if (card && card.color !== 'Colorless') {
+      seen.add(card.color);
+    }
+  }
+  return [...seen].sort();
+}
+
 const liveDecks = liveDecksData as unknown as DeckRecord[];
 
 export function getDecks(): DeckRecord[] {
-  return [...deckCatalog, ...liveDecks];
+  const allDecks = [...deckCatalog, ...liveDecks];
+
+  // Infer colors for decks with empty colors array
+  return allDecks.map(deck => {
+    if (!deck.colors || deck.colors.length === 0) {
+      return {
+        ...deck,
+        colors: inferColors(deck.entries)
+      };
+    }
+    return deck;
+  });
 }
 
 export function getDeckById(id: string): DeckRecord | undefined {
