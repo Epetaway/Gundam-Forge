@@ -690,23 +690,19 @@ BEGIN
   DELETE FROM public.deck_cards WHERE deck_id = v_deck_id;
   INSERT INTO public.deck_cards (deck_id, card_id, qty, is_boss) VALUES
     (v_deck_id, 'ST09-001', 4, false),
-    (v_deck_id, 'ST09-002', 3, false),
-    (v_deck_id, 'ST09-004', 3, false),
-    (v_deck_id, 'GD01-118', 2, false),
-    (v_deck_id, 'GD02-076', 1, false),
-    (v_deck_id, 'GD02-110', 1, false),
-    (v_deck_id, 'ST04-002', 1, false),
-    (v_deck_id, 'ST04-010', 1, false),
+    (v_deck_id, 'ST09-002', 4, false),
+    (v_deck_id, 'ST09-004', 4, false),
+    (v_deck_id, 'GD01-118', 4, false),
+    (v_deck_id, 'GD02-076', 2, false),
+    (v_deck_id, 'GD02-110', 3, false),
+    (v_deck_id, 'ST04-002', 3, false),
+    (v_deck_id, 'ST04-010', 4, false),
     (v_deck_id, 'ST04-015', 2, false),
-    (v_deck_id, 'ST09-005', 1, false),
-    (v_deck_id, 'ST09-006', 1, false),
-    (v_deck_id, 'ST09-007', 2, false),
-    (v_deck_id, 'ST09-008', 2, false),
-    (v_deck_id, 'ST09-010', 2, false),
-    (v_deck_id, 'ST04-001', 1, false),
-    (v_deck_id, 'GD01-065', 1, false),
-    (v_deck_id, 'GD03-070', 1, false),
-    (v_deck_id, 'GD02-058', 1, false);
+    (v_deck_id, 'ST09-005', 4, false),
+    (v_deck_id, 'ST09-006', 4, false),
+    (v_deck_id, 'ST09-007', 4, false),
+    (v_deck_id, 'ST09-008', 4, false),
+    (v_deck_id, 'ST09-010', 4, false);
 
   -- ─── deck-027: deck-027 ───
   v_deck_id := uuid_generate_v5(ns, base_url || 'deck-027');
@@ -718,23 +714,19 @@ BEGIN
 
   DELETE FROM public.deck_cards WHERE deck_id = v_deck_id;
   INSERT INTO public.deck_cards (deck_id, card_id, qty, is_boss) VALUES
-    (v_deck_id, 'ST09-001', 3, false),
-    (v_deck_id, 'ST09-003', 3, false),
-    (v_deck_id, 'ST04-011', 3, false),
-    (v_deck_id, 'GD01-049', 1, false),
-    (v_deck_id, 'GD01-054', 2, false),
-    (v_deck_id, 'ST04-007', 2, false),
-    (v_deck_id, 'ST04-016', 1, false),
-    (v_deck_id, 'ST09-002', 2, false),
-    (v_deck_id, 'ST09-005', 1, false),
-    (v_deck_id, 'ST09-006', 2, false),
-    (v_deck_id, 'ST09-007', 1, false),
-    (v_deck_id, 'ST09-008', 2, false),
+    (v_deck_id, 'ST09-001', 4, false),
+    (v_deck_id, 'ST09-003', 4, false),
+    (v_deck_id, 'ST04-011', 4, false),
+    (v_deck_id, 'GD01-049', 3, false),
+    (v_deck_id, 'GD01-054', 4, false),
+    (v_deck_id, 'ST04-007', 4, false),
+    (v_deck_id, 'ST04-016', 2, false),
+    (v_deck_id, 'ST09-002', 4, false),
+    (v_deck_id, 'ST09-005', 4, false),
+    (v_deck_id, 'ST09-006', 4, false),
+    (v_deck_id, 'ST09-007', 4, false),
+    (v_deck_id, 'ST09-008', 4, false),
     (v_deck_id, 'ST09-009', 2, false),
-    (v_deck_id, 'ST09-010', 1, false),
-    (v_deck_id, 'GD03-033', 1, false),
-    (v_deck_id, 'GD03-091', 1, false),
-    (v_deck_id, 'ST04-006', 1, false),
-    (v_deck_id, 'GD01-050', 1, false);
+    (v_deck_id, 'ST09-010', 3, false);
 
 END $$;
