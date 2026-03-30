@@ -15,6 +15,8 @@ export interface StarterDeckTemplate {
 }
 
 const VALID_COLORS = new Set<CardColor>(['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless']);
+const MAIN_DECK_TARGET = 50;
+const MAX_COPIES_PER_CARD = 4;
 
 function toDisplayName(slug: string, name: string): string {
   const normalizedName = name.trim();
@@ -70,12 +72,64 @@ function resolveTemplateImage(
   return withBasePath('/hero-bg.png');
 }
 
+function normalizeMainDeckCount(
+  entries: Array<{ cardId: string; qty: number; isBoss?: boolean }>,
+): Array<{ cardId: string; qty: number; isBoss?: boolean }> {
+  const normalized = entries
+    .map((entry) => ({ ...entry, qty: Math.max(1, Math.floor(entry.qty || 0)) }))
+    .filter((entry) => entry.qty > 0);
+
+  if (normalized.length === 0) return normalized;
+
+  const total = () => normalized.reduce((sum, entry) => sum + entry.qty, 0);
+  let current = total();
+
+  if (current < MAIN_DECK_TARGET) {
+    let adjusted = true;
+    while (current < MAIN_DECK_TARGET && adjusted) {
+      adjusted = false;
+      for (const entry of normalized) {
+        if (current >= MAIN_DECK_TARGET) break;
+        if (entry.qty >= MAX_COPIES_PER_CARD) continue;
+        entry.qty += 1;
+        current += 1;
+        adjusted = true;
+      }
+    }
+
+    // If source data is too sparse, continue filling to keep starter decks playable.
+    while (current < MAIN_DECK_TARGET) {
+      for (const entry of normalized) {
+        if (current >= MAIN_DECK_TARGET) break;
+        entry.qty += 1;
+        current += 1;
+      }
+    }
+  } else if (current > MAIN_DECK_TARGET) {
+    while (current > MAIN_DECK_TARGET) {
+      let adjusted = false;
+      for (const entry of normalized) {
+        if (current <= MAIN_DECK_TARGET) break;
+        if (entry.qty <= 1) continue;
+        entry.qty -= 1;
+        current -= 1;
+        adjusted = true;
+      }
+      if (!adjusted) break;
+    }
+  }
+
+  return normalized;
+}
+
 export function getStarterDeckTemplates(limit = 6): StarterDeckTemplate[] {
   return OFFICIAL_DECKS
     .map((deck) => {
-      const entries = deck.cards
+      const entries = normalizeMainDeckCount(
+        deck.cards
         .map((card) => ({ cardId: card.cardId, qty: card.qty, isBoss: card.isBoss }))
-        .filter((card) => cardsById.has(card.cardId));
+        .filter((card) => cardsById.has(card.cardId)),
+      );
 
       if (entries.length === 0) return null;
 
