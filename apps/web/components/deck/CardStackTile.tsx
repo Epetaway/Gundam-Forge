@@ -63,7 +63,7 @@ export function CardStackTile({
       {showSecondLayer && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 translate-x-[12px] translate-y-[8px] overflow-hidden rounded-md border border-border opacity-50"
+          className="absolute inset-0 translate-x-[8px] translate-y-[5px] overflow-hidden rounded-md border border-border opacity-50"
         >
           <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" onError={handleImgError} />
         </div>
@@ -73,7 +73,7 @@ export function CardStackTile({
       {showLayers && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 translate-x-[6px] translate-y-[4px] overflow-hidden rounded-md border border-border opacity-70"
+          className="absolute inset-0 translate-x-[4px] translate-y-[3px] overflow-hidden rounded-md border border-border opacity-70"
         >
           <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" onError={handleImgError} />
         </div>

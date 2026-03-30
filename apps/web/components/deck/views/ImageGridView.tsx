@@ -16,8 +16,8 @@ export function ImageGridView({ items, selection, actions, ui }: DeckViewRendere
   return (
     <div
       className={cn(
-        'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6',
-        ui.density === 'compact' ? 'gap-2' : 'gap-3',
+        'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7',
+        ui.density === 'compact' ? 'gap-1.5' : 'gap-2',
       )}
     >
       {items.map((item) => (
