@@ -1,4 +1,5 @@
 import type { CardColor, CardDefinition } from '@gundam-forge/shared';
+import { isMainDeckCard } from '@gundam-forge/shared';
 import { cardsById } from '@/lib/data/cards';
 import liveDecksData from './decks-live.json';
 
@@ -36,20 +37,20 @@ export const deckCatalog: DeckRecord[] = [
     updatedAt: '2026-02-12T18:30:00Z',
     entries: [
       { cardId: 'ST01-001', qty: 3 },
-      { cardId: 'ST01-005', qty: 4 },
-      { cardId: 'ST01-010', qty: 4 },
+      { cardId: 'ST01-005', qty: 3 },
+      { cardId: 'ST01-010', qty: 3 },
       { cardId: 'ST04-001', qty: 2 },
       { cardId: 'ST04-005', qty: 3 },
       { cardId: 'GD01-068', qty: 3 },
       { cardId: 'GD01-077', qty: 3 },
       { cardId: 'GD01-100', qty: 4 },
       { cardId: 'GD01-118', qty: 4 },
-      { cardId: 'GD01-124', qty: 4 },
+      { cardId: 'GD01-124', qty: 3 },
       { cardId: 'GD01-088', qty: 4 },
       { cardId: 'GD01-089', qty: 4 },
       { cardId: 'ST01-013', qty: 4 },
       { cardId: 'ST04-013', qty: 4 },
-      { cardId: 'ST01-015', qty: 4 },
+      { cardId: 'ST01-015', qty: 3 },
     ],
   },
   {
@@ -63,18 +64,18 @@ export const deckCatalog: DeckRecord[] = [
     views: 1915,
     updatedAt: '2026-02-08T14:22:00Z',
     entries: [
-      { cardId: 'ST02-001', qty: 4 },
-      { cardId: 'ST02-002', qty: 4 },
-      { cardId: 'ST02-005', qty: 4 },
-      { cardId: 'ST02-008', qty: 4 },
-      { cardId: 'ST02-010', qty: 4 },
-      { cardId: 'ST02-012', qty: 4 },
+      { cardId: 'ST02-001', qty: 3 },
+      { cardId: 'ST02-002', qty: 3 },
+      { cardId: 'ST02-005', qty: 3 },
+      { cardId: 'ST02-008', qty: 3 },
+      { cardId: 'ST02-010', qty: 3 },
+      { cardId: 'ST02-012', qty: 3 },
       { cardId: 'GD01-030', qty: 4 },
       { cardId: 'GD01-034', qty: 4 },
       { cardId: 'GD01-040', qty: 4 },
-      { cardId: 'GD01-041', qty: 4 },
+      { cardId: 'GD01-041', qty: 3 },
       { cardId: 'GD01-070', qty: 2 },
-      { cardId: 'GD01-075', qty: 4 },
+      { cardId: 'GD01-075', qty: 3 },
       { cardId: 'GD01-076', qty: 4 },
       { cardId: 'GD01-107', qty: 4 },
       { cardId: 'GD01-117', qty: 4 },
@@ -91,11 +92,11 @@ export const deckCatalog: DeckRecord[] = [
     views: 3370,
     updatedAt: '2026-02-15T09:45:00Z',
     entries: [
-      { cardId: 'ST03-001', qty: 4 },
-      { cardId: 'ST03-002', qty: 4 },
-      { cardId: 'ST03-004', qty: 4 },
-      { cardId: 'ST03-006', qty: 4 },
-      { cardId: 'ST03-007', qty: 4 },
+      { cardId: 'ST03-001', qty: 3 },
+      { cardId: 'ST03-002', qty: 3 },
+      { cardId: 'ST03-004', qty: 3 },
+      { cardId: 'ST03-006', qty: 3 },
+      { cardId: 'ST03-007', qty: 3 },
       { cardId: 'ST03-008', qty: 4 },
       { cardId: 'ST03-009', qty: 4 },
       { cardId: 'ST03-010', qty: 4 },
@@ -119,19 +120,19 @@ export const deckCatalog: DeckRecord[] = [
     views: 1741,
     updatedAt: '2026-02-10T16:15:00Z',
     entries: [
-      { cardId: 'ST01-001', qty: 4 },
-      { cardId: 'ST01-002', qty: 4 },
-      { cardId: 'ST01-010', qty: 4 },
-      { cardId: 'ST01-013', qty: 4 },
+      { cardId: 'ST01-001', qty: 3 },
+      { cardId: 'ST01-002', qty: 3 },
+      { cardId: 'ST01-010', qty: 3 },
+      { cardId: 'ST01-013', qty: 3 },
       { cardId: 'ST02-001', qty: 3 },
-      { cardId: 'ST02-005', qty: 4 },
+      { cardId: 'ST02-005', qty: 3 },
       { cardId: 'ST02-010', qty: 4 },
       { cardId: 'ST03-007', qty: 2 },
       { cardId: 'GD01-015', qty: 4 },
       { cardId: 'GD01-016', qty: 4 },
       { cardId: 'GD01-026', qty: 4 },
       { cardId: 'GD01-030', qty: 4 },
-      { cardId: 'GD01-040', qty: 4 },
+      { cardId: 'GD01-040', qty: 3 },
       { cardId: 'GD01-100', qty: 4 },
       { cardId: 'GD01-105', qty: 3 },
     ],
@@ -147,8 +148,8 @@ export const deckCatalog: DeckRecord[] = [
     views: 1823,
     updatedAt: '2026-02-14T11:20:00Z',
     entries: [
-      { cardId: 'GD01-001', qty: 4 },
-      { cardId: 'GD01-002', qty: 4 },
+      { cardId: 'GD01-001', qty: 3 },
+      { cardId: 'GD01-002', qty: 3 },
       { cardId: 'GD01-003', qty: 3 },
       { cardId: 'GD01-004', qty: 4 },
       { cardId: 'GD01-005', qty: 3 },
@@ -157,8 +158,8 @@ export const deckCatalog: DeckRecord[] = [
       { cardId: 'GD01-008', qty: 4 },
       { cardId: 'GD01-009', qty: 3 },
       { cardId: 'GD01-010', qty: 4 },
-      { cardId: 'GD01-011', qty: 4 },
-      { cardId: 'GD01-012', qty: 4 },
+      { cardId: 'GD01-011', qty: 3 },
+      { cardId: 'GD01-012', qty: 3 },
       { cardId: 'GD01-013', qty: 4 },
       { cardId: 'GD01-014', qty: 3 },
       { cardId: 'GD01-015', qty: 2 },
@@ -175,16 +176,16 @@ export const deckCatalog: DeckRecord[] = [
     views: 2456,
     updatedAt: '2026-02-13T19:55:00Z',
     entries: [
-      { cardId: 'GD01-044', qty: 4 },
-      { cardId: 'GD01-045', qty: 4 },
-      { cardId: 'GD01-046', qty: 4 },
-      { cardId: 'GD01-047', qty: 4 },
+      { cardId: 'GD01-044', qty: 3 },
+      { cardId: 'GD01-045', qty: 3 },
+      { cardId: 'GD01-046', qty: 3 },
+      { cardId: 'GD01-047', qty: 3 },
       { cardId: 'GD01-048', qty: 3 },
       { cardId: 'GD01-049', qty: 4 },
       { cardId: 'GD01-050', qty: 4 },
       { cardId: 'GD01-051', qty: 3 },
       { cardId: 'GD01-065', qty: 4 },
-      { cardId: 'GD01-066', qty: 4 },
+      { cardId: 'GD01-066', qty: 3 },
       { cardId: 'GD01-067', qty: 4 },
       { cardId: 'GD01-068', qty: 3 },
       { cardId: 'GD01-069', qty: 4 },
@@ -203,10 +204,10 @@ export const deckCatalog: DeckRecord[] = [
     views: 1621,
     updatedAt: '2026-02-09T12:30:00Z',
     entries: [
-      { cardId: 'GD01-030', qty: 4 },
-      { cardId: 'GD01-031', qty: 4 },
-      { cardId: 'GD01-032', qty: 4 },
-      { cardId: 'GD01-033', qty: 4 },
+      { cardId: 'GD01-030', qty: 3 },
+      { cardId: 'GD01-031', qty: 3 },
+      { cardId: 'GD01-032', qty: 3 },
+      { cardId: 'GD01-033', qty: 3 },
       { cardId: 'GD01-034', qty: 4 },
       { cardId: 'GD01-035', qty: 3 },
       { cardId: 'GD01-036', qty: 4 },
@@ -231,8 +232,8 @@ export const deckCatalog: DeckRecord[] = [
     views: 1534,
     updatedAt: '2026-02-11T08:40:00Z',
     entries: [
-      { cardId: 'GD02-053', qty: 4 },
-      { cardId: 'GD02-054', qty: 4 },
+      { cardId: 'GD02-053', qty: 3 },
+      { cardId: 'GD02-054', qty: 3 },
       { cardId: 'GD02-055', qty: 4 },
       { cardId: 'GD02-056', qty: 3 },
       { cardId: 'GD02-057', qty: 4 },
@@ -259,9 +260,9 @@ export const deckCatalog: DeckRecord[] = [
     views: 1298,
     updatedAt: '2026-02-07T15:25:00Z',
     entries: [
-      { cardId: 'GD01-065', qty: 4 },
-      { cardId: 'GD01-066', qty: 4 },
-      { cardId: 'GD01-067', qty: 4 },
+      { cardId: 'GD01-065', qty: 3 },
+      { cardId: 'GD01-066', qty: 3 },
+      { cardId: 'GD01-067', qty: 3 },
       { cardId: 'GD01-068', qty: 4 },
       { cardId: 'GD01-069', qty: 3 },
       { cardId: 'GD01-070', qty: 4 },
@@ -287,9 +288,9 @@ export const deckCatalog: DeckRecord[] = [
     views: 2187,
     updatedAt: '2026-02-05T10:10:00Z',
     entries: [
-      { cardId: 'GD01-044', qty: 4 },
-      { cardId: 'GD01-045', qty: 4 },
-      { cardId: 'GD01-046', qty: 4 },
+      { cardId: 'GD01-044', qty: 3 },
+      { cardId: 'GD01-045', qty: 3 },
+      { cardId: 'GD01-046', qty: 3 },
       { cardId: 'GD01-047', qty: 4 },
       { cardId: 'GD01-048', qty: 4 },
       { cardId: 'GD01-049', qty: 4 },
@@ -343,7 +344,7 @@ export const deckCatalog: DeckRecord[] = [
     views: 891,
     updatedAt: '2026-02-04T07:50:00Z',
     entries: [
-      { cardId: 'EXBP-001', qty: 4 },
+      { cardId: 'EXBP-001', qty: 3 },
       { cardId: 'EXBP-002', qty: 4 },
       { cardId: 'EXBP-003', qty: 4 },
       { cardId: 'EXBP-004', qty: 4 },
@@ -369,8 +370,24 @@ const resolveEntry = (entry: DeckEntry): (DeckEntry & { card?: CardDefinition })
 
 const liveDecks = liveDecksData as unknown as DeckRecord[];
 
+function inferColors(entries: DeckEntry[]): CardColor[] {
+  const seen = new Set<CardColor>();
+  for (const entry of entries) {
+    const card = cardsById.get(entry.cardId);
+    if (card && card.color !== 'Colorless') seen.add(card.color);
+  }
+  return [...seen];
+}
+
+function withInferredColors(deck: DeckRecord): DeckRecord {
+  if (deck.colors.length === 0) {
+    return { ...deck, colors: inferColors(deck.entries) };
+  }
+  return deck;
+}
+
 export function getDecks(): DeckRecord[] {
-  return [...deckCatalog, ...liveDecks];
+  return [...deckCatalog, ...liveDecks].map(withInferredColors);
 }
 
 export function getDeckById(id: string): DeckRecord | undefined {

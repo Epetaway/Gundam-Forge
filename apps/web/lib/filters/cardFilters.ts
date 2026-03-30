@@ -6,6 +6,7 @@ export type CardDeckRole = 'main' | 'resource' | 'ex';
 export interface CatalogFilters {
   query?: string;
   color?: CardColor | 'All';
+  colors?: CardColor[];
   type?: CardType | 'All';
   set?: string;
   keyword?: string;
@@ -41,6 +42,7 @@ export function filtersFromSearchParams(searchParams: URLSearchParams): CatalogF
   const filters: CatalogFilters = {
     query: searchParams.get('q') ?? undefined,
     color: (searchParams.get('color') as CardColor | 'All' | null) ?? undefined,
+    colors: parseListParam(searchParams.get('colors')) as CardColor[] | undefined,
     type: (searchParams.get('type') as CardType | 'All' | null) ?? undefined,
     set: searchParams.get('set') ?? undefined,
     keyword: searchParams.get('keyword') ?? undefined,
@@ -48,6 +50,11 @@ export function filtersFromSearchParams(searchParams: URLSearchParams): CatalogF
     deckRole: (searchParams.get('deckRole') as CardDeckRole | 'All' | null) ?? undefined,
     matchMode: (searchParams.get('matchMode') as FilterMatchMode | null) ?? undefined,
   };
+
+  // Normalize empty colors array to undefined
+  if (filters.colors && filters.colors.length === 0) {
+    filters.colors = undefined;
+  }
 
   for (const key of LIST_KEYS) {
     const values = parseListParam(searchParams.get(key));
@@ -65,6 +72,7 @@ export function filtersToSearchParams(filters: CatalogFilters): URLSearchParams 
 
   if (query) params.set('q', query);
   if (filters.color && filters.color !== 'All') params.set('color', filters.color);
+  encodeListParam(params, 'colors', filters.colors);
   if (filters.type && filters.type !== 'All') params.set('type', filters.type);
   if (filters.set && filters.set !== 'All') params.set('set', filters.set);
   if (filters.keyword && filters.keyword !== 'All') params.set('keyword', filters.keyword);
@@ -115,6 +123,7 @@ function normalizeList(values?: string[]): string[] | undefined {
 export interface ComparableFilters {
   query?: string;
   color?: string;
+  colors?: string[];
   type?: string;
   set?: string;
   keyword?: string;
@@ -131,6 +140,7 @@ export function normalizeComparableFilters(filters: ComparableFilters): Comparab
   return {
     query: normalizeScalar(filters.query),
     color: normalizeScalar(filters.color),
+    colors: normalizeList(filters.colors),
     type: normalizeScalar(filters.type),
     set: normalizeScalar(filters.set),
     keyword: normalizeScalar(filters.keyword),
@@ -150,6 +160,7 @@ export function getFilterMismatchKeys(selected: ComparableFilters, applied: Comp
   const keys: Array<keyof ComparableFilters> = [
     'query',
     'color',
+    'colors',
     'type',
     'set',
     'keyword',

@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { LayoutGrid, SlidersHorizontal, Table2, FileJson } from 'lucide-react';
+import { validateDeck } from '@gundam-forge/shared';
+import { cards as allCards } from '@/lib/data/cards';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/layout/Container';
 import { DeckHeader } from '@/components/deck/DeckHeader';
@@ -59,6 +61,12 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
   const [sortBy, setSortBy] = React.useState<DeckSortKey>('name');
   const [activeCardId, setActiveCardId] = React.useState<string | null>(null);
   const [feedback, setFeedback] = React.useState('');
+  const [validityExpanded, setValidityExpanded] = React.useState(false);
+
+  const validationResult = React.useMemo(() => {
+    const entries = initialItems.map((item) => ({ cardId: item.id, qty: item.qty }));
+    return validateDeck(entries, allCards);
+  }, [initialItems]);
 
   const visibleCards = React.useMemo(
     () => applyDeckFilterSort(initialItems, { query, sortBy }),
@@ -147,6 +155,31 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
           JSON
         </Button>
       </DeckHeader>
+
+      {/* Deck Validity Badge */}
+      {validationResult.isValid ? (
+        <div className="flex items-center gap-1.5 rounded-md border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-sm text-green-400">
+          <span>✓</span> Valid
+        </div>
+      ) : (
+        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-sm text-red-400">
+          <button
+            type="button"
+            className="flex w-full items-center gap-1.5 text-left"
+            onClick={() => setValidityExpanded((prev) => !prev)}
+          >
+            <span>✗</span> Invalid — {validationResult.errors.length} issue{validationResult.errors.length !== 1 ? 's' : ''}
+            <span className="ml-auto text-xs">{validityExpanded ? '▲' : '▼'}</span>
+          </button>
+          {validityExpanded && (
+            <ul className="mt-2 space-y-1 pl-5 text-xs text-red-300">
+              {validationResult.errors.map((err, i) => (
+                <li key={i}>• {err}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <DeckToolbar
         density={density}
