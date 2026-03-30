@@ -50,6 +50,10 @@ jobs:
           test -d apps/web/out
           test -f apps/web/out/index.html
           test -f apps/web/out/404.html
+          test -f apps/web/out/decks.html
+          grep -q 'href="/Gundam-Forge/decks"' apps/web/out/index.html
+          grep -q 'src="/Gundam-Forge/_next/' apps/web/out/index.html
+          grep -q 'href="/Gundam-Forge/decks"' apps/web/out/decks.html
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
