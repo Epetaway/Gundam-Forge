@@ -1,5 +1,7 @@
 import { apiOk, toApiErrorResponse } from '@/lib/api/server';
 import { getDecks } from '@/lib/data/decks';
+import { validateDeck } from '@gundam-forge/shared';
+import { cards } from '@/lib/data/cards';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
@@ -29,7 +31,11 @@ export async function GET(request: Request): Promise<Response> {
         const matchesArchetype =
           archetype.length === 0 || deck.archetype.toLowerCase() === archetype;
 
-        return matchesQuery && matchesColor && matchesArchetype;
+        // Filter out invalid decks
+        const validation = validateDeck(deck.entries, cards);
+        const isValid = validation.isValid;
+
+        return matchesQuery && matchesColor && matchesArchetype && isValid;
       })
       .sort((a, b) => b.likes + b.views - (a.likes + a.views));
 
