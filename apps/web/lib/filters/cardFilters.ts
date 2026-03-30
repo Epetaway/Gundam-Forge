@@ -6,6 +6,7 @@ export type CardDeckRole = 'main' | 'resource' | 'ex';
 export interface CatalogFilters {
   query?: string;
   color?: CardColor | 'All';
+  colors?: CardColor[]; // Multi-color OR filter
   type?: CardType | 'All';
   set?: string;
   keyword?: string;
@@ -49,6 +50,11 @@ export function filtersFromSearchParams(searchParams: URLSearchParams): CatalogF
     matchMode: (searchParams.get('matchMode') as FilterMatchMode | null) ?? undefined,
   };
 
+  const colors = parseListParam(searchParams.get('colors')) as CardColor[];
+  if (colors.length > 0) {
+    filters.colors = colors;
+  }
+
   for (const key of LIST_KEYS) {
     const values = parseListParam(searchParams.get(key));
     if (values.length > 0) {
@@ -65,6 +71,9 @@ export function filtersToSearchParams(filters: CatalogFilters): URLSearchParams 
 
   if (query) params.set('q', query);
   if (filters.color && filters.color !== 'All') params.set('color', filters.color);
+  if (filters.colors && filters.colors.length > 0) {
+    params.set('colors', filters.colors.join(','));
+  }
   if (filters.type && filters.type !== 'All') params.set('type', filters.type);
   if (filters.set && filters.set !== 'All') params.set('set', filters.set);
   if (filters.keyword && filters.keyword !== 'All') params.set('keyword', filters.keyword);
@@ -115,6 +124,7 @@ function normalizeList(values?: string[]): string[] | undefined {
 export interface ComparableFilters {
   query?: string;
   color?: string;
+  colors?: string[];
   type?: string;
   set?: string;
   keyword?: string;
@@ -131,6 +141,7 @@ export function normalizeComparableFilters(filters: ComparableFilters): Comparab
   return {
     query: normalizeScalar(filters.query),
     color: normalizeScalar(filters.color),
+    colors: normalizeList(filters.colors),
     type: normalizeScalar(filters.type),
     set: normalizeScalar(filters.set),
     keyword: normalizeScalar(filters.keyword),
@@ -150,6 +161,7 @@ export function getFilterMismatchKeys(selected: ComparableFilters, applied: Comp
   const keys: Array<keyof ComparableFilters> = [
     'query',
     'color',
+    'colors',
     'type',
     'set',
     'keyword',
