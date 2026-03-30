@@ -34,6 +34,18 @@ const config: Config = {
         'shimmer': {
           '0%': { backgroundPosition: '200% 0' },
           '100%': { backgroundPosition: '-200% 0' },
+                  'slide-up': {
+                    from: { opacity: '0', transform: 'translateY(100%)' },
+                    to: { opacity: '1', transform: 'translateY(0)' },
+                  },
+                  'slide-down': {
+                    from: { opacity: '1', transform: 'translateY(0)' },
+                    to: { opacity: '0', transform: 'translateY(100%)' },
+                  },
+                  'fade-up': {
+                    from: { opacity: '0', transform: 'translateY(10px)' },
+                    to: { opacity: '1', transform: 'translateY(0)' },
+                  },
         },
       },
       animation: {
@@ -42,6 +54,9 @@ const config: Config = {
         'zoom-in': 'zoom-in 200ms ease-out',
         'zoom-out': 'zoom-out 140ms ease-in',
         'shimmer': 'shimmer 2s infinite',
+                'slide-up': 'slide-up 280ms cubic-bezier(0.32, 0.72, 0, 1)',
+                'slide-down': 'slide-down 220ms cubic-bezier(0.32, 0.72, 0, 1)',
+                'fade-up': 'fade-up 200ms ease-out',
       },
       maxWidth: {
         content: '80rem',

@@ -53,7 +53,7 @@ export function CardViewerModal({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-4xl" onKeyDown={onKeyDown}>
+      <DialogContent className="max-w-3xl" onKeyDown={onKeyDown}>
         {currentCard ? (
           <>
             <DialogHeader>

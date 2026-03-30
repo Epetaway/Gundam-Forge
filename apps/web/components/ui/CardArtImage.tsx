@@ -4,6 +4,7 @@ import * as React from 'react';
 import Image, { type ImageProps } from 'next/image';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { getCardImage } from '@/lib/data/cards';
+import { getCardImageFallback } from '@/lib/images/cardImageUtils';
 
 type CardArtRef = Pick<CardDefinition, 'id' | 'name' | 'imageUrl' | 'placeholderArt'>;
 
@@ -21,6 +22,8 @@ export function CardArtImage(props: CardArtImageProps): JSX.Element {
   const { card, alt, onError, ...imageProps } = props;
 
   const primarySource = React.useMemo(() => getCardImage(card), [card]);
+  const cdnSource = React.useMemo(() => getCardImageFallback(card.id, card.name), [card.id, card.name]);
+  const cardBackSource = '/card-back.svg';
   const inlineFallback = React.useMemo(() => buildInlineFallback(card.name), [card.name]);
   const [source, setSource] = React.useState(primarySource);
 
@@ -29,7 +32,11 @@ export function CardArtImage(props: CardArtImageProps): JSX.Element {
   }, [primarySource]);
 
   const handleError = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    if (source !== inlineFallback) {
+    if (source === primarySource && source !== cdnSource) {
+      setSource(cdnSource);
+    } else if (source !== cardBackSource && source !== inlineFallback) {
+      setSource(cardBackSource);
+    } else if (source !== inlineFallback) {
       setSource(inlineFallback);
     }
     onError?.(event);

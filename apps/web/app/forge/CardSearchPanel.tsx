@@ -2,8 +2,7 @@
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { ChevronDown, ChevronRight, Lightbulb, Edit } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Lightbulb, Edit } from 'lucide-react';
 import type { DeckIntent, CardDefinition, CardColor } from '@gundam-forge/shared';
 import { sortCardsBySynergy, filterCardsByIntent, clearSynergyScoreCache } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
@@ -115,7 +114,7 @@ function CardListTable({
       )}
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="border-b border-border bg-surface-interactive text-[10px] uppercase tracking-wider text-white sticky top-0 z-10">
+          <thead className="border-b border-border bg-surface-interactive text-[10px] uppercase tracking-wider text-foreground sticky top-0 z-10">
             <tr>
               <th className="px-3 py-1.5">Card</th>
               <th className="px-2 py-1.5 hidden sm:table-cell">Type</th>
@@ -137,7 +136,7 @@ function CardListTable({
                 <td className="px-3 py-1 font-medium text-foreground leading-tight">
                   {card.name}
                 </td>
-                <td className="px-2 py-1 hidden text-white sm:table-cell">{card.type}</td>
+                <td className="px-2 py-1 hidden text-foreground sm:table-cell">{card.type}</td>
                 {showSynergy && (
                   <td className="px-2 py-1 text-right font-mono text-[10px] text-cobalt-400">
                     {(card.synergyScore ?? 0) > 0 ? `★${card.synergyScore}` : ''}
@@ -147,7 +146,7 @@ function CardListTable({
                   <button
                     type="button"
                     aria-label={`Add ${card.name} to deck`}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600/0 text-white transition-all group-hover:bg-cobalt-600 group-hover:text-white font-bold"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-600/0 text-foreground transition-all group-hover:bg-cobalt-600 group-hover:text-white font-bold"
                     onClick={(e) => {
                       e.stopPropagation();
                       onSelect(card.id);
@@ -163,6 +162,20 @@ function CardListTable({
       </div>
     </>
   );
+}
+
+function getResponsivePageConfig(width: number) {
+  if (width >= 760) return { columns: 4, rows: 2 };
+  if (width >= 520) return { columns: 3, rows: 2 };
+  if (width >= 380) return { columns: 2, rows: 3 };
+  return { columns: 2, rows: 2 };
+}
+
+function getVisiblePageNumbers(page: number, pageCount: number) {
+  const start = Math.max(0, page - 1);
+  const end = Math.min(pageCount, start + 3);
+  const adjustedStart = Math.max(0, end - 3);
+  return Array.from({ length: end - adjustedStart }, (_, index) => adjustedStart + index);
 }
 
 // ─── Grouped section ─────────────────────────────────────────────────────────
@@ -184,106 +197,178 @@ function CardGroup({
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [hovered, setHovered] = useState<{ card: ScoredCard; anchor: DOMRect } | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
-  // Virtualize grid rows (2 columns per row)
-  const COLS = 2;
-  const rows = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < cards.length; i += COLS) {
-      result.push(cards.slice(i, i + COLS));
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateWidth = () => setContainerWidth(element.getBoundingClientRect().width);
+    updateWidth();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
     }
-    return result;
-  }, [cards]);
 
-  const rowVirtualizer = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 240, // ~200px for card + 40px for gap/padding
-    enabled: !collapsed && rows.length > 5, // Only virtualize with 5+ rows
-    overscan: 5, // Render extra rows on each side
-  });
+    const observer = new ResizeObserver(() => updateWidth());
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const { columns, rows } = useMemo(
+    () => getResponsivePageConfig(containerWidth),
+    [containerWidth],
+  );
+  const pageSize = columns * rows;
+  const pageCount = Math.max(1, Math.ceil(cards.length / pageSize));
+  const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    setPage(0);
+  }, [cards, columns, rows]);
+
+  useEffect(() => {
+    if (page >= pageCount) {
+      setPage(Math.max(0, pageCount - 1));
+    }
+  }, [page, pageCount]);
+
+  const pageCards = useMemo(() => {
+    const start = page * pageSize;
+    return cards.slice(start, start + pageSize);
+  }, [cards, page, pageSize]);
+
+  const pageNumbers = useMemo(
+    () => getVisiblePageNumbers(page, pageCount),
+    [page, pageCount],
+  );
+  const startIndex = cards.length === 0 ? 0 : page * pageSize + 1;
+  const endIndex = Math.min(cards.length, (page + 1) * pageSize);
+  const gridClassName = columns === 4 ? 'grid-cols-4' : columns === 3 ? 'grid-cols-3' : 'grid-cols-2';
 
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div ref={containerRef} className="border-b border-border last:border-b-0">
       {hovered && typeof document !== 'undefined' && (
         <CardHoverTooltip card={hovered.card} anchor={hovered.anchor} />
       )}
-      <button
-        type="button"
-        className="flex w-full items-center justify-between px-3 py-2 hover:bg-surface-interactive/40 transition-colors"
-        onClick={() => setCollapsed((v) => !v)}
-        aria-expanded={!collapsed}
-      >
-        <span className="flex items-center gap-1.5 text-xs font-semibold text-white">
-          {collapsed ? (
-            <ChevronRight className="h-3 w-3 text-white" />
-          ) : (
-            <ChevronDown className="h-3 w-3 text-white" />
-          )}
-          {label}
-        </span>
-        <span className="rounded-full bg-steel-800 px-2 py-0.5 text-[10px] text-white">
-          {cards.length}
-        </span>
-      </button>
-      {!collapsed && (
-        <div
-          ref={scrollContainerRef}
-          className="max-h-[600px] overflow-y-auto"
-          style={{ minWidth: 0 }}
+      <div className="flex flex-wrap items-center gap-2 px-3 py-2.5">
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-surface-interactive/40"
+          onClick={() => setCollapsed((value) => !value)}
+          aria-expanded={!collapsed}
         >
-          {rows.length > 5 ? (
-            // Virtualized grid for large groups
-            <div
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-                position: 'relative',
-              }}
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                  className="px-2.5 pb-3.5"
-                >
-                  <div className="grid grid-cols-2 gap-3">
-                    {rows[virtualRow.index].map((card) => (
-                      <UnifiedCardTile
-                        key={card.id}
-                        card={card}
-                        mode="deckbuilder"
-                        showSynergy={showSynergy}
-                        onPreview={onPreview}
-                        onAdd={() => onSelect(card.id)}
-                        onHoverChange={setHovered}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {collapsed ? (
+            <ChevronRight className="h-3.5 w-3.5 flex-none text-foreground" />
           ) : (
-            // Non-virtualized grid for small groups
-            <div className="grid grid-cols-2 gap-3 px-2.5 pb-3.5">
-              {cards.map((card) => (
-                <UnifiedCardTile
-                  key={card.id}
-                  card={card}
-                  mode="deckbuilder"
-                  showSynergy={showSynergy}
-                  onPreview={onPreview}
-                  onAdd={() => onSelect(card.id)}
-                  onHoverChange={setHovered}
-                />
-              ))}
+            <ChevronDown className="h-3.5 w-3.5 flex-none text-foreground" />
+          )}
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-xs font-semibold text-foreground">{label}</span>
+            <span className="block text-[10px] text-text-muted">
+              {collapsed ? `${cards.length} cards` : `${startIndex}-${endIndex} of ${cards.length}`}
+            </span>
+          </span>
+          <span className="inline-flex min-w-10 items-center justify-center rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-semibold tabular-nums text-foreground shadow-sm">
+            {cards.length}
+          </span>
+        </button>
+
+        {!collapsed && pageCount > 1 && (
+          <div className="ml-auto flex items-center gap-1.5">
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-steel-600 transition-colors hover:bg-surface-interactive hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setPage((value) => Math.max(0, value - 1))}
+              disabled={page === 0}
+              aria-label={`Previous ${label} page`}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-steel-600 transition-colors hover:bg-surface-interactive hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}
+              disabled={page >= pageCount - 1}
+              aria-label={`Next ${label} page`}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!collapsed && (
+        <div className="border-t border-border/80 px-3 pb-3 pt-3" style={{ minWidth: 0 }}>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-muted">
+            <span>
+              {columns}-column layout · {rows} row{rows !== 1 ? 's' : ''} per page
+            </span>
+            {pageCount > 1 ? (
+              <span>
+                Page {page + 1} of {pageCount}
+              </span>
+            ) : (
+              <span>All results shown</span>
+            )}
+          </div>
+
+          <div className={cn('grid gap-3', gridClassName)}>
+            {pageCards.map((card) => (
+              <UnifiedCardTile
+                key={card.id}
+                card={card}
+                mode="deckbuilder"
+                showSynergy={showSynergy}
+                onPreview={onPreview}
+                onAdd={() => onSelect(card.id)}
+                onHoverChange={setHovered}
+              />
+            ))}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1">
+                {pageNumbers.map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    className={cn(
+                      'inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 text-xs font-semibold transition-colors',
+                      pageNumber === page
+                        ? 'border-cobalt-600 bg-cobalt-600 text-white'
+                        : 'border-border bg-surface text-foreground hover:bg-surface-interactive',
+                    )}
+                    onClick={() => setPage(pageNumber)}
+                    aria-label={`${label} page ${pageNumber + 1}`}
+                    aria-current={pageNumber === page ? 'page' : undefined}
+                  >
+                    {pageNumber + 1}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-3 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={() => setPage((value) => Math.max(0, value - 1))}
+                  disabled={page === 0}
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-3 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}
+                  disabled={page >= pageCount - 1}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -461,10 +546,10 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX) && (
           <div className="rounded-lg border border-cobalt-500/30 bg-cobalt-900/10 p-2 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-cobalt-300">Active Filters</span>
+              <span className="text-xs font-semibold text-foreground">Active Filters</span>
               <button
                 type="button"
-                className="text-xs text-white hover:text-cobalt-300 transition-colors"
+                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
                 onClick={() => {
                   setQuery('');
                   setRawQuery('');
@@ -484,57 +569,57 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             </div>
             <div className="flex flex-wrap gap-1.5">
               {rawQuery && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   Search: &quot;{rawQuery.slice(0, 15)}{rawQuery.length > 15 ? '…' : ''}&quot;
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
+                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
                 </span>
               )}
               {typeFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   Type: {typeFilter}
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
+                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
                 </span>
               )}
               {colorFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   Color: {colorFilter}
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
+                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
                 </span>
               )}
               {setFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   Set: {setFilter}
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
+                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
                 </span>
               )}
               {keywordFilters.map((kw) => (
-                <span key={kw} className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-300 border border-amber-500/30">
+                <span key={kw} className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-600 border border-amber-500/30">
                   {kw.replace('-', ' ')}
-                  <button type="button" className="hover:text-amber-100 transition-colors" onClick={() => setKeywordFilters(keywordFilters.filter((k) => k !== kw))} aria-label={`Clear ${kw} keyword filter`}>×</button>
+                  <button type="button" className="hover:text-amber-700 transition-colors" onClick={() => setKeywordFilters(keywordFilters.filter((k) => k !== kw))} aria-label={`Clear ${kw} keyword filter`}>×</button>
                 </span>
               ))}
               {triggerFilters.map((tr) => (
-                <span key={tr} className="inline-flex items-center gap-1 rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs text-emerald-300 border border-emerald-500/30">
+                <span key={tr} className="inline-flex items-center gap-1 rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs text-emerald-600 border border-emerald-500/30">
                   {tr.replace('-', ' ')}
-                  <button type="button" className="hover:text-emerald-100 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
+                  <button type="button" className="hover:text-emerald-700 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
                 </span>
               ))}
               {effectKeywordFilters.map((effect) => (
-                <span key={effect} className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-300 border border-purple-500/30">
+                <span key={effect} className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-600 border border-purple-500/30">
                   {effect.replace('_', ' ')}
-                  <button type="button" className="hover:text-purple-100 transition-colors" onClick={() => setEffectKeywordFilters(effectKeywordFilters.filter((e) => e !== effect))} aria-label={`Clear ${effect} effect filter`}>×</button>
+                  <button type="button" className="hover:text-purple-700 transition-colors" onClick={() => setEffectKeywordFilters(effectKeywordFilters.filter((e) => e !== effect))} aria-label={`Clear ${effect} effect filter`}>×</button>
                 </span>
               ))}
               {deckColorOnly && deckColors.length > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   Deck colors only
-                  <button type="button" className="hover:text-cobalt-100 transition-colors" onClick={() => setDeckColorOnly(false)} aria-label="Disable deck colors filter">×</button>
+                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setDeckColorOnly(false)} aria-label="Disable deck colors filter">×</button>
                 </span>
               )}
               {includeEX && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-300 border border-amber-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-600 border border-amber-500/30">
                   EX cards shown
-                  <button type="button" className="hover:text-amber-100 transition-colors" onClick={() => setIncludeEX(false)} aria-label="Exclude EX cards">×</button>
+                  <button type="button" className="hover:text-amber-700 transition-colors" onClick={() => setIncludeEX(false)} aria-label="Exclude EX cards">×</button>
                 </span>
               )}
             </div>
@@ -545,11 +630,11 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         {(deckColors.length > 0 || deckClans.length > 0) && (
           <div className="rounded-lg border border-steel-700/50 bg-steel-900/20 p-2 space-y-1.5">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-white uppercase tracking-wider">Deck Intent</div>
+              <div className="text-xs font-semibold text-foreground uppercase tracking-wider">Deck Intent</div>
               {onIntentChange && (
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-xs text-white hover:text-cobalt-400 transition-colors"
+                  className="flex items-center gap-1 text-xs text-foreground hover:text-cobalt-600 transition-colors"
                   onClick={() => setIntentEditorOpen(!intentEditorOpen)}
                   title="Edit deck intent"
                 >
@@ -560,12 +645,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             </div>
             <div className="flex flex-wrap gap-1.5">
               {deckClans.map((clan) => (
-                <span key={clan} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span key={clan} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   {clan}
                 </span>
               ))}
               {deckColors.map((color) => (
-                <span key={color} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-300 border border-cobalt-500/30">
+                <span key={color} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
                   {color}
                 </span>
               ))}
@@ -579,19 +664,19 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             {/* Suggestions */}
             {deckAnalysis && deckAnalysis.improvements.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
                   <Lightbulb className="w-3.5 h-3.5" />
                   Suggestions (Confidence: {deckAnalysis.confidence}%)
                 </div>
                 <div className="space-y-1">
                   {deckAnalysis.improvements.map((imp, i) => (
-                    <p key={i} className="text-xs text-white leading-relaxed">• {imp}</p>
+                    <p key={i} className="text-xs text-foreground leading-relaxed">• {imp}</p>
                   ))}
                 </div>
                 {deckAnalysis.confidence >= 70 && (
                   <button
                     type="button"
-                    className="w-full rounded border border-amber-600 bg-amber-600/20 px-2 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-600/30 transition-colors"
+                    className="w-full rounded border border-amber-600 bg-amber-600/20 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-600/30 transition-colors"
                     onClick={() => {
                       onIntentChange(deckAnalysis.suggestedIntent);
                       setIntentEditorOpen(false);
@@ -605,7 +690,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
             {/* Manual Color Selection */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-white">Colors</label>
+              <label className="text-xs font-semibold text-foreground">Colors</label>
               <div className="flex flex-wrap gap-1">
                 {CARD_COLORS.filter(c => c !== 'All').map((color) => {
                   const active = deckColors.includes(color as CardColor);
@@ -636,7 +721,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
             {/* Manual Clan Selection */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-white">Factions</label>
+              <label className="text-xs font-semibold text-foreground">Factions</label>
               <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
                 {CLAN_OPTIONS.map((clan) => {
                   const active = deckClans.includes(clan);
@@ -667,7 +752,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
             <button
               type="button"
-              className="w-full rounded border border-steel-600 bg-surface-interactive px-2 py-1.5 text-xs font-semibold text-white hover:bg-surface-hover transition-colors"
+              className="w-full rounded border border-steel-600 bg-surface-interactive px-2 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-hover transition-colors"
               onClick={() => setIntentEditorOpen(false)}
             >
               Done
@@ -682,7 +767,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             className={`w-full rounded border px-2 py-1 text-xs font-semibold transition-colors ${
               deckColorOnly
                 ? 'border-cobalt-600 bg-cobalt-600 text-white'
-                : 'border-border bg-surface-interactive text-white hover:bg-surface'
+                : 'border-border bg-surface-interactive text-foreground hover:bg-surface'
             }`}
             onClick={() => setDeckColorOnly((v) => !v)}
             aria-pressed={deckColorOnly}
@@ -697,7 +782,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
           type="button"
           className={`w-full rounded border px-2 py-1 text-xs font-semibold transition-colors ${
             includeEX
-              ? 'border-amber-600 bg-amber-600/20 text-amber-300'
+              ? 'border-amber-600 bg-amber-600/20 text-amber-600'
               : 'border-border bg-surface-interactive text-foreground hover:bg-surface'
           }`}
           onClick={() => setIncludeEX((v) => !v)}
@@ -710,11 +795,11 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         {/* Keywords Filter */}
         <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white">Keywords</span>
+            <span className="text-xs font-semibold text-foreground">Keywords</span>
             {keywordFilters.length > 0 && (
               <button
                 type="button"
-                className="text-xs text-white hover:text-white transition-colors"
+                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
                 onClick={() => setKeywordFilters([])}
               >
                 Clear
@@ -725,13 +810,13 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             {['blocker', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
               const active = keywordFilters.includes(kw);
               const colorMap: Record<string, { border: string; bg: string; text: string; hoverBg: string }> = {
-                'blocker': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-300', hoverBg: 'hover:bg-red-600/30' },
-                'high-maneuver': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-300', hoverBg: 'hover:bg-blue-600/30' },
-                'first-strike': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-300', hoverBg: 'hover:bg-amber-600/30' },
-                'breach': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-300', hoverBg: 'hover:bg-purple-600/30' },
-                'support': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-300', hoverBg: 'hover:bg-emerald-600/30' },
-                'repair': { border: 'border-green-600', bg: 'bg-green-600/20', text: 'text-green-300', hoverBg: 'hover:bg-green-600/30' },
-                'suppression': { border: 'border-slate-600', bg: 'bg-slate-600/20', text: 'text-slate-300', hoverBg: 'hover:bg-slate-600/30' },
+                'blocker': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-600', hoverBg: 'hover:bg-red-600/30' },
+                'high-maneuver': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-600', hoverBg: 'hover:bg-blue-600/30' },
+                'first-strike': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-600', hoverBg: 'hover:bg-amber-600/30' },
+                'breach': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-600', hoverBg: 'hover:bg-purple-600/30' },
+                'support': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-600', hoverBg: 'hover:bg-emerald-600/30' },
+                'repair': { border: 'border-green-600', bg: 'bg-green-600/20', text: 'text-green-600', hoverBg: 'hover:bg-green-600/30' },
+                'suppression': { border: 'border-slate-600', bg: 'bg-slate-600/20', text: 'text-slate-600', hoverBg: 'hover:bg-slate-600/30' },
               };
               const colors = colorMap[kw] || colorMap['blocker'];
               return (
@@ -762,11 +847,11 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         {/* Triggers Filter */}
         <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white">Triggers</span>
+            <span className="text-xs font-semibold text-foreground">Triggers</span>
             {triggerFilters.length > 0 && (
               <button
                 type="button"
-                className="text-xs text-white hover:text-white transition-colors"
+                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
                 onClick={() => setTriggerFilters([])}
               >
                 Clear
@@ -777,13 +862,13 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             {['burst', 'when-paired', 'during-pair', 'deploy', 'attack', 'when-linked', 'during-link'].map((tr) => {
               const active = triggerFilters.includes(tr);
               const triggerColorMap: Record<string, { border: string; bg: string; text: string; hoverBg: string }> = {
-                'burst': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-300', hoverBg: 'hover:bg-red-600/30' },
-                'when-paired': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-300', hoverBg: 'hover:bg-blue-600/30' },
-                'during-pair': { border: 'border-cyan-600', bg: 'bg-cyan-600/20', text: 'text-cyan-300', hoverBg: 'hover:bg-cyan-600/30' },
-                'deploy': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-300', hoverBg: 'hover:bg-emerald-600/30' },
-                'attack': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-300', hoverBg: 'hover:bg-amber-600/30' },
-                'when-linked': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-300', hoverBg: 'hover:bg-purple-600/30' },
-                'during-link': { border: 'border-indigo-600', bg: 'bg-indigo-600/20', text: 'text-indigo-300', hoverBg: 'hover:bg-indigo-600/30' },
+                'burst': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-600', hoverBg: 'hover:bg-red-600/30' },
+                'when-paired': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-600', hoverBg: 'hover:bg-blue-600/30' },
+                'during-pair': { border: 'border-cyan-600', bg: 'bg-cyan-600/20', text: 'text-cyan-600', hoverBg: 'hover:bg-cyan-600/30' },
+                'deploy': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-600', hoverBg: 'hover:bg-emerald-600/30' },
+                'attack': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-600', hoverBg: 'hover:bg-amber-600/30' },
+                'when-linked': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-600', hoverBg: 'hover:bg-purple-600/30' },
+                'during-link': { border: 'border-indigo-600', bg: 'bg-indigo-600/20', text: 'text-indigo-600', hoverBg: 'hover:bg-indigo-600/30' },
               };
               const triggerColors = triggerColorMap[tr] || triggerColorMap['burst'];
               return (
@@ -818,7 +903,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-surface-interactive/50 transition-colors"
             onClick={() => setFiltersExpanded((v) => !v)}
           >
-            <span className="text-xs font-semibold text-white">
+            <span className="text-xs font-semibold text-foreground">
               {(() => {
                 const activeCount = (typeFilter !== 'All' ? 1 : 0) +
                                    (colorFilter !== 'All' ? 1 : 0) +
@@ -829,14 +914,14 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
               })()}
             </span>
             <ChevronDown
-              className={cn('w-4 h-4 text-white transition-transform duration-200', filtersExpanded ? 'rotate-180' : '')}
+              className={cn('w-4 h-4 text-foreground transition-transform duration-200', filtersExpanded ? 'rotate-180' : '')}
             />
           </button>
 
           {filtersExpanded && (
             <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
               <div>
-                <span className="mb-1 block text-xs text-white" id="type-filter-label">Type</span>
+                <span className="mb-1 block text-xs text-foreground" id="type-filter-label">Type</span>
                 <div className="flex flex-wrap gap-1" role="group" aria-labelledby="type-filter-label">
                   {CARD_TYPES.map((t) => (
                     <button
@@ -848,7 +933,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                 </div>
               </div>
               <div>
-                <span className="mb-1 block text-xs text-white" id="color-filter-label">Color</span>
+                <span className="mb-1 block text-xs text-foreground" id="color-filter-label">Color</span>
                 <div className="flex flex-wrap gap-1" role="group" aria-labelledby="color-filter-label">
                   {CARD_COLORS.map((c) => (
                     <button
@@ -860,7 +945,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs text-white" htmlFor="set-filter-select">Set</label>
+                <label className="mb-1 block text-xs text-foreground" htmlFor="set-filter-select">Set</label>
                 <select
                   id="set-filter-select"
                   className="w-full rounded border border-border bg-surface p-1 text-xs outline-none focus-visible:border-ring"
@@ -935,7 +1020,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         aria-label="Card results"
       >
         {filtered.length === 0 ? (
-          <p className="p-4 text-center text-xs text-white">No cards match your filters.</p>
+                <p className="p-4 text-center text-xs text-foreground">No cards match your filters.</p>
         ) : groupedResults ? (
           /* Grouped view */
           <div>
