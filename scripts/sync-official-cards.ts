@@ -8,12 +8,18 @@ import type { CardDefinition, CardColor, CardType } from '../packages/shared/src
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
+const cardsOutputPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
+const catalogOutputPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.catalog.json');
+const publicCatalogOutputPath = path.join(projectRoot, 'apps', 'web', 'public', 'data', 'cards.catalog.json');
+const seedOutputPath = path.join(projectRoot, 'seed', 'official_cards_enhanced.json');
+const cardArtDir = path.join(projectRoot, 'apps', 'web', 'public', 'card_art');
 
 const DEFAULT_BASE_URL = 'https://exburst.dev';
 const DEFAULT_CARDS_URL = `${DEFAULT_BASE_URL}/gundam/cardlist`;
 const USE_PLAYWRIGHT = process.env.GUNDAM_GCG_USE_PLAYWRIGHT !== 'false';
 const FETCH_TIMEOUT_MS = Number(process.env.GUNDAM_GCG_FETCH_TIMEOUT_MS || '20000');
 const FETCH_RETRIES = Number(process.env.GUNDAM_GCG_FETCH_RETRIES || '2');
+const IMAGE_EXTENSIONS = ['webp', 'png', 'jpg', 'jpeg'] as const;
 
 const CARD_ID_PATTERN = /^(?:[A-Z]{2,4}\d{2}|[A-Z]{2,4})-\d{3,4}$/;
 
@@ -52,6 +58,8 @@ interface DiscoveredCardLink {
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+type ImageExtension = (typeof IMAGE_EXTENSIONS)[number];
 
 const getEnv = (key: string, fallback: string): string => process.env[key] || fallback;
 
@@ -115,6 +123,99 @@ const fetchJson = async (url: string): Promise<unknown> => {
   } catch (error) {
     throw new Error(`Invalid JSON from ${url}`);
   }
+};
+
+const fetchBuffer = async (url: string): Promise<Buffer> => {
+  const response = await fetchWithRetry(url, {
+    headers: {
+      'User-Agent': 'Gundam-Forge-Sync/1.0 (+https://github.com/Epetaway/Gundam-Forge)',
+      'Accept': 'image/webp,image/*,*/*;q=0.8',
+    },
+  });
+
+  return Buffer.from(await response.arrayBuffer());
+};
+
+const fileExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const readJsonArray = async <T>(filePath: string): Promise<T[]> => {
+  const raw = await fs.readFile(filePath, 'utf-8');
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed) ? parsed as T[] : [];
+};
+
+const writeJson = async (filePath: string, payload: unknown): Promise<void> => {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(payload, null, 2) + '\n');
+};
+
+const getImageExtension = (imageUrl: string): ImageExtension => {
+  try {
+    const pathname = new URL(imageUrl).pathname.toLowerCase();
+    const ext = pathname.split('.').pop();
+    if (ext && IMAGE_EXTENSIONS.includes(ext as ImageExtension)) {
+      return ext as ImageExtension;
+    }
+  } catch {
+    // ignore parse failures
+  }
+
+  return 'webp';
+};
+
+const findLocalImagePath = async (cardId: string): Promise<string | undefined> => {
+  for (const ext of IMAGE_EXTENSIONS) {
+    const fullPath = path.join(cardArtDir, `${cardId}.${ext}`);
+    if (await fileExists(fullPath)) {
+      return `/card_art/${cardId}.${ext}`;
+    }
+  }
+
+  return undefined;
+};
+
+const downloadLocalImage = async (cardId: string, imageUrl?: string): Promise<string | undefined> => {
+  if (!imageUrl || imageUrl.startsWith('/card_art/')) return imageUrl;
+
+  const ext = getImageExtension(imageUrl);
+  const buffer = await fetchBuffer(imageUrl);
+  await fs.mkdir(cardArtDir, { recursive: true });
+
+  const outputFilePath = path.join(cardArtDir, `${cardId}.${ext}`);
+  await fs.writeFile(outputFilePath, buffer);
+
+  return `/card_art/${cardId}.${ext}`;
+};
+
+const ensureLocalCardImage = async (card: CardDefinition): Promise<CardDefinition> => {
+  const existingLocalPath = await findLocalImagePath(card.id);
+  if (existingLocalPath) {
+    return {
+      ...card,
+      imageUrl: existingLocalPath,
+    };
+  }
+
+  try {
+    const localImagePath = await downloadLocalImage(card.id, card.imageUrl);
+    if (localImagePath) {
+      return {
+        ...card,
+        imageUrl: localImagePath,
+      };
+    }
+  } catch (error) {
+    console.warn(`  ⚠️  Failed to cache local art for ${card.id}: ${error}`);
+  }
+
+  return card;
 };
 
 const fetchRenderedPayloads = async (url: string): Promise<unknown[]> => {
@@ -737,6 +838,29 @@ const mergeCards = (existing: CardDefinition[], incoming: CardDefinition[]): Car
   return Array.from(byId.values()).sort((a, b) => a.id.localeCompare(b.id));
 };
 
+const persistSyncedCards = async (existingCards: CardDefinition[], incomingCards: CardDefinition[]): Promise<CardDefinition[]> => {
+  const localizedCards: CardDefinition[] = [];
+  for (const card of incomingCards) {
+    localizedCards.push(await ensureLocalCardImage(card));
+  }
+
+  const mergedCards = mergeCards(existingCards, localizedCards);
+  await writeJson(cardsOutputPath, mergedCards);
+
+  const seedCards = await readJsonArray<CardDefinition>(seedOutputPath);
+  await writeJson(seedOutputPath, mergeCards(seedCards, localizedCards));
+
+  const catalogCards = localizedCards.filter((card) => card.imageUrl?.startsWith('/card_art/'));
+  if (catalogCards.length > 0) {
+    const existingCatalog = await readJsonArray<CardDefinition>(catalogOutputPath);
+    const mergedCatalog = mergeCards(existingCatalog, catalogCards);
+    await writeJson(catalogOutputPath, mergedCatalog);
+    await writeJson(publicCatalogOutputPath, mergedCatalog);
+  }
+
+  return mergedCards;
+};
+
 const buildPlaceholderArt = (name: string): string => {
   const encoded = encodeURIComponent(name || 'Card');
   return `https://placehold.co/600x840/1f2937/f9fafb?text=${encoded}`;
@@ -854,8 +978,6 @@ const main = async () => {
     .filter((value) => CARD_ID_PATTERN.test(value));
   const pageLimit = Number(process.env.GUNDAM_GCG_PAGE_LIMIT || '0');
   const detailLimit = Number(process.env.GUNDAM_GCG_DETAIL_LIMIT || '0');
-  const outputPath = path.join(projectRoot, 'apps', 'web', 'lib', 'data', 'cards.json');
-
   console.log('🔄 Syncing official cards');
   console.log(`  Source: ${cardsUrl}`);
 
@@ -877,8 +999,7 @@ const main = async () => {
       }
     }
 
-    const existingRaw = await fs.readFile(outputPath, 'utf-8');
-    const existingCards = JSON.parse(existingRaw) as CardDefinition[];
+    const existingCards = await readJsonArray<CardDefinition>(cardsOutputPath);
     const existingById = new Map(existingCards.map((card) => [card.id, card] as const));
 
     const normalized: CardDefinition[] = [];
@@ -888,8 +1009,7 @@ const main = async () => {
       if (card) normalized.push(card);
     }
 
-    const merged = mergeCards(existingCards, normalized);
-    await fs.writeFile(outputPath, JSON.stringify(merged, null, 2) + '\n');
+    const merged = await persistSyncedCards(existingCards, normalized);
     console.log(`✅ Synced ${normalized.length} cards from explicit IDs. Total now: ${merged.length}`);
     return;
   }
@@ -976,10 +1096,8 @@ const main = async () => {
     );
 
     if (detailCards.length > 0) {
-      const existingRaw = await fs.readFile(outputPath, 'utf-8');
-      const existingCards = JSON.parse(existingRaw) as CardDefinition[];
-      const merged = mergeCards(existingCards, detailCards);
-      await fs.writeFile(outputPath, JSON.stringify(merged, null, 2) + '\n');
+      const existingCards = await readJsonArray<CardDefinition>(cardsOutputPath);
+      const merged = await persistSyncedCards(existingCards, detailCards);
       console.log(`✅ Synced ${detailCards.length} cards. Total now: ${merged.length}`);
       return;
     }
@@ -998,8 +1116,7 @@ const main = async () => {
     }
   }
 
-  const existingRaw = await fs.readFile(outputPath, 'utf-8');
-  const existingCards = JSON.parse(existingRaw) as CardDefinition[];
+  const existingCards = await readJsonArray<CardDefinition>(cardsOutputPath);
   const existingById = new Map(existingCards.map((card) => [card.id, card] as const));
 
   const normalized: CardDefinition[] = [];
@@ -1009,8 +1126,7 @@ const main = async () => {
     if (card) normalized.push(card);
   }
 
-  const merged = mergeCards(existingCards, normalized);
-  await fs.writeFile(outputPath, JSON.stringify(merged, null, 2) + '\n');
+  const merged = await persistSyncedCards(existingCards, normalized);
 
   console.log(`✅ Synced ${normalized.length} cards. Total now: ${merged.length}`);
 };
