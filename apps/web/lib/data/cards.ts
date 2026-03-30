@@ -1,5 +1,6 @@
 import cardsCatalogJson from '@/lib/data/cards.catalog.json';
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
+import { isExCard, isMainDeckCard, isResourceCard } from '@gundam-forge/shared';
 import { withBasePath } from '@/lib/utils/basePath';
 import { extractEffectKeywords } from '@/lib/search/extractEffectKeywords';
 import type { CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
@@ -21,27 +22,11 @@ function normalizeColorValue(value: string | undefined): string {
   return (value ?? '').trim().toLowerCase();
 }
 
-function isExCard(card: CardDefinition): boolean {
-  if (card.isExCard) return true;
-  if ((card.traits ?? []).some((trait) => trait.toLowerCase().includes('ex'))) return true;
-  return card.id.toLowerCase().startsWith('ex');
-}
-
 function inDeckRole(card: CardDefinition, deckRole: NonNullable<CatalogFilters['deckRole']>): boolean {
   if (deckRole === 'All') return true;
-
-  const ex = isExCard(card);
-  if (deckRole === 'ex') {
-    return ex;
-  }
-
-  if (deckRole === 'resource') {
-    if (typeof card.isResource === 'boolean') return card.isResource;
-    return card.type === 'Resource' || card.type === 'Base' || card.type === 'Command' || ex;
-  }
-
-  if (typeof card.isMainDeck === 'boolean') return card.isMainDeck;
-  return (card.type === 'Unit' || card.type === 'Pilot' || card.type === 'Command') && !ex;
+  if (deckRole === 'ex') return isExCard(card);
+  if (deckRole === 'resource') return isResourceCard(card);
+  return isMainDeckCard(card); // 'main'
 }
 
 function toMatchMode(mode: CatalogFilters['matchMode']): FilterMatchMode {
@@ -118,7 +103,11 @@ function applyCardFilters(source: CardDefinition[], filters: CatalogFilters = {}
       if (!haystack.includes(query)) return false;
     }
 
-    if (
+    // Multi-color OR filter (overrides scalar if both present)
+    if (filters.colors && filters.colors.length > 0) {
+      const colorSet = new Set(filters.colors.map(normalizeColorValue));
+      if (!colorSet.has(normalizeColorValue(card.color))) return false;
+    } else if (
       filters.color &&
       filters.color !== 'All' &&
       normalizeColorValue(card.color) !== normalizeColorValue(filters.color)
