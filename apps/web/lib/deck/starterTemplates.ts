@@ -44,7 +44,17 @@ function normalizeColors(raw: string[], entries: Array<{ cardId: string; qty: nu
   return [...new Set(inferred)];
 }
 
-function resolveTemplateImage(entries: Array<{ cardId: string; qty: number; isBoss?: boolean }>): string {
+function resolveTemplateImage(
+  deckImageUrl: string | undefined,
+  entries: Array<{ cardId: string; qty: number; isBoss?: boolean }>,
+): string {
+  if (deckImageUrl && deckImageUrl.trim().length > 0) {
+    if (deckImageUrl.startsWith('/')) {
+      return withBasePath(deckImageUrl);
+    }
+    return deckImageUrl;
+  }
+
   const bossCard = entries.find((entry) => entry.isBoss && cardsById.has(entry.cardId));
   if (bossCard) {
     const card = cardsById.get(bossCard.cardId);
@@ -75,7 +85,7 @@ export function getStarterDeckTemplates(limit = 6): StarterDeckTemplate[] {
         description: deck.description.trim() || `Start from ${deck.archetype.trim() || 'an official list'} and tune in Forge.`,
         archetype: deck.archetype.trim() || 'Starter',
         colors: normalizeColors(deck.colors, entries),
-        imageUrl: resolveTemplateImage(entries),
+        imageUrl: resolveTemplateImage(deck.imageUrl, entries),
         sourceUrl: deck.sourceUrl,
         entries: entries.map((entry) => ({ cardId: entry.cardId, qty: entry.qty })),
       } satisfies StarterDeckTemplate;
