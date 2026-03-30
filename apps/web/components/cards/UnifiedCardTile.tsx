@@ -3,6 +3,7 @@
 import { ChevronRight, Minus, Plus } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { getCardImage } from '@/lib/data/cards';
 import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
 
@@ -60,7 +61,7 @@ export function UnifiedCardTile({
         title="Click to preview · + to add"
       >
         <img
-          src={card.imageUrl || card.placeholderArt || '/card_art/placeholder.png'}
+          src={getCardImage(card)}
           alt={card.name}
           className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
           loading="lazy"
