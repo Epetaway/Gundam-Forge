@@ -514,6 +514,7 @@ export function PlaytestGameEnhanced({
               gamePhase={gameState.phase}
               cardDatabase={cardDatabase}
               selectedCard={selectedCard}
+              turnNumber={gameState.turnNumber}
               gameLog={engine.getLog().slice(-20)}
               onUnitSelected={(unit, isOpponent) => {
                 if (!isOpponent) {
