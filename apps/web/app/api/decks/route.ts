@@ -1,5 +1,7 @@
 import { apiOk, toApiErrorResponse } from '@/lib/api/server';
 import { getDecks } from '@/lib/data/decks';
+import { cards } from '@/lib/data/cards';
+import { validateDeck } from '@gundam-forge/shared';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
@@ -20,6 +22,10 @@ export async function GET(request: Request): Promise<Response> {
 
     const decks = getDecks()
       .filter((deck) => {
+        // Exclude invalid decks (not exactly 50 main-deck cards, >2 colors, etc.)
+        const validation = validateDeck(deck.entries, cards);
+        if (!validation.isValid) return false;
+
         const matchesQuery =
           q.length === 0 ||
           `${deck.name} ${deck.description} ${deck.owner}`.toLowerCase().includes(q);

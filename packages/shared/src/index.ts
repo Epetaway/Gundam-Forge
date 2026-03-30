@@ -1,4 +1,5 @@
 export * from './types';
+export * from './cardClassification';
 export * from './playmat-zones';
 export * from './validation';
 export * from './game-engine';

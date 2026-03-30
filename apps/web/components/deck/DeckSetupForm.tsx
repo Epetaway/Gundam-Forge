@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { cn } from '@/lib/utils/cn';
@@ -26,6 +26,15 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [intentErrors, setIntentErrors] = useState(false);
+
+  // Compute total imported card count from paste input for early warning
+  const importedCount = useMemo(() => {
+    const trimmed = ctx.decklist.trim();
+    if (!trimmed) return null;
+    const parsed = parseDeckList(trimmed);
+    const result = matchDeckEntries(parsed, cards);
+    return result.matched.reduce((sum, { entry }) => sum + entry.qty, 0);
+  }, [ctx.decklist, cards]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,6 +204,17 @@ Unrecognized cards are listed as warnings after import.`}</pre>
           value={ctx.decklist}
         />
       </div>
+
+      {/* Import count warning */}
+      {importedCount !== null && importedCount !== 50 && (
+        <p
+          role="status"
+          aria-live="polite"
+          className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400"
+        >
+          Imported {importedCount} cards — a valid main deck requires exactly 50.
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
