@@ -104,6 +104,12 @@ Optional environment variables:
 - `/decks/[id]` — Individual deck view
 - `/profile` — User profile panel
 
+## GitHub Pages URL Notes
+
+- Canonical production URL: `https://epetaway.github.io/Gundam-Forge/`
+- Deck library URL: `https://epetaway.github.io/Gundam-Forge/decks`
+- This repository is deployed as a project site. Visiting `https://epetaway.github.io/decks` (without `/Gundam-Forge`) will return a GitHub Pages 404.
+
 ## Beta features implemented
 
 - Card catalog from local `apps/web/lib/data/cards.json`

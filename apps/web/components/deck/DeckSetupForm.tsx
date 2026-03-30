@@ -1,14 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { cn } from '@/lib/utils/cn';
 import { parseDeckList } from '@/app/forge/parseDeckList';
 import { matchDeckEntries } from '@/app/forge/cardMatching';
 import { createStoredDeck } from '@/lib/deck/storage';
+import { getStarterDeckTemplates, type StarterDeckTemplate } from '@/lib/deck/starterTemplates';
 import { allSets } from '@/lib/data/cards';
 import { useDeckSetupContext } from './DeckSetupContext';
 import DeckIntentBuilder from './DeckIntentBuilder';
+import StarterDeckPicker from './StarterDeckPicker';
 
 const VISIBILITIES: { value: 'private' | 'unlisted' | 'public'; label: string; desc: string }[] = [
   { value: 'private',  label: 'Private',  desc: 'Only you' },
@@ -26,6 +28,22 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [intentErrors, setIntentErrors] = useState(false);
+  const [selectedStarterSlug, setSelectedStarterSlug] = useState<string | null>(null);
+
+  const starterTemplates = useMemo(() => getStarterDeckTemplates(), []);
+
+  const handleStarterSelect = (template: StarterDeckTemplate | null) => {
+    setSelectedStarterSlug(template?.slug ?? null);
+
+    if (!template) return;
+
+    ctx.setName(template.name);
+    ctx.setDescription(template.description);
+    ctx.setDeckIntent((prev) => ({
+      ...prev,
+      colors: template.colors.filter((color) => color !== 'Colorless').slice(0, 2),
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +65,9 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
 
     setSubmitting(true);
     try {
-      let initialEntries: { cardId: string; qty: number }[] = [];
+      const selectedStarter = starterTemplates.find((template) => template.slug === selectedStarterSlug) ?? null;
+
+      let initialEntries: { cardId: string; qty: number }[] = selectedStarter?.entries ?? [];
       let importResults = null;
 
       if (ctx.decklist.trim()) {
@@ -153,6 +173,12 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
           ))}
         </select>
       </div>
+
+      <StarterDeckPicker
+        templates={starterTemplates}
+        selectedSlug={selectedStarterSlug}
+        onSelect={handleStarterSelect}
+      />
 
       {/* Description */}
       <div className="flex flex-col gap-1.5">
