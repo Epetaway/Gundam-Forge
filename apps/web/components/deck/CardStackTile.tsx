@@ -18,6 +18,7 @@
 import * as React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { getCardImage } from '@/lib/data/cards';
+import { withBasePath } from '@/lib/utils/basePath';
 import { ActionRail } from '@/components/cards/primitives';
 import { cn } from '@/lib/utils/cn';
 import type { DeckViewItem } from '@/lib/deck/sortFilter';
@@ -48,7 +49,7 @@ export function CardStackTile({
     if (!el.src.includes('gundam-gcg.com') && !el.src.includes('card-back')) {
       el.src = `https://www.gundam-gcg.com/en/images/cards/card/${item.id}.webp`;
     } else if (!el.src.includes('card-back')) {
-      el.src = '/card-back.svg';
+      el.src = withBasePath('/card-back.svg');
     }
   };
 
