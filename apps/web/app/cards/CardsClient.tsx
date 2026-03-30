@@ -508,6 +508,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               {/* Sort */}
               <select
                 className={selectClassName}
+                style={{ width: 'auto', minWidth: '9rem', maxWidth: '13rem' }}
                 onChange={(event) => setSortBy(event.target.value as SortKey)}
                 value={sortBy}
               >
@@ -553,22 +554,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                   </span>
                 ) : null}
               </Button>
-            </div>
-          </div>
-
-          {/* Info + trust badge */}
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-            <div className="text-steel-500">Use the Filters panel for advanced criteria.</div>
-            <div className="rounded-full border border-emerald-200 bg-emerald-50/70 px-2 py-0.5 text-emerald-700">
-              ✓ Shared source
-            </div>
-          </div>
-
-          {/* Info + trust badge */}
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[10px]">
-            <div className="text-steel-500">Shared source with Deckbuilder</div>
-            <div className="rounded-full border border-emerald-200 bg-emerald-50/70 px-2 py-0.5 font-medium text-emerald-700">
-              ✓ Verified source
             </div>
           </div>
 

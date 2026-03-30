@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { Layers, Loader2 } from 'lucide-react';
 import type { DeckRecord } from '@/lib/data/decks';
 import { useDecksQuery } from '@/lib/query/useDecksQuery';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
+import { getCard, getCardImage } from '@/lib/data/cards';
+import { withBasePath } from '@/lib/utils/basePath';
+import { relativeTime } from '@/lib/utils/relativeTime';
 
 interface DecksClientProps {
   initialDecks: DeckRecord[];
@@ -34,32 +36,29 @@ export default function DecksClient({ initialDecks }: DecksClientProps): JSX.Ele
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {decks.map((deck) => (
-            <Card key={deck.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between gap-3">
-                  <CardTitle>{deck.name}</CardTitle>
-                  <Badge variant="accent">{deck.archetype}</Badge>
-                </div>
-                <CardDescription>{deck.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  {deck.colors.map((color) => (
-                    <Badge key={color}>{color}</Badge>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between text-xs text-steel-600">
-                  <p>{deck.entries.reduce((sum, entry) => sum + entry.qty, 0)} cards • by {deck.owner}</p>
-                  <p>{deck.likes} likes • {deck.views} views</p>
-                </div>
-                <Button asChild className="w-full" variant="secondary">
-                  <Link href={`/decks/${deck.id}`}>Open deck</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {decks.map((deck) => {
+            const previewCard = getCard(deck.entries[0]?.cardId);
+            return (
+              <DeckPreviewCard
+                key={deck.id}
+                heroUrl={previewCard ? getCardImage(previewCard) : withBasePath('/hero-bg.png')}
+                title={deck.name}
+                subtitle={deck.description || ''}
+                author={deck.owner || 'Unknown'}
+                views={deck.views || 0}
+                cardCount={deck.entries.reduce((sum, e) => sum + (e.qty || 0), 0)}
+                updatedAgo={relativeTime(deck.updatedAt ?? deck.id)}
+                colors={deck.colors || []}
+                archetype={deck.archetype}
+                tags={[
+                  ...(deck.archetype ? [deck.archetype] : []),
+                  ...(deck.source === 'tournament' ? ['Tournament'] : []),
+                ]}
+                href={`/decks/${deck.id}`}
+              />
+            );
+          })}
         </div>
       )}
     </div>

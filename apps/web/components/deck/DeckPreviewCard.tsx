@@ -1,47 +1,30 @@
 import Link from 'next/link';
 import React from "react";
 
-const COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
-  Blue: {
-    bg: "bg-cobalt-700/40",
-    border: "border-cobalt-400/60",
-    text: "text-white",
-  },
-  Green: {
-    bg: "bg-green-700/40",
-    border: "border-green-400/60",
-    text: "text-white",
-  },
-  Red: {
-    bg: "bg-red-700/40",
-    border: "border-red-400/60",
-    text: "text-white",
-  },
-  White: {
-    bg: "bg-steel-700/40",
-    border: "border-steel-400/60",
-    text: "text-white",
-  },
-  Purple: {
-    bg: "bg-purple-700/40",
-    border: "border-purple-400/60",
-    text: "text-white",
-  },
-  Colorless: {
-    bg: "bg-steel-600/40",
-    border: "border-steel-400/60",
-    text: "text-white",
-  },
+const COLOR_DOT: Record<string, string> = {
+  Blue: "bg-cobalt-400",
+  Green: "bg-green-400",
+  Red: "bg-red-400",
+  White: "bg-steel-300",
+  Purple: "bg-purple-400",
+  Colorless: "bg-steel-500",
 };
 
-function colorToClasses(color: string) {
-  return (
-    COLOR_MAP[color] || {
-      bg: "bg-steel-600/40",
-      border: "border-steel-400/60",
-      text: "text-white",
-    }
-  );
+const COLOR_PILL: Record<string, { bg: string; border: string; text: string }> = {
+  Blue: { bg: "bg-cobalt-700/60", border: "border-cobalt-400/50", text: "text-white" },
+  Green: { bg: "bg-green-700/60", border: "border-green-400/50", text: "text-white" },
+  Red: { bg: "bg-red-700/60", border: "border-red-400/50", text: "text-white" },
+  White: { bg: "bg-steel-700/60", border: "border-steel-400/50", text: "text-white" },
+  Purple: { bg: "bg-purple-700/60", border: "border-purple-400/50", text: "text-white" },
+  Colorless: { bg: "bg-steel-600/60", border: "border-steel-400/50", text: "text-white" },
+};
+
+function colorDot(color: string) {
+  return COLOR_DOT[color] ?? "bg-steel-500";
+}
+
+function colorPill(color: string) {
+  return COLOR_PILL[color] ?? { bg: "bg-steel-600/60", border: "border-steel-400/50", text: "text-white" };
 }
 
 export interface DeckPreviewCardProps {
@@ -78,156 +61,145 @@ export function DeckPreviewCard({
   onMenu,
   isLoading,
 }: DeckPreviewCardProps & { isLoading?: boolean }) {
-  const metaLine = [
-    `${views.toLocaleString()} views`,
-    `${cardCount} cards`,
-    updatedAgo,
-  ]
-    .filter(Boolean)
-    .join(" • ");
+  const displayColors = colors.length > 0 ? colors : ['Colorless'];
 
   return (
     <article
-      className="group relative rounded-lg overflow-hidden border border-border transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:border-cobalt-500/40 focus-within:ring-2 focus-within:ring-cobalt-400/60 will-change-transform cursor-pointer"
+      className="group relative overflow-hidden rounded-xl cursor-pointer will-change-transform transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl hover:shadow-black/50 focus-within:ring-2 focus-within:ring-cobalt-400/60"
+      style={{ aspectRatio: '3/4' }}
       aria-label={`Deck: ${title}`}
     >
-      {/* Hero Image with Overlay */}
-      <div className="relative h-40 w-full overflow-hidden bg-surface-muted">
+      {/* Full-bleed image */}
+      {isLoading ? (
+        <div className="absolute inset-0 bg-surface-muted animate-pulse" />
+      ) : (
         <img
           src={heroUrl}
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-          style={{ filter: "contrast(1.1) saturate(1.15)" }}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+          style={{ filter: "contrast(1.05) saturate(1.2)" }}
           loading="lazy"
           decoding="async"
           draggable={false}
         />
-        {/* Dark overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-cobalt-700 via-cobalt-700/40 to-transparent dark:from-cobalt-900 dark:via-cobalt-900/40" />
-        <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
+      )}
 
-        {/* Title overlay */}
-        <div className="absolute inset-0 flex items-end p-4">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-white leading-tight truncate drop-shadow-lg">
-              {title}
-            </h2>
-            <p className="text-xs text-white/80 truncate mt-1">{subtitle}</p>
+      {/* Persistent gradient — strong at bottom, fades out at top third */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 pointer-events-none" />
+
+      {/* Menu button — top-right, always visible */}
+      {onMenu ? (
+        <button
+          className="absolute top-3 right-3 z-20 p-1.5 rounded-lg bg-black/30 backdrop-blur-sm hover:bg-black/60 text-white/70 hover:text-white transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenu(e);
+          }}
+          aria-label="Deck options"
+          type="button"
+        >
+          <span className="text-base leading-none" aria-hidden="true">⋮</span>
+        </button>
+      ) : null}
+
+      {/* Bottom content area */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-2">
+
+        {/* HOVER-REVEAL: author + stats — slides up from below */}
+        <div className="transform translate-y-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="flex items-center gap-2 mb-1.5">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={author}
+                className="h-6 w-6 rounded-full object-cover border border-white/20 flex-shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="h-6 w-6 rounded-full bg-white/20 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" aria-hidden="true">
+                {author.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="text-xs text-white/80 truncate">{author}</span>
           </div>
-        </div>
+          <div className="flex items-center gap-2 text-[11px] text-white/55 font-mono">
+            <span>{views.toLocaleString()} views</span>
+            <span aria-hidden="true">·</span>
+            <span>{cardCount} cards</span>
+            {updatedAgo ? (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{updatedAgo}</span>
+              </>
+            ) : null}
+          </div>
 
-        {/* Menu button — must be z-20 to stay above the click overlay below */}
-        {onMenu ? (
-          <button
-            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-white/70 hover:text-white transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onMenu(e);
-            }}
-            aria-label="Deck options"
-            type="button"
-          >
-            <span className="text-lg" aria-hidden="true">⋮</span>
-          </button>
-        ) : null}
-      </div>
-
-      {/* Content Section */}
-      <div className="bg-surface-elevated dark:bg-surface-elevated/80 p-4 space-y-3">
-        {/* Author info */}
-        <div className="flex items-center gap-2">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={author}
-              className="h-8 w-8 rounded-full object-cover border border-border/50"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : (
-            <div className="h-8 w-8 rounded-full bg-surface-muted border border-border/50 flex items-center justify-center text-xs font-bold text-text-subtle" aria-hidden="true">
-              {author.charAt(0).toUpperCase()}
+          {/* Tags */}
+          {tags && tags.length > 0 ? (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {tags.map((tag) => (
+                <span key={tag} className="rounded-full bg-white/10 border border-white/15 text-white/70 px-2 py-0.5 text-[10px] font-medium">
+                  {tag}
+                </span>
+              ))}
             </div>
-          )}
-          <span className="text-xs text-text-muted truncate">
-            {author}
-          </span>
+          ) : null}
         </div>
 
-        {/* Color badges */}
-        <div className="flex flex-wrap gap-1.5" aria-label="Deck colors">
-          {colors.length > 0 ? (
-            colors.map((color, i) => {
-              const classes = colorToClasses(color);
+        {/* ALWAYS VISIBLE: title */}
+        <h2 className="text-base font-bold text-white leading-snug line-clamp-2 drop-shadow-md">
+          {title}
+        </h2>
+
+        {/* ALWAYS VISIBLE: archetype + color row */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {archetype ? (
+            <span className="inline-block px-2 py-0.5 rounded-full bg-cobalt-600/70 border border-cobalt-400/40 text-white text-[10px] font-semibold uppercase tracking-wide backdrop-blur-sm">
+              {archetype}
+            </span>
+          ) : null}
+
+          <div className="flex items-center gap-1" aria-label="Deck colors">
+            {displayColors.map((color, i) => (
+              <span
+                key={color + i}
+                className={`h-2.5 w-2.5 rounded-full ring-1 ring-black/30 ${colorDot(color)}`}
+                title={color}
+              />
+            ))}
+          </div>
+
+          {/* Color pills — hover only */}
+          <div className="hidden group-hover:flex items-center gap-1 flex-wrap ml-0.5 transition-all duration-200">
+            {displayColors.map((color, i) => {
+              const pill = colorPill(color);
               return (
                 <span
                   key={color + i}
-                  className={`inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold ${classes.bg} ${classes.border} ${classes.text}`}
+                  className={`inline-flex items-center px-1.5 py-0.5 rounded-full border text-[10px] font-semibold ${pill.bg} ${pill.border} ${pill.text}`}
                 >
-                  <span aria-hidden="true">● </span>
-                  <span className="ml-1.5">{color}</span>
+                  {color}
                 </span>
               );
-            })
-          ) : (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold bg-steel-600/40 border-steel-400/60 text-white">
-              <span aria-hidden="true">● </span>
-              <span className="ml-1.5">Colorless</span>
-            </span>
-          )}
-        </div>
-
-        {/* Archetype badge */}
-        {archetype && (
-          <div className="flex">
-            <span className="inline-block px-2.5 py-1 rounded-full bg-surface-interactive text-foreground text-xs font-medium">
-              {archetype}
-            </span>
+            })}
           </div>
-        )}
-
-        {/* Metadata line */}
-        <div className="flex justify-end pt-2 border-t border-border/30">
-          <span className="text-xs text-text-secondary dark:text-text-secondary">
-            {metaLine}
-          </span>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5">
-          {isLoading
-            ? Array.from({ length: 2 }).map((_, i) => (
-                <span
-                  key={i}
-                  className="rounded-full bg-surface-muted animate-pulse px-2 py-1 text-xs text-surface-muted min-w-[40px] h-5"
-                />
-              ))
-            : tags && tags.length > 0
-            ? tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-surface-muted text-text-subtle px-2 py-1 text-xs font-medium"
-                >
-                  {tag}
-                </span>
-              ))
-            : null}
         </div>
       </div>
 
-      {/* Full-card click overlay — last in DOM so it stacks on top; z-10 below menu (z-20) */}
+      {/* Full-card click overlay — z-10 (below menu at z-20) */}
       {href ? (
         <Link
           href={href}
-          className="absolute inset-0 z-10 cursor-pointer rounded-lg"
+          className="absolute inset-0 z-10 rounded-xl"
           aria-label={`Open deck: ${title}`}
           tabIndex={0}
         />
       ) : onClick ? (
         <button
           type="button"
-          className="absolute inset-0 z-10 cursor-pointer rounded-lg"
+          className="absolute inset-0 z-10 rounded-xl"
           onClick={onClick}
           aria-label={`Open deck: ${title}`}
           tabIndex={0}
