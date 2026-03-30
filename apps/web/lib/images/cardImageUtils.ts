@@ -99,7 +99,7 @@ export function getProductionCardImageUrl(card: CardImageRef): string {
   
   // 2. TRY: Existing imageUrl (if it's not a placeholder)
   if (imageUrl && !imageUrl.includes('placehold')) {
-    return imageUrl;
+    return withBasePath(imageUrl);
   }
 
   // 3. RETURN: Local URL with fallback chain

@@ -5,6 +5,7 @@ import Image, { type ImageProps } from 'next/image';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { getCardImage } from '@/lib/data/cards';
 import { getCardImageFallback } from '@/lib/images/cardImageUtils';
+import { withBasePath } from '@/lib/utils/basePath';
 
 type CardArtRef = Pick<CardDefinition, 'id' | 'name' | 'imageUrl' | 'placeholderArt'>;
 
@@ -23,7 +24,7 @@ export function CardArtImage(props: CardArtImageProps): JSX.Element {
 
   const primarySource = React.useMemo(() => getCardImage(card), [card]);
   const cdnSource = React.useMemo(() => getCardImageFallback(card.id, card.name), [card.id, card.name]);
-  const cardBackSource = '/card-back.svg';
+  const cardBackSource = withBasePath('/card-back.svg');
   const inlineFallback = React.useMemo(() => buildInlineFallback(card.name), [card.name]);
   const [source, setSource] = React.useState(primarySource);
 
