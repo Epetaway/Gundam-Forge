@@ -103,7 +103,11 @@ function applyCardFilters(source: CardDefinition[], filters: CatalogFilters = {}
       if (!haystack.includes(query)) return false;
     }
 
-    if (
+    // Multi-color OR filter (overrides scalar if both present)
+    if (filters.colors && filters.colors.length > 0) {
+      const colorSet = new Set(filters.colors.map(normalizeColorValue));
+      if (!colorSet.has(normalizeColorValue(card.color))) return false;
+    } else if (
       filters.color &&
       filters.color !== 'All' &&
       normalizeColorValue(card.color) !== normalizeColorValue(filters.color)
