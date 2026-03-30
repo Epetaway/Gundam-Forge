@@ -366,7 +366,7 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
               style={{ width: `${mainPct}%` }}
             />
           </div>
-          <span className={cn('font-mono font-semibold tabular-nums', metrics.mainDeckCards === 50 ? 'text-green-400' : 'text-cobalt-300')}>
+          <span className={cn('font-mono font-semibold tabular-nums', metrics.mainDeckCards === 50 ? 'text-green-600' : 'text-cobalt-600')}>
             {metrics.mainDeckCards}/50
           </span>
         </div>
@@ -381,7 +381,7 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
               style={{ width: `${resPct}%` }}
             />
           </div>
-          <span className={cn('font-mono font-semibold tabular-nums', metrics.resourceDeckCards === 10 ? 'text-green-400' : 'text-cobalt-300')}>
+          <span className={cn('font-mono font-semibold tabular-nums', metrics.resourceDeckCards === 10 ? 'text-green-600' : 'text-cobalt-600')}>
             {metrics.resourceDeckCards}/10
           </span>
         </div>
@@ -429,7 +429,7 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
                 <li key={e} className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-400">{e}</li>
               ))}
               {warnings.map((w) => (
-                <li key={w} className="rounded bg-amber-500/10 px-3 py-2 text-sm text-amber-300">{w}</li>
+                <li key={w} className="rounded bg-amber-500/10 px-3 py-2 text-sm text-amber-700">{w}</li>
               ))}
             </ul>
           </div>
@@ -1000,13 +1000,13 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
           {/* Import result feedback */}
           {result && (
-            <div className={cn('rounded px-3 py-2 text-xs', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-300' : 'bg-green-500/10 text-green-400')}>
+            <div className={cn('rounded px-3 py-2 text-xs', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-700' : 'bg-green-500/10 text-green-700')}>
               <p className="font-semibold">
                 {result.imported} card type{result.imported !== 1 ? 's' : ''} imported.
               </p>
               {result.notFound.length > 0 && (
                 <>
-                  <p className="mt-1 font-semibold text-amber-300">{result.notFound.length} card{result.notFound.length !== 1 ? 's' : ''} not found:</p>
+                  <p className="mt-1 font-semibold text-amber-700">{result.notFound.length} card{result.notFound.length !== 1 ? 's' : ''} not found:</p>
                   <ul className="mt-1 list-inside list-disc">
                     {result.notFound.map((n) => <li key={n}>{n}</li>)}
                   </ul>
@@ -1294,9 +1294,9 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     return { main, resources, ex, mainTotal: total(main), resourcesTotal: total(resources), exTotal: total(ex) };
   }, [filteredDeckItems]);
 
-  // Sidebar state: mobile overlay drawer + desktop collapse (persisted)
+  // Sidebar state: mobile overlay drawer + desktop collapse (session only)
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [desktopPanelOpen, setDesktopPanelOpen] = useLocalStorageState('gundam-forge.forge.desktopPanelOpen', true);
+  const [desktopPanelOpen, setDesktopPanelOpen] = React.useState(true);
 
   // Scroll-lock: prevent page scroll (and any horizontal drift) while the catalog overlay is open.
   React.useEffect(() => {
@@ -1418,46 +1418,33 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
       {/*
        * Card catalog overlay modal.
-       * Mobile  : slide-up bottom sheet (h-[92dvh], rounded-t-xl)
-       * Desktop : centered modal (min(820px,90vh) × min(1100px,92vw), rounded-xl)
-       * Opened by the "Cards" button in MobileToolbar (mobile) or the desktop toolbar (collapsed).
+       * Mobile  : full-screen sheet with slide-up animation
+       * Desktop : centered modal with constrained width/height
        */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end overflow-hidden md:items-center md:justify-center"
-          style={{ width: '100dvw', height: '100dvh' }}
+          className="fixed inset-0 z-50 flex flex-col md:items-center md:justify-center"
           role="dialog"
           aria-modal="true"
           aria-label="Card Catalog"
         >
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Sheet — mobile: bottom sheet | desktop: centered modal */}
+          {/* Sheet — mobile: full-screen | desktop: centered modal */}
           <div
-            className="relative z-10 flex flex-col overflow-hidden rounded-t-xl bg-surface shadow-2xl md:rounded-xl"
-            style={{
-              width: '100dvw',
-              maxWidth: '100dvw',
-              maxHeight: '100dvh',
-              padding: '0.5rem',
-              alignItems: 'center',
-            }}
+            className="relative z-10 flex h-full w-full flex-col overflow-hidden bg-surface animate-slide-up md:h-[88svh] md:w-[min(860px,92vw)] md:animate-zoom-in md:rounded-xl md:shadow-2xl"
           >
             {/* Header — fixed 56px */}
-            <div className="flex h-14 flex-shrink-0 items-center justify-between border-b border-border px-3" style={{
-              width: '100dvw',
-              maxWidth: '100dvvw',
-            }}>
-              <div className="h-1 w-8 rounded-full bg-border md:hidden" aria-hidden="true" />
-              <span className="text-sm font-semibold">Card Catalog</span>
+            <div className="flex h-14 flex-shrink-0 items-center justify-between border-b border-border bg-surface px-4">
+              <span className="text-sm font-semibold text-foreground">Card Catalog</span>
               <button
                 type="button"
-                className="rounded p-1 text-steel-500 hover:bg-surface-interactive"
+                className="rounded p-2 text-steel-500 transition-colors hover:bg-surface-interactive hover:text-foreground"
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close card catalog"
               >
@@ -1468,7 +1455,6 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             {/* Body — fills remaining height, scrolls vertically only */}
             <div
               className="flex flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
-              style={{ maxWidth: '100dvw' }}
             >
               <CardSearchPanel
                 onSelect={(cardId) => { handleAdd(cardId); setSidebarOpen(false); }}

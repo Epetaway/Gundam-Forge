@@ -46,7 +46,9 @@ export function DeckToolbar({
                 aria-label={`View as ${view.label}`}
                 className={cn(
                   'inline-flex items-center gap-1 rounded px-2.5 py-1.5 text-xs font-semibold transition-colors',
-                  viewMode === view.id ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
+                  viewMode === view.id
+                    ? 'bg-surface text-foreground shadow-sm ring-1 ring-border/60'
+                    : 'text-steel-600 hover:bg-surface-muted hover:text-foreground',
                 )}
                 key={view.id}
                 onClick={() => onViewModeChange(view.id)}

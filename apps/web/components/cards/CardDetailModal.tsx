@@ -99,7 +99,7 @@ export function CardDetailModal({
         <DialogOverlay />
         <DialogPrimitive.Content
           ref={contentRef}
-          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[90svh] sm:w-[min(1100px,94vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35"
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(820px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35 lg:w-[min(900px,88vw)]"
         >
         {card ? (
           <>

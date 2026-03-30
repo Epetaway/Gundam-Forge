@@ -42,6 +42,16 @@ export function CardStackTile({
   const showLayers = item.qty >= 2;
   const showSecondLayer = item.qty >= 3;
 
+  // Two-step onError: local → CDN → card-back.svg
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const el = e.currentTarget;
+    if (!el.src.includes('gundam-gcg.com') && !el.src.includes('card-back')) {
+      el.src = `https://www.gundam-gcg.com/en/images/cards/card/${item.id}.webp`;
+    } else if (!el.src.includes('card-back')) {
+      el.src = '/card-back.svg';
+    }
+  };
+
   return (
     /*
      * Outer wrapper: no padding — the main card is w-full at full grid cell size.
@@ -54,7 +64,7 @@ export function CardStackTile({
           aria-hidden="true"
           className="absolute inset-0 translate-x-[12px] translate-y-[8px] overflow-hidden rounded-md border border-border opacity-50"
         >
-          <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" />
+          <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" onError={handleImgError} />
         </div>
       )}
 
@@ -64,15 +74,16 @@ export function CardStackTile({
           aria-hidden="true"
           className="absolute inset-0 translate-x-[6px] translate-y-[4px] overflow-hidden rounded-md border border-border opacity-70"
         >
-          <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" />
+          <img src={getCardImage(item)} alt="" className="h-full w-full object-cover" onError={handleImgError} />
         </div>
       )}
 
       {/* Main card face */}
       <div
         className={cn(
-          'relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black',
-          'shadow-md transition-all duration-150 group-hover:shadow-lg group-hover:-translate-y-[2px]',
+          'relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-surface-elevated',
+          'shadow-md transition-all duration-200',
+          'group-hover:shadow-xl group-hover:-translate-y-1 group-hover:border-cobalt-400/50 group-hover:ring-1 group-hover:ring-cobalt-400/20',
           isActive ? 'ring-2 ring-cobalt-400/70' : '',
         )}
       >
@@ -82,6 +93,7 @@ export function CardStackTile({
           alt={item.name}
           className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
           loading="lazy"
+          onError={handleImgError}
         />
 
         {/* Full-area click target for opening card preview */}
