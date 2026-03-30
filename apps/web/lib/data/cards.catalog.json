@@ -9810,6 +9810,171 @@
     "imageUrl": "/card_art/ST08-015.webp"
   },
   {
+    "id": "ST09-001",
+    "name": "Impulse Gundam",
+    "color": "Purple",
+    "cost": 2,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Activate･Main】②, return this Unit to the bottom of its owner's deck：Choose 1 Unit card with \"Impulse Gundam\" in its card name that is Lv.4 or higher from your trash. Deploy it.",
+    "ap": 3,
+    "hp": 3,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-001.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Impulse%20Gundam"
+  },
+  {
+    "id": "ST09-002",
+    "name": "Force Impulse Gundam",
+    "color": "Purple",
+    "cost": 4,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Destroyed】Choose 1 (Minerva Squad) Unit card without \"Force Impulse Gundam\" in its card name from your trash. Add it to your hand.",
+    "ap": 5,
+    "hp": 4,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-002.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Force%20Impulse%20Gundam"
+  },
+  {
+    "id": "ST09-003",
+    "name": "Saviour Gundam",
+    "color": "Red",
+    "cost": 5,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "<Breach 3> (When this Unit's attack destroys an enemy Unit, deal the specified amount of damage to the first card in that opponent's shield area.)\n【When Linked】If there are 5 or more purple cards in your trash, deal 2 damage to all Units with 5 or less AP.",
+    "ap": 5,
+    "hp": 4,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-003.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Saviour%20Gundam"
+  },
+  {
+    "id": "ST09-004",
+    "name": "Freedom Gundam",
+    "color": "White",
+    "cost": 5,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "<Blocker> (Rest this Unit to change the attack target to it.)\nWhile a friendly Base in play, this Unit gains <Suppression>.\n(Damage to Shields by an attack is dealt to the first 2 cards simultaneously.)",
+    "ap": 4,
+    "hp": 5,
+    "traits": [
+      "(Orb)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-004.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Freedom%20Gundam"
+  },
+  {
+    "id": "ST09-005",
+    "name": "Zaku Warrior",
+    "color": "Purple",
+    "cost": 1,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "ap": 2,
+    "hp": 2,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-005.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Zaku%20Warrior"
+  },
+  {
+    "id": "ST09-006",
+    "name": "Sword Impulse Gundam",
+    "color": "Purple",
+    "cost": 2,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Deploy】If you deploy this Unit from your trash, choose 1 enemy Unit that is Lv.3 or lower. Destroy it.",
+    "ap": 4,
+    "hp": 2,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-006.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Sword%20Impulse%20Gundam"
+  },
+  {
+    "id": "ST09-007",
+    "name": "Blast Impulse Gundam",
+    "color": "Purple",
+    "cost": 3,
+    "type": "Unit",
+    "set": "ST09 - Destiny Ignition",
+    "text": "<Blocker> (Rest this Unit to change the attack target to it.)",
+    "ap": 5,
+    "hp": 3,
+    "traits": [
+      "(ZAFT) (Minerva Squad)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-007.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Blast%20Impulse%20Gundam"
+  },
+  {
+    "id": "ST09-008",
+    "name": "Shinn Asuka",
+    "color": "Purple",
+    "cost": 1,
+    "type": "Pilot",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Burst】Add this card to your hand.\n【Attack】If this is a (Minerva Squad) Unit, choose 1 of your Resources. Set it as active.",
+    "ap": 3,
+    "hp": 0,
+    "traits": [
+      "(ZAFT) (Minerva Squad) (Coordinator)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-008.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Shinn%20Asuka"
+  },
+  {
+    "id": "ST09-009",
+    "name": "Giant Killing",
+    "color": "Purple",
+    "cost": 3,
+    "type": "Command",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Main】/【Action】Choose 1 active enemy Unit with 4 or less AP. Destroy it.",
+    "traits": [
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-009.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Giant%20Killing"
+  },
+  {
+    "id": "ST09-010",
+    "name": "Minerva",
+    "color": "Purple",
+    "cost": 1,
+    "type": "Base",
+    "set": "ST09 - Destiny Ignition",
+    "text": "【Burst】Deploy this card.\n【Deploy】Add 1 of your Shields to your hand. Then, if it is your turn, look at the top 2 cards of your deck and return 1 to the top. Place the remaining card into your trash.",
+    "hp": 5,
+    "traits": [
+      "(ZAFT) (Minerva Squad) (Warship)",
+      "Mobile Suit Gundam SEED DESTINY"
+    ],
+    "imageUrl": "https://www.gundam-gcg.com/en/images/cards/card/ST09-010.webp?26013001",
+    "placeholderArt": "https://placehold.co/600x840/1f2937/f9fafb?text=Minerva"
+  },
+  {
     "id": "T-001",
     "name": "Gundam",
     "color": "Colorless",
