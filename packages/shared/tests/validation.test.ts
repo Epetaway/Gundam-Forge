@@ -163,7 +163,7 @@ describe('validateDeck', () => {
   });
 
   describe('resource deck (Rule 6-1-1)', () => {
-    it('errors when resource deck is not exactly 10 (if any resources present)', () => {
+    it('allows 0-10 resource cards (optional)', () => {
       const mainCards = makeCards(50);
       const resourceCards = makeCards(5, { type: 'Resource' }).map((c, i) => ({
         ...c,
@@ -176,9 +176,28 @@ describe('validateDeck', () => {
       ];
       const result = validateDeck(deck, allCards);
 
+      // Should be valid - resource deck is optional and can be 0-10 cards
+      expect(result.isValid).toBe(true);
+      expect(result.metrics.resourceDeckCards).toBe(5);
+    });
+
+    it('errors when resource deck exceeds 10 cards', () => {
+      const mainCards = makeCards(50);
+      const resourceCards = makeCards(12, { type: 'Resource' }).map((c, i) => ({
+        ...c,
+        id: `RES-${i}`,
+      }));
+      const allCards = [...mainCards, ...resourceCards];
+      const deck = [
+        ...makeDeck(mainCards.map((c) => c.id)),
+        ...makeDeck(resourceCards.map((c) => c.id)),
+      ];
+      const result = validateDeck(deck, allCards);
+
       expect(result.errors).toEqual(
-        expect.arrayContaining([expect.stringContaining('Resource deck must contain exactly 10')])
+        expect.arrayContaining([expect.stringContaining('Resource deck cannot exceed 10')])
       );
+      expect(result.metrics.resourceDeckCards).toBe(12);
     });
   });
 

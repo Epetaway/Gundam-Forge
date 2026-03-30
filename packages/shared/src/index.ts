@@ -1,6 +1,7 @@
 export * from './types';
 export * from './playmat-zones';
 export * from './validation';
+export * from './cardClassification';
 export * from './game-engine';
 export { GameEngine } from './playtest-game-engine';
 export * from './deckIntentPackages';
