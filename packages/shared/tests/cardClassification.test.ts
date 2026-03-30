@@ -53,8 +53,8 @@ describe('isResourceCard', () => {
     expect(isResourceCard(makeCard({ id: 'res-1', type: 'Resource' }))).toBe(true);
   });
 
-  it('returns true for Base type cards', () => {
-    expect(isResourceCard(makeCard({ id: 'base-1', type: 'Base' }))).toBe(true);
+  it('returns false for Base type cards', () => {
+    expect(isResourceCard(makeCard({ id: 'base-1', type: 'Base' }))).toBe(false);
   });
 
   it('returns false for Unit type cards', () => {
@@ -91,8 +91,8 @@ describe('isMainDeckCard', () => {
     expect(isMainDeckCard(makeCard({ id: 'res-1', type: 'Resource' }))).toBe(false);
   });
 
-  it('returns false for Base type', () => {
-    expect(isMainDeckCard(makeCard({ id: 'base-1', type: 'Base' }))).toBe(false);
+  it('returns true for Base type', () => {
+    expect(isMainDeckCard(makeCard({ id: 'base-1', type: 'Base' }))).toBe(true);
   });
 
   it('returns false for EX cards (Unit with EX trait)', () => {
@@ -120,10 +120,13 @@ describe('consistency: all three functions partition the card space', () => {
   });
 
   it('resource cards are not main deck cards', () => {
-    for (const card of [resource, base]) {
-      expect(isResourceCard(card)).toBe(true);
-      expect(isMainDeckCard(card)).toBe(false);
-    }
+    expect(isResourceCard(resource)).toBe(true);
+    expect(isMainDeckCard(resource)).toBe(false);
+  });
+
+  it('base cards are main deck cards, not resource cards', () => {
+    expect(isMainDeckCard(base)).toBe(true);
+    expect(isResourceCard(base)).toBe(false);
   });
 
   it('EX cards are not main deck cards', () => {
