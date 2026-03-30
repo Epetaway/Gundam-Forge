@@ -23,6 +23,15 @@ type KeywordOption = typeof KEYWORD_OPTIONS[number];
 const CANONICAL_COLORS: CardColor[] = ['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const CANONICAL_TYPES: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 
+const COLOR_PILL_ACTIVE_CLASSES: Record<CardColor, string> = {
+  Blue: 'bg-blue-600 text-white border-blue-500',
+  Green: 'bg-green-600 text-white border-green-500',
+  Red: 'bg-red-600 text-white border-red-500',
+  White: 'bg-white text-steel-900 border-steel-300',
+  Purple: 'bg-purple-600 text-white border-purple-500',
+  Colorless: 'bg-steel-600 text-white border-steel-500',
+};
+
 type CatalogView = 'grid' | 'list';
 type SortKey = 'name' | 'cost-asc' | 'cost-desc' | 'set';
 
@@ -730,12 +739,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                         className={cn(
                           'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
                           active
-                            ? c === 'Blue' ? 'bg-blue-600 text-white border-blue-500'
-                            : c === 'Green' ? 'bg-green-600 text-white border-green-500'
-                            : c === 'Red' ? 'bg-red-600 text-white border-red-500'
-                            : c === 'White' ? 'bg-white text-steel-900 border-steel-300'
-                            : c === 'Purple' ? 'bg-purple-600 text-white border-purple-500'
-                            : 'bg-steel-600 text-white border-steel-500'
+                            ? COLOR_PILL_ACTIVE_CLASSES[c]
                             : 'bg-surface-interactive text-steel-600 border-border hover:border-accent hover:text-foreground',
                         )}
                         onClick={() => {

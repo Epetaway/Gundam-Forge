@@ -26,6 +26,11 @@ describe('isExCard', () => {
     expect(isExCard(makeCard({ id: 'card-1', traits: ['EX Base'] }))).toBe(true);
   });
 
+  it('returns false when "ex" is only a substring of a trait word', () => {
+    expect(isExCard(makeCard({ id: 'card-1', traits: ['Next Generation'] }))).toBe(false);
+    expect(isExCard(makeCard({ id: 'card-1', traits: ['Flexible'] }))).toBe(false);
+  });
+
   it('returns true when id starts with "ex"', () => {
     expect(isExCard(makeCard({ id: 'EX-001' }))).toBe(true);
   });

@@ -207,7 +207,11 @@ Unrecognized cards are listed as warnings after import.`}</pre>
 
       {/* Import count warning */}
       {importedCount !== null && importedCount !== 50 && (
-        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+        <p
+          role="status"
+          aria-live="polite"
+          className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400"
+        >
           Imported {importedCount} cards — a valid main deck requires exactly 50.
         </p>
       )}

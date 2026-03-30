@@ -3,7 +3,10 @@ import type { CardDefinition } from './types';
 /** Returns true if card is an EX card (by flag, trait, or ID prefix). */
 export function isExCard(card: CardDefinition): boolean {
   if (typeof card.isExCard === 'boolean') return card.isExCard;
-  if ((card.traits ?? []).some((t) => t.toLowerCase().includes('ex'))) return true;
+  if ((card.traits ?? []).some((t) => {
+    const words = t.toLowerCase().split(/\s+/);
+    return words.includes('ex');
+  })) return true;
   return card.id.toLowerCase().startsWith('ex');
 }
 
