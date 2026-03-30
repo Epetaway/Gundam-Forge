@@ -2,6 +2,9 @@
   "name": "@gundam-forge/web",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "NAPI_RS_NATIVE_LIBRARY_PATH=$PWD/lib/tailwind-oxide-fallback.cjs next dev",
     "lint": "tsc --noEmit",
