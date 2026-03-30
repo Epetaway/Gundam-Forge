@@ -35,6 +35,7 @@ const selectClassName =
 interface FilterDraft {
   query: string;
   color: CardColor | 'All';
+  selectedColors: CardColor[];
   type: CardType | 'All';
   setCode: string;
   keyword: KeywordOption;
@@ -97,6 +98,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   );
 
   const colorParam = searchParams.get('color');
+  const colorsParam = searchParams.get('colors');
   const typeParam = searchParams.get('type');
   const setParam = searchParams.get('set');
   const queryParam = searchParams.get('q');
@@ -107,12 +109,16 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const initialColor = colorOptions.includes((colorParam ?? 'All') as CardColor | 'All')
     ? ((colorParam ?? 'All') as CardColor | 'All')
     : 'All';
+  const initialColors = colorsParam
+    ? (parseDelimitedInput(colorsParam).filter((c): c is CardColor => CANONICAL_COLORS.includes(c as CardColor)))
+    : [];
   const initialType = typeOptions.includes((typeParam ?? 'All') as CardType | 'All')
     ? ((typeParam ?? 'All') as CardType | 'All')
     : 'All';
   const keywordParam = searchParams.get('keyword') ?? 'All';
   const [query, setQuery] = useState(queryParam ?? '');
   const [color, setColor] = useState<CardColor | 'All'>(initialColor);
+  const [selectedColors, setSelectedColors] = useState<CardColor[]>(initialColors);
   const [type, setType] = useState<CardType | 'All'>(initialType);
   const [setCode, setSetCode] = useState(setParam ?? 'All');
   const [keyword, setKeyword] = useState<KeywordOption>(
@@ -141,6 +147,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const [draft, setDraft] = useState<FilterDraft>({
     query: '',
     color: 'All',
+    selectedColors: [],
     type: 'All',
     setCode: 'All',
     keyword: 'All',
@@ -194,6 +201,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     const params = filtersToSearchParams({
       query,
       color,
+      colors: selectedColors.length > 0 ? selectedColors : undefined,
       type,
       set: setCode,
       keyword,
@@ -213,6 +221,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   }, [
     query,
     color,
+    selectedColors,
     type,
     setCode,
     keyword,
@@ -229,6 +238,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     () => ({
       query,
       color,
+      colors: selectedColors.length > 0 ? selectedColors : undefined,
       type,
       set: setCode,
       keyword,
@@ -242,6 +252,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     }),
     [
       color,
+      selectedColors,
       query,
       setCode,
       type,
@@ -266,7 +277,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
   useEffect(() => {
     setDisplayCount(pageSize);
-  }, [pageSize, query, color, type, setCode, sortBy, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [pageSize, query, color, selectedColors, type, setCode, sortBy, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   // Focus trap for filter drawer
   useEffect(() => {
@@ -313,6 +324,13 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     }
     if (color !== 'All') {
       chips.push({ id: `color:${color}`, label: `Color: ${color}`, clear: () => setColor('All') });
+    }
+    for (const sc of selectedColors) {
+      chips.push({
+        id: `colors:${sc}`,
+        label: `Color: ${sc}`,
+        clear: () => setSelectedColors((prev) => prev.filter((c) => c !== sc)),
+      });
     }
     if (type !== 'All') {
       chips.push({ id: `type:${type}`, label: `Type: ${type}`, clear: () => setType('All') });
@@ -361,12 +379,13 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       });
     }
     return chips;
-  }, [color, query, setCode, type, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
+  }, [color, selectedColors, query, setCode, type, keyword, zone, deckRole, matchMode, selectedClans, selectedTraits, selectedMechanics, selectedTriggers]);
 
   const clearAll = (): void => {
     setRawQuery('');
     setQuery('');
     setColor('All');
+    setSelectedColors([]);
     setType('All');
     setSetCode('All');
     setKeyword('All');
@@ -383,6 +402,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setDraft({
       query,
       color,
+      selectedColors,
       type,
       setCode,
       keyword,
@@ -401,6 +421,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     setRawQuery(draft.query);
     setQuery(draft.query);
     setColor(draft.color);
+    setSelectedColors(draft.selectedColors);
     setType(draft.type);
     setSetCode(draft.setCode);
     setKeyword(draft.keyword);
@@ -698,18 +719,40 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Color</span>
-                <select
-                  className={selectClassName}
-                  onChange={(event) => setDraft((c) => ({ ...c, color: event.target.value as CardColor | 'All' }))}
-                  value={draft.color}
-                >
-                  <option value="All">All Colors</option>
-                  {colorOptions.filter((option) => option !== 'All').map((option) => (
-                    <option key={option} value={option}>
-                      {option} ({colorCounts.get(option as CardColor) ?? 0})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-wrap gap-1.5">
+                  {colorOptions.filter((option) => option !== 'All').map((option) => {
+                    const c = option as CardColor;
+                    const active = draft.selectedColors.includes(c);
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        className={cn(
+                          'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
+                          active
+                            ? c === 'Blue' ? 'bg-blue-600 text-white border-blue-500'
+                            : c === 'Green' ? 'bg-green-600 text-white border-green-500'
+                            : c === 'Red' ? 'bg-red-600 text-white border-red-500'
+                            : c === 'White' ? 'bg-white text-steel-900 border-steel-300'
+                            : c === 'Purple' ? 'bg-purple-600 text-white border-purple-500'
+                            : 'bg-steel-600 text-white border-steel-500'
+                            : 'bg-surface-interactive text-steel-600 border-border hover:border-accent hover:text-foreground',
+                        )}
+                        onClick={() => {
+                          setDraft((prev) => ({
+                            ...prev,
+                            selectedColors: active
+                              ? prev.selectedColors.filter((sc) => sc !== c)
+                              : [...prev.selectedColors, c],
+                            color: 'All',
+                          }));
+                        }}
+                      >
+                        {c} ({colorCounts.get(c) ?? 0})
+                      </button>
+                    );
+                  })}
+                </div>
               </label>
 
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">

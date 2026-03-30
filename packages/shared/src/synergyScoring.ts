@@ -11,6 +11,7 @@
  */
 
 import type { CardDefinition } from './types';
+import { isExCard, isMainDeckCard } from './cardClassification';
 import { getPackagesByIds, getMechanicsFromPackages } from './deckIntentPackages';
 
 // ─── Simple LRU Cache ────────────────────────────────────────────────────────
@@ -395,9 +396,9 @@ export function filterCardsByIntent(
   onlyMainDeck: boolean = true,
 ): CardDefinition[] {
   return cards.filter((card) => {
-    // Zone filtering
-    if (onlyMainDeck && !card.isMainDeck) return false;
-    if (!includeEX && card.isExCard) return false;
+    // Zone filtering — delegate to shared classification utilities
+    if (!includeEX && isExCard(card)) return false;
+    if (onlyMainDeck && !isMainDeckCard(card)) return false;
 
     // Color filtering (allow Colorless + selected colors)
     if (selectedColors.length > 0) {
