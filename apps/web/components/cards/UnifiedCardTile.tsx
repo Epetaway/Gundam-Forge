@@ -47,7 +47,7 @@ export function UnifiedCardTile({
         )}
         onClick={() => onPreview?.(card.id)}
         onMouseEnter={(e) => {
-          if (onHoverChange && 'synergyScore' in card) {
+          if (onHoverChange) {
             onHoverChange({ card: card as ScoredCard, anchor: e.currentTarget.getBoundingClientRect() });
           }
         }}
