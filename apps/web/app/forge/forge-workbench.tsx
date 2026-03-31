@@ -25,6 +25,10 @@ import type { CardDefinition, CardColor, DeckIntent } from '@gundam-forge/shared
 import { CardSearchPanel } from './CardSearchPanel';
 import { cards as allCards, cardsById, allSets } from '@/lib/data/cards';
 import { parseDeckList } from './parseDeckList';
+import { DeckAnalyticsPanel } from '@/components/deck/analytics/DeckAnalyticsPanel';
+import { useDeckAnalyticsQuery } from '@/lib/query/useDeckAnalyticsQuery';
+import { computeDeckMetaProximity, computeConsistencyIndex, rankArchetypes } from '@/lib/meta/engine';
+import { getEvents } from '@/lib/data/events';
 
 // ---------- types ----------
 
@@ -1284,6 +1288,27 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
     [deckViewItems, query, sortBy],
   );
 
+  // Live analytics — pure client-side compute on every deck edit
+  const metaArchetypes = React.useMemo(() => rankArchetypes(getEvents()), []);
+
+  const liveMetaProximity = React.useMemo(() => computeDeckMetaProximity(
+    {
+      archetype: deckMeta.deckIntent?.packages?.[0] ?? '',
+      colors: deckMeta.deckIntent?.colors ?? [],
+      mainDeckCount: deckViewItems
+        .filter((i) => i.typeLine !== 'Resource')
+        .reduce((s, i) => s + i.qty, 0),
+    },
+    metaArchetypes,
+  ), [deckViewItems, deckMeta.deckIntent, metaArchetypes]);
+
+  const liveConsistencyIndex = React.useMemo(() => computeConsistencyIndex({
+    entries: deckViewItems.map((i) => ({ cardId: i.id, qty: i.qty, typeLine: i.typeLine, cmc: i.cmc })),
+  }), [deckViewItems]);
+
+  // Server-side analytics (stale-while-revalidate every 60 s)
+  const analyticsQuery = useDeckAnalyticsQuery(deckId ?? null);
+
   // Zone grouping for zone headers
   const zoneGroups = React.useMemo(() => {
     const isEX = (id: string) => id.startsWith('EXB') || id.startsWith('EXR');
@@ -1602,6 +1627,16 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             />
           </div>
         </div>
+
+        {/* Live Deck Analytics Panel */}
+        <DeckAnalyticsPanel
+          items={deckViewItems}
+          serverAnalytics={analyticsQuery.data ?? null}
+          liveMetaProximity={liveMetaProximity}
+          liveConsistencyIndex={liveConsistencyIndex}
+          isLoading={analyticsQuery.isLoading && deckViewItems.length > 0}
+          className="mx-4 mt-2 mb-1"
+        />
 
         {/* Scrollable deck list */}
         <div className="flex-1 overflow-y-auto">

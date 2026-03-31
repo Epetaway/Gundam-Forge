@@ -23,6 +23,8 @@ import {
 } from '@/lib/deck/sortFilter';
 import { useLocalStorageState } from '@/lib/useLocalStorageState';
 import { DeckStats } from '@/components/deck/DeckStats';
+import { DeckAnalyticsPanel } from '@/components/deck/analytics/DeckAnalyticsPanel';
+import { useDeckAnalyticsQuery } from '@/lib/query/useDeckAnalyticsQuery';
 
 interface DeckViewPageProps {
   deck: {
@@ -32,6 +34,7 @@ interface DeckViewPageProps {
     archetype: string;
     owner: string;
     colors: string[];
+    isPublic?: boolean;
   };
   initialItems: DeckViewItem[];
 }
@@ -55,6 +58,7 @@ const viewRegistry: DeckViewRegistryEntry[] = [
 ];
 
 export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Element {
+  const analyticsQuery = useDeckAnalyticsQuery(deck.id);
   const [viewMode, setViewMode] = useLocalStorageState<DeckViewMode>('gundam-forge.deck.viewer.viewMode', 'image');
   const [density, setDensity] = useLocalStorageState<DeckDensity>('gundam-forge.deck.viewer.density', 'comfortable');
   const [query, setQuery] = React.useState('');
@@ -194,6 +198,13 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
       />
 
       <DeckStats items={initialItems} />
+
+      <DeckAnalyticsPanel
+        items={initialItems}
+        serverAnalytics={analyticsQuery.data ?? null}
+        isLoading={analyticsQuery.isLoading}
+        className="mt-4"
+      />
 
       <section aria-live="polite" className="space-y-3 pb-4">
         <p className="text-xs text-text-muted">{visibleCards.length} cards shown</p>

@@ -14,7 +14,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { GameEngine } from '@/lib/game';
-import { AdvancedAutoplayer } from '@/lib/game/advanced-autoplayer';
+import { AdvancedAutoplayer, type StrategyBias } from '@/lib/game/advanced-autoplayer';
 import { Battlefield } from './Battlefield';
 import { GameStartFlow } from './GameStartFlow';
 import type { GameStartPhase } from './GameStartFlow';
@@ -89,6 +89,30 @@ function toOpponentDeckDefinition(option: OpponentDeckOption): DeckDefinition {
   };
 }
 
+function inferStrategyBiasFromDeckEntries(
+  entries: Array<{ cardId: string; qty: number }>,
+  cardDatabase: Record<string, any>,
+): StrategyBias {
+  const expanded: any[] = [];
+
+  for (const entry of entries) {
+    const card = cardDatabase[entry.cardId];
+    if (!card || card.type !== 'Unit') continue;
+    for (let i = 0; i < entry.qty; i++) {
+      expanded.push(card);
+    }
+  }
+
+  if (expanded.length === 0) return 'BALANCED';
+
+  const avgCost = expanded.reduce((sum, card) => sum + Number(card.cost ?? 0), 0) / expanded.length;
+  const avgPower = expanded.reduce((sum, card) => sum + Number(card.ap ?? 0), 0) / expanded.length;
+
+  if (avgCost <= 2.3 && avgPower >= 2.2) return 'AGGRESSIVE';
+  if (avgCost >= 3.4) return 'DEFENSIVE';
+  return 'BALANCED';
+}
+
 /**
  * Enhanced Playtester Game Component
  * Full Phase 1-4 implementation matching master prompt specifications
@@ -109,6 +133,8 @@ export function PlaytestGameEnhanced({
 
   // Autoplayer
   const autoplayerRef = useRef(new AdvancedAutoplayer());
+  const mobilePlayerAutoplayerRef = useRef(new AdvancedAutoplayer('player1'));
+  const mobileOpponentAutoplayerRef = useRef(new AdvancedAutoplayer('player2'));
 
   // GameStartFlow phase state (only shown once at game start)
   const [startPhase, setStartPhase] = useState<GameStartPhase>('coinFlip');
@@ -195,6 +221,7 @@ export function PlaytestGameEnhanced({
 
   // Mobile Detection
   const [isMobile, setIsMobile] = useState(false);
+  const isMobileAutoMode = isMobile;
 
   useEffect(() => {
     const checkMobileSize = () => {
@@ -218,8 +245,15 @@ export function PlaytestGameEnhanced({
         ? toOpponentDeckDefinition(selectedOpponent)
         : undefined;
 
+      const playerStrategyBias = inferStrategyBiasFromDeckEntries(playerDeck.entries, cardDatabase);
+      const opponentStrategyBias = selectedOpponent
+        ? inferStrategyBiasFromDeckEntries(selectedOpponent.entries, cardDatabase)
+        : 'BALANCED';
+
       const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase, opponentDefinition);
       autoplayerRef.current = new AdvancedAutoplayer('player2', cardDatabase);
+      mobilePlayerAutoplayerRef.current = new AdvancedAutoplayer('player1', cardDatabase, playerStrategyBias);
+      mobileOpponentAutoplayerRef.current = new AdvancedAutoplayer('player2', cardDatabase, opponentStrategyBias);
       setEngine(eng);
       setGameState(eng.getState());
       setStartPhase('coinFlip');
@@ -231,6 +265,28 @@ export function PlaytestGameEnhanced({
       setIsLoading(false);
     }
   }, [playerDeck, cardDatabase, opponentDeckOptions, selectedOpponentDeckId]);
+
+  useEffect(() => {
+    if (!isMobileAutoMode || !engine || gameReady) return;
+
+    const current = engine.getState();
+    if (current.players.player1.hand.length === 0) {
+      engine.setupDraw('player1', 5);
+    }
+    if (current.players.player2.hand.length === 0) {
+      engine.setupDraw('player2', 5);
+    }
+
+    engine.setFirstPlayer('player1');
+    engine.executeAction({
+      type: 'ADVANCE_PHASE',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+
+    setGameState(engine.getState());
+    setGameReady(true);
+  }, [engine, gameReady, isMobileAutoMode]);
 
   useEffect(() => {
     if (!engine || !gameState || !gameReady || !autoResolveTriggers) return;
@@ -253,6 +309,50 @@ export function PlaytestGameEnhanced({
 
     return () => clearTimeout(timeout);
   }, [autoResolveTriggers, engine, gameReady, gameState]);
+
+  useEffect(() => {
+    if (!isMobileAutoMode || !engine || !gameReady || !gameState) return;
+    if (gameState.isGameOver || gameState.phase === 'gameOver') return;
+
+    const timeout = setTimeout(() => {
+      const currentState = engine.getState();
+      if (currentState.isGameOver || currentState.phase === 'gameOver') return;
+
+      if (currentState.stack.length > 0) {
+        const stackValidation = engine.executeAction({
+          type: 'RESOLVE_ALL_TRIGGERS',
+          playerId: currentState.activePlayerId,
+          timestamp: Date.now(),
+        });
+
+        if (stackValidation.valid) {
+          setGameState(engine.getState());
+        }
+        return;
+      }
+
+      const activeAutoplayer = currentState.activePlayerId === 'player1'
+        ? mobilePlayerAutoplayerRef.current
+        : mobileOpponentAutoplayerRef.current;
+
+      const decision = activeAutoplayer.decideActions(currentState, cardDatabase);
+      if (decision.actions.length === 0) {
+        engine.executeAction({
+          type: 'ADVANCE_PHASE',
+          playerId: currentState.activePlayerId,
+          timestamp: Date.now(),
+        });
+      } else {
+        for (const action of decision.actions) {
+          engine.executeAction(action);
+        }
+      }
+
+      setGameState(engine.getState());
+    }, 450);
+
+    return () => clearTimeout(timeout);
+  }, [cardDatabase, engine, gameReady, gameState, isMobileAutoMode]);
 
   // Game Action Handler
   const handleAction = (action: GameAction) => {
@@ -307,8 +407,9 @@ export function PlaytestGameEnhanced({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.phase, gameReady]);
 
-  // Opponent turn: fire autoplayer when it's player2's turn
+  // Opponent turn: fire autoplayer when it's player2's turn (desktop/tablet mode)
   useEffect(() => {
+    if (isMobileAutoMode) return;
     if (!engine || !gameState) return;
     if (gameState.activePlayerId !== 'player2') return;
     if (gameState.phase === 'start' || gameState.phase === 'gameOver') return;
@@ -338,7 +439,7 @@ export function PlaytestGameEnhanced({
 
     return () => clearTimeout(timeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState?.activePlayerId, gameState?.phase]);
+  }, [gameState?.activePlayerId, gameState?.phase, isMobileAutoMode]);
 
   // Dismiss error
   const dismissError = () => setError(null);
@@ -417,25 +518,6 @@ export function PlaytestGameEnhanced({
     );
   }
 
-  // Mobile Not Supported
-  if (isMobile) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-surface to-surface-elevated">
-        <div className="text-center px-4">
-          <p className="text-2xl font-bold text-foreground mb-2">📱 Mobile Not Supported</p>
-          <p className="text-white mb-4">The Gundam TCG Playtester is only available on tablet and desktop devices.</p>
-          <p className="text-white/70 text-sm">Please access this feature using a tablet or computer for the best experience.</p>
-          <Link
-            href="/decks"
-            className="inline-block mt-6 px-4 py-2 bg-cobalt-600 hover:bg-cobalt-700 text-white rounded font-semibold transition"
-          >
-            ← Back to Decks
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const isSetupPhase = !gameReady;
   const isPlayerTurn = gameState.activePlayerId === 'player1';
   const isDrawPhase = gameState.phase === 'draw';
@@ -467,13 +549,19 @@ export function PlaytestGameEnhanced({
             />
           )}
 
+          {isMobileAutoMode && !isSetupPhase && (
+            <span className="px-2 py-1 text-[10px] rounded-full border border-cyan-300/40 bg-cyan-950/50 text-cyan-100 whitespace-nowrap">
+              Mobile Auto Match
+            </span>
+          )}
+
           {/* Spacer */}
           <div className="flex-1" />
 
           {/* Action buttons — always in one row, never wrap */}
           <div className="flex items-center gap-1.5 shrink-0">
             {/* Undo/Redo */}
-            {!isSetupPhase && (
+            {!isSetupPhase && !isMobileAutoMode && (
               <>
                 <button
                   onClick={handleUndo}
@@ -495,7 +583,7 @@ export function PlaytestGameEnhanced({
             )}
 
             {/* Draw Card — only when player must draw */}
-            {!isSetupPhase && needsToDraw && (
+            {!isSetupPhase && !isMobileAutoMode && needsToDraw && (
               <button
                 onClick={handleDraw}
                 className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition animate-pulse"
@@ -505,7 +593,7 @@ export function PlaytestGameEnhanced({
             )}
 
             {/* Place Resource — resource phase */}
-            {!isSetupPhase && needsToPlaceResource && (
+            {!isSetupPhase && !isMobileAutoMode && needsToPlaceResource && (
               <button
                 onClick={() =>
                   handleAction({ type: 'PLACE_RESOURCE', playerId: 'player1', timestamp: Date.now() })
@@ -517,7 +605,7 @@ export function PlaytestGameEnhanced({
             )}
 
             {/* Next Phase */}
-            {!isSetupPhase && (
+            {!isSetupPhase && !isMobileAutoMode && (
               <button
                 onClick={handleAdvancePhase}
                 disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
@@ -529,7 +617,7 @@ export function PlaytestGameEnhanced({
             )}
 
             {/* Resolve Trigger Stack */}
-            {!isSetupPhase && hasPendingTriggers && (
+            {!isSetupPhase && !isMobileAutoMode && hasPendingTriggers && (
               <button
                 onClick={() =>
                   handleAction({
@@ -617,7 +705,7 @@ export function PlaytestGameEnhanced({
           </div>
         </div>
 
-        {!isSetupPhase && (
+        {!isSetupPhase && !isMobileAutoMode && (
           <div className="mt-1 hidden lg:flex items-center justify-end">
             <p className="text-[10px] text-slate-400/90 tracking-wide">
               Hover cards to preview · Double-click card or press P to pin
@@ -627,7 +715,7 @@ export function PlaytestGameEnhanced({
       </header>
 
       {/* SETUP PHASE — GameStartFlow */}
-      {isSetupPhase && (
+      {isSetupPhase && !isMobileAutoMode && (
         <GameStartFlow
           phase={startPhase}
           playerId="player1"
@@ -679,6 +767,17 @@ export function PlaytestGameEnhanced({
             setGameReady(true);
           }}
         />
+      )}
+
+      {isSetupPhase && isMobileAutoMode && (
+        <div className="flex-1 flex items-center justify-center px-6 text-center">
+          <div className="max-w-sm space-y-2">
+            <div className="text-cyan-200 text-lg font-semibold">Preparing Auto Match</div>
+            <p className="text-slate-300 text-sm">
+              Setting opening hands and running AI strategies based on your playtest deck.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* MAIN GAME AREA: Battlefield */}
@@ -767,7 +866,7 @@ export function PlaytestGameEnhanced({
       )}
 
       {/* One-time Controls Toast */}
-      {!isSetupPhase && showControlsToast && (
+      {!isSetupPhase && showControlsToast && !isMobileAutoMode && (
         <div
           className="fixed top-20 right-4 max-w-sm rounded-lg border border-cyan-400/35 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl z-50"
           role="status"
