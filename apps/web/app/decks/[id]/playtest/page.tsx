@@ -26,7 +26,7 @@ export default function PlaytestPage({ params }: PlaytestPageProps) {
     <ErrorBoundary context="Playtester">
       <PlaytestGameEnhanced
         playerDeck={deck}
-        opponentDeckId="ai-deck-default"
+        opponentDeckId="token-colorless-bot"
         cardDatabase={cardsRecord}
       />
     </ErrorBoundary>

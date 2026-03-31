@@ -27,13 +27,21 @@ export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: Phase
   const phaseLabel = PHASE_LABELS[currentPhase] ?? currentPhase;
   // Grammatically correct "Your Turn" vs "Opponent's Turn"
   const turnText = activePlayer === 'You' ? 'Your Turn' : "Opponent's Turn";
+  const isPlayerTurn = activePlayer === 'You';
 
   return (
     <div className="flex items-center gap-2 shrink-0">
-      <span className="text-xs text-white whitespace-nowrap">
+      <span className="text-xs text-slate-300 whitespace-nowrap">
         Turn {turnNumber} &bull; {turnText}
       </span>
-      <span className="px-2.5 py-1 text-xs rounded font-bold bg-cobalt-600 text-foreground whitespace-nowrap">
+      <span
+        className="px-2.5 py-1 text-xs rounded-full font-semibold whitespace-nowrap border"
+        style={{
+          background: isPlayerTurn ? 'rgba(14,116,144,0.25)' : 'rgba(153,27,27,0.25)',
+          borderColor: isPlayerTurn ? 'rgba(34,211,238,0.45)' : 'rgba(252,165,165,0.45)',
+          color: isPlayerTurn ? '#67e8f9' : '#fecaca',
+        }}
+      >
         {phaseLabel} Phase
       </span>
     </div>

@@ -186,10 +186,11 @@ export class GameEngine {
     deckId: string,
     deck: DeckDefinition,
     cardDatabase: Record<string, CardDefinition>,
+    opponentDeck?: DeckDefinition,
   ) {
     this.cardDb = cardDatabase;
     this.registerTokenDeckDefinitions();
-    this.state = this.initializeGame(deckId, deck);
+    this.state = this.initializeGame(deckId, deck, opponentDeck);
     // Save initial state
     this.saveStateToHistory();
   }
@@ -215,10 +216,10 @@ export class GameEngine {
     }
   }
 
-  private initializeGame(deckId: string, deck: DeckDefinition): GameState {
+  private initializeGame(deckId: string, deck: DeckDefinition, opponentDeck?: DeckDefinition): GameState {
     const rngSeed = Math.floor(Math.random() * (2 ** 31));
     const player1 = this.createPlayerState('player1', deck, rngSeed);
-    const player2 = this.createPlayerStateOpponent('player2', rngSeed);
+    const player2 = this.createPlayerStateOpponent('player2', rngSeed, opponentDeck);
 
     const game: GameState = {
       gameId: `game-${Date.now()}`,
@@ -342,7 +343,12 @@ export class GameEngine {
     return player;
   }
 
-  private createPlayerStateOpponent(playerId: string, rngSeed: number): PlayerState {
+  private createPlayerStateOpponent(playerId: string, rngSeed: number, opponentDeck?: DeckDefinition): PlayerState {
+    if (opponentDeck) {
+      const seededOffset = rngSeed + 997;
+      return this.createPlayerState(playerId, opponentDeck, seededOffset);
+    }
+
     const deckCards: CardInstance[] = [];
     let instanceCounter = 0;
 

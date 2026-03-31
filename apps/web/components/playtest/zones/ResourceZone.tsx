@@ -14,12 +14,16 @@ interface ResourceZoneProps {
   resources: CardInstance[];
   cardDatabase: Record<string, any>;
   isOpponent: boolean;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }
 
 export function ResourceZone({
   resources,
   cardDatabase,
   isOpponent,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: ResourceZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-resources' : 'resources',
@@ -54,6 +58,9 @@ export function ResourceZone({
                 card={card}
                 isResting={isResting}
                 label={card?.name ?? res.cardId}
+                onHoverCardChange={onHoverCardChange}
+                cardId={res.cardId}
+                onCardDoubleClick={onCardDoubleClick}
               />
             );
           })}
@@ -74,15 +81,24 @@ function ResourcePip({
   card,
   isResting,
   label,
+  cardId,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: {
   card: any;
   isResting: boolean;
   label: string;
+  cardId: string;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }) {
   return (
     <div
       className="flex-shrink-0 relative transition-all duration-300"
       title={`${label} (${isResting ? 'rested' : 'ready'})`}
+      onMouseEnter={() => onHoverCardChange?.(cardId)}
+      onMouseLeave={() => onHoverCardChange?.(null)}
+      onDoubleClick={() => onCardDoubleClick?.(cardId)}
       style={{
         width: '22px',
         height: '30px',

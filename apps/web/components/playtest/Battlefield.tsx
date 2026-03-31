@@ -114,11 +114,15 @@ function BaseCard({
   cardDatabase,
   baseHealth,
   maxBaseHealth,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: {
   base: CardInstance | null;
   cardDatabase: Record<string, any>;
   baseHealth: number;
   maxBaseHealth: number;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }) {
   const card = base ? cardDatabase[base.cardId] : null;
   const hpPct =
@@ -131,8 +135,8 @@ function BaseCard({
       <div
         className="flex-shrink-0 rounded border-2 border-dashed flex items-center justify-center"
         style={{
-          width: '44px',
-          height: '60px',
+          width: '50px',
+          height: '70px',
           borderColor: 'rgba(71,85,105,0.25)',
         }}
       >
@@ -147,12 +151,15 @@ function BaseCard({
     <div
       className="flex-shrink-0 relative rounded-lg overflow-hidden border-2"
       style={{
-        width: '44px',
-        height: '60px',
+        width: '50px',
+        height: '70px',
         borderColor: 'rgba(52,211,153,0.35)',
         boxShadow: '0 2px 8px rgba(16,185,129,0.12)',
       }}
       title={`Base: ${card?.name ?? base.cardId} — HP:${baseHealth}/${maxBaseHealth}`}
+      onMouseEnter={() => onHoverCardChange?.(base.cardId)}
+      onMouseLeave={() => onHoverCardChange?.(null)}
+      onDoubleClick={() => onCardDoubleClick?.(base.cardId)}
     >
       {card?.imageUrl ? (
         <img
@@ -243,6 +250,8 @@ export function Battlefield({
   onAttackDeclared,
 }: BattlefieldProps) {
   const [attackingUnit, setAttackingUnit] = useState<CardInstance | null>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [pinnedCardId, setPinnedCardId] = useState<string | null>(null);
 
   // Escape cancels targeting mode
   useEffect(() => {
@@ -255,15 +264,143 @@ export function Battlefield({
   }, [attackingUnit]);
 
   const isTargeting = !!attackingUnit;
+  const previewCardId = pinnedCardId ?? hoveredCardId ?? selectedCard?.cardId ?? null;
+  const previewCard = previewCardId ? cardDatabase[previewCardId] : null;
+
+  const handleHoverCardChange = (cardId: string | null) => {
+    setHoveredCardId(cardId);
+  };
+
+  const togglePinForCard = (cardId: string | null) => {
+    if (!cardId) return;
+    setPinnedCardId((prev) => (prev === cardId ? null : cardId));
+  };
+
+  const togglePreviewPin = () => {
+    togglePinForCard(previewCardId);
+  };
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 'p') return;
+
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (previewCardId) {
+        event.preventDefault();
+        togglePinForCard(previewCardId);
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [previewCardId]);
 
   return (
     <div
-      className="w-full h-full flex flex-col overflow-hidden"
+      className="relative w-full h-full flex flex-col overflow-hidden"
       style={{
         background:
-          'radial-gradient(ellipse at 50% 50%, #060e20 0%, #03060e 100%)',
+          'radial-gradient(ellipse at 50% 45%, #0a1835 0%, #050d1f 45%, #040814 100%)',
       }}
     >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          opacity: 0.22,
+        }}
+      />
+
+      {previewCard && (
+        <aside
+          className="absolute right-3 top-14 z-30 hidden xl:flex w-52 flex-col rounded-xl border bg-slate-950/85 backdrop-blur-sm overflow-hidden"
+          style={{ borderColor: 'rgba(56,189,248,0.35)', boxShadow: '0 10px 28px rgba(2,132,199,0.2)' }}
+        >
+          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-cyan-300/20 bg-slate-900/80">
+            <span className="text-[10px] uppercase tracking-wider text-cyan-200/90">
+              {pinnedCardId ? 'Pinned Card' : 'Hover Preview'}
+            </span>
+            <button
+              type="button"
+              onClick={togglePreviewPin}
+              className="text-[10px] px-1.5 py-0.5 rounded border border-cyan-300/40 text-cyan-200 hover:bg-cyan-900/40 transition"
+              title={pinnedCardId ? 'Unpin preview' : 'Pin this preview'}
+            >
+              {pinnedCardId ? 'Unpin' : 'Pin'}
+            </button>
+          </div>
+          <div className="relative aspect-[5/7] w-full">
+            {previewCard.imageUrl ? (
+              <img src={previewCard.imageUrl} alt={previewCard.name} className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-slate-800" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+            <div className="absolute left-2 right-2 bottom-2 text-[11px] font-semibold text-slate-100 truncate">
+              {previewCard.name ?? previewCardId}
+            </div>
+          </div>
+          <div className="px-2.5 py-2 text-[11px] text-slate-300 space-y-1.5">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-wide text-slate-400">
+              <span>{previewCard.type ?? 'Card'}</span>
+              <span>{previewCard.color ?? 'Colorless'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-200">
+              <span className="rounded bg-cyan-900/60 px-1.5 py-0.5">Cost {previewCard.cost ?? 0}</span>
+              <span className="rounded bg-rose-900/40 px-1.5 py-0.5">AP {previewCard.ap ?? 0}</span>
+              <span className="rounded bg-sky-900/40 px-1.5 py-0.5">HP {previewCard.hp ?? 0}</span>
+            </div>
+            {previewCard.text ? (
+              <p className="line-clamp-4 leading-relaxed text-slate-300/90">{previewCard.text}</p>
+            ) : (
+              <p className="text-slate-500">No rules text</p>
+            )}
+            <p className="text-[10px] text-slate-500/90 border-t border-slate-700/60 pt-1">
+              Tip: double-click any card or press P to pin this preview
+            </p>
+          </div>
+        </aside>
+      )}
+
+      {previewCard && (
+        <aside
+          className="absolute right-2 top-14 z-30 xl:hidden w-44 rounded-lg border bg-slate-950/90 backdrop-blur-sm overflow-hidden"
+          style={{ borderColor: 'rgba(56,189,248,0.3)', boxShadow: '0 8px 22px rgba(2,132,199,0.16)' }}
+        >
+          <div className="px-2 py-1.5 border-b border-cyan-300/20 flex items-center justify-between">
+            <span className="text-[9px] uppercase tracking-wide text-cyan-100/90">Card</span>
+            <button
+              type="button"
+              onClick={togglePreviewPin}
+              className="text-[9px] px-1 py-0.5 rounded border border-cyan-300/30 text-cyan-200"
+            >
+              {pinnedCardId ? 'Unpin' : 'Pin'}
+            </button>
+          </div>
+          <div className="p-2 space-y-1.5">
+            <div className="text-[10px] text-slate-100 font-semibold truncate">{previewCard.name ?? previewCardId}</div>
+            <div className="text-[9px] text-slate-400 uppercase tracking-wide">{previewCard.type ?? 'Card'} · {previewCard.color ?? 'Colorless'}</div>
+            <div className="grid grid-cols-3 gap-1 text-[9px] text-slate-200">
+              <span className="rounded bg-cyan-900/50 px-1 py-0.5 text-center">C {previewCard.cost ?? 0}</span>
+              <span className="rounded bg-rose-900/35 px-1 py-0.5 text-center">A {previewCard.ap ?? 0}</span>
+              <span className="rounded bg-sky-900/35 px-1 py-0.5 text-center">H {previewCard.hp ?? 0}</span>
+            </div>
+            <div className="text-[9px] text-slate-500/95 border-t border-slate-700/60 pt-1">
+              Double-click card or press P to pin
+            </div>
+          </div>
+        </aside>
+      )}
+
       {/* ── TARGETING BANNER ─────────────────────────────────────── */}
       {isTargeting && (
         <div
@@ -362,6 +499,8 @@ export function Battlefield({
               resources={opponentState.resources}
               cardDatabase={cardDatabase}
               isOpponent
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
             />
           </div>
 
@@ -380,6 +519,8 @@ export function Battlefield({
                   onUnitSelected?.(unit, true);
                 }
               }}
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
               gamePhase={gamePhase}
               isPlayerTurn={isPlayerTurn}
             />
@@ -399,6 +540,8 @@ export function Battlefield({
               cardDatabase={cardDatabase}
               baseHealth={opponentState.baseHealth}
               maxBaseHealth={opponentState.maxBaseHealth}
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
             />
           </div>
         </div>
@@ -429,6 +572,19 @@ export function Battlefield({
             {gamePhase.toUpperCase()} ·{' '}
             {isPlayerTurn ? 'Your Turn' : 'Opponent'}
           </div>
+          {pinnedCardId && (
+            <div
+              className="px-2 py-[3px] rounded-full text-[10px] font-semibold whitespace-nowrap flex-shrink-0"
+              style={{
+                border: '1px solid rgba(34,211,238,0.45)',
+                background: 'rgba(8,47,73,0.6)',
+                color: 'rgba(186,230,253,0.95)',
+              }}
+              title="Pinned preview active (double-click card or press P to toggle)"
+            >
+              Pinned
+            </div>
+          )}
           <div
             className="flex-1 h-px"
             style={{
@@ -454,6 +610,8 @@ export function Battlefield({
               cardDatabase={cardDatabase}
               baseHealth={playerState.baseHealth}
               maxBaseHealth={playerState.maxBaseHealth}
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
             />
             <ShieldZone
               shields={playerState.shields}
@@ -485,6 +643,8 @@ export function Battlefield({
               gamePhase={gamePhase}
               isPlayerTurn={isPlayerTurn}
               attackingUnitId={attackingUnit?.instanceId}
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
             />
           </div>
 
@@ -494,6 +654,8 @@ export function Battlefield({
               resources={playerState.resources}
               cardDatabase={cardDatabase}
               isOpponent={false}
+              onHoverCardChange={handleHoverCardChange}
+              onCardDoubleClick={togglePinForCard}
             />
           </div>
 
@@ -543,6 +705,8 @@ export function Battlefield({
           onPlayCard={onCardPlayRequested ?? (() => {})}
           gamePhase={gamePhase}
           isPlayerTurn={isPlayerTurn}
+          onHoverCardChange={handleHoverCardChange}
+          onCardDoubleClick={togglePinForCard}
         />
       </div>
     </div>
