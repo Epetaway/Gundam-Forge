@@ -21,7 +21,6 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
   { href: '/decks/new', label: '+ Create Deck' },
-  { href: '/forge', label: 'Forge' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },

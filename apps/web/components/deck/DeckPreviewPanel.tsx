@@ -1,4 +1,6 @@
 'use client';
+import * as React from 'react';
+import Link from 'next/link';
 import type { CardColor } from '@gundam-forge/shared';
 import { cn } from '@/lib/utils/cn';
 import { useDeckSetupContext } from './DeckSetupContext';
@@ -15,6 +17,7 @@ const COLOR_STYLES: Record<CardColor, { bg: string; text: string; label: string 
 export default function DeckPreviewPanel() {
   const { name, visibility, deckIntent, description, decklist } = useDeckSetupContext();
   const { colors, packages } = deckIntent;
+  const [browseQuery, setBrowseQuery] = React.useState('');
 
   const lineCount = decklist.trim()
     ? decklist.split('\n').filter((l) => l.trim()).length
@@ -81,6 +84,35 @@ export default function DeckPreviewPanel() {
           Fill in the form to see your deck preview here.
         </p>
       )}
+
+      {/* Browse Public Decks */}
+      <div className="border-t border-border pt-4 space-y-2">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel-500">
+          Browse Public Decks
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="search"
+            placeholder="Search decks…"
+            value={browseQuery}
+            onChange={(e) => setBrowseQuery(e.target.value)}
+            className={cn(
+              'min-w-0 flex-1 rounded border border-border bg-surface px-2.5 py-1.5 text-xs text-foreground',
+              'placeholder:text-steel-600 focus:border-cobalt-500 focus:outline-none focus:ring-1 focus:ring-cobalt-500/40',
+            )}
+            aria-label="Search public decks"
+          />
+          <Link
+            href={`/decks${browseQuery.trim() ? `?q=${encodeURIComponent(browseQuery.trim())}` : ''}`}
+            className={cn(
+              'flex-shrink-0 rounded border border-cobalt-600 bg-cobalt-600/10 px-3 py-1.5',
+              'text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20',
+            )}
+          >
+            Browse
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

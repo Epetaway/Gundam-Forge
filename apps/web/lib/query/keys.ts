@@ -15,4 +15,10 @@ export const queryKeys = {
     all: ['decks'] as const,
     list: (filters: DeckQueryFilters) => ['decks', 'list', filters] as const,
   },
+  deckAnalytics: {
+    all: ['deck-analytics'] as const,
+    detail: (deckId: string) => ['deck-analytics', 'detail', deckId] as const,
+    cards: (deckId: string) => ['deck-analytics', 'cards', deckId] as const,
+    comparison: (deckId: string) => ['deck-analytics', 'comparison', deckId] as const,
+  },
 } as const;

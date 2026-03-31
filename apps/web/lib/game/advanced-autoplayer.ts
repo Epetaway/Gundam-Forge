@@ -13,6 +13,8 @@
 
 import type { CardInstance, PlayerState, GameState, GameAction, CardDefinition } from './game-engine';
 
+export type StrategyBias = 'AGGRESSIVE' | 'BALANCED' | 'DEFENSIVE';
+
 export interface BoardEvaluation {
   unitCount: number;
   totalAttack: number;
@@ -34,12 +36,25 @@ export interface StrategyDecision {
 export class AdvancedAutoplayer {
   private playerId: string = 'player2';
   private cardDatabase: Record<string, CardDefinition> = {};
+  private strategyBias: StrategyBias | null = null;
 
-  constructor(playerId: string = 'player2', cardDatabase?: Record<string, CardDefinition>) {
+  constructor(
+    playerId: string = 'player2',
+    cardDatabase?: Record<string, CardDefinition>,
+    strategyBias?: StrategyBias,
+  ) {
     this.playerId = playerId;
     if (cardDatabase) {
       this.cardDatabase = cardDatabase;
     }
+    if (strategyBias) {
+      this.strategyBias = strategyBias;
+    }
+  }
+
+  private getOpponentId(gameState: GameState): string {
+    const playerIds = Object.keys(gameState.players);
+    return playerIds.find((id) => id !== this.playerId) ?? (this.playerId === 'player1' ? 'player2' : 'player1');
   }
 
   /**
@@ -157,7 +172,8 @@ export class AdvancedAutoplayer {
       this.cardDatabase = cardDatabase;
     }
     const player = gameState.players[this.playerId];
-    const opponent = gameState.players['player1'];
+    const opponentId = this.getOpponentId(gameState);
+    const opponent = gameState.players[opponentId];
     const actions: GameAction[] = [];
     let reasoning = '';
     let strategy = '';
@@ -182,33 +198,76 @@ export class AdvancedAutoplayer {
       reasoning = 'Balanced game state: Playing strategically. ';
     }
 
-    // DRAW PHASE
-    if (phase === 'draw' && !gameState.hasDrawnThisTurn) {
-      actions.push({
-        type: 'DRAW',
-        playerId: this.playerId,
-        timestamp: Date.now(),
-      });
-      reasoning += 'Drew card. ';
+    if (this.strategyBias && strategy !== 'DEFENSIVE') {
+      strategy = this.strategyBias;
+      reasoning += `Deck bias: ${this.strategyBias.toLowerCase()}. `;
     }
 
-    // MAIN PHASE
-    if (phase === 'main') {
-      reasoning += this.decideMainPhase(player, opponent, gameState, strategy, actions);
-    }
-
-    // ADVANCE TO NEXT PHASE
-    // Combat happens during Main Phase — no separate battle phase
-    if (
-      (phase === 'main' || phase === 'end') &&
-      actions.length > 0
-    ) {
+    if (phase === 'start') {
       actions.push({
         type: 'ADVANCE_PHASE',
         playerId: this.playerId,
         timestamp: Date.now(),
       });
-      reasoning += 'Advancing phase. ';
+      reasoning += 'Advanced start phase. ';
+    }
+
+    // DRAW PHASE
+    if (phase === 'draw') {
+      if (!gameState.hasDrawnThisTurn) {
+        actions.push({
+          type: 'DRAW',
+          playerId: this.playerId,
+          timestamp: Date.now(),
+        });
+        reasoning += 'Drew card. ';
+      }
+
+      actions.push({
+        type: 'ADVANCE_PHASE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Advanced to resource phase. ';
+    }
+
+    if (phase === 'resource') {
+      if (!gameState.hasResourcePlacedThisTurn && player.resourceDeck.length > 0) {
+        actions.push({
+          type: 'PLACE_RESOURCE',
+          playerId: this.playerId,
+          timestamp: Date.now(),
+        });
+        reasoning += 'Placed resource. ';
+      }
+
+      actions.push({
+        type: 'ADVANCE_PHASE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Advanced to main phase. ';
+    }
+
+    // MAIN PHASE
+    if (phase === 'main') {
+      reasoning += this.decideMainPhase(player, opponent, gameState, strategy, actions);
+      reasoning += this.decideBattlePhase(player, opponent, actions, strategy);
+      actions.push({
+        type: 'ADVANCE_PHASE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Advanced to end phase. ';
+    }
+
+    if (phase === 'end') {
+      actions.push({
+        type: 'ADVANCE_PHASE',
+        playerId: this.playerId,
+        timestamp: Date.now(),
+      });
+      reasoning += 'Passing turn. ';
     }
 
     return { actions, reasoning, strategy };

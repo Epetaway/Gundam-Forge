@@ -58,7 +58,10 @@
       "Bash(jq '[.[] | select\\(.type == \"\"Token\"\"\\)] | length' /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/data/cards.json)",
       "Bash(jq '.[] | select\\(.type == \"\"Unit\"\"\\) | {id, name, type, cost, power, color, text, set, rarity} | select\\(.id | startswith\\(\"\"GD\"\"\\)\\) | limit\\(3; .\\)' /Users/earlhickson/Development/Gundam-Forge/apps/web/lib/data/cards.json)",
       "Bash(ls /Users/earlhickson/Development/Gundam-Forge/apps/web/app/decks/[id]/)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(ls apps/web/.eslint* apps/web/eslint*)",
+      "Bash(find /Users/earlhickson/Development/Gundam-Forge -name *.eslintrc* -o -name eslint.config*)",
+      "Bash(npm run:*)"
     ]
   }
 }

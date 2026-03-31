@@ -159,6 +159,142 @@ export function rankArchetypes(events: EventRecord[]): ArchetypeMetaRecord[] {
     .sort((a, b) => b.score - a.score);
 }
 
+// ── Client-side pure analytics compute functions ────────────────────────────
+// These run instantly on every deck edit in the builder without needing a
+// server round-trip. They power the live-reactive analytics panels.
+
+export interface DeckMetaProximityInput {
+  /** Deck archetype label (e.g. "Midrange", "Aggro"). */
+  archetype: string;
+  /** Deck color array (e.g. ['Blue', 'White']). */
+  colors: readonly string[];
+  /** Total main-deck card count (excludes resources and EX). */
+  mainDeckCount: number;
+}
+
+/**
+ * computeDeckMetaProximity
+ *
+ * Returns a 0–100 score representing how closely this deck aligns with the
+ * current meta archetypes. Higher = more on-meta.
+ *
+ * Algorithm:
+ *  1. Exact archetype match in top-5 archetypes → 40–80 pts (scaled by rank).
+ *  2. Partial name match (substring) → 25 pts.
+ *  3. Color overlap with each top-5 archetype name → up to 15 pts.
+ *  4. Deck completion bonus (50 cards = full deck) → up to 5 pts.
+ */
+export function computeDeckMetaProximity(
+  deck: DeckMetaProximityInput,
+  metaArchetypes: ArchetypeMetaRecord[],
+): number {
+  if (metaArchetypes.length === 0) return 0;
+
+  const top5 = metaArchetypes.slice(0, 5);
+  const normalizedDeckArch = deck.archetype.toLowerCase().trim();
+
+  let score = 0;
+
+  for (let i = 0; i < top5.length; i++) {
+    const rank = i + 1; // 1..5
+    const meta = top5[i];
+    const metaNorm = meta.archetype.toLowerCase();
+
+    // Exact archetype match: rank-1 gets 80 pts, rank-5 gets 40 pts
+    if (metaNorm === normalizedDeckArch) {
+      score += 80 - (rank - 1) * 8;
+      break;
+    }
+
+    // Substring match: at least 25 pts
+    if (metaNorm.includes(normalizedDeckArch) || normalizedDeckArch.includes(metaNorm)) {
+      score = Math.max(score, 25);
+    }
+
+    // Color overlap with meta archetype name (e.g. "Blue Purple Midrange")
+    const colorOverlapCount = GCG_COLORS.filter(
+      (c) => deck.colors.includes(c) && meta.archetype.includes(c),
+    ).length;
+    if (colorOverlapCount > 0) {
+      score += (colorOverlapCount / Math.max(deck.colors.length, 1)) * 15 * (1 - i * 0.15);
+    }
+  }
+
+  // Completion bonus
+  const completionPct = Math.min(1, deck.mainDeckCount / 50);
+  score += completionPct * 5;
+
+  return Math.min(100, Math.max(0, Number.parseFloat(score.toFixed(2))));
+}
+
+export interface ConsistencyIndexInput {
+  /** Card entries with their quantities. */
+  entries: ReadonlyArray<{ cardId: string; qty: number; typeLine?: string; cmc?: number }>;
+}
+
+/**
+ * computeConsistencyIndex
+ *
+ * Returns a 0–100 score representing how likely the deck is to have a
+ * consistent draw pattern.
+ *
+ * Algorithm:
+ *  1. Main deck size (50 = 40 pts, partial = proportional).
+ *  2. Resource deck completeness (10 = 20 pts).
+ *  3. Curve efficiency: average CMC ≤ 3 = 20 pts, tapers off above.
+ *  4. Copy count density: average copies per unique card (ideal = 3) → 20 pts.
+ */
+export function computeConsistencyIndex(input: ConsistencyIndexInput): number {
+  const entries = input.entries;
+  if (entries.length === 0) return 0;
+
+  const mainEntries  = entries.filter((e) => e.typeLine !== 'Resource');
+  const resEntries   = entries.filter((e) => e.typeLine === 'Resource');
+
+  const mainTotal  = mainEntries.reduce((s, e) => s + e.qty, 0);
+  const resTotal   = resEntries.reduce((s, e) => s + e.qty, 0);
+  const grandTotal = mainTotal + resTotal;
+
+  if (grandTotal === 0) return 0;
+
+  // (1) Main deck completeness: 50 cards = 40 pts
+  const mainScore = Math.min(40, (mainTotal / 50) * 40);
+
+  // (2) Resource deck: 10 cards = 20 pts
+  const resScore = Math.min(20, (resTotal / 10) * 20);
+
+  // (3) Curve efficiency using provided CMC values (default 2 if missing)
+  const totalCost = mainEntries.reduce((s, e) => s + (e.cmc ?? 2) * e.qty, 0);
+  const avgCmc = mainTotal > 0 ? totalCost / mainTotal : 0;
+  // avgCmc ≤ 2 → 20 pts; ≤ 3 → 15 pts; ≤ 4 → 8 pts; > 4 → 0 pts
+  const curveScore = avgCmc <= 2 ? 20 : avgCmc <= 3 ? 15 : avgCmc <= 4 ? 8 : 0;
+
+  // (4) Copy count density: avg copies per unique card, capped at 4
+  const uniqueCards = mainEntries.length;
+  const avgCopies = uniqueCards > 0 ? mainTotal / uniqueCards : 0;
+  // Ideal = 3–4 copies → 20 pts; tapers below
+  const copyScore = Math.min(20, (avgCopies / 3) * 20);
+
+  const total = mainScore + resScore + curveScore + copyScore;
+  return Math.min(100, Math.max(0, Number.parseFloat(total.toFixed(2))));
+}
+
+// ── Trend direction from sparkline ──────────────────────────────────────────
+
+/**
+ * Derives trend direction from a series of scores ordered oldest → newest.
+ * Returns 'up' | 'flat' | 'down'.
+ */
+export function deriveTrendDirection(scores: number[]): 'up' | 'flat' | 'down' {
+  if (scores.length < 2) return 'flat';
+  const first = scores[0];
+  const last  = scores[scores.length - 1];
+  const delta = last - first;
+  if (delta > 3) return 'up';
+  if (delta < -3) return 'down';
+  return 'flat';
+}
+
 export function getColorDistribution(events: EventRecord[], decks: DeckRecord[]): ColorShareRecord[] {
   const deckMap = new Map(decks.map((d) => [d.id, d]));
   const colorCount = new Map<string, number>();
