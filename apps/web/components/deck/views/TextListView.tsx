@@ -1,51 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { cn } from '@/lib/utils/cn';
+import { CardHoverPreview } from '@/components/cards/CardHoverPreview';
 import type { DeckViewRendererProps } from '@/components/deck/types';
 import type { DeckViewItem } from '@/lib/deck/sortFilter';
-
-function CardHoverPreview({ item, anchor }: { item: DeckViewItem; anchor: DOMRect }) {
-  const CARD_W = 168;
-  const GAP = 12;
-
-  const left =
-    anchor.left - CARD_W - GAP < 8
-      ? anchor.right + GAP
-      : anchor.left - CARD_W - GAP;
-
-  const rawTop = anchor.top + anchor.height / 2 - 120;
-  const top = Math.max(8, Math.min(rawTop, window.innerHeight - 260));
-
-  const content = (
-    <div
-      className="pointer-events-none fixed z-[300] w-[168px] overflow-hidden rounded-lg shadow-2xl ring-1 ring-white/10"
-      style={{ left, top }}
-    >
-      {item.imageUrl || item.placeholderArt ? (
-        <img
-          src={item.imageUrl ?? item.placeholderArt}
-          alt={item.name}
-          className="w-full"
-          draggable={false}
-        />
-      ) : (
-        <div className="flex h-56 flex-col items-center justify-center gap-1 bg-surface-interactive p-3 text-center">
-          <p className="text-xs font-semibold leading-tight text-foreground">{item.name}</p>
-          {item.typeLine && <p className="text-[10px] text-text-muted">{item.typeLine}</p>}
-          {item.ap !== undefined && (
-            <p className="text-[10px] text-text-muted">
-              AP {item.ap} / HP {item.hp}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  return ReactDOM.createPortal(content, document.body);
-}
+import type { CardDefinition } from '@gundam-forge/shared';
 
 export function TextListView({ items, selection, actions, ui }: DeckViewRendererProps): JSX.Element {
   const [hovered, setHovered] = React.useState<{ item: DeckViewItem; anchor: DOMRect } | null>(null);
@@ -61,7 +21,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
   return (
     <>
       {hovered && typeof document !== 'undefined' && (
-        <CardHoverPreview item={hovered.item} anchor={hovered.anchor} />
+        <CardHoverPreview card={hovered.item as unknown as CardDefinition} anchor={hovered.anchor} width={168} />
       )}
       <div className="overflow-x-auto rounded-md border border-border bg-surface">
         <table className="w-full text-left">

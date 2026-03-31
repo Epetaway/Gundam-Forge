@@ -10,6 +10,7 @@ import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetail
 import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
+import { CardHoverPreview } from '@/components/cards/CardHoverPreview';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage, getCardsFromSource } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
@@ -138,6 +139,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const drawerRef = useRef<HTMLDivElement>(null);
   const debouncedSetQuery = useCallback(debounce((val: string) => setQuery(val), 150), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [addFeedback, setAddFeedback] = useState<string | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<{ card: CardDefinition; anchor: DOMRect } | null>(null);
   const [draft, setDraft] = useState<FilterDraft>({
     query: '',
     color: 'All',
@@ -626,7 +628,15 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 role="list"
               >
                 {visibleCards.map((card) => (
-                  <li key={card.id}>
+                  <li
+                    key={card.id}
+                    onMouseEnter={(e) => {
+                      setHoveredCard({ card, anchor: e.currentTarget.getBoundingClientRect() });
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredCard(null);
+                    }}
+                  >
                     <CardPreviewTile
                       imageUrl={getCardImage(card)}
                       name={card.name}
@@ -641,7 +651,16 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             ) : (
               <ul className="divide-y divide-border" role="list">
                 {visibleCards.map((card) => (
-                  <li className="px-1.5 py-1" key={card.id}>
+                  <li
+                    className="px-1.5 py-1"
+                    key={card.id}
+                    onMouseEnter={(e) => {
+                      setHoveredCard({ card, anchor: e.currentTarget.getBoundingClientRect() });
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredCard(null);
+                    }}
+                  >
                     <ReferenceCardTile
                       card={card}
                       onOpen={() => setInspectCardId(card.id)}
@@ -919,6 +938,9 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         qty={0}
         onAdd={activeDeckId ? () => inspectCard && handleAddCard(inspectCard.id) : undefined}
       />
+
+      {/* ── Hover preview ──────────────────────────────────────── */}
+      {hoveredCard && <CardHoverPreview card={hoveredCard.card} anchor={hoveredCard.anchor} />}
     </>
   );
 }
