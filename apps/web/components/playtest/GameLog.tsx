@@ -41,29 +41,29 @@ export function GameLog({ entries }: GameLogProps) {
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto space-y-2 p-2">
-      <div className="text-xs font-bold text-white mb-2">Game Log</div>
+      <div className="text-[11px] font-semibold text-slate-200 mb-2 uppercase tracking-wide">Game Log</div>
 
       {entries.length > 0 ? (
         entries.map((entry, i) => (
-          <div key={i} className="text-xs border-l border-slate-600 pl-2 py-1">
+          <div key={i} className="text-xs border-l border-slate-500/60 pl-2.5 py-1.5 bg-slate-900/25 rounded-r">
             <div className="flex gap-2">
-              <span className="text-white min-w-fit">
+              <span className="text-slate-300 min-w-fit font-mono text-[10px]">
                 T{entry.state?.turnNumber || '?'} {entry.phase}
               </span>
               <span className={`font-semibold ${getActionColor(entry.actionType)}`}>
                 {entry.actionType}
               </span>
             </div>
-            <div className="text-white mt-1">{entry.description}</div>
+            <div className="text-slate-100 mt-1">{entry.description}</div>
             {entry.rulesTrace && (
-              <div className="text-white italic text-[10px] mt-1">
+              <div className="text-slate-400 italic text-[10px] mt-1">
                 {entry.rulesTrace}
               </div>
             )}
           </div>
         ))
       ) : (
-        <div className="text-white py-4">No actions yet</div>
+        <div className="text-slate-500 py-4">No actions yet</div>
       )}
     </div>
   );

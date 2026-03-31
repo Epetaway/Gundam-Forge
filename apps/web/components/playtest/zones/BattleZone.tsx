@@ -20,6 +20,8 @@ interface BattleZoneProps {
   attackingUnitId?: string;
   /** When true (targeting mode, opponent side), all units become clickable attack targets */
   isTargeting?: boolean;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }
 
 export function BattleZone({
@@ -31,6 +33,8 @@ export function BattleZone({
   isPlayerTurn = false,
   attackingUnitId,
   isTargeting = false,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: BattleZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: isOpponent ? 'opponent-battle' : 'battle',
@@ -80,6 +84,8 @@ export function BattleZone({
                 isTargetable={isTargeting}
                 canAttack={canAttack}
                 onUnitSelected={onUnitSelected}
+                onHoverCardChange={onHoverCardChange}
+                onCardDoubleClick={onCardDoubleClick}
               />
             );
           })}
@@ -97,6 +103,8 @@ interface UnitTileProps {
   isTargetable: boolean;
   canAttack: boolean;
   onUnitSelected?: (unit: CardInstance) => void;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }
 
 function UnitTile({
@@ -107,6 +115,8 @@ function UnitTile({
   isTargetable,
   canAttack,
   onUnitSelected,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: UnitTileProps) {
   const ap = card?.ap ?? 0;
   const hp = card?.hp ?? 0;
@@ -125,10 +135,13 @@ function UnitTile({
 
   return (
     <div
-      className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 group select-none ${borderStyle}`}
-      style={{ width: '52px', height: '72px' }}
+      className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] group select-none ${borderStyle}`}
+      style={{ width: '58px', height: '80px' }}
       title={`${card?.name ?? unit.cardId} — AP:${ap} HP:${remainingHp}/${hp}${isResting ? ' (resting)' : ' (ready)'}${isTargetable ? ' — Click to target' : ''}`}
       onClick={() => onUnitSelected?.(unit)}
+      onMouseEnter={() => onHoverCardChange?.(unit.cardId)}
+      onMouseLeave={() => onHoverCardChange?.(null)}
+      onDoubleClick={() => onCardDoubleClick?.(unit.cardId)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -178,7 +191,7 @@ function UnitTile({
       {/* AP / HP stats */}
       <div className="absolute bottom-[3px] left-[3px] right-[3px] flex justify-between items-end pointer-events-none">
         <span
-          className="text-[8px] font-bold leading-tight px-0.5 rounded"
+          className="text-[9px] font-bold leading-tight px-0.5 rounded"
           style={{
             color: '#fca5a5',
             background: 'rgba(0,0,0,0.55)',
@@ -187,7 +200,7 @@ function UnitTile({
           ⚔{ap}
         </span>
         <span
-          className="text-[8px] font-bold leading-tight px-0.5 rounded"
+          className="text-[9px] font-bold leading-tight px-0.5 rounded"
           style={{
             color: hpDamaged ? '#fbbf24' : '#93c5fd',
             background: 'rgba(0,0,0,0.55)',

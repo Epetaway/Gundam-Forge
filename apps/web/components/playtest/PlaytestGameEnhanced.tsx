@@ -14,7 +14,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { GameEngine } from '@/lib/game';
-import { Autoplayer } from '@/lib/game/autoplayer';
+import { AdvancedAutoplayer } from '@/lib/game/advanced-autoplayer';
 import { Battlefield } from './Battlefield';
 import { GameStartFlow } from './GameStartFlow';
 import type { GameStartPhase } from './GameStartFlow';
@@ -25,12 +25,68 @@ import { KeyboardShortcutsLegend } from './KeyboardShortcutsLegend';
 import { DragDropProvider } from '@/lib/hooks/DragDropContext';
 import type { GameState, GameAction, CardInstance, DeckDefinition } from '@/lib/game/game-engine';
 import type { DeckRecord } from '@/lib/data/decks';
+import { getStarterDeckTemplates } from '@/lib/deck/starterTemplates';
+import { downloadPlayingCardsDeckExport } from '@/lib/export/playingCards';
 
 interface PlaytestGameEnhancedProps {
   playerDeck: DeckRecord;
   opponentDeckId: string;
   cardDatabase: Record<string, any>;
   onGameEnd?: (winner: string, reason: string) => void;
+}
+
+interface OpponentDeckOption {
+  id: string;
+  name: string;
+  entries: Array<{ cardId: string; qty: number }>;
+}
+
+function readBooleanQueryParam(paramName: string, fallback: boolean): boolean {
+  if (typeof window === 'undefined') return fallback;
+  const value = new URLSearchParams(window.location.search).get(paramName);
+  if (value === '1' || value === 'true') return true;
+  if (value === '0' || value === 'false') return false;
+  return fallback;
+}
+
+function readStringQueryParam(paramName: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return new URLSearchParams(window.location.search).get(paramName);
+}
+
+const DEFAULT_RESOURCE_DECK: Array<{ cardId: string; count: number; zone: 'resource' }> = [
+  { cardId: 'TOKEN-RESOURCE-001', count: 8, zone: 'resource' as const },
+  { cardId: 'EX-RESOURCE-TOKEN', count: 2, zone: 'resource' as const },
+];
+
+function toDeckDefinition(deck: DeckRecord): DeckDefinition {
+  const mainDeckEntries: Array<{ cardId: string; count: number; zone: 'main' }> = deck.entries.map((entry) => ({
+    cardId: entry.cardId,
+    count: entry.qty,
+    zone: 'main' as const,
+  }));
+
+  return {
+    id: deck.id,
+    name: deck.name,
+    description: deck.description,
+    cards: [...mainDeckEntries, ...DEFAULT_RESOURCE_DECK],
+  };
+}
+
+function toOpponentDeckDefinition(option: OpponentDeckOption): DeckDefinition {
+  const mainDeckEntries: Array<{ cardId: string; count: number; zone: 'main' }> = option.entries.map((entry) => ({
+    cardId: entry.cardId,
+    count: entry.qty,
+    zone: 'main' as const,
+  }));
+
+  return {
+    id: option.id,
+    name: option.name,
+    description: `${option.name} starter template`,
+    cards: [...mainDeckEntries, ...DEFAULT_RESOURCE_DECK],
+  };
 }
 
 /**
@@ -43,6 +99,8 @@ export function PlaytestGameEnhanced({
   cardDatabase,
   onGameEnd,
 }: PlaytestGameEnhancedProps) {
+  const CONTROLS_TOAST_KEY = 'gf.playtest.controlsToastDismissed.v1';
+
   // Game State
   const [engine, setEngine] = useState<GameEngine | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -50,7 +108,7 @@ export function PlaytestGameEnhanced({
   const [error, setError] = useState<string | null>(null);
 
   // Autoplayer
-  const autoplayerRef = useRef(new Autoplayer());
+  const autoplayerRef = useRef(new AdvancedAutoplayer());
 
   // GameStartFlow phase state (only shown once at game start)
   const [startPhase, setStartPhase] = useState<GameStartPhase>('coinFlip');
@@ -65,6 +123,64 @@ export function PlaytestGameEnhanced({
   const [showHandPanel, setShowHandPanel] = useState(true);
   const [showBoardPanel, setShowBoardPanel] = useState(true);
   const [showMobileLog, setShowMobileLog] = useState(false);
+  const [disableSetupAnimations, setDisableSetupAnimations] = useState(() =>
+    readBooleanQueryParam('fastSetup', true),
+  );
+  const [autoResolveTriggers, setAutoResolveTriggers] = useState(() =>
+    readBooleanQueryParam('autoTriggers', true),
+  );
+  const [selectedOpponentDeckId, setSelectedOpponentDeckId] = useState(() =>
+    readStringQueryParam('opponentDeck') ?? opponentDeckId,
+  );
+  const [showControlsToast, setShowControlsToast] = useState(false);
+
+  const opponentDeckOptions = React.useMemo<OpponentDeckOption[]>(() => {
+    const starterOptions = getStarterDeckTemplates(8).map((template) => ({
+      id: template.slug,
+      name: template.name,
+      entries: template.entries,
+    }));
+
+    return [
+      {
+        id: 'token-colorless-bot',
+        name: 'Token Colorless Bot',
+        entries: [],
+      },
+      ...starterOptions,
+    ];
+  }, []);
+
+  useEffect(() => {
+    if (opponentDeckOptions.some((option) => option.id === selectedOpponentDeckId)) return;
+    setSelectedOpponentDeckId(opponentDeckOptions[0]?.id ?? opponentDeckId);
+  }, [opponentDeckId, opponentDeckOptions, selectedOpponentDeckId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('opponentDeck', selectedOpponentDeckId);
+    url.searchParams.set('autoTriggers', autoResolveTriggers ? '1' : '0');
+    url.searchParams.set('fastSetup', disableSetupAnimations ? '1' : '0');
+
+    window.history.replaceState({}, '', url.toString());
+  }, [autoResolveTriggers, disableSetupAnimations, selectedOpponentDeckId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const dismissed = window.localStorage.getItem(CONTROLS_TOAST_KEY) === '1';
+    if (!dismissed) {
+      setShowControlsToast(true);
+    }
+  }, [CONTROLS_TOAST_KEY]);
+
+  const dismissControlsToast = () => {
+    setShowControlsToast(false);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(CONTROLS_TOAST_KEY, '1');
+    }
+  };
 
   // Phase 3: Sound Effects Integration
   const {
@@ -96,39 +212,47 @@ export function PlaytestGameEnhanced({
   // Initialize Game Engine
   useEffect(() => {
     try {
-      // All deck entries are main deck cards
-      const mainDeckEntries: Array<{ cardId: string; count: number; zone: 'main' }> = playerDeck.entries.map(
-        (entry) => ({
-          cardId: entry.cardId,
-          count: entry.qty,
-          zone: 'main' as const,
-        })
-      );
+      const deckDefinition = toDeckDefinition(playerDeck);
+      const selectedOpponent = opponentDeckOptions.find((option) => option.id === selectedOpponentDeckId);
+      const opponentDefinition = selectedOpponent && selectedOpponent.entries.length > 0
+        ? toOpponentDeckDefinition(selectedOpponent)
+        : undefined;
 
-      // Create a basic 10-card resource deck using generic resource tokens
-      // until the deck builder supports explicit resource deck specification
-      const resourceDeckEntries: Array<{ cardId: string; count: number; zone: 'resource' }> = [
-        { cardId: 'TOKEN-RESOURCE-001', count: 8, zone: 'resource' as const },
-        { cardId: 'EX-RESOURCE-TOKEN', count: 2, zone: 'resource' as const },
-      ];
-
-      const deckDefinition: DeckDefinition = {
-        id: playerDeck.id,
-        name: playerDeck.name,
-        description: playerDeck.description,
-        cards: [...mainDeckEntries, ...resourceDeckEntries],
-      };
-
-      const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase);
-      autoplayerRef.current.initialize('player2', cardDatabase);
+      const eng = new GameEngine(playerDeck.id, deckDefinition, cardDatabase, opponentDefinition);
+      autoplayerRef.current = new AdvancedAutoplayer('player2', cardDatabase);
       setEngine(eng);
       setGameState(eng.getState());
+      setStartPhase('coinFlip');
+      setGameReady(false);
+      setSelectedCard(null);
       setIsLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initialize game');
       setIsLoading(false);
     }
-  }, [playerDeck, cardDatabase]);
+  }, [playerDeck, cardDatabase, opponentDeckOptions, selectedOpponentDeckId]);
+
+  useEffect(() => {
+    if (!engine || !gameState || !gameReady || !autoResolveTriggers) return;
+    if (gameState.stack.length === 0) return;
+
+    const timeout = setTimeout(() => {
+      const current = engine.getState();
+      if (current.stack.length === 0) return;
+
+      const validation = engine.executeAction({
+        type: 'RESOLVE_ALL_TRIGGERS',
+        playerId: current.activePlayerId,
+        timestamp: Date.now(),
+      });
+
+      if (validation.valid) {
+        setGameState(engine.getState());
+      }
+    }, 120);
+
+    return () => clearTimeout(timeout);
+  }, [autoResolveTriggers, engine, gameReady, gameState]);
 
   // Game Action Handler
   const handleAction = (action: GameAction) => {
@@ -324,6 +448,7 @@ export function PlaytestGameEnhanced({
     isPlayerTurn &&
     !gameState.hasResourcePlacedThisTurn &&
     playerState.resourceDeck.length > 0;
+  const hasPendingTriggers = gameState.stack.length > 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
@@ -403,7 +528,65 @@ export function PlaytestGameEnhanced({
               </button>
             )}
 
+            {/* Resolve Trigger Stack */}
+            {!isSetupPhase && hasPendingTriggers && (
+              <button
+                onClick={() =>
+                  handleAction({
+                    type: 'RESOLVE_ALL_TRIGGERS',
+                    playerId: gameState.activePlayerId,
+                    timestamp: Date.now(),
+                  })
+                }
+                className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded font-semibold text-xs transition"
+                title="Resolve all pending triggers"
+              >
+                Resolve Triggers ({gameState.stack.length})
+              </button>
+            )}
+
+            <button
+              onClick={() => setAutoResolveTriggers((prev) => !prev)}
+              className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
+              title={autoResolveTriggers ? 'Disable automatic trigger resolution' : 'Enable automatic trigger resolution'}
+            >
+              {autoResolveTriggers ? 'Auto Triggers On' : 'Auto Triggers Off'}
+            </button>
+
             {/* Sound Toggle */}
+            <button
+              onClick={() => setDisableSetupAnimations((prev) => !prev)}
+              className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
+              title={disableSetupAnimations ? 'Enable setup animations' : 'Disable setup animations'}
+            >
+              {disableSetupAnimations ? 'Fast Setup' : 'Animated Setup'}
+            </button>
+
+            <select
+              value={selectedOpponentDeckId}
+              onChange={(event) => setSelectedOpponentDeckId(event.target.value)}
+              className="px-2 py-1 bg-surface-elevated border border-border rounded text-xs text-foreground max-w-[200px]"
+              title="Select opponent deck"
+            >
+              {opponentDeckOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => {
+                downloadPlayingCardsDeckExport(playerDeck, cardDatabase);
+                setError('PlayingCards export downloaded.');
+                setTimeout(() => setError(null), 1500);
+              }}
+              className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
+              title="Download deck export for PlayingCards.io"
+            >
+              Export P.io
+            </button>
+
             <button
               onClick={toggleMute}
               className="px-2 py-1 bg-surface-elevated hover:bg-surface rounded text-xs transition"
@@ -433,6 +616,14 @@ export function PlaytestGameEnhanced({
             </Link>
           </div>
         </div>
+
+        {!isSetupPhase && (
+          <div className="mt-1 hidden lg:flex items-center justify-end">
+            <p className="text-[10px] text-slate-400/90 tracking-wide">
+              Hover cards to preview · Double-click card or press P to pin
+            </p>
+          </div>
+        )}
       </header>
 
       {/* SETUP PHASE — GameStartFlow */}
@@ -443,6 +634,7 @@ export function PlaytestGameEnhanced({
           opponentId="player2"
           handCards={engine.getState().players['player1'].hand}
           cardDatabase={cardDatabase}
+          disableAnimations={disableSetupAnimations}
           onCoinFlipResult={(_isHeads, goesFirst) => {
             setPlayerGoesFirst(goesFirst);
             setStartPhase('shuffle');
@@ -571,6 +763,28 @@ export function PlaytestGameEnhanced({
           >
             ✕
           </button>
+        </div>
+      )}
+
+      {/* One-time Controls Toast */}
+      {!isSetupPhase && showControlsToast && (
+        <div
+          className="fixed top-20 right-4 max-w-sm rounded-lg border border-cyan-400/35 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl z-50"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="text-sm font-semibold text-cyan-200 mb-1">New Controls</div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Hover cards to preview. Double-click any card or press P to pin the preview while you play.
+          </p>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={dismissControlsToast}
+              className="text-xs px-2 py-1 rounded border border-cyan-300/40 text-cyan-200 hover:bg-cyan-900/30 transition"
+            >
+              Got it
+            </button>
+          </div>
         </div>
       )}
 

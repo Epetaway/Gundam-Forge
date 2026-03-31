@@ -22,6 +22,8 @@ interface HandTrayProps {
   onPlayCard: (card: CardInstance) => void;
   gamePhase: string;
   isPlayerTurn: boolean;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }
 
 /**
@@ -36,6 +38,8 @@ export function HandTray({
   onPlayCard,
   gamePhase,
   isPlayerTurn,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: HandTrayProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -69,6 +73,8 @@ export function HandTray({
       canPlayCards,
       hoveredCard,
       setHoveredCard,
+      onHoverCardChange,
+      onCardDoubleClick,
     }} />;
   }
 
@@ -84,6 +90,8 @@ export function HandTray({
         canPlayCards,
         hoveredCard,
         setHoveredCard,
+        onHoverCardChange,
+        onCardDoubleClick,
         drawerOpen,
         setDrawerOpen,
       }}
@@ -132,6 +140,8 @@ function DesktopArcFan({
   canPlayCards,
   hoveredCard,
   setHoveredCard,
+  onHoverCardChange,
+  onCardDoubleClick,
 }: {
   cards: CardInstance[];
   cardDatabase: Record<string, any>;
@@ -141,6 +151,8 @@ function DesktopArcFan({
   canPlayCards: boolean;
   hoveredCard: string | null;
   setHoveredCard: (id: string | null) => void;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
 }) {
   return (
     <div className="flex flex-wrap gap-2 justify-center items-start px-4 pb-2 w-full overflow-visible">
@@ -154,12 +166,19 @@ function DesktopArcFan({
             <div className="relative flex-shrink-0">
               <button
                 onClick={() => onSelectCard(card)}
-                onMouseEnter={() => setHoveredCard(card.instanceId)}
-                onMouseLeave={() => setHoveredCard(null)}
+                onMouseEnter={() => {
+                  setHoveredCard(card.instanceId);
+                  onHoverCardChange?.(card.cardId);
+                }}
+                onMouseLeave={() => {
+                  setHoveredCard(null);
+                  onHoverCardChange?.(null);
+                }}
+                onDoubleClick={() => onCardDoubleClick?.(card.cardId)}
                 className={cn(
                   'relative group transition-all duration-150 ease-out flex flex-col items-center',
                   isSelected && '-translate-y-2 scale-105',
-                  isHovered && !isSelected && '-translate-y-1 scale-102',
+                  isHovered && !isSelected && '-translate-y-1 scale-[1.03]',
                 )}
                 title={cardData?.name || card.cardId}
               >
@@ -168,10 +187,10 @@ function DesktopArcFan({
                     'relative aspect-[5/7] rounded-lg overflow-hidden',
                     'border-2 shadow-lg transition-all w-24 sm:w-28',
                     isSelected
-                      ? 'border-yellow-400 shadow-yellow-500/50 ring-2 ring-yellow-300'
+                      ? 'border-cyan-300 shadow-cyan-500/35 ring-2 ring-cyan-200/80'
                       : isHovered
-                        ? 'border-steel-400 shadow-steel-500/50'
-                        : 'border-steel-600 shadow-surface/50',
+                        ? 'border-cyan-400/80 shadow-cyan-500/40'
+                        : 'border-steel-600/80 shadow-surface/50',
                   )}
                 >
                   {cardData ? (
@@ -192,7 +211,7 @@ function DesktopArcFan({
 
                 {/* Card name on hover */}
                 {isHovered && (
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface-elevated text-foreground text-sm px-2 py-1 rounded border border-border z-50 pointer-events-none shadow-lg">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-900/95 text-slate-100 text-xs px-2 py-1 rounded border border-cyan-400/50 z-50 pointer-events-none shadow-lg">
                     {cardData?.name || card.cardId}
                   </div>
                 )}
@@ -228,6 +247,8 @@ function MobileDrawer({
   canPlayCards,
   hoveredCard,
   setHoveredCard,
+  onHoverCardChange,
+  onCardDoubleClick,
   drawerOpen,
   setDrawerOpen,
 }: {
@@ -239,6 +260,8 @@ function MobileDrawer({
   canPlayCards: boolean;
   hoveredCard: string | null;
   setHoveredCard: (id: string | null) => void;
+  onHoverCardChange?: (cardId: string | null) => void;
+  onCardDoubleClick?: (cardId: string) => void;
   drawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
 }) {
@@ -290,8 +313,15 @@ function MobileDrawer({
                   <DraggableHandCard key={card.instanceId} card={card}>
                   <button
                     onClick={() => onSelectCard(card)}
-                    onMouseEnter={() => setHoveredCard(card.instanceId)}
-                    onMouseLeave={() => setHoveredCard(null)}
+                    onMouseEnter={() => {
+                      setHoveredCard(card.instanceId);
+                      onHoverCardChange?.(card.cardId);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredCard(null);
+                      onHoverCardChange?.(null);
+                    }}
+                    onDoubleClick={() => onCardDoubleClick?.(card.cardId)}
                     className={cn(
                       'relative group aspect-[5/7] rounded-lg overflow-hidden',
                       'border-2 transition-all',
