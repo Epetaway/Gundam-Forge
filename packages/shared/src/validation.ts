@@ -35,8 +35,8 @@ const DEFAULT_MAX_COPIES_PER_CARD = 4;
 /** Official rules: main deck MUST be exactly 50 cards (strictly enforced) */
 const MIN_MAIN_DECK_SIZE = 50;
 const MAX_MAIN_DECK_SIZE = 50;
-/** Official rules: resource deck maximum 10 cards */
-const MAX_RESOURCE_DECK_SIZE = 10;
+/** Official rules: resource deck must be exactly 10 cards when present */
+const RESOURCE_DECK_SIZE = 10;
 /** Official rules: side deck maximum 15 cards */
 const MAX_SIDE_DECK_SIZE = 15;
 /** Official rules: max 2 colors excluding Colorless (Rule 6-1-1-2) */
@@ -103,9 +103,9 @@ export const validateDeck = (
     errors.push(`Main deck must contain exactly ${MAX_MAIN_DECK_SIZE} cards (currently ${mainDeckCards}).`);
   }
 
-  // Rule 2: Resource deck = maximum 10 cards (optional)
-  if (resourceDeckCards > MAX_RESOURCE_DECK_SIZE) {
-    errors.push(`Resource deck cannot exceed ${MAX_RESOURCE_DECK_SIZE} cards (currently ${resourceDeckCards}).`);
+  // Rule 2: Resource deck must be exactly 10 cards when present (Rule 6-1-1)
+  if (resourceDeckCards > 0 && resourceDeckCards !== RESOURCE_DECK_SIZE) {
+    errors.push(`Resource deck must contain exactly ${RESOURCE_DECK_SIZE} cards when included (currently ${resourceDeckCards}).`);
   }
 
   // Rule 3: Maximum 2 colors excluding Colorless (Rule 6-1-1-2)

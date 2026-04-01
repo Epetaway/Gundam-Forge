@@ -3,10 +3,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
-import { MetaPressureGauge } from './MetaPressureGauge';
-import { CardContributionChart } from './CardContributionChart';
-import { ArchetypeTrendLine } from './ArchetypeTrendLine';
-import { ConsistencyScale } from './ConsistencyScale';
+import { PracticalAnalysisPanel } from './PracticalAnalysisPanel';
 import type { DeckViewItem } from '@/lib/deck/sortFilter';
 import type { DeckAnalyticsDto } from '@/lib/api/deckAnalytics';
 
@@ -100,23 +97,12 @@ export function DeckAnalyticsPanel({
   className,
   isLoading = false,
 }: DeckAnalyticsPanelProps) {
-  // Derived values: prefer live (from builder) over server snapshot
-  const metaScore = liveMetaProximity ?? serverAnalytics?.metaProximityScore ?? 0;
-  const consistencyScore = liveConsistencyIndex ?? serverAnalytics?.consistencyIndex ?? 0;
-  const trendDirection = serverAnalytics?.trendDirection ?? 'flat';
-
-  const sparklinePoints = React.useMemo(() => {
-    if (!serverAnalytics?.sparklineDates?.length) return [];
-    return serverAnalytics.sparklineDates.map((date, i) => ({
-      date,
-      score: serverAnalytics.sparklineScores[i] ?? 0,
-    }));
-  }, [serverAnalytics]);
+  void liveMetaProximity;
 
   return (
     <section
       className={cn(
-        'rounded-lg border border-cobalt-900/65 bg-surface-elevated',
+        'rounded-lg border border-cobalt-900/65 bg-gradient-to-br from-surface-elevated via-surface to-surface shadow-[0_8px_24px_rgba(2,6,23,0.35)]',
         className,
       )}
       aria-label="Deck analytics"
@@ -124,7 +110,7 @@ export function DeckAnalyticsPanel({
     >
       {/* Header */}
       <div className="border-b border-cobalt-900/65 px-4 py-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cobalt-300">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cobalt-200">
           Deck Analytics
         </p>
       </div>
@@ -159,70 +145,14 @@ export function DeckAnalyticsPanel({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
-            {/* Row 1: Gauge + Consistency */}
-            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
-              <MetaPressureGauge
-                score={metaScore}
-                label="Meta Fit"
-                className="flex-shrink-0"
-              />
-              <ConsistencyScale
-                score={consistencyScore}
-                className="w-full"
-              />
-            </div>
-
-            {/* Row 2: Card type contribution */}
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel-500 mb-2">
-                Card Composition
-              </p>
-              <CardContributionChart items={items} />
-            </div>
-
-            {/* Row 3: 7-day sparkline (server data only) */}
-            {sparklinePoints.length >= 2 && (
-              <ArchetypeTrendLine
-                points={sparklinePoints}
-                trendDirection={trendDirection}
-              />
-            )}
-
-            {/* Archetype / rank footnote */}
-            {serverAnalytics && (
-              <div className="flex flex-wrap gap-3 border-t border-cobalt-900/65 pt-3">
-                {serverAnalytics.archetypePopularityRank !== null && (
-                  <Stat
-                    label="Archetype Rank"
-                    value={`#${serverAnalytics.archetypePopularityRank}`}
-                  />
-                )}
-                {serverAnalytics.colorComboRank !== null && (
-                  <Stat
-                    label="Color Rank"
-                    value={`#${serverAnalytics.colorComboRank}`}
-                  />
-                )}
-                {serverAnalytics.viewCountDelta > 0 && (
-                  <Stat
-                    label="Views today"
-                    value={`+${serverAnalytics.viewCountDelta}`}
-                  />
-                )}
-              </div>
-            )}
+            <PracticalAnalysisPanel
+              items={items}
+              serverAnalytics={serverAnalytics ?? undefined}
+              liveConsistencyIndex={liveConsistencyIndex}
+            />
           </motion.div>
         )}
       </AnimatePresence>
     </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel-600">{label}</span>
-      <span className="font-mono text-sm font-semibold text-cobalt-300">{value}</span>
-    </div>
   );
 }
