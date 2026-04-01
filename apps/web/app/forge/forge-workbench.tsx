@@ -456,8 +456,6 @@ interface MobileToolbarProps {
   onQueryChange: (q: string) => void;
   sortBy: DeckSortKey;
   onSortByChange: (k: DeckSortKey) => void;
-  density: DeckDensity;
-  onDensityChange: (d: DeckDensity) => void;
 }
 
 function MobileToolbar({
@@ -469,8 +467,6 @@ function MobileToolbar({
   onQueryChange,
   sortBy,
   onSortByChange,
-  density,
-  onDensityChange,
 }: MobileToolbarProps): JSX.Element {
   const [optionsOpen, setOptionsOpen] = React.useState(false);
   const [searchOpen, setSearchOpen]   = React.useState(false);
@@ -540,7 +536,7 @@ function MobileToolbar({
           className="ml-auto rounded border border-border bg-surface-interactive p-1.5 text-steel-600 transition-colors hover:text-foreground"
           onClick={() => setOptionsOpen(true)}
           aria-label="View options"
-          title="Sort, density, import"
+          title="Sort, import"
         >
           <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -609,27 +605,6 @@ function MobileToolbar({
                   <option value="cost">Cost</option>
                   <option value="type">Type</option>
                 </select>
-              </div>
-
-              {/* Density */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-foreground">Density</span>
-                <div className="inline-flex rounded border border-border bg-surface-interactive p-0.5">
-                  {(['comfortable', 'compact'] as const).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      className={cn(
-                        'rounded px-2.5 py-1 text-xs font-semibold capitalize transition-colors',
-                        density === d ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
-                      )}
-                      onClick={() => onDensityChange(d)}
-                      aria-pressed={density === d}
-                    >
-                      {d}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {/* Import */}
@@ -1068,7 +1043,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
   const [deck, setDeck] = React.useState<Record<string, number>>({});
   const [importResults, setImportResults] = React.useState<CardMatchResult | null>(null);
   const [viewMode, setViewMode] = useLocalStorageState<DeckViewMode>('gundam-forge.forge.viewMode', 'stacks');
-  const [density, setDensity] = useLocalStorageState<DeckDensity>('gundam-forge.forge.density', 'comfortable');
+  const density: DeckDensity = 'comfortable';
   const [query, setQuery] = React.useState('');
   const [sortBy, setSortBy] = React.useState<DeckSortKey>('type');
   const [activeCardId, setActiveCardId] = React.useState<string | null>(null);
@@ -1395,7 +1370,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             Create a new deck or open an existing one to begin using the Forge.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <a href="/decks/new">
+            <a href="/forge">
               <button className="inline-flex items-center gap-2 rounded-sm border border-cobalt-400/70 bg-cobalt-500/25 px-4 py-2 font-semibold text-cobalt-300 transition-all hover:bg-cobalt-500/35">
                 + Create Deck
               </button>
@@ -1570,8 +1545,6 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           onQueryChange={setQuery}
           sortBy={sortBy}
           onSortByChange={setSortBy}
-          density={density}
-          onDensityChange={setDensity}
         />
 
         {/* Pending import results banner (from deck-creation flow) */}
@@ -1593,26 +1566,6 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
 
         {/* Desktop: cards + import buttons + full toolbar */}
         <div className="hidden flex-shrink-0 flex-col md:flex">
-          <div className="flex items-center justify-end gap-2 border-b border-border px-4 py-1">
-            {!desktopPanelOpen && (
-              <button
-                type="button"
-                className="rounded border border-cobalt-600 bg-cobalt-600/10 px-3 py-1 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open card catalog"
-              >
-                Cards
-              </button>
-            )}
-            <button
-              type="button"
-              className="rounded border border-border bg-surface-interactive px-3 py-1 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
-              onClick={() => setImportOpen(true)}
-              aria-label="Import deck list"
-            >
-              Import Deck
-            </button>
-          </div>
           <div className="flex-none px-4">
             <DeckToolbar
               views={VIEW_REGISTRY.filter((v) => v.id !== 'table')}
@@ -1623,7 +1576,30 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
               sortBy={sortBy}
               onSortByChange={setSortBy}
               density={density}
-              onDensityChange={setDensity}
+              onDensityChange={() => {}}
+              showDensity={false}
+              actions={
+                <>
+                  {!desktopPanelOpen && (
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center rounded border border-cobalt-600 bg-cobalt-600/10 px-3 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20"
+                      onClick={() => setSidebarOpen(true)}
+                      aria-label="Open card catalog"
+                    >
+                      Cards
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="inline-flex h-9 items-center rounded border border-border bg-surface-interactive px-3 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
+                    onClick={() => setImportOpen(true)}
+                    aria-label="Import deck list"
+                  >
+                    Import Deck
+                  </button>
+                </>
+              }
             />
           </div>
         </div>

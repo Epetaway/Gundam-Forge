@@ -52,7 +52,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
 
   if (items.length === 0) {
     return (
-      <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-text-muted">
+      <p className="rounded-md border border-dashed border-cobalt-900/65 p-10 text-center text-sm text-text-muted">
         No cards match your filters.
       </p>
     );
@@ -63,9 +63,9 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
       {hovered && typeof document !== 'undefined' && (
         <CardHoverPreview item={hovered.item} anchor={hovered.anchor} />
       )}
-      <div className="overflow-x-auto rounded-md border border-border bg-surface">
+      <div className="overflow-x-auto rounded-md border border-cobalt-900/65 bg-surface">
         <table className="w-full text-left">
-          <thead className="border-b border-border bg-surface-interactive text-[11px] uppercase tracking-[0.12em] text-text-muted">
+          <thead className="border-b border-cobalt-900/65 bg-surface-interactive text-[11px] uppercase tracking-[0.12em] text-text-muted">
             <tr>
               <th className="w-10 px-3 py-2">Qty</th>
               <th className="px-3 py-2">Card</th>
@@ -83,7 +83,7 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
                 <tr
                   key={item.id}
                   className={cn(
-                    'group cursor-pointer border-b border-border/70 text-sm transition-colors hover:bg-surface-interactive',
+                    'group cursor-pointer border-b border-cobalt-900/55 text-sm transition-colors hover:bg-surface-interactive',
                     ui.density === 'compact' ? 'h-8' : 'h-10',
                     active && 'bg-surface-interactive',
                   )}

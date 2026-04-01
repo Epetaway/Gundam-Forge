@@ -73,16 +73,21 @@ export function ConsistencyScale({ score, className }: ConsistencyScaleProps) {
       >
         {/* Zone segments (static, cosmetic) */}
         <div className="absolute inset-0 flex">
-          {ZONES.map((z) => (
-            <div
-              key={z.label}
-              className="h-full opacity-15"
-              style={{
-                width: `${z.max - z.min + 1}%`,
-                background: z.color,
-              }}
-            />
-          ))}
+          {ZONES.map((z, index) => {
+            const next = ZONES[index + 1];
+            const zoneWidth = next ? next.min - z.min : 100 - z.min;
+
+            return (
+              <div
+                key={z.label}
+                className="h-full opacity-15"
+                style={{
+                  width: `${zoneWidth}%`,
+                  background: z.color,
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Filled bar */}

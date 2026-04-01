@@ -51,7 +51,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
           {isFetching && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
           {isFetching ? 'Refreshing…' : `${visibleDecks.length} decks`}
         </div>
-        <Link href="/decks/new" className="ml-4">
+        <Link href="/forge" className="ml-4">
           <Button size="sm" variant="primary">+ Create Deck</Button>
         </Link>
       </div>
@@ -63,7 +63,7 @@ export default function ExploreClient({ initialDecks }: ExploreClientProps): JSX
           <p className="text-sm text-steel-600 mb-6">
             {isFetching ? 'Loading decks…' : 'No competitive decks match your filters. Try a different sort or create one yourself!'}
           </p>
-          <Link href="/decks/new">
+          <Link href="/forge">
             <Button size="sm" variant="primary">+ Create Deck</Button>
           </Link>
         </div>

@@ -116,14 +116,14 @@ export function DeckAnalyticsPanel({
   return (
     <section
       className={cn(
-        'rounded-lg border border-border bg-surface-elevated',
+        'rounded-lg border border-cobalt-900/65 bg-surface-elevated',
         className,
       )}
       aria-label="Deck analytics"
       data-testid="deck-analytics-panel"
     >
       {/* Header */}
-      <div className="border-b border-border px-4 py-3">
+      <div className="border-b border-cobalt-900/65 px-4 py-3">
         <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cobalt-300">
           Deck Analytics
         </p>
@@ -190,7 +190,7 @@ export function DeckAnalyticsPanel({
 
             {/* Archetype / rank footnote */}
             {serverAnalytics && (
-              <div className="flex flex-wrap gap-3 border-t border-border pt-3">
+              <div className="flex flex-wrap gap-3 border-t border-cobalt-900/65 pt-3">
                 {serverAnalytics.archetypePopularityRank !== null && (
                   <Stat
                     label="Archetype Rank"

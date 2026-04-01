@@ -2,6 +2,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import type { CardColor } from '@gundam-forge/shared';
+import { getPackagesByIds } from '@gundam-forge/shared';
 import { cn } from '@/lib/utils/cn';
 import { useDeckSetupContext } from './DeckSetupContext';
 
@@ -15,9 +16,14 @@ const COLOR_STYLES: Record<CardColor, { bg: string; text: string; label: string 
 };
 
 export default function DeckPreviewPanel() {
-  const { name, visibility, deckIntent, description, decklist } = useDeckSetupContext();
-  const { colors, packages } = deckIntent;
+  const { name, visibility, deckIntent, decklist } = useDeckSetupContext();
+  const { clans, colors, packages } = deckIntent;
   const [browseQuery, setBrowseQuery] = React.useState('');
+
+  const selectedPackages = React.useMemo(
+    () => getPackagesByIds(packages),
+    [packages],
+  );
 
   const lineCount = decklist.trim()
     ? decklist.split('\n').filter((l) => l.trim()).length
@@ -27,7 +33,7 @@ export default function DeckPreviewPanel() {
   const packageLabel = packages.length > 0 ? `${packages.length} package${packages.length === 1 ? '' : 's'}` : '';
 
   return (
-    <div className="panel-level-2 w-full max-w-sm rounded-lg border border-border p-6 space-y-4">
+    <div className="panel-level-2 w-full max-w-sm rounded-lg border border-cobalt-900/65 p-6 space-y-4">
       <div>
         <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cobalt-300 mb-1">
           Deck Preview
@@ -66,13 +72,44 @@ export default function DeckPreviewPanel() {
         <span className="capitalize">{visibility}</span>
       </div>
 
-      {description && (
-        <p className="text-sm text-steel-600 line-clamp-3">{description}</p>
-      )}
+      <div className="rounded-md border border-cobalt-900/65 bg-cobalt-900/10 px-3 py-2.5">
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-cobalt-300">Intent Summary</p>
+
+        <div className="grid grid-cols-1 gap-1.5 text-xs text-steel-600">
+          <p>
+            <span className="font-semibold text-foreground">Factions:</span>{' '}
+            {clans.length > 0 ? clans.join(', ') : 'Any'}
+          </p>
+          <p>
+            <span className="font-semibold text-foreground">Colors:</span>{' '}
+            {colors.length > 0 ? colors.join(', ') : 'Not set'}
+          </p>
+          <p>
+            <span className="font-semibold text-foreground">Packages:</span>{' '}
+            {packages.length > 0 ? packages.length : 'None'}
+          </p>
+        </div>
+
+        {selectedPackages.length > 0 && (
+          <div className="mt-2.5 border-t border-cobalt-900/60 pt-2">
+            <p className="mb-1 text-[11px] font-semibold text-steel-500">Selected Mechanics</p>
+            <div className="flex flex-wrap gap-1">
+              {selectedPackages.map((pkg) => (
+                <span
+                  key={pkg.id}
+                  className="inline-flex items-center rounded border border-cobalt-500/30 bg-cobalt-600/30 px-2 py-0.5 text-[10px] text-cobalt-200"
+                >
+                  {pkg.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Import preview */}
       {lineCount > 0 && (
-        <div className="rounded-md border border-border bg-surface px-3 py-2 text-xs text-steel-600">
+        <div className="rounded-md border border-cobalt-900/65 bg-surface px-3 py-2 text-xs text-steel-600">
           <span className="font-semibold text-cobalt-300">{lineCount}</span>{' '}
           {lineCount === 1 ? 'line' : 'lines'} ready to import
         </div>
@@ -86,7 +123,7 @@ export default function DeckPreviewPanel() {
       )}
 
       {/* Browse Public Decks */}
-      <div className="border-t border-border pt-4 space-y-2">
+      <div className="border-t border-cobalt-900/65 pt-4 space-y-2">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel-500">
           Browse Public Decks
         </p>
@@ -97,7 +134,7 @@ export default function DeckPreviewPanel() {
             value={browseQuery}
             onChange={(e) => setBrowseQuery(e.target.value)}
             className={cn(
-              'min-w-0 flex-1 rounded border border-border bg-surface px-2.5 py-1.5 text-xs text-foreground',
+              'min-w-0 flex-1 rounded border border-cobalt-900/65 bg-surface px-2.5 py-1.5 text-xs text-foreground',
               'placeholder:text-steel-600 focus:border-cobalt-500 focus:outline-none focus:ring-1 focus:ring-cobalt-500/40',
             )}
             aria-label="Search public decks"

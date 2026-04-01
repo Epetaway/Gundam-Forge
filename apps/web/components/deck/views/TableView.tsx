@@ -18,7 +18,7 @@ export function TableView({ items, actions, ui }: DeckViewRendererProps): JSX.El
             {columns.map(col => (
               <th
                 key={col.key}
-                className="px-2 py-2 text-xs font-semibold text-left cursor-pointer select-none border-b border-border"
+                className="px-2 py-2 text-xs font-semibold text-left cursor-pointer select-none border-b border-cobalt-900/65"
               >
                 {col.label}
               </th>

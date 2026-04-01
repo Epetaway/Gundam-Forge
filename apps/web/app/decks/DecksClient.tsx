@@ -31,7 +31,7 @@ export default function DecksClient({ initialDecks }: DecksClientProps): JSX.Ele
           <p className="text-sm text-steel-600 mb-6">
             {isFetching ? 'Loading decks…' : 'No decks have been added to the library yet. Start by creating your first deck!'}
           </p>
-          <Link href="/decks/new">
+          <Link href="/forge">
             <Button variant="primary">+ Create Deck</Button>
           </Link>
         </div>
