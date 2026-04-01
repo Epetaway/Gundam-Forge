@@ -47,7 +47,7 @@ interface ComparisonResponse {
 export async function fetchDeckAnalytics(deckId: string): Promise<DeckAnalyticsDto | null> {
   try {
     const payload = await fetchApiDataOrThrow<AnalyticsResponse<DeckAnalyticsDto>>(
-      `/api/decks/${encodeURIComponent(deckId)}/analytics`,
+      `/api/deck-analytics/${encodeURIComponent(deckId)}/summary`,
     );
     return payload.analytics;
   } catch {
@@ -58,7 +58,7 @@ export async function fetchDeckAnalytics(deckId: string): Promise<DeckAnalyticsD
 export async function fetchDeckCardAnalytics(deckId: string): Promise<DeckCardAnalyticsDto[]> {
   try {
     const payload = await fetchApiDataOrThrow<CardAnalyticsResponse>(
-      `/api/decks/${encodeURIComponent(deckId)}/analytics/cards`,
+      `/api/deck-analytics/${encodeURIComponent(deckId)}/cards`,
     );
     return payload.cards;
   } catch {
@@ -69,7 +69,7 @@ export async function fetchDeckCardAnalytics(deckId: string): Promise<DeckCardAn
 export async function fetchDeckMetaComparison(deckId: string): Promise<DeckMetaComparisonDto | null> {
   try {
     const payload = await fetchApiDataOrThrow<ComparisonResponse>(
-      `/api/decks/${encodeURIComponent(deckId)}/analytics/comparison`,
+      `/api/deck-analytics/${encodeURIComponent(deckId)}/comparison`,
     );
     return payload.comparison;
   } catch {
