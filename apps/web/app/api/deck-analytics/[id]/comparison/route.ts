@@ -1,7 +1,10 @@
 import { apiOk, apiError } from '@/lib/api/server';
 import { supabase } from '@/lib/supabase/client';
+import { getDecks } from '@/lib/data/decks';
 
-export const dynamic = 'force-dynamic';
+export function generateStaticParams() {
+  return getDecks().map((deck) => ({ id: deck.id }));
+}
 
 interface ComparisonRow {
   deck_id: string;

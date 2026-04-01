@@ -33,6 +33,9 @@ function randomId(): string {
 }
 
 function getRequestId(request?: Request): string {
+  if (process.env.NEXT_OUTPUT_MODE === 'export') {
+    return randomId();
+  }
   return request?.headers.get('x-request-id') ?? randomId();
 }
 
