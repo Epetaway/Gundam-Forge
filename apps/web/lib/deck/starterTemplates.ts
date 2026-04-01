@@ -1,7 +1,8 @@
-import type { CardColor } from '@gundam-forge/shared';
+import type { CardColor, CardDefinition, DeckIntent } from '@gundam-forge/shared';
 import { OFFICIAL_DECKS } from '@/lib/data/officialDecks';
 import { cardsById, getCardImage } from '@/lib/data/cards';
 import { withBasePath } from '@/lib/utils/basePath';
+import { analyzeDeckIntent } from './analyzeDeckIntent';
 
 export interface StarterDeckTemplate {
   slug: string;
@@ -12,6 +13,13 @@ export interface StarterDeckTemplate {
   imageUrl: string;
   sourceUrl: string;
   entries: Array<{ cardId: string; qty: number }>;
+}
+
+export interface StarterDeckRecommendation {
+  template: StarterDeckTemplate;
+  score: number;
+  confidence: 'strong' | 'consider';
+  reasons: string[];
 }
 
 const VALID_COLORS = new Set<CardColor>(['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless']);
@@ -122,7 +130,21 @@ function normalizeMainDeckCount(
   return normalized;
 }
 
-export function getStarterDeckTemplates(limit = 6): StarterDeckTemplate[] {
+function entryMatchesSet(entry: { cardId: string }, setId: string): boolean {
+  const expectedSet = setId.trim().toUpperCase();
+  if (!expectedSet) return true;
+
+  const card = cardsById.get(entry.cardId);
+  if (card?.set?.toUpperCase() === expectedSet) {
+    return true;
+  }
+
+  return entry.cardId.toUpperCase().startsWith(`${expectedSet}-`);
+}
+
+export function getStarterDeckTemplates(limit = 6, setId?: string): StarterDeckTemplate[] {
+  const normalizedSetId = setId?.trim();
+
   return OFFICIAL_DECKS
     .map((deck) => {
       const entries = normalizeMainDeckCount(
@@ -132,6 +154,10 @@ export function getStarterDeckTemplates(limit = 6): StarterDeckTemplate[] {
       );
 
       if (entries.length === 0) return null;
+
+      if (normalizedSetId && !entries.some((entry) => entryMatchesSet(entry, normalizedSetId))) {
+        return null;
+      }
 
       return {
         slug: deck.slug,
@@ -145,5 +171,72 @@ export function getStarterDeckTemplates(limit = 6): StarterDeckTemplate[] {
       } satisfies StarterDeckTemplate;
     })
     .filter((deck): deck is StarterDeckTemplate => Boolean(deck))
+    .slice(0, limit);
+}
+
+function getTemplateCards(template: StarterDeckTemplate): CardDefinition[] {
+  return template.entries
+    .flatMap((entry) => {
+      const card = cardsById.get(entry.cardId);
+      if (!card) return [];
+      return Array.from({ length: entry.qty }, () => card);
+    });
+}
+
+function toRatioScore(matches: number, total: number): number {
+  if (total <= 0) return 0;
+  return Math.round((matches / total) * 100);
+}
+
+export function getRecommendedStarterTemplates(
+  templates: StarterDeckTemplate[],
+  intent: DeckIntent,
+  limit = 3,
+): StarterDeckRecommendation[] {
+  const hasIntentSignal =
+    intent.colors.length > 0 || intent.clans.length > 0 || intent.packages.length > 0;
+
+  if (!hasIntentSignal || templates.length === 0) {
+    return [];
+  }
+
+  return templates
+    .map((template) => {
+      const cards = getTemplateCards(template);
+      const inferredIntent = analyzeDeckIntent(cards, undefined).suggestedIntent;
+
+      const colorMatches = intent.colors.filter((color) => inferredIntent.colors.includes(color)).length;
+      const clanMatches = intent.clans.filter((clan) => inferredIntent.clans.includes(clan)).length;
+      const packageMatches = intent.packages.filter((pkg) => inferredIntent.packages.includes(pkg)).length;
+
+      const colorScore = toRatioScore(colorMatches, intent.colors.length);
+      const clanScore = toRatioScore(clanMatches, intent.clans.length);
+      const packageScore = toRatioScore(packageMatches, intent.packages.length);
+
+      const weightedScore = Math.round(colorScore * 0.45 + clanScore * 0.2 + packageScore * 0.35);
+      const reasons: string[] = [];
+
+      if (intent.colors.length > 0) {
+        reasons.push(`${colorMatches}/${intent.colors.length} color match`);
+      }
+      if (intent.clans.length > 0) {
+        reasons.push(`${clanMatches}/${intent.clans.length} faction match`);
+      }
+      if (intent.packages.length > 0) {
+        reasons.push(`${packageMatches}/${intent.packages.length} package match`);
+      }
+
+      return {
+        template,
+        score: weightedScore,
+        confidence: weightedScore >= 65 ? 'strong' : 'consider',
+        reasons,
+      } satisfies StarterDeckRecommendation;
+    })
+    .filter((result) => result.score >= 35)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.template.slug.localeCompare(b.template.slug);
+    })
     .slice(0, limit);
 }

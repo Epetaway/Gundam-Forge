@@ -40,7 +40,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
   const typeEntries = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="rounded-lg border border-border bg-surface-elevated p-4 space-y-4">
+    <div className="space-y-4 rounded-lg border border-cobalt-900/65 bg-gradient-to-br from-surface-elevated via-surface to-surface p-4 shadow-[0_8px_24px_rgba(2,6,23,0.35)]">
       {/* Summary chips */}
       <div className="flex flex-wrap gap-3">
         <Chip label="Cards" value={`${totalCards}`} />
@@ -52,7 +52,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
 
       {/* Cost curve */}
       <div>
-        <p className="font-mono text-[10px] uppercase tracking-wider text-text-muted mb-2">Cost Curve</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-text-muted">Cost Curve</p>
         <div className="flex items-end gap-1 h-14">
           {costBuckets.map((count, i) => {
             const heightPct = (count / maxCount) * 100;
@@ -62,7 +62,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
                   {count > 0 ? count : ''}
                 </span>
                 <div
-                  className="w-full rounded-t-sm bg-cobalt-500 transition-all"
+                  className="w-full rounded-t-sm bg-gradient-to-t from-cobalt-600 to-cobalt-400 transition-all"
                   style={{ height: `${heightPct}%`, minHeight: count > 0 ? 4 : 0 }}
                 />
                 <span className="font-mono text-[9px] text-text-muted leading-none">{COST_LABELS[i]}</span>
@@ -75,7 +75,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
       {/* Type breakdown bar */}
       {typeEntries.length > 0 && (
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-wider text-text-muted mb-2">Type Split</p>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-text-muted">Type Split</p>
           <div className="h-3 rounded-full overflow-hidden flex">
             {typeEntries.map(([type, count]) => (
               <div
@@ -116,7 +116,7 @@ function Chip({
   color?: string;
 }): JSX.Element {
   return (
-    <div className="flex items-center gap-1.5 rounded border border-border bg-surface-interactive px-2 py-1">
+    <div className="flex items-center gap-1.5 rounded border border-cobalt-900/70 bg-surface-interactive px-2 py-1">
       {color && (
         <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
       )}

@@ -100,6 +100,12 @@ export function UnifiedCardTile({
         'transition-all duration-150 hover:border-cobalt-400/60 hover:bg-surface-interactive',
         className,
       )}
+      onMouseEnter={(e) => {
+        onHoverChange?.({ card: card as ScoredCard, anchor: e.currentTarget.getBoundingClientRect() });
+      }}
+      onMouseLeave={() => {
+        onHoverChange?.(null);
+      }}
     >
       {/* Thumbnail */}
       <div className="relative h-14 w-10 flex-none overflow-hidden rounded-[3px] border border-steel-400 bg-black">

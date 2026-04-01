@@ -7,7 +7,7 @@ import type { DeckViewRendererProps } from '@/components/deck/types';
 export function ImageGridView({ items, selection, actions, ui }: DeckViewRendererProps): JSX.Element {
   if (items.length === 0) {
     return (
-      <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
+      <p className="rounded-md border border-dashed border-cobalt-900/65 p-10 text-center text-sm text-steel-600">
         No cards match your filters.
       </p>
     );

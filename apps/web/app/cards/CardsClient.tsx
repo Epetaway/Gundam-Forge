@@ -6,7 +6,7 @@ import { LayoutGrid, List, Search, SlidersHorizontal, X, CheckCircle } from 'luc
 import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
-import { ReferenceCardDetailModal } from '@/components/cards/ReferenceCardDetailModal';
+import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
@@ -960,10 +960,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       ) : null}
 
       {/* ── Detail modal ──────────────────────────────────────── */}
-      <ReferenceCardDetailModal
+      <CardDetailModal
         card={inspectCard ?? null}
         onOpenChange={(open) => !open && setInspectCardId(null)}
         open={Boolean(inspectCard)}
+        context="cards"
         qty={0}
         onAdd={activeDeckId ? () => inspectCard && handleAddCard(inspectCard.id) : undefined}
       />

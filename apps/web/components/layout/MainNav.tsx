@@ -20,12 +20,27 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/decks/new', label: '+ Create Deck' },
+  { href: '/forge', label: 'Forge' },
   { href: '/explore', label: 'Explore' },
   { href: '/cards', label: 'Cards' },
   { href: '/events', label: 'Events' },
   { href: '/decks', label: 'Decks', hint: 'Browse and playtest your decks' },
 ];
+
+function isNavItemActive(pathname: string, href: string): boolean {
+  if (href === '/') return pathname === '/';
+
+  // Keep "Forge" and "Decks" mutually exclusive.
+  if (href === '/decks') {
+    return pathname === '/decks' || pathname.startsWith('/decks/');
+  }
+
+  if (href === '/forge') {
+    return pathname === '/forge' || pathname.startsWith('/forge/');
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 export function MainNav(): JSX.Element {
   const pathname = usePathname();
 
@@ -33,9 +48,7 @@ export function MainNav(): JSX.Element {
     <>
       <nav aria-label="Primary" className="hidden items-center gap-2 md:flex">
         {navItems.map((item) => {
-          const isActive = item.href === '/'
-            ? pathname === '/'
-            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = isNavItemActive(pathname, item.href);
           return (
             <Link
               className={cn(
@@ -64,9 +77,7 @@ export function MainNav(): JSX.Element {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
           {navItems.map((item) => {
-            const isActiveItem = item.href === '/'
-              ? pathname === '/'
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActiveItem = isNavItemActive(pathname, item.href);
             return (
               <DropdownMenuItem asChild key={item.href}>
                 <Link

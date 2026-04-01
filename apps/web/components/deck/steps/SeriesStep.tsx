@@ -54,7 +54,7 @@ export default function SeriesStep({
   };
 
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div className="border-b border-cobalt-900/60 last:border-b-0">
       <button
         onClick={() => onExpandChange(!expanded)}
         className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface transition-colors"
@@ -76,7 +76,7 @@ export default function SeriesStep({
       </button>
 
       {expanded && (
-        <div className="px-4 py-3 border-t border-border bg-surface-interactive/50 flex flex-col gap-3">
+        <div className="px-4 py-3 border-t border-cobalt-900/60 bg-surface-interactive/50 flex flex-col gap-3">
           {/* Any Series Toggle */}
           <div className="flex items-center gap-2">
             <input
@@ -84,7 +84,7 @@ export default function SeriesStep({
               id="any-series"
               checked={anySeriesMode}
               onChange={handleAnySeriesToggle}
-              className="w-4 h-4 rounded border border-border bg-surface-interactive cursor-pointer"
+              className="w-4 h-4 rounded border border-cobalt-900/70 bg-surface-interactive cursor-pointer"
             />
             <label htmlFor="any-series" className="text-sm text-foreground cursor-pointer font-medium">
               Any Series (default)
@@ -106,7 +106,7 @@ export default function SeriesStep({
                       'px-3 py-1.5 text-xs font-medium rounded-full border transition-all',
                       active
                         ? 'bg-cobalt-600 text-white border-cobalt-500 ring-2 ring-cobalt-400/40'
-                        : 'bg-surface-interactive border-border text-steel-600 hover:border-cobalt-400/40 hover:text-foreground',
+                        : 'bg-surface-interactive border-cobalt-900/70 text-steel-600 hover:border-cobalt-400/40 hover:text-foreground',
                       atMax ? 'opacity-40 cursor-not-allowed' : '',
                     )}
                     type="button"

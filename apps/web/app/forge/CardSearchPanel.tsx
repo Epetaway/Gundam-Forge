@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, Lightbulb, Edit } from 'lucide-react';
-import type { DeckIntent, CardDefinition, CardColor } from '@gundam-forge/shared';
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, Search, SlidersHorizontal, Sparkles, Tags, X, Zap } from 'lucide-react';
+import type { DeckIntent, CardDefinition } from '@gundam-forge/shared';
 import { sortCardsBySynergy, filterCardsByIntent, clearSynergyScoreCache } from '@gundam-forge/shared';
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
@@ -12,9 +12,9 @@ import { cn } from '@/lib/utils/cn';
 import { debounce } from '@/lib/utils/debounce';
 import { analyzeDeckIntent } from '@/lib/deck/analyzeDeckIntent';
 import { AdvancedSearchInput } from '@/components/search/AdvancedSearchInput';
-import { EffectKeywordPills } from '@/components/search/EffectKeywordPills';
 import { filterCardsAdvanced } from '@/lib/search/advancedCardFilter';
 import { getPopularEffects } from '@/lib/search/searchSuggestions';
+import DeckIntentBuilder from '@/components/deck/DeckIntentBuilder';
 
 const CARD_TYPES = ['All', 'Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 const CARD_COLORS = ['All', 'Red', 'Blue', 'Green', 'White', 'Purple', 'Colorless'];
@@ -32,6 +32,16 @@ const TYPE_ORDER = ['Unit', 'Pilot', 'Command', 'Base'];
 const EXCLUDED_SETS = new Set(['Token']);
 
 type GroupMode = 'none' | 'clan' | 'type';
+
+const FILTER_SECTIONS = [
+  { id: 'intent', label: 'Intent', icon: Sparkles },
+  { id: 'keywords', label: 'Keywords', icon: Tags },
+  { id: 'triggers', label: 'Triggers', icon: Zap },
+  { id: 'filters', label: 'Type/Color', icon: SlidersHorizontal },
+  { id: 'search', label: 'Search', icon: Search },
+] as const;
+
+type FilterSectionId = (typeof FILTER_SECTIONS)[number]['id'];
 
 type ScoredCard = CardDefinition & { synergyScore?: number; synergyReasons?: any[] };
 
@@ -397,16 +407,20 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
   const [previewCardId, setPreviewCardId] = useState<string | null>(null);
   const previewCard = previewCardId ? (allCards.find((c) => c.id === previewCardId) ?? null) : null;
 
-  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [intentEditorOpen, setIntentEditorOpen] = useState(false);
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const [activeFilterSection, setActiveFilterSection] = useState<FilterSectionId>('intent');
 
   const deckColors = deckIntent?.colors ?? [];
   const deckClans = deckIntent?.clans ?? [];
   const mechanicsPackages = deckIntent?.packages ?? [];
   const intentIncludeEX = deckIntent?.includeEX ?? false;
+  const effectiveDeckIntent: DeckIntent =
+    deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false };
 
   const [deckColorOnly, setDeckColorOnly] = useState(() => deckColors.length > 0);
   const [includeEX, setIncludeEX] = useState(intentIncludeEX);
+  const hasActiveFilters = rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX;
 
   // Group mode: auto-switch to 'clan' when deck has clans, user can override
   const [groupMode, setGroupMode] = useState<GroupMode>(() =>
@@ -448,9 +462,6 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
     setGroupMode(mode);
     setGroupModeOverridden(true);
   };
-
-  // ── Popular effect keywords for quick filtering ──────────────────────────
-  const popularEffects = useMemo(() => getPopularEffects(allCards, 12), []);
 
   // ── Deck intent analysis ──────────────────────────────────────────────────
   const deckAnalysis = useMemo(() => {
@@ -498,6 +509,9 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
   const showSynergy = mechanicsPackages.length > 0;
 
+  // ── Popular effect keywords for quick filtering (live with filters) ─────
+  const popularEffects = useMemo(() => getPopularEffects(filtered, 12), [filtered]);
+
   // ── Grouped results ──────────────────────────────────────────────────────
   const groupedResults = useMemo(() => {
     if (groupMode === 'none') return null;
@@ -540,455 +554,361 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
       aria-label="Card search panel"
     >
       {/* ── Filters + search ─────────────────────────────────────────────── */}
-      <div className="space-y-3 border-b border-border p-3" style={{ maxWidth: '100%' }}>
+      <div className="border-b border-border" style={{ maxWidth: '100%' }}>
 
-        {/* Active Filters Summary */}
-        {(rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX) && (
-          <div className="rounded-lg border border-cobalt-500/30 bg-cobalt-900/10 p-2 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground">Active Filters</span>
-              <button
-                type="button"
-                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
-                onClick={() => {
-                  setQuery('');
-                  setRawQuery('');
-                  setTypeFilter('All');
-                  setColorFilter('All');
-                  setSetFilter(initialSetId && SETS_LIST.includes(initialSetId) ? initialSetId : 'All');
-                  setKeywordFilters([]);
-                  setTriggerFilters([]);
-                  setEffectKeywordFilters([]);
-                  setDeckColorOnly(false);
-                  setIncludeEX(intentIncludeEX);
-                }}
-                title="Reset all filters"
-              >
-                Clear All
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {rawQuery && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  Search: &quot;{rawQuery.slice(0, 15)}{rawQuery.length > 15 ? '…' : ''}&quot;
-                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search">×</button>
-                </span>
-              )}
-              {typeFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  Type: {typeFilter}
-                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setTypeFilter('All')} aria-label="Clear type filter">×</button>
-                </span>
-              )}
-              {colorFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  Color: {colorFilter}
-                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setColorFilter('All')} aria-label="Clear color filter">×</button>
-                </span>
-              )}
-              {setFilter !== 'All' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  Set: {setFilter}
-                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setSetFilter('All')} aria-label="Clear set filter">×</button>
-                </span>
-              )}
-              {keywordFilters.map((kw) => (
-                <span key={kw} className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-600 border border-amber-500/30">
-                  {kw.replace('-', ' ')}
-                  <button type="button" className="hover:text-amber-700 transition-colors" onClick={() => setKeywordFilters(keywordFilters.filter((k) => k !== kw))} aria-label={`Clear ${kw} keyword filter`}>×</button>
-                </span>
-              ))}
-              {triggerFilters.map((tr) => (
-                <span key={tr} className="inline-flex items-center gap-1 rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs text-emerald-600 border border-emerald-500/30">
-                  {tr.replace('-', ' ')}
-                  <button type="button" className="hover:text-emerald-700 transition-colors" onClick={() => setTriggerFilters(triggerFilters.filter((t) => t !== tr))} aria-label={`Clear ${tr} trigger filter`}>×</button>
-                </span>
-              ))}
-              {effectKeywordFilters.map((effect) => (
-                <span key={effect} className="inline-flex items-center gap-1 rounded-full bg-purple-600/20 px-2 py-0.5 text-xs text-purple-600 border border-purple-500/30">
-                  {effect.replace('_', ' ')}
-                  <button type="button" className="hover:text-purple-700 transition-colors" onClick={() => setEffectKeywordFilters(effectKeywordFilters.filter((e) => e !== effect))} aria-label={`Clear ${effect} effect filter`}>×</button>
-                </span>
-              ))}
-              {deckColorOnly && deckColors.length > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  Deck colors only
-                  <button type="button" className="hover:text-cobalt-700 transition-colors" onClick={() => setDeckColorOnly(false)} aria-label="Disable deck colors filter">×</button>
-                </span>
-              )}
-              {includeEX && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-600/20 px-2 py-0.5 text-xs text-amber-600 border border-amber-500/30">
-                  EX cards shown
-                  <button type="button" className="hover:text-amber-700 transition-colors" onClick={() => setIncludeEX(false)} aria-label="Exclude EX cards">×</button>
-                </span>
-              )}
-            </div>
-          </div>
-        )}
+        {/* ── Top bar: toggle + active pill count ── */}
+        <div className="flex items-center justify-between gap-2 px-3 py-2">
+          <button
+            type="button"
+            onClick={() => setIsFilterMenuOpen((v) => !v)}
+            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive active:scale-95"
+            aria-expanded={isFilterMenuOpen}
+            aria-label="Toggle filters menu"
+          >
+            {isFilterMenuOpen ? <X className="h-3.5 w-3.5" /> : <Menu className="h-3.5 w-3.5" />}
+            <span>{isFilterMenuOpen ? 'Close Filters' : 'Filters'}</span>
+          </button>
 
-        {/* Intent Summary with Clans/Colors */}
-        {(deckColors.length > 0 || deckClans.length > 0) && (
-          <div className="rounded-lg border border-steel-700/50 bg-steel-900/20 p-2 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-foreground uppercase tracking-wider">Deck Intent</div>
-              {onIntentChange && (
-                <button
-                  type="button"
-                  className="flex items-center gap-1 text-xs text-foreground hover:text-cobalt-600 transition-colors"
-                  onClick={() => setIntentEditorOpen(!intentEditorOpen)}
-                  title="Edit deck intent"
-                >
-                  <Edit className="w-3 h-3" />
-                  Edit
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {deckClans.map((clan) => (
-                <span key={clan} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  {clan}
-                </span>
-              ))}
-              {deckColors.map((color) => (
-                <span key={color} className="inline-flex items-center rounded-full bg-cobalt-600/20 px-2 py-0.5 text-xs text-cobalt-500 border border-cobalt-500/40">
-                  {color}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Intent Editor & Suggestions */}
-        {onIntentChange && intentEditorOpen && (
-          <div className="rounded-lg border border-cobalt-600/50 bg-cobalt-900/20 p-3 space-y-3">
-            {/* Suggestions */}
-            {deckAnalysis && deckAnalysis.improvements.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-                  <Lightbulb className="w-3.5 h-3.5" />
-                  Suggestions (Confidence: {deckAnalysis.confidence}%)
-                </div>
-                <div className="space-y-1">
-                  {deckAnalysis.improvements.map((imp, i) => (
-                    <p key={i} className="text-xs text-foreground leading-relaxed">• {imp}</p>
-                  ))}
-                </div>
-                {deckAnalysis.confidence >= 70 && (
-                  <button
-                    type="button"
-                    className="w-full rounded border border-amber-600 bg-amber-600/20 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-600/30 transition-colors"
-                    onClick={() => {
-                      onIntentChange(deckAnalysis.suggestedIntent);
-                      setIntentEditorOpen(false);
-                    }}
-                  >
-                    Apply Suggested Intent
-                  </button>
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto scrollbar-none">
+            {hasActiveFilters ? (
+              <>
+                {rawQuery && (
+                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-cobalt-500/15 px-2 py-0.5 text-[11px] text-cobalt-200">
+                    &quot;{rawQuery.slice(0, 10)}{rawQuery.length > 10 ? '…' : ''}&quot;
+                    <button type="button" onClick={() => { setQuery(''); setRawQuery(''); }} aria-label="Clear search" className="ml-0.5 opacity-60 hover:opacity-100">×</button>
+                  </span>
                 )}
-              </div>
+                {deckColorOnly && (
+                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-cobalt-500/15 px-2 py-0.5 text-[11px] text-cobalt-200">
+                    Deck colors
+                    <button type="button" onClick={() => setDeckColorOnly(false)} aria-label="Clear deck color filter" className="ml-0.5 opacity-60 hover:opacity-100">×</button>
+                  </span>
+                )}
+                {[...keywordFilters, ...triggerFilters].map((f) => (
+                  <span key={f} className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-cobalt-500/15 px-2 py-0.5 text-[11px] text-cobalt-200">
+                    {f.replace('-', ' ')}
+                    <button type="button" onClick={() => {
+                      setKeywordFilters((ks) => ks.filter((k) => k !== f));
+                      setTriggerFilters((ts) => ts.filter((t) => t !== f));
+                    }} aria-label={`Clear ${f}`} className="ml-0.5 opacity-60 hover:opacity-100">×</button>
+                  </span>
+                ))}
+                {typeFilter !== 'All' && (
+                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-cobalt-500/15 px-2 py-0.5 text-[11px] text-cobalt-200">
+                    {typeFilter}
+                    <button type="button" onClick={() => setTypeFilter('All')} aria-label="Clear type filter" className="ml-0.5 opacity-60 hover:opacity-100">×</button>
+                  </span>
+                )}
+                {colorFilter !== 'All' && (
+                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-cobalt-500/15 px-2 py-0.5 text-[11px] text-cobalt-200">
+                    {colorFilter}
+                    <button type="button" onClick={() => setColorFilter('All')} aria-label="Clear color filter" className="ml-0.5 opacity-60 hover:opacity-100">×</button>
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="ml-auto shrink-0 text-[11px] text-text-secondary transition-colors hover:text-foreground"
+                  onClick={() => {
+                    setQuery(''); setRawQuery('');
+                    setTypeFilter('All'); setColorFilter('All');
+                    setSetFilter(initialSetId && SETS_LIST.includes(initialSetId) ? initialSetId : 'All');
+                    setKeywordFilters([]); setTriggerFilters([]);
+                    setEffectKeywordFilters([]); setDeckColorOnly(false);
+                    setIncludeEX(intentIncludeEX);
+                  }}
+                >
+                  Clear all
+                </button>
+              </>
+            ) : (
+              <span className="text-[11px] text-text-secondary">No active filters</span>
             )}
+          </div>
+        </div>
 
-            {/* Manual Color Selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Colors</label>
-              <div className="flex flex-wrap gap-1">
-                {CARD_COLORS.filter(c => c !== 'All').map((color) => {
-                  const active = deckColors.includes(color as CardColor);
-                  return (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => {
-                        const newColors = active
-                          ? deckColors.filter((c) => c !== color)
-                          : [...deckColors, color as CardColor];
-                        onIntentChange({ ...(deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), colors: newColors as CardColor[] });
-                      }}
-                      className={cn(
-                        'rounded px-2 py-1 text-xs font-medium transition-colors',
-                        active
-                          ? 'bg-cobalt-600 text-white'
-                          : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
-                      )}
-                      aria-pressed={active}
-                    >
-                      {color}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Manual Clan Selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Factions</label>
-              <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
-                {CLAN_OPTIONS.map((clan) => {
-                  const active = deckClans.includes(clan);
-                  return (
-                    <button
-                      key={clan}
-                      type="button"
-                      onClick={() => {
-                        const newClans = active
-                          ? deckClans.filter((c) => c !== clan)
-                          : [...deckClans, clan];
-                        onIntentChange({ ...(deckIntent ?? { clans: [], colors: [], packages: [], includeEX: false }), clans: newClans });
-                      }}
-                      className={cn(
-                        'rounded px-2 py-1 text-xs font-medium transition-colors',
-                        active
-                          ? 'bg-cobalt-600 text-white'
-                          : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
-                      )}
-                      aria-pressed={active}
-                    >
-                      {clan}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="w-full rounded border border-steel-600 bg-surface-interactive px-2 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-hover transition-colors"
-              onClick={() => setIntentEditorOpen(false)}
+        {/* ── Unified filter panel ── */}
+        {isFilterMenuOpen && (
+          <div className="border-t border-border">
+            {/* Icon tab strip */}
+            <nav
+              aria-label="Filter sections"
+              className="flex border-b border-border"
             >
-              Done
-            </button>
-          </div>
-        )}
-
-        {/* Deck-color quick filter */}
-        {deckColors.length > 0 && (
-          <button
-            type="button"
-            className={`w-full rounded border px-2 py-1 text-xs font-semibold transition-colors ${
-              deckColorOnly
-                ? 'border-cobalt-600 bg-cobalt-600 text-white'
-                : 'border-border bg-surface-interactive text-foreground hover:bg-surface'
-            }`}
-            onClick={() => setDeckColorOnly((v) => !v)}
-            aria-pressed={deckColorOnly}
-            title="Restrict results to your deck's colors"
-          >
-            {deckColorOnly ? '✓ Deck colors only' : 'Show deck colors only'}
-          </button>
-        )}
-
-        {/* Include EX toggle */}
-        <button
-          type="button"
-          className={`w-full rounded border px-2 py-1 text-xs font-semibold transition-colors ${
-            includeEX
-              ? 'border-amber-600 bg-amber-600/20 text-amber-600'
-              : 'border-border bg-surface-interactive text-foreground hover:bg-surface'
-          }`}
-          onClick={() => setIncludeEX((v) => !v)}
-          aria-pressed={includeEX}
-          title="Include EX Base and EX Resource cards in search results"
-        >
-          {includeEX ? '✓ EX cards shown' : 'Include EX cards'}
-        </button>
-
-        {/* Keywords Filter */}
-        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-foreground">Keywords</span>
-            {keywordFilters.length > 0 && (
-              <button
-                type="button"
-                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
-                onClick={() => setKeywordFilters([])}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {['blocker', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
-              const active = keywordFilters.includes(kw);
-              const colorMap: Record<string, { border: string; bg: string; text: string; hoverBg: string }> = {
-                'blocker': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-600', hoverBg: 'hover:bg-red-600/30' },
-                'high-maneuver': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-600', hoverBg: 'hover:bg-blue-600/30' },
-                'first-strike': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-600', hoverBg: 'hover:bg-amber-600/30' },
-                'breach': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-600', hoverBg: 'hover:bg-purple-600/30' },
-                'support': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-600', hoverBg: 'hover:bg-emerald-600/30' },
-                'repair': { border: 'border-green-600', bg: 'bg-green-600/20', text: 'text-green-600', hoverBg: 'hover:bg-green-600/30' },
-                'suppression': { border: 'border-slate-600', bg: 'bg-slate-600/20', text: 'text-slate-600', hoverBg: 'hover:bg-slate-600/30' },
-              };
-              const colors = colorMap[kw] || colorMap['blocker'];
-              return (
-                <button
-                  key={kw}
-                  type="button"
-                  onClick={() => {
-                    const next = active
-                      ? keywordFilters.filter((k) => k !== kw)
-                      : [...keywordFilters, kw];
-                    setKeywordFilters(next);
-                  }}
-                  className={cn(
-                    'rounded px-2 py-0.5 text-xs font-medium transition-colors border',
-                    active
-                      ? `${colors.border} ${colors.bg.replace('/20', '')} text-white`
-                      : `${colors.border} ${colors.bg} ${colors.text} ${colors.hoverBg}`,
-                  )}
-                  aria-pressed={active}
-                >
-                  {kw.replace('-', ' ')}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Triggers Filter */}
-        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/30 p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-foreground">Triggers</span>
-            {triggerFilters.length > 0 && (
-              <button
-                type="button"
-                className="text-xs text-foreground hover:text-cobalt-600 transition-colors"
-                onClick={() => setTriggerFilters([])}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {['burst', 'when-paired', 'during-pair', 'deploy', 'attack', 'when-linked', 'during-link'].map((tr) => {
-              const active = triggerFilters.includes(tr);
-              const triggerColorMap: Record<string, { border: string; bg: string; text: string; hoverBg: string }> = {
-                'burst': { border: 'border-red-600', bg: 'bg-red-600/20', text: 'text-red-600', hoverBg: 'hover:bg-red-600/30' },
-                'when-paired': { border: 'border-blue-600', bg: 'bg-blue-600/20', text: 'text-blue-600', hoverBg: 'hover:bg-blue-600/30' },
-                'during-pair': { border: 'border-cyan-600', bg: 'bg-cyan-600/20', text: 'text-cyan-600', hoverBg: 'hover:bg-cyan-600/30' },
-                'deploy': { border: 'border-emerald-600', bg: 'bg-emerald-600/20', text: 'text-emerald-600', hoverBg: 'hover:bg-emerald-600/30' },
-                'attack': { border: 'border-amber-600', bg: 'bg-amber-600/20', text: 'text-amber-600', hoverBg: 'hover:bg-amber-600/30' },
-                'when-linked': { border: 'border-purple-600', bg: 'bg-purple-600/20', text: 'text-purple-600', hoverBg: 'hover:bg-purple-600/30' },
-                'during-link': { border: 'border-indigo-600', bg: 'bg-indigo-600/20', text: 'text-indigo-600', hoverBg: 'hover:bg-indigo-600/30' },
-              };
-              const triggerColors = triggerColorMap[tr] || triggerColorMap['burst'];
-              return (
-                <button
-                  key={tr}
-                  type="button"
-                  onClick={() => {
-                    const next = active
-                      ? triggerFilters.filter((t) => t !== tr)
-                      : [...triggerFilters, tr];
-                    setTriggerFilters(next);
-                  }}
-                  className={cn(
-                    'rounded px-2 py-0.5 text-xs font-medium transition-colors border',
-                    active
-                      ? `${triggerColors.border} ${triggerColors.bg.replace('/20', '')} text-white`
-                      : `${triggerColors.border} ${triggerColors.bg} ${triggerColors.text} ${triggerColors.hoverBg}`,
-                  )}
-                  aria-pressed={active}
-                >
-                  {tr.replace('-', ' ')}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Advanced Filters Collapsible Section */}
-        <div className="rounded-lg border border-border bg-surface-interactive/30">
-          <button
-            type="button"
-            className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-surface-interactive/50 transition-colors"
-            onClick={() => setFiltersExpanded((v) => !v)}
-          >
-            <span className="text-xs font-semibold text-foreground">
-              {(() => {
-                const activeCount = (typeFilter !== 'All' ? 1 : 0) +
-                                   (colorFilter !== 'All' ? 1 : 0) +
-                                   (setFilter !== 'All' ? 1 : 0);
-                if (filtersExpanded) return 'Type · Color · Set';
-                if (activeCount > 0) return `Filters (${activeCount} active)`;
-                return 'Filters (Type · Color · Set)';
-              })()}
-            </span>
-            <ChevronDown
-              className={cn('w-4 h-4 text-foreground transition-transform duration-200', filtersExpanded ? 'rotate-180' : '')}
-            />
-          </button>
-
-          {filtersExpanded && (
-            <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
-              <div>
-                <span className="mb-1 block text-xs text-foreground" id="type-filter-label">Type</span>
-                <div className="flex flex-wrap gap-1" role="group" aria-labelledby="type-filter-label">
-                  {CARD_TYPES.map((t) => (
-                    <button
-                      key={t} type="button"
-                      className={`rounded border px-2 py-0.5 text-xs transition-colors ${typeFilter === t ? 'border-cobalt-600 bg-cobalt-600 text-white' : 'border-border bg-surface-interactive text-foreground hover:bg-surface'}`}
-                      onClick={() => setTypeFilter(t)} aria-pressed={typeFilter === t}
-                    >{t}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <span className="mb-1 block text-xs text-foreground" id="color-filter-label">Color</span>
-                <div className="flex flex-wrap gap-1" role="group" aria-labelledby="color-filter-label">
-                  {CARD_COLORS.map((c) => (
-                    <button
-                      key={c} type="button"
-                      className={`rounded border px-2 py-0.5 text-xs transition-colors ${colorFilter === c ? 'border-cobalt-600 bg-cobalt-600 text-white' : 'border-border bg-surface-interactive text-foreground hover:bg-surface'}`}
-                      onClick={() => setColorFilter(c)} aria-pressed={colorFilter === c}
-                    >{c}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-foreground" htmlFor="set-filter-select">Set</label>
-                <select
-                  id="set-filter-select"
-                  className="w-full rounded border border-border bg-surface p-1 text-xs outline-none focus-visible:border-ring"
-                  value={setFilter}
-                  onChange={(e) => setSetFilter(e.target.value)}
-                >
-                  {SETS_LIST.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Search (placed under filters by request) */}
-        <div className="space-y-2 rounded-lg border border-border bg-surface-interactive/20 p-2.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Search</p>
-          <AdvancedSearchInput
-            value={rawQuery}
-            onChange={(val) => { setRawQuery(val); debouncedSetQuery(val); }}
-            cards={allCards}
-            placeholder="Search cards... (try 'draw', 'Zeon', or 'deal damage')"
-            debounceMs={150}
-            showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
-          />
-
-          {popularEffects.length > 0 && (
-            <EffectKeywordPills
-              effects={popularEffects}
-              activeEffects={effectKeywordFilters}
-              onEffectClick={(effect) => {
-                setEffectKeywordFilters(prev =>
-                  prev.includes(effect)
-                    ? prev.filter(e => e !== effect)
-                    : [...prev, effect]
+              {FILTER_SECTIONS.map((section) => {
+                const Icon = section.icon;
+                const active = activeFilterSection === section.id;
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => setActiveFilterSection(section.id)}
+                    className={cn(
+                      'flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-semibold transition-colors',
+                      active
+                        ? 'border-b-2 border-cobalt-400 text-cobalt-200'
+                        : 'border-b-2 border-transparent text-text-secondary hover:text-foreground',
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="hidden xs:block sm:block">{section.label}</span>
+                  </button>
                 );
-              }}
-              maxVisible={10}
-            />
-          )}
-        </div>
+              })}
+            </nav>
 
-        {/* Results count + group mode toggle */}
-        <div className="flex items-center justify-between gap-2">
+            {/* Single content pane */}
+            <div className="p-3 pt-2.5">
+
+              {/* INTENT tab */}
+              {activeFilterSection === 'intent' && (
+                <div className="space-y-2.5">
+                  {(deckColors.length > 0 || deckClans.length > 0) ? (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Deck intent</span>
+                        {onIntentChange && (
+                          <button
+                            type="button"
+                            className="text-xs text-cobalt-300 transition-colors hover:text-cobalt-100"
+                            onClick={() => setIntentEditorOpen((o) => !o)}
+                          >
+                            {intentEditorOpen ? 'Done' : 'Edit'}
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {[...deckClans, ...deckColors].map((v) => (
+                          <span key={v} className="rounded-full bg-cobalt-500/14 px-2.5 py-0.5 text-xs text-cobalt-200">{v}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-text-secondary">No deck intent set.</p>
+                  )}
+
+                  {onIntentChange && intentEditorOpen && (
+                    <div className="space-y-2">
+                      {deckAnalysis && deckAnalysis.improvements.length > 0 && (
+                        <div className="space-y-1 rounded-md bg-amber-500/8 p-2">
+                          <p className="text-[11px] font-semibold text-amber-400">Suggestions ({deckAnalysis.confidence}% confidence)</p>
+                          {deckAnalysis.improvements.map((imp, i) => (
+                            <p key={i} className="text-xs text-foreground">• {imp}</p>
+                          ))}
+                          {deckAnalysis.confidence >= 50 && (
+                            <button
+                              type="button"
+                              className={cn(
+                                'mt-1 w-full rounded-md px-2 py-1.5 text-xs font-semibold transition-colors',
+                                deckAnalysis.confidence >= 70
+                                  ? 'bg-green-600/20 text-green-300 hover:bg-green-600/30'
+                                  : 'bg-amber-600/20 text-amber-300 hover:bg-amber-600/30',
+                              )}
+                              onClick={() => onIntentChange(deckAnalysis.suggestedIntent)}
+                            >
+                              {deckAnalysis.confidence >= 70 ? 'Apply strong suggestion' : 'Apply suggestion'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <DeckIntentBuilder
+                        initialIntent={effectiveDeckIntent}
+                        onIntentChange={onIntentChange}
+                        variant="inline"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-1.5">
+                    {deckColors.length > 0 && (
+                      <button
+                        type="button"
+                        className={cn(
+                          'w-full rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+                          deckColorOnly ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                        )}
+                        onClick={() => setDeckColorOnly((v) => !v)}
+                        aria-pressed={deckColorOnly}
+                      >
+                        {deckColorOnly ? '✓ Deck colors only' : 'Show deck colors only'}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className={cn(
+                        'w-full rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+                        includeEX ? 'bg-amber-600/20 text-amber-300' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                      )}
+                      onClick={() => setIncludeEX((v) => !v)}
+                      aria-pressed={includeEX}
+                    >
+                      {includeEX ? '✓ Include EX cards' : 'Include EX cards'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* KEYWORDS tab */}
+              {activeFilterSection === 'keywords' && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Keywords</span>
+                    {keywordFilters.length > 0 && (
+                      <button type="button" className="text-xs text-text-secondary hover:text-foreground" onClick={() => setKeywordFilters([])}>Clear</button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['blocker', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
+                      const active = keywordFilters.includes(kw);
+                      return (
+                        <button
+                          key={kw}
+                          type="button"
+                          onClick={() => setKeywordFilters((ks) => active ? ks.filter((k) => k !== kw) : [...ks, kw])}
+                          className={cn(
+                            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                            active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                          )}
+                          aria-pressed={active}
+                        >
+                          {kw.replace(/-/g, ' ')}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* TRIGGERS tab */}
+              {activeFilterSection === 'triggers' && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Triggers</span>
+                    {triggerFilters.length > 0 && (
+                      <button type="button" className="text-xs text-text-secondary hover:text-foreground" onClick={() => setTriggerFilters([])}>Clear</button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['burst', 'when-paired', 'during-pair', 'deploy', 'attack', 'when-linked', 'during-link'].map((tr) => {
+                      const active = triggerFilters.includes(tr);
+                      return (
+                        <button
+                          key={tr}
+                          type="button"
+                          onClick={() => setTriggerFilters((ts) => active ? ts.filter((t) => t !== tr) : [...ts, tr])}
+                          className={cn(
+                            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                            active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                          )}
+                          aria-pressed={active}
+                        >
+                          {tr.replace(/-/g, ' ')}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* TYPE/COLOR tab */}
+              {activeFilterSection === 'filters' && (
+                <div className="space-y-3">
+                  <div>
+                    <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Type</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CARD_TYPES.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          className={cn(
+                            'rounded-full px-3 py-1 text-xs transition-colors',
+                            typeFilter === t ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                          )}
+                          onClick={() => setTypeFilter(t)}
+                          aria-pressed={typeFilter === t}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Color</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CARD_COLORS.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          className={cn(
+                            'rounded-full px-3 py-1 text-xs transition-colors',
+                            colorFilter === c ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                          )}
+                          onClick={() => setColorFilter(c)}
+                          aria-pressed={colorFilter === c}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary" htmlFor="set-filter-select">Set</label>
+                    <select
+                      id="set-filter-select"
+                      className="w-full rounded-md bg-surface-interactive px-2.5 py-1.5 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500/30"
+                      value={setFilter}
+                      onChange={(e) => setSetFilter(e.target.value)}
+                    >
+                      {SETS_LIST.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* SEARCH tab */}
+              {activeFilterSection === 'search' && (
+                <div className="space-y-2">
+                  <AdvancedSearchInput
+                    value={rawQuery}
+                    onChange={(val) => { setRawQuery(val); debouncedSetQuery(val); }}
+                    cards={allCards}
+                    placeholder="Search cards, effects, factions…"
+                    debounceMs={150}
+                    showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
+                  />
+                  {popularEffects.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {popularEffects.slice(0, 6).map((effect) => {
+                        const active = effectKeywordFilters.includes(effect.value);
+                        return (
+                          <button
+                            key={effect.value}
+                            type="button"
+                            onClick={() => setEffectKeywordFilters((prev) =>
+                              prev.includes(effect.value) ? prev.filter((e) => e !== effect.value) : [...prev, effect.value]
+                            )}
+                            className={cn(
+                              'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
+                              active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
+                            )}
+                            aria-pressed={active}
+                          >
+                            {effect.label}
+                            <span className={cn('rounded px-1 py-px text-[9px] leading-none', active ? 'bg-white/15' : 'bg-surface text-text-secondary')}>
+                              {effect.count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Results bar ── */}
+        <div className="flex items-center justify-between gap-2 px-3 py-2">
           <p className="text-xs text-text-secondary" aria-live="polite">
             {filtered.length} card{filtered.length !== 1 ? 's' : ''}
           </p>

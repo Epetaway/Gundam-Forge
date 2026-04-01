@@ -42,7 +42,6 @@ export function CardContributionChart({ items, className }: CardContributionChar
       .slice(0, 6); // top 6 types
   }, [items]);
 
-  const maxCount = Math.max(1, ...typeCounts.map(([, n]) => n));
   const total = typeCounts.reduce((s, [, n]) => s + n, 0);
 
   if (typeCounts.length === 0) {
@@ -63,7 +62,7 @@ export function CardContributionChart({ items, className }: CardContributionChar
         const palette = TYPE_PALETTE[type];
         const fill  = palette?.fill ?? fallbackColor;
         const label = palette?.label ?? type;
-        const pct   = (count / maxCount) * 100;
+        const pct   = total > 0 ? (count / total) * 100 : 0;
         const share = total > 0 ? ((count / total) * 100).toFixed(0) : '0';
         const isHovered = hoveredType === type;
 
@@ -108,7 +107,7 @@ export function CardContributionChart({ items, className }: CardContributionChar
                   ease: [0.4, 0, 0.2, 1],
                 }}
                 aria-valuenow={count}
-                aria-valuemax={maxCount}
+                aria-valuemax={total}
                 role="progressbar"
                 aria-label={label}
               />

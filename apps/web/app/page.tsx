@@ -41,7 +41,7 @@ export default function HomePage(): JSX.Element {
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="primary">
-                <Link href="/decks/new">+ Create Deck</Link>
+                <Link href="/forge">+ Create Deck</Link>
               </Button>
               <Button asChild size="lg" variant="secondary">
                 <Link href="/cards">Browse Cards</Link>

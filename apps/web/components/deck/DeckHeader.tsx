@@ -54,50 +54,52 @@ export function DeckHeader({
     );
 
   return (
-    <header className="sticky top-16 z-20 border-b border-border bg-surface/95 backdrop-blur-md">
-      <div className="flex flex-col gap-3 py-4 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-2">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cobalt-300">
+    <header className="sticky top-16 z-20 border-b border-cobalt-900/60 bg-surface/95 backdrop-blur-md">
+      <div className="p-4 md:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cobalt-300">
             {eyebrow}
-          </p>
-          <h1 className="font-display text-3xl font-semibold uppercase tracking-[0.04em] text-foreground">
-            {name}
-          </h1>
-          {description && (
-            <p className="max-w-3xl text-sm text-steel-600">{description}</p>
-          )}
-          <div className="flex flex-wrap items-center gap-2">
-            {archetype && <Badge variant="accent">{archetype}</Badge>}
-            {colors.map((color) => (
-              <Badge key={color} variant="default">
-                {color}
-              </Badge>
-            ))}
-            <span className="text-xs text-steel-600">{totalCards} cards</span>
-            {owner && <span className="text-xs text-steel-600">by {owner}</span>}
+            </p>
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl font-semibold uppercase tracking-[0.06em] text-foreground md:text-4xl">
+                {name}
+              </h1>
+              {description && <p className="max-w-3xl text-sm text-steel-600">{description}</p>}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {archetype && <Badge variant="accent">{archetype}</Badge>}
+              {colors.map((color) => (
+                <Badge key={color} variant="default">
+                  {color}
+                </Badge>
+              ))}
+              <Badge variant="success">{totalCards} cards</Badge>
+              {owner ? <span className="text-xs text-steel-600">Pilot: {owner}</span> : null}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end sm:gap-2">
+            {children}
+            <Button asChild size="sm" variant="primary">
+              <Link href={`/decks/${deckId}/playtest`}>
+                <Swords className="mr-1.5 h-3.5 w-3.5" />
+                Playtest
+              </Link>
+            </Button>
+            <Button onClick={onShare} size="sm" variant="secondary">
+              <Share2 className="mr-1.5 h-3.5 w-3.5" />
+              Share
+            </Button>
+            <Button onClick={onExport} size="sm" variant="secondary">
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Export
+            </Button>
+            {actionLink}
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {children}
-          <Button asChild size="sm" variant="primary">
-            <Link href={`/decks/${deckId}/playtest`}>
-              <Swords className="mr-1.5 h-3.5 w-3.5" />
-              Playtest
-            </Link>
-          </Button>
-          <Button onClick={onShare} size="sm" variant="secondary">
-            <Share2 className="mr-1.5 h-3.5 w-3.5" />
-            Share
-          </Button>
-          <Button onClick={onExport} size="sm" variant="secondary">
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            Export
-          </Button>
-          {actionLink}
-        </div>
       </div>
-      {feedback ? <p className="pb-2 text-xs text-cobalt-300">{feedback}</p> : null}
+      {feedback ? <p className="pt-2 text-xs text-cobalt-300">{feedback}</p> : null}
     </header>
   );
 }

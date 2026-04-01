@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { X, Minus, Plus, ChevronLeft, ChevronRight, Copy, TrendingUp } from 'lucide-react';
-import type { CardDefinition } from '@gundam-forge/shared';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
@@ -11,8 +10,30 @@ import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { useSwipeToClose } from '@/lib/hooks/useSwipeToClose';
 import { features } from '@/lib/features/feature-flags';
 
+export interface CardDetailModalCard {
+  id: string;
+  name: string;
+  type: string;
+  color?: string;
+  cost?: number | string;
+  set?: string;
+  text?: string;
+  imageUrl?: string;
+  placeholderArt?: string;
+  ap?: number;
+  hp?: number;
+  level?: number;
+  apModifier?: number;
+  hpModifier?: number;
+  traits?: string[];
+  keywords?: string[];
+  triggers?: string[];
+  clans?: string[];
+  linkCondition?: string;
+}
+
 interface CardDetailModalProps {
-  card: CardDefinition | null;
+  card: CardDetailModalCard | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   // Context mode: 'deckbuilder' or 'cards'
@@ -22,7 +43,7 @@ interface CardDetailModalProps {
   onAdd?: () => void;
   onRemove?: () => void;
   // Navigation (for catalog preview)
-  allCards?: CardDefinition[];
+  allCards?: CardDetailModalCard[];
   onSelectCard?: (cardId: string) => void;
 }
 
@@ -99,15 +120,15 @@ export function CardDetailModal({
         <DialogOverlay />
         <DialogPrimitive.Content
           ref={contentRef}
-          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(820px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35 lg:w-[min(900px,88vw)]"
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(860px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35 sm:shadow-[0_24px_70px_rgba(2,6,23,0.65)] lg:w-[min(960px,88vw)]"
         >
         {card ? (
           <>
             {/* Header */}
-            <DialogHeader className="flex-shrink-0 border-b border-border bg-surface-muted px-4 py-3 md:px-6 md:py-4">
+            <DialogHeader className="flex-shrink-0 border-b border-border bg-gradient-to-r from-cobalt-950/40 via-surface-muted to-surface px-4 py-3 md:px-6 md:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <DialogTitle className="text-xl font-semibold md:text-2xl">
+                  <DialogTitle className="font-display text-2xl font-semibold uppercase tracking-wide md:text-3xl">
                     {card.name}
                     {/* Trending Badge (feature-flagged) */}
                     {features.trending() && (
@@ -120,6 +141,11 @@ export function CardDetailModal({
                   <DialogDescription className="mt-1 text-xs md:text-sm">
                     {card.id} • {card.color} • {card.type} • Cost {card.cost}
                   </DialogDescription>
+                  <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide">
+                    <span className="rounded border border-cobalt-400/40 bg-cobalt-500/15 px-2 py-0.5 text-cobalt-200">{card.type}</span>
+                    <span className="rounded border border-border bg-surface/70 px-2 py-0.5 text-steel-600">{card.color ?? 'Colorless'}</span>
+                    <span className="rounded border border-border bg-surface/70 px-2 py-0.5 text-steel-600">Set {card.set ?? 'Unknown'}</span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Copy Card ID Button (feature-flagged) */}
@@ -160,7 +186,7 @@ export function CardDetailModal({
               </div>
 
               {/* Details column - visible on all screens, scrollable on desktop */}
-              <div className="flex-1 space-y-4 bg-surface-muted/50 p-4 md:overflow-y-auto md:p-6">
+              <div className="flex-1 space-y-4 bg-gradient-to-b from-surface-muted/50 to-surface p-4 md:overflow-y-auto md:p-6">
                 {/* Type & Stats */}
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Type</p>

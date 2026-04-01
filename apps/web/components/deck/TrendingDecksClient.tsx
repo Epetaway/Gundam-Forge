@@ -25,7 +25,7 @@ export function TrendingDecksClient({ decks }: { decks: TrendingDeckData[] }) {
         <Layers className="mx-auto mb-3 h-8 w-8 text-steel-600" aria-hidden="true" />
         <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-3">No trending decks yet</p>
         <p className="text-sm text-steel-600 mb-4">Be the first to build a deck and contribute to the meta.</p>
-        <Link href="/decks/new">
+        <Link href="/forge">
           <Button size="sm" variant="primary">+ Create Deck</Button>
         </Link>
       </div>

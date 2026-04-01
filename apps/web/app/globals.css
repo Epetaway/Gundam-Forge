@@ -108,6 +108,43 @@
 }
 
 @layer components {
+  /* Global scrollbar skin to avoid default gray system bars on macOS/Chromium. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--accent) / 0.58) hsl(var(--surface-muted) / 0.45);
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: hsl(var(--surface-muted) / 0.42);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--accent) / 0.75),
+      hsl(217 91% 52% / 0.72)
+    );
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--accent) / 0.9),
+      hsl(217 91% 56% / 0.88)
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
   .panel-level-1 {
     @apply rounded-md border border-border bg-surface shadow-sm;
   }
@@ -122,6 +159,43 @@
 
   .industrial-divider {
     background-image: linear-gradient(to bottom, rgba(96, 165, 250, 0.24), transparent 55%);
+  }
+
+  /* Local scrollbar variant for heavy panes (create-deck aside, etc.). */
+  .scrollbar-modern {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--accent) / 0.68) hsl(var(--surface-muted) / 0.5);
+  }
+
+  .scrollbar-modern::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-track {
+    background: hsl(var(--surface-muted) / 0.5);
+    border-radius: 999px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--accent) / 0.82),
+      hsl(217 91% 54% / 0.8)
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--accent) / 0.96),
+      hsl(217 91% 58% / 0.92)
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
 }
 
