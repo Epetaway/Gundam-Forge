@@ -119,13 +119,17 @@ export function DeckPreviewCard({
               />
             ) : (
               <div className="h-6 w-6 rounded-full bg-white/20 border border-white/20 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" aria-hidden="true">
-                {author.charAt(0).toUpperCase()}
+                {author.substring(0, 2).charAt(0).toUpperCase() + author.substring(1, 2).toLowerCase()}
               </div>
             )}
             <span className="text-xs text-white/80 truncate">{author}</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-white/55 font-mono">
-            <span>{views.toLocaleString()} views</span>
+            {views < 5 ? (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-cobalt-600/60 border border-cobalt-400/40 text-cobalt-200 text-[10px] font-semibold uppercase tracking-wide">New</span>
+            ) : (
+              <span>{views.toLocaleString()} views</span>
+            )}
             <span aria-hidden="true">·</span>
             <span>{cardCount} cards</span>
             {updatedAgo ? (

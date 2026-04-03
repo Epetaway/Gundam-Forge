@@ -43,7 +43,7 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
       <footer className="border-t border-border bg-surface/90" style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))', paddingLeft: 'max(0px, env(safe-area-inset-left))', paddingRight: 'max(0px, env(safe-area-inset-right))' }}>
         <Container className="flex flex-col gap-3 py-6 text-xs text-steel-600 sm:flex-row sm:items-center sm:justify-between">
           <p>Built for high-velocity Gundam GCG deck iteration.</p>
-          <p className="font-mono uppercase tracking-[0.16em]">SSR first • Accessible • Tokenized</p>
+          <p className="font-mono uppercase tracking-[0.16em]">Fast · Free · Community-powered</p>
         </Container>
       </footer>
     </div>

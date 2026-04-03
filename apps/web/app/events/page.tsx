@@ -6,11 +6,14 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
+import { canLinkPlacementDeck, formatPlacementDeckLabel } from '@/lib/events/linking';
 import { rankArchetypes } from '@/lib/meta/engine';
 
 export default function EventsPage(): JSX.Element {
   const events = getEvents();
+  const knownDeckIds = new Set(getDecks().map((deck) => deck.id));
   const archetypeMeta = rankArchetypes(events).slice(0, 5);
   const latestEventDate = events[0]?.date ?? null;
 
@@ -52,7 +55,7 @@ export default function EventsPage(): JSX.Element {
                             {placement.placement <= 3 ? <Medal className="h-4 w-4 text-amber-300" /> : <Trophy className="h-4 w-4 text-steel-500" />}
                             #{placement.placement} {placement.player}
                           </p>
-                          <p className="text-xs text-steel-600">{placement.deckName} • {placement.archetype}</p>
+                          <p className="text-xs text-steel-600">{formatPlacementDeckLabel(placement.deckName, placement.archetype)}</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="accent">{placement.wins}-{placement.losses}-{placement.draws}</Badge>
@@ -60,9 +63,15 @@ export default function EventsPage(): JSX.Element {
                             {getWinRateIcon(placement.wins, placement.losses, placement.draws)}
                             {formatMatchWinRate(placement.wins, placement.losses, placement.draws)}
                           </span>
-                          <Button asChild size="sm" variant="secondary">
-                            <Link href={`/decks/${placement.deckId}`}>Deck</Link>
-                          </Button>
+                          {canLinkPlacementDeck(placement.deckId, knownDeckIds) ? (
+                            <Button asChild size="sm" variant="secondary">
+                              <Link href={`/decks/${placement.deckId}`}>Deck</Link>
+                            </Button>
+                          ) : (
+                            <span className="inline-flex items-center rounded border border-border px-2 py-1 text-[11px] text-steel-600">
+                              Archetype only
+                            </span>
+                          )}
                         </div>
                       </div>
                     </li>

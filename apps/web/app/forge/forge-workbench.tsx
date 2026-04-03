@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Printer, Swords } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, AlignLeft, Settings, X, Download, Search, Save, Printer, Swords, AlertTriangle } from 'lucide-react';
 import { DeckToolbar, type DeckToolbarViewOption } from '@/components/deck/DeckToolbar';
 import { DeckListRenderer } from '@/components/deck/DeckListRenderer';
 import { CardViewerModal } from '@/components/deck/CardViewerModal';
@@ -1024,9 +1024,25 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
 export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<ForgeWorkbenchProps, 'cards'>): JSX.Element | null {
   const [importOpen, setImportOpen] = React.useState(false);
+  const [warningDismissed, setWarningDismissed] = React.useState(false);
 
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => { setMounted(true); }, []);
+
+  React.useEffect(() => {
+    try {
+      if (localStorage.getItem('gundam-forge.forge.localWarningDismissed') === 'true') {
+        setWarningDismissed(true);
+      }
+    } catch {
+      setWarningDismissed(false);
+    }
+  }, []);
+
+  const dismissWarning = React.useCallback(() => {
+    setWarningDismissed(true);
+    try { localStorage.setItem('gundam-forge.forge.localWarningDismissed', 'true'); } catch { /* ignore */ }
+  }, []);
 
   const [deckMeta, setDeckMeta] = React.useState({
     name: 'Untitled Deck',
@@ -1519,6 +1535,25 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
             ]}
           />
         </div>
+
+        {!warningDismissed && (
+          <div className="mx-3 mt-3 flex items-start gap-2.5 rounded-lg border border-amber-500/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-200 md:mx-4">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+            <p className="flex-1 leading-relaxed">
+              <span className="font-semibold">Decks are saved locally.</span>{' '}
+              Clearing browser data or switching devices will erase your decks. Use{' '}
+              <span className="font-semibold">Export</span> to back up.
+            </p>
+            <button
+              type="button"
+              onClick={dismissWarning}
+              className="ml-1 shrink-0 rounded p-0.5 text-amber-400/70 transition-colors hover:text-amber-300"
+              aria-label="Dismiss warning"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Deck settings bar with live validation */}
         {deckSettingsBar}

@@ -10,6 +10,15 @@ const nextConfig = {
   poweredByHeader: false,
   ...(useBasePath ? { basePath: normalizedBasePath, assetPrefix: normalizedBasePath } : {}),
   ...(isStaticExport ? { output: 'export' } : {}),
+    async redirects() {
+      return [
+        {
+          source: '/explore',
+          destination: '/decks',
+          permanent: true,
+        },
+      ];
+    },
   images: {
     ...(isStaticExport ? { unoptimized: true } : {}),
     remotePatterns: [

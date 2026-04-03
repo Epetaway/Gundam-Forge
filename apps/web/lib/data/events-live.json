@@ -49,9 +49,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Muskrat",
         "placement": 5,
         "wins": 3,
@@ -130,9 +130,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Dinodast",
         "placement": 4,
         "wins": 2,
@@ -282,9 +282,9 @@
     "playerCount": 16,
     "placements": [
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "KotyAngeloff",
         "placement": 1,
         "wins": 4,
@@ -302,9 +302,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Muskrat",
         "placement": 3,
         "wins": 3,
@@ -332,9 +332,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "sourmango",
         "placement": 6,
         "wins": 2,
@@ -423,9 +423,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "alastor_92",
         "placement": 6,
         "wins": 3,
@@ -474,9 +474,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Sekardblue",
         "placement": 2,
         "wins": 6,
@@ -494,9 +494,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Koreatwo",
         "placement": 4,
         "wins": 5,
@@ -605,9 +605,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "sourmango",
         "placement": 6,
         "wins": 3,
@@ -656,9 +656,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "sourmango",
         "placement": 2,
         "wins": 3,
@@ -666,9 +666,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "kiiyo",
         "placement": 3,
         "wins": 3,
@@ -676,9 +676,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "type82c",
         "placement": 4,
         "wins": 3,
@@ -696,9 +696,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Nova2",
         "placement": 6,
         "wins": 2,
@@ -716,9 +716,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "danieluzi",
         "placement": 8,
         "wins": 1,
@@ -767,9 +767,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Gallet",
         "placement": 4,
         "wins": 3,
@@ -777,9 +777,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Ipixx",
         "placement": 5,
         "wins": 3,
@@ -797,9 +797,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "KotyAngeloff",
         "placement": 7,
         "wins": 3,
@@ -979,9 +979,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Robert Gherrity",
         "placement": 7,
         "wins": 1,
@@ -1010,9 +1010,9 @@
     "playerCount": 9,
     "placements": [
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Gallet",
         "placement": 1,
         "wins": 4,
@@ -1020,9 +1020,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Ystesia",
         "placement": 2,
         "wins": 3,
@@ -1030,9 +1030,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "type82c",
         "placement": 3,
         "wins": 3,
@@ -1040,9 +1040,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "danieluzi",
         "placement": 4,
         "wins": 3,
@@ -1050,9 +1050,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "kiiyo",
         "placement": 5,
         "wins": 2,
@@ -1070,9 +1070,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "kagarithewize",
         "placement": 7,
         "wins": 1,
@@ -1080,9 +1080,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Koujex",
         "placement": 8,
         "wins": 1,
@@ -1111,9 +1111,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "KotyAngeloff",
         "placement": 2,
         "wins": 7,
@@ -1131,9 +1131,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Mariamne",
         "placement": 4,
         "wins": 5,
@@ -1252,9 +1252,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "ChaChi",
         "placement": 7,
         "wins": 2,
@@ -1293,9 +1293,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "CalebWhite",
         "placement": 2,
         "wins": 3,
@@ -1333,9 +1333,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "KingBirry",
         "placement": 6,
         "wins": 2,
@@ -1353,9 +1353,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Geicokiller",
         "placement": 8,
         "wins": 1,
@@ -1465,9 +1465,9 @@
     "playerCount": 19,
     "placements": [
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Michae1",
         "placement": 1,
         "wins": 4,
@@ -1495,9 +1495,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Mariamne",
         "placement": 4,
         "wins": 3,
@@ -1535,9 +1535,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "JethroBodeen",
         "placement": 8,
         "wins": 2,
@@ -1839,9 +1839,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "Rixter117",
         "placement": 2,
         "wins": 6,
@@ -1970,9 +1970,9 @@
         "draws": 0
       },
       {
-        "deckId": "other",
-        "deckName": "Other",
-        "archetype": "Other",
+        "deckId": "rogue-unclassified",
+        "deckName": "Rogue / Unclassified",
+        "archetype": "Rogue / Unclassified",
         "player": "SerUrso",
         "placement": 6,
         "wins": 2,
