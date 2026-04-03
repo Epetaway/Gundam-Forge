@@ -4,10 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
+import { isFeatureEnabled } from '@/lib/config/features';
 
 export function UserMenu(): JSX.Element {
+  const authEnabled = isFeatureEnabled('authEnabled');
   const { user, loading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (!authEnabled) {
+    return <></>;
+  }
 
   if (loading) {
     return (

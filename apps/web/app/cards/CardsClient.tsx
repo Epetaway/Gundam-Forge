@@ -32,6 +32,15 @@ const COLOR_PILL_ACTIVE_CLASSES: Record<CardColor, string> = {
   Colorless: 'bg-steel-600 text-white border-steel-500',
 };
 
+const COLOR_DOT_CLASSES: Record<CardColor, string> = {
+  Blue: 'bg-cobalt-400',
+  Green: 'bg-green-400',
+  Red: 'bg-red-400',
+  White: 'bg-steel-300',
+  Purple: 'bg-purple-400',
+  Colorless: 'bg-steel-500',
+};
+
 type CatalogView = 'grid' | 'list';
 type SortKey = 'name' | 'cost-asc' | 'cost-desc' | 'set';
 
@@ -276,9 +285,28 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     ],
   );
 
-  const { data: cardsResult } = useCardsQuery({ filters, initialData: initialCards });
+  const {
+    data: cardsResult,
+    isFetching,
+    isError,
+    refetch,
+  } = useCardsQuery({ filters, initialData: initialCards });
   const filtered = useMemo(() => getCardsFromSource(initialCards, filters), [initialCards, filters]);
   const serverTotal = cardsResult?.total;
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!isFetching) {
+      setTimedOut(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setTimedOut(true);
+    }, 5000);
+
+    return () => window.clearTimeout(timeout);
+  }, [isFetching]);
 
   const sorted = useMemo(() => sortCards(filtered, sortBy), [filtered, sortBy]);
   const pageSize = view === 'grid' ? GRID_PAGE_SIZE : LIST_PAGE_SIZE;
@@ -644,6 +672,15 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       ) : null}
 
       <Container className="py-4" wide>
+        {(timedOut || isError) && sorted.length === 0 ? (
+          <div className="mb-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-300">
+            <p>Cards failed to load. Retry?</p>
+            <Button className="mt-2" onClick={() => { setTimedOut(false); void refetch(); }} size="sm" variant="secondary">
+              Retry
+            </Button>
+          </div>
+        ) : null}
+
         {sorted.length === 0 ? (
           <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
             No cards match the active filters.
@@ -752,7 +789,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                           }));
                         }}
                       >
-                        {c} ({colorCounts.get(c) ?? 0})
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className={cn('h-2 w-2 rounded-full ring-1 ring-black/25', COLOR_DOT_CLASSES[c])} aria-hidden="true" />
+                          {c} ({colorCounts.get(c) ?? 0})
+                        </span>
                       </button>
                     );
                   })}

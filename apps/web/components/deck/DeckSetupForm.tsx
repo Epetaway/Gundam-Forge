@@ -31,10 +31,10 @@ const FIELD_CLASS =
 const SECTION_CLASS = 'space-y-3 rounded-lg bg-surface/30 p-3';
 
 const FORM_SECTIONS = [
-  { id: 'setup-basics', label: 'Basics', icon: Target },
-  { id: 'setup-intent', label: 'Intent', icon: Sparkles },
-  { id: 'setup-starter', label: 'Starter', icon: WandSparkles },
-  { id: 'setup-import', label: 'Import', icon: FileInput },
+  { id: 'setup-basics',  label: 'Basics',  desc: 'Name & format',           icon: Target,       optional: false },
+  { id: 'setup-intent',  label: 'Intent',  desc: 'Playstyle focus',          icon: Sparkles,     optional: true  },
+  { id: 'setup-starter', label: 'Starter', desc: 'Pick a template',          icon: WandSparkles, optional: true  },
+  { id: 'setup-import',  label: 'Import',  desc: 'Paste a list',             icon: FileInput,    optional: true  },
 ] as const;
 
 type FormSectionId = (typeof FORM_SECTIONS)[number]['id'];
@@ -157,7 +157,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <nav aria-label="Create deck sections" className="grid grid-cols-4 gap-1.5 rounded-lg bg-surface/30 p-1.5">
-        {FORM_SECTIONS.map((section) => {
+        {FORM_SECTIONS.map((section, idx) => {
           const Icon = section.icon;
           const active = activeSection === section.id;
           return (
@@ -165,13 +165,17 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
               key={section.id}
               type="button"
               onClick={() => setActiveSection(section.id)}
+              title={section.desc}
               className={cn(
                 'inline-flex flex-col items-center justify-center gap-1 rounded-md px-2 py-2 text-[11px] font-semibold transition-colors',
                 active ? 'bg-cobalt-500/18 text-cobalt-100' : 'text-steel-500 hover:text-foreground',
               )}
             >
               <Icon className="h-3.5 w-3.5" />
-              {section.label}
+              <span className="leading-none">{section.label}</span>
+              <span className={cn('text-[9px] font-normal leading-none', active ? 'text-cobalt-300/80' : 'text-steel-600')}>
+                {section.optional ? 'optional' : `step ${idx + 1}`}
+              </span>
             </button>
           );
         })}

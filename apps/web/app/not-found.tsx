@@ -8,11 +8,16 @@ export default function NotFound(): JSX.Element {
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-muted">404</p>
       <h1 className="font-display text-4xl font-semibold">Route not found</h1>
       <p className="max-w-reading text-sm text-text-muted">
-        The UI layer has been rebuilt. This route may no longer exist in the new architecture.
+        That page does not exist. It may have moved or the link may be broken.
       </p>
-      <Button asChild>
-        <Link href="/">Return to home</Link>
-      </Button>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Button asChild>
+          <Link href="/">Return to home</Link>
+        </Button>
+        <Button asChild variant="secondary">
+          <Link href="/decks">Browse Decks</Link>
+        </Button>
+      </div>
     </Container>
   );
 }

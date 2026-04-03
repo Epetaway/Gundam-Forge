@@ -90,7 +90,7 @@ export async function getUserDecks(userId: string): Promise<{ data: Deck[] | nul
 }
 
 /**
- * Get public decks for Explore page
+ * Get public decks for the deck browser page
  */
 export async function getPublicDecks(limit: number = 50): Promise<{ data: Deck[] | null; error: string | null }> {
   if (!supabase) {

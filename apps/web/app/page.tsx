@@ -16,7 +16,7 @@ export default function HomePage(): JSX.Element {
   const decks = getDecks();
   const events = getEvents();
   const allArchetypes = rankArchetypes(events);
-  const trendingDecks = rankTrendingDecks(decks, events, 3);
+  const trendingDecks = rankTrendingDecks(decks, events, 6);
   const archetypes = allArchetypes.slice(0, 6);
   const colorDistribution = getColorDistribution(events, decks);
   const latestEventDate = events[0]?.date ?? null;
@@ -65,9 +65,9 @@ export default function HomePage(): JSX.Element {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="Decks Indexed" value={`${decks.length}`} />
+                <Stat label="Decks Indexed" value={`${decks.length}`} hint="Growing weekly" />
                 <Stat label="Cards in Pool" value={`${cards.length}`} />
-                <Stat label="Events Tracked" value={`${events.length}`} />
+                <Stat label="Events Tracked" value={`${events.length}`} hint={latestEventDate ? `Last updated ${latestEventDate}` : undefined} />
                 <Stat label="Archetypes" value={`${allArchetypes.length}`} />
               </div>
               <p className="text-[11px] text-text-muted">
@@ -78,12 +78,40 @@ export default function HomePage(): JSX.Element {
         </Container>
       </section>
 
+      <section className="py-10">
+        <Container>
+          <Card className="bg-surface-elevated border-cobalt-500/30">
+            <CardHeader>
+              <CardTitle>New to Gundam Forge?</CardTitle>
+              <CardDescription>Three quick steps from card pool to match-ready deck.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-md border border-border bg-surface-interactive p-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-cobalt-400">Step 1</p>
+                <p className="mt-1 text-sm font-semibold">Browse Cards</p>
+                <p className="mt-1 text-xs text-text-muted">Find legal units, pilots, and commands before committing to an archetype.</p>
+              </div>
+              <div className="rounded-md border border-border bg-surface-interactive p-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-cobalt-400">Step 2</p>
+                <p className="mt-1 text-sm font-semibold">Build in Forge</p>
+                <p className="mt-1 text-xs text-text-muted">Assemble a 50-card list with live validation and starter templates.</p>
+              </div>
+              <div className="rounded-md border border-border bg-surface-interactive p-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-cobalt-400">Step 3</p>
+                <p className="mt-1 text-sm font-semibold">Playtest & Compete</p>
+                <p className="mt-1 text-xs text-text-muted">Test matchup flow, then compare your build against event-proven decks.</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Container>
+      </section>
+
       <section className="py-12">
         <Container className="space-y-5">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-display text-2xl font-semibold">Trending Decks</h2>
             <Button asChild size="sm" variant="secondary">
-              <Link href="/explore">See all decks</Link>
+              <Link href="/decks">See all decks</Link>
             </Button>
           </div>
           <TrendingDecksClient
@@ -149,7 +177,7 @@ export default function HomePage(): JSX.Element {
                   Test any deck against an AI opponent using the full official GCG ruleset — phases, combat, triggers, and all official keywords.
                 </CardDescription>
                 <Button asChild className="w-full" variant="secondary">
-                  <Link href="/decks">Choose a Deck →</Link>
+                  <Link href="/decks?action=playtest">Choose a Deck →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -205,7 +233,12 @@ export default function HomePage(): JSX.Element {
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="font-mono text-[10px] tabular-nums text-text-muted w-4 shrink-0">#{idx + 1}</span>
-                        <p className="text-sm font-semibold truncate">{record.archetype}</p>
+                        <p
+                          className="text-sm font-semibold truncate"
+                          title={record.archetype === 'Rogue / Unclassified' ? 'Decks that don\'t fit established archetypes' : undefined}
+                        >
+                          {record.archetype}
+                        </p>
                         <ArchetypeBadge archetype={record.archetype} />
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -254,7 +287,7 @@ export default function HomePage(): JSX.Element {
                       </span>
                       <span className="font-mono text-text-muted">{(share * 100).toFixed(1)}%</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-surface-muted overflow-hidden">
+                    <div className="h-3 rounded-full bg-surface-muted overflow-hidden">
                       <div
                         className="h-full rounded-full"
                         style={{ width: `${(share * 100).toFixed(1)}%`, backgroundColor: CARD_COLOR_HEX[color] ?? '#9aa9bf' }}
@@ -271,11 +304,12 @@ export default function HomePage(): JSX.Element {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }): JSX.Element {
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {
   return (
     <div className="rounded-md border border-border bg-surface-interactive px-3 py-2">
       <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-muted">{label}</p>
       <p className="mt-1 font-display text-xl font-semibold text-foreground">{value}</p>
+      {hint ? <p className="mt-0.5 text-[10px] text-text-muted">{hint}</p> : null}
     </div>
   );
 }
@@ -288,6 +322,7 @@ const ARCHETYPE_TYPE_STYLES: Array<[RegExp, string]> = [
   [/combo|link|pair/i, 'bg-amber-500/15 text-amber-400 border-amber-500/20'],
   [/burn/i, 'bg-red-500/15 text-red-400 border-red-500/20'],
   [/toolbox|toolkit/i, 'bg-steel-400/15 text-steel-600 border-steel-400/20'],
+  [/rogue|unclassified/i, 'bg-steel-400/15 text-steel-500 border-steel-400/20'],
 ];
 
 function detectArchetypeType(name: string): string {

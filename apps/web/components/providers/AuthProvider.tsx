@@ -6,6 +6,7 @@ import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 import { getUnsyncedDecks, downloadDecksFromServer } from '@/lib/deck/sync-engine';
 import { DeckSyncPrompt } from '@/components/deck/DeckSyncPrompt';
+import { isFeatureEnabled } from '@/lib/config/features';
 
 interface AuthContextType {
   user: User | null;
@@ -30,6 +31,8 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
+  const authEnabled = isFeatureEnabled('authEnabled');
+  const cloudDeckSyncEnabled = isFeatureEnabled('cloudDeckSyncEnabled');
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +41,11 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const router = useRouter();
 
   useEffect(() => {
+    if (!authEnabled) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     const initializeAuth = async () => {
       if (!supabase) {
@@ -67,7 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         setUser(currentSession?.user ?? null);
 
         // Handle sign in: check for local decks to sync and download server decks
-        if (event === 'SIGNED_IN' && currentSession?.user) {
+        if (event === 'SIGNED_IN' && currentSession?.user && cloudDeckSyncEnabled) {
           // Check for unsynced local decks
           const unsyncedDecks = getUnsyncedDecks();
           if (unsyncedDecks.length > 0) {
@@ -91,10 +99,10 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, authEnabled, cloudDeckSyncEnabled]);
 
   const handleSignOut = async () => {
-    if (!supabase) return;
+    if (!authEnabled || !supabase) return;
 
     await supabase.auth.signOut();
     router.push('/');
@@ -111,7 +119,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   return (
     <AuthContext.Provider value={value}>
       {children}
-      {showSyncPrompt && (
+      {cloudDeckSyncEnabled && showSyncPrompt && (
         <DeckSyncPrompt
           deckCount={unsyncedCount}
           onComplete={() => {
