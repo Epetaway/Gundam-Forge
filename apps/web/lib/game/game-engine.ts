@@ -1223,13 +1223,13 @@ export class GameEngine {
           revealedShieldIds.push(shield.cardId);
         }
 
-        // If Suppression destroyed all shields and there was overflow, remainder hits base
+        // Suppression tried to destroy 2 shields but only 1 remained — leftover hits base for 1
         if (hasSupression && shieldsToDestroy > count) {
-          defender.baseHealth -= damageAmount;
+          defender.baseHealth -= 1;
         }
       } else {
-        // No shields remain — damage hits the base directly
-        defender.baseHealth -= damageAmount;
+        // No shields remain — each unblocked attack deals exactly 1 damage to the base (GCG rule)
+        defender.baseHealth -= 1;
       }
     }
 

@@ -1,4 +1,5 @@
-import { apiOk, apiError } from '@/lib/api/server';
+import { DeckAnalyticsCardsResponseSchema } from '@gundam-forge/shared';
+import { apiError, apiOk, enforceContract, toApiErrorResponse } from '@/lib/api/server';
 import { supabase } from '@/lib/supabase/client';
 import { getDecks } from '@/lib/data/decks';
 
@@ -58,10 +59,16 @@ export async function GET(
       trendDirection: row.trend_direction as 'up' | 'flat' | 'down',
     }));
 
-    return apiOk({ cards }, request, {
+    const response = enforceContract(
+      DeckAnalyticsCardsResponseSchema,
+      { cards },
+      '/api/deck-analytics/[id]/cards',
+    );
+
+    return apiOk(response, request, {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
     });
-  } catch {
-    return apiError('Internal error', 500, request);
+  } catch (err) {
+    return toApiErrorResponse('/api/deck-analytics/[id]/cards', err, request);
   }
 }

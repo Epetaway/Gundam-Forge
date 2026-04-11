@@ -24,9 +24,13 @@
     "pipeline:list": "tsx scripts/run-pipeline.ts --list",
     "pipeline:all": "tsx scripts/run-pipeline.ts --all",
     "test": "vitest run",
+    "test:contracts": "vitest run apps/web/lib/api/contracts.test.ts apps/web/lib/api/contract-fixtures.test.ts apps/web/app/api/core-routes.test.ts apps/web/app/api/playtester/playtester-routes.test.ts apps/web/lib/playtester/replay-repository.test.ts",
+    "test:smoke": "npm run test:contracts && npm test -- apps/web/lib/decks/browser.test.ts apps/web/lib/filters/__tests__/cardsUxV2.test.ts apps/web/lib/playtester/assist.test.ts apps/web/components/cards/CardsFilterApplyBar.test.tsx apps/web/components/playtest/PlaytesterAssistBanner.test.tsx && npm run qa",
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "jsdom": "^29.0.2",
     "playwright": "^1.58.2",
     "tsx": "^4.21.0",
     "vitest": "^4.0.18",

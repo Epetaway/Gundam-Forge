@@ -1,4 +1,5 @@
-import { apiOk, toApiErrorResponse } from '@/lib/api/server';
+import { CardsApiResponseSchema, CardsQuerySchema } from '@gundam-forge/shared';
+import { apiOk, enforceContract, parseRequestContract, toApiErrorResponse } from '@/lib/api/server';
 import { getCardList } from '@/lib/data/cards';
 import { filtersFromSearchParams } from '@/lib/filters/cardFilters';
 
@@ -7,10 +8,23 @@ export const revalidate = false;
 
 function parseQueryParams(searchParams: URLSearchParams) {
   const filters = filtersFromSearchParams(searchParams);
-  const q = searchParams.get('q') ?? undefined;
-  const limit = parseInt(searchParams.get('limit') || '30', 10);
-  const cursor = searchParams.get('cursor') || undefined;
-  const excludeTypes = searchParams.get('excludeTypes')?.split(',') || [];
+
+  const parsedQuery = parseRequestContract(
+    CardsQuerySchema,
+    {
+    q: searchParams.get('q') ?? undefined,
+    limit: searchParams.get('limit') ?? undefined,
+    cursor: searchParams.get('cursor') ?? undefined,
+    excludeTypes: searchParams.get('excludeTypes') ?? undefined,
+    },
+    '/api/cards',
+  );
+
+  const q = parsedQuery.q;
+  const limit = parsedQuery.limit;
+  const cursor = parsedQuery.cursor;
+  const excludeTypes = parsedQuery.excludeTypes ?? [];
+
   return { q, limit, cursor, excludeTypes, filters };
 }
 
@@ -20,7 +34,8 @@ export async function GET(request: Request): Promise<Response> {
     const { q, limit, cursor, excludeTypes, filters } = parseQueryParams(searchParams);
     const { results, nextCursor, total } = getCardList({ q, limit, cursor, excludeTypes, ...filters });
 
-    return apiOk(
+    const response = enforceContract(
+      CardsApiResponseSchema,
       {
         cards: results,
         nextCursor,
@@ -28,8 +43,10 @@ export async function GET(request: Request): Promise<Response> {
         limit,
         appliedFilters: filters,
       },
-      request,
+      '/api/cards',
     );
+
+    return apiOk(response, request);
   } catch (error) {
     return toApiErrorResponse('/api/cards', error, request);
   }

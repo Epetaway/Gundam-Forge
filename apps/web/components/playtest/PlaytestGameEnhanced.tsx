@@ -22,11 +22,28 @@ import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { useSoundEffects } from '@/lib/hooks/useSoundEffects';
 import { PhaseIndicator } from './PhaseIndicator';
 import { KeyboardShortcutsLegend } from './KeyboardShortcutsLegend';
+import { PlaytesterAssistBanner } from './PlaytesterAssistBanner';
 import { DragDropProvider } from '@/lib/hooks/DragDropContext';
 import type { GameState, GameAction, CardInstance, DeckDefinition } from '@/lib/game/game-engine';
 import type { DeckRecord } from '@/lib/data/decks';
 import { getStarterDeckTemplates } from '@/lib/deck/starterTemplates';
 import { downloadPlayingCardsDeckExport } from '@/lib/export/playingCards';
+import { features } from '@/lib/features/feature-flags';
+import { getPlaytesterAssistHint } from '@/lib/playtester/assist';
+import {
+  AlertTriangle,
+  Coins,
+  Clock,
+  Timer,
+  Moon,
+  LayoutGrid,
+  Swords,
+  Castle,
+  RefreshCw,
+  PackageOpen,
+  Flag,
+  X,
+} from 'lucide-react';
 
 interface PlaytestGameEnhancedProps {
   playerDeck: DeckRecord;
@@ -123,6 +140,7 @@ export function PlaytestGameEnhanced({
   cardDatabase,
   onGameEnd,
 }: PlaytestGameEnhancedProps) {
+  const playtesterAssistV2Enabled = features.playtesterAssistV2();
   const CONTROLS_TOAST_KEY = 'gf.playtest.controlsToastDismissed.v1';
 
   // Game State
@@ -130,6 +148,70 @@ export function PlaytestGameEnhanced({
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Misplay error toast — richer than the generic error string
+  const [misplayError, setMisplayError] = useState<{
+    message: string;
+    hint: string;
+    category: 'resource' | 'phase' | 'turn' | 'exhausted' | 'zone' | 'combat' | 'base' | 'mulligan' | 'deck' | 'generic';
+    accent: string;
+  } | null>(null);
+  const misplayTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showMisplay = React.useCallback((message: string, rulesTrace?: string) => {
+    if (misplayTimerRef.current) clearTimeout(misplayTimerRef.current);
+
+    const text = `${message} ${rulesTrace ?? ''}`.toLowerCase();
+    let hint = rulesTrace ?? '';
+    let accent = 'bg-red-950/95 border-red-700/60';
+    let category: NonNullable<typeof misplayError>['category'] = 'generic';
+
+    if (text.includes('resource')) {
+      category = 'resource';
+      accent = 'bg-amber-950/95 border-amber-600/60';
+      hint = rulesTrace || 'Place more resources during your Resource Phase before playing this card.';
+    } else if (text.includes('phase') || text.includes('cannot be used in')) {
+      category = 'phase';
+      accent = 'bg-indigo-950/95 border-indigo-600/60';
+      hint = rulesTrace || 'This action is not allowed in the current phase.';
+    } else if (text.includes('not your turn')) {
+      category = 'turn';
+      accent = 'bg-slate-900/95 border-slate-600/60';
+      hint = 'Wait for your opponent\'s turn to end.';
+    } else if (text.includes('exhausted') || text.includes('rest')) {
+      category = 'exhausted';
+      accent = 'bg-slate-900/95 border-slate-600/60';
+      hint = rulesTrace || 'Resting units cannot attack. They recover at the start of your next turn.';
+    } else if (text.includes('battle area full') || text.includes('exceed 6')) {
+      category = 'zone';
+      accent = 'bg-red-950/95 border-red-700/60';
+      hint = 'The battle area is full (max 6 units). A unit must be destroyed or removed first.';
+    } else if (text.includes('blocker') || text.includes('high-maneuver') || text.includes('high_maneuver')) {
+      category = 'combat';
+      accent = 'bg-purple-950/95 border-purple-600/60';
+      hint = rulesTrace || 'High-Maneuver units cannot be blocked.';
+    } else if (text.includes('base already')) {
+      category = 'base';
+      accent = 'bg-red-950/95 border-red-700/60';
+      hint = 'You already have a base in play. Only one base is allowed at a time.';
+    } else if (text.includes('mulligan')) {
+      category = 'mulligan';
+      accent = 'bg-slate-900/95 border-slate-600/60';
+      hint = 'You can only mulligan once per game.';
+    } else if (text.includes('draw') || text.includes('empty')) {
+      category = 'deck';
+      accent = 'bg-slate-900/95 border-slate-600/60';
+      hint = rulesTrace || 'No cards left to draw.';
+    } else if (text.includes('game is over')) {
+      category = 'generic';
+      accent = 'bg-slate-900/95 border-slate-600/60';
+      hint = 'The game has ended.';
+    }
+
+    setMisplayError({ message, hint, category, accent });
+    const delay = hint.length > 60 ? 6000 : 4000;
+    misplayTimerRef.current = setTimeout(() => setMisplayError(null), delay);
+  }, []);
 
   // Autoplayer
   const autoplayerRef = useRef(new AdvancedAutoplayer());
@@ -383,8 +465,7 @@ export function PlaytestGameEnhanced({
         }
       }
     } else {
-      setError(validation.error || 'Invalid action');
-      setTimeout(() => setError(null), 3000);
+      showMisplay(validation.error || 'Invalid action', validation.rulesTrace);
     }
   };
 
@@ -442,7 +523,11 @@ export function PlaytestGameEnhanced({
   }, [gameState?.activePlayerId, gameState?.phase, isMobileAutoMode]);
 
   // Dismiss error
-  const dismissError = () => setError(null);
+  const dismissError = () => {
+    setError(null);
+    setMisplayError(null);
+    if (misplayTimerRef.current) clearTimeout(misplayTimerRef.current);
+  };
 
   // Undo/Redo Handlers
   const handleUndo = () => {
@@ -494,6 +579,36 @@ export function PlaytestGameEnhanced({
     onShowHelp: () => setShowHelpModal(true),
   });
 
+  // Derived state — computed before early returns so hooks are never conditional.
+  const isSetupPhase = !gameReady;
+  const isPlayerTurn = gameState?.activePlayerId === 'player1';
+  const isDrawPhase = gameState?.phase === 'draw';
+  const isResourcePhase = gameState?.phase === 'resource';
+  const needsToDraw = isDrawPhase && isPlayerTurn && !gameState?.hasDrawnThisTurn;
+  const playerState = gameState?.players['player1'];
+  const opponentState = gameState?.players['player2'];
+  const needsToPlaceResource =
+    isResourcePhase &&
+    isPlayerTurn &&
+    !gameState?.hasResourcePlacedThisTurn &&
+    (playerState?.resourceDeck.length ?? 0) > 0;
+  const hasPendingTriggers = (gameState?.stack.length ?? 0) > 0;
+
+  const assistHint = React.useMemo(
+    () =>
+      getPlaytesterAssistHint({
+        isSetupPhase,
+        isPlayerTurn,
+        hasPendingTriggers,
+        stackSize: gameState?.stack.length ?? 0,
+        needsToDraw,
+        needsToPlaceResource,
+        phase: gameState?.phase ?? 'start',
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gameState?.phase, gameState?.stack.length, hasPendingTriggers, isPlayerTurn, isSetupPhase, needsToDraw, needsToPlaceResource],
+  );
+
   // Loading State
   if (isLoading) {
     return (
@@ -518,19 +633,9 @@ export function PlaytestGameEnhanced({
     );
   }
 
-  const isSetupPhase = !gameReady;
-  const isPlayerTurn = gameState.activePlayerId === 'player1';
-  const isDrawPhase = gameState.phase === 'draw';
-  const isResourcePhase = gameState.phase === 'resource';
-  const needsToDraw = isDrawPhase && isPlayerTurn && !gameState.hasDrawnThisTurn;
-  const playerState = gameState.players['player1'];
-  const opponentState = gameState.players['player2'];
-  const needsToPlaceResource =
-    isResourcePhase &&
-    isPlayerTurn &&
-    !gameState.hasResourcePlacedThisTurn &&
-    playerState.resourceDeck.length > 0;
-  const hasPendingTriggers = gameState.stack.length > 0;
+  // gameState and engine are guaranteed non-null past this point.
+  const resolvedPlayerState = gameState.players['player1'];
+  const resolvedOpponentState = gameState.players['player2'];
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
@@ -712,6 +817,10 @@ export function PlaytestGameEnhanced({
             </p>
           </div>
         )}
+
+        {playtesterAssistV2Enabled && !isSetupPhase && (
+          <PlaytesterAssistBanner assistHint={assistHint} isPlayerTurn={isPlayerTurn} turnNumber={gameState.turnNumber} />
+        )}
       </header>
 
       {/* SETUP PHASE — GameStartFlow */}
@@ -792,15 +901,12 @@ export function PlaytestGameEnhanced({
               payload: { cardInstanceId: card.instanceId },
             })
           }
-          onDropError={(msg) => {
-            setError(msg);
-            setTimeout(() => setError(null), 3000);
-          }}
+          onDropError={(msg) => showMisplay(msg)}
         >
           <main className="flex-1 overflow-hidden" id="main-content">
             <Battlefield
-              playerState={playerState}
-              opponentState={opponentState}
+              playerState={resolvedPlayerState}
+              opponentState={resolvedOpponentState}
               isPlayerTurn={isPlayerTurn}
               gamePhase={gameState.phase}
               cardDatabase={cardDatabase}
@@ -847,20 +953,65 @@ export function PlaytestGameEnhanced({
         onClose={() => setShowHelpModal(false)}
       />
 
-      {/* Error Toast */}
-      {error && (
+      {/* Misplay Error Toast */}
+      {misplayError && (() => {
+        const iconMap: Record<NonNullable<typeof misplayError>['category'], React.ReactNode> = {
+          resource: <Coins className="w-4 h-4 shrink-0 mt-0.5" />,
+          phase:    <Clock className="w-4 h-4 shrink-0 mt-0.5" />,
+          turn:     <Timer className="w-4 h-4 shrink-0 mt-0.5" />,
+          exhausted: <Moon className="w-4 h-4 shrink-0 mt-0.5" />,
+          zone:     <LayoutGrid className="w-4 h-4 shrink-0 mt-0.5" />,
+          combat:   <Swords className="w-4 h-4 shrink-0 mt-0.5" />,
+          base:     <Castle className="w-4 h-4 shrink-0 mt-0.5" />,
+          mulligan: <RefreshCw className="w-4 h-4 shrink-0 mt-0.5" />,
+          deck:     <PackageOpen className="w-4 h-4 shrink-0 mt-0.5" />,
+          generic:  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />,
+        };
+        return (
+          <div
+            className={`fixed bottom-4 right-4 flex flex-col gap-1.5 text-white px-4 py-3 rounded-xl shadow-2xl max-w-sm z-50 border backdrop-blur-sm ${misplayError.accent}`}
+            role="alert"
+            aria-live="assertive"
+          >
+            <div className="flex items-start gap-2.5">
+              <span aria-hidden="true" className="text-white/80">
+                {iconMap[misplayError.category]}
+              </span>
+              <span className="flex-1 text-sm font-semibold leading-snug">
+                {misplayError.message}
+              </span>
+              <button
+                onClick={dismissError}
+                className="shrink-0 text-white/50 hover:text-white transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {misplayError.hint && misplayError.hint !== misplayError.message && (
+              <p className="text-xs text-white/70 leading-snug pl-[26px]">
+                {misplayError.hint}
+              </p>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Generic Error Toast (init/system errors) */}
+      {error && !misplayError && (
         <div
-          className="fixed bottom-4 right-4 flex items-start gap-2 bg-destructive/90 text-white px-4 py-3 rounded-lg shadow-lg max-w-xs z-50 border border-destructive"
+          className="fixed bottom-4 right-4 flex items-start gap-2.5 bg-destructive/90 text-white px-4 py-3 rounded-xl shadow-lg max-w-xs z-50 border border-destructive/60 backdrop-blur-sm"
           role="alert"
           aria-live="assertive"
         >
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-white/80" aria-hidden="true" />
           <span className="flex-1 text-sm">{error}</span>
           <button
             onClick={dismissError}
-            className="ml-1 shrink-0 text-white/80 hover:text-white transition-colors"
+            className="shrink-0 text-white/50 hover:text-white transition-colors"
             aria-label="Dismiss error"
           >
-            ✕
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}

@@ -55,6 +55,30 @@ describe('deck browser helpers', () => {
     expect(sorted.map((d) => d.id)).toEqual(['d2', 'd1', 'd3']);
   });
 
+  it('filters by source scope when requested', () => {
+    const withSources: TrendingDeckRecord[] = [
+      makeDeck({ id: 'tourney', source: 'tournament', archetype: 'Aggro' }),
+      makeDeck({ id: 'catalog-1', source: 'catalog', archetype: 'Control' }),
+      makeDeck({ id: 'catalog-2', source: 'catalog', archetype: 'Ramp' }),
+    ];
+
+    const tournamentOnly = filterAndSortDeckBrowserData(withSources, {
+      selectedColors: [],
+      archetype: 'All',
+      sort: 'newest',
+      sourceScope: 'tournament',
+    });
+    expect(tournamentOnly.map((deck) => deck.id)).toEqual(['tourney']);
+
+    const communityOnly = filterAndSortDeckBrowserData(withSources, {
+      selectedColors: [],
+      archetype: 'All',
+      sort: 'newest',
+      sourceScope: 'community',
+    });
+    expect(communityOnly.map((deck) => deck.id).sort()).toEqual(['catalog-1', 'catalog-2']);
+  });
+
   it('returns ordered available colors', () => {
     expect(availableDeckColors(ranked)).toEqual(['Blue', 'Green', 'Red', 'White']);
   });

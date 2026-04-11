@@ -1,6 +1,12 @@
-import { apiOk, apiError } from '@/lib/api/server';
+import { DeckAnalyticsComparisonResponseSchema } from '@gundam-forge/shared';
+import { apiError, apiOk, enforceContract, toApiErrorResponse } from '@/lib/api/server';
 import { supabase } from '@/lib/supabase/client';
 import { getDecks } from '@/lib/data/decks';
+
+// Normalize a score that may be stored as 0-1 decimal or 0-100 integer to 0-100.
+function normalizeScore(value: number): number {
+  return value <= 1 ? Math.round(value * 100) : Math.round(value);
+}
 
 export function generateStaticParams() {
   return getDecks().map((deck) => ({ id: deck.id }));
@@ -56,22 +62,34 @@ export async function GET(
     const row = (data as ComparisonRow[] | null)?.[0] ?? null;
 
     if (!row) {
-      return apiOk({ comparison: null }, request);
+      const response = enforceContract(
+        DeckAnalyticsComparisonResponseSchema,
+        { comparison: null },
+        '/api/deck-analytics/[id]/comparison',
+      );
+
+      return apiOk(response, request);
     }
 
     const comparison = {
       deckId: row.deck_id,
       deckArchetype: row.deck_archetype,
-      metaProximityScore: Number(row.meta_proximity_score),
+      metaProximityScore: normalizeScore(Number(row.meta_proximity_score)),
       topArchetypes: row.top_archetypes ?? [],
       archetypeMetaShares: (row.archetype_meta_shares ?? []).map(Number),
       archetypeWinRates: (row.archetype_win_rates ?? []).map(Number),
     };
 
-    return apiOk({ comparison }, request, {
+    const response = enforceContract(
+      DeckAnalyticsComparisonResponseSchema,
+      { comparison },
+      '/api/deck-analytics/[id]/comparison',
+    );
+
+    return apiOk(response, request, {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
     });
-  } catch {
-    return apiError('Internal error', 500, request);
+  } catch (err) {
+    return toApiErrorResponse('/api/deck-analytics/[id]/comparison', err, request);
   }
 }

@@ -3,6 +3,7 @@ import { rankTrendingDecks, type TrendingDeckRecord } from '@/lib/meta/engine';
 import type { EventRecord } from '@/lib/data/events';
 
 export type DeckSort = 'newest' | 'trending' | 'winRate' | 'mostViewed';
+export type DeckSourceScope = 'all' | 'tournament' | 'community';
 
 function updatedTimestamp(deck: DeckRecord): number {
   const timestamp = Date.parse(deck.updatedAt ?? '');
@@ -15,9 +16,16 @@ export function rankDeckBrowserData(decks: DeckRecord[], events: EventRecord[]):
 
 export function filterAndSortDeckBrowserData(
   decks: TrendingDeckRecord[],
-  options: { selectedColors: string[]; archetype: string; sort: DeckSort },
+  options: { selectedColors: string[]; archetype: string; sort: DeckSort; sourceScope?: DeckSourceScope },
 ): TrendingDeckRecord[] {
-  const filtered = decks.filter((deck) => {
+  const sourceScoped =
+    !options.sourceScope || options.sourceScope === 'all'
+      ? decks
+      : options.sourceScope === 'tournament'
+        ? decks.filter((deck) => deck.source === 'tournament')
+        : decks.filter((deck) => deck.source !== 'tournament');
+
+  const filtered = sourceScoped.filter((deck) => {
     const matchesColors = options.selectedColors.length === 0 || (deck.colors ?? []).some((c) => options.selectedColors.includes(c));
     const matchesArchetype = options.archetype === 'All' || deck.archetype === options.archetype;
     return matchesColors && matchesArchetype;

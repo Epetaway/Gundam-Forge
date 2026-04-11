@@ -15,11 +15,13 @@ import { withBasePath } from '@/lib/utils/basePath';
 import { relativeTime } from '@/lib/utils/relativeTime';
 import { rankTrendingDecks, type TrendingDeckRecord } from '@/lib/meta/engine';
 import { cn } from '@/lib/utils/cn';
+import { features } from '@/lib/features/feature-flags';
 import {
   availableDeckArchetypes,
   availableDeckColors,
   filterAndSortDeckBrowserData,
   rankDeckBrowserData,
+  type DeckSourceScope,
   type DeckSort,
 } from '@/lib/decks/browser';
 
@@ -40,10 +42,12 @@ const COLOR_PILL_ACTIVE_CLASSES: Record<string, string> = {
 export default function DecksClient({ initialDecks, events }: DecksClientProps): JSX.Element {
   const searchParams = useSearchParams();
   const playtestMode = searchParams.get('action') === 'playtest';
+  const decksUxV2Enabled = features.decksUxV2();
   const { data: decks = initialDecks, isFetching } = useDecksQuery({ initialData: initialDecks });
   const [sort, setSort] = React.useState<DeckSort>('newest');
   const [selectedColors, setSelectedColors] = React.useState<string[]>([]);
   const [archetype, setArchetype] = React.useState('All');
+  const [sourceFilter, setSourceFilter] = React.useState<DeckSourceScope>('all');
 
   const rankedDecks = React.useMemo(() => rankDeckBrowserData(decks, events), [decks, events]);
 
@@ -52,9 +56,17 @@ export default function DecksClient({ initialDecks, events }: DecksClientProps):
   const availableColors = React.useMemo(() => availableDeckColors(rankedDecks), [rankedDecks]);
 
   const visibleDecks = React.useMemo(
-    () => filterAndSortDeckBrowserData(rankedDecks, { selectedColors, archetype, sort }),
-    [rankedDecks, selectedColors, archetype, sort],
+    () =>
+      filterAndSortDeckBrowserData(rankedDecks, {
+        selectedColors,
+        archetype,
+        sort,
+        sourceScope: decksUxV2Enabled ? sourceFilter : 'all',
+      }),
+    [rankedDecks, selectedColors, archetype, sort, decksUxV2Enabled, sourceFilter],
   );
+
+  const activeFilterCount = selectedColors.length + (archetype !== 'All' ? 1 : 0) + (decksUxV2Enabled && sourceFilter !== 'all' ? 1 : 0);
 
   const toggleColor = React.useCallback((color: string) => {
     setSelectedColors((current) => (current.includes(color) ? current.filter((c) => c !== color) : [...current, color]));
@@ -63,7 +75,10 @@ export default function DecksClient({ initialDecks, events }: DecksClientProps):
   const clearFilters = React.useCallback(() => {
     setSelectedColors([]);
     setArchetype('All');
-  }, []);
+    if (decksUxV2Enabled) {
+      setSourceFilter('all');
+    }
+  }, [decksUxV2Enabled]);
 
   return (
     <div className="space-y-4">
@@ -104,6 +119,37 @@ export default function DecksClient({ initialDecks, events }: DecksClientProps):
       </div>
 
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-interactive p-2">
+        {decksUxV2Enabled ? (
+          <div className="flex w-full flex-wrap items-center gap-1.5 border-b border-border/70 pb-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.08em] text-steel-500">Source</span>
+            <Button
+              aria-pressed={sourceFilter === 'all'}
+              onClick={() => setSourceFilter('all')}
+              size="sm"
+              variant={sourceFilter === 'all' ? 'primary' : 'secondary'}
+            >
+              All
+            </Button>
+            <Button
+              aria-pressed={sourceFilter === 'tournament'}
+              onClick={() => setSourceFilter('tournament')}
+              size="sm"
+              variant={sourceFilter === 'tournament' ? 'primary' : 'secondary'}
+            >
+              Tournament
+            </Button>
+            <Button
+              aria-pressed={sourceFilter === 'community'}
+              onClick={() => setSourceFilter('community')}
+              size="sm"
+              variant={sourceFilter === 'community' ? 'primary' : 'secondary'}
+            >
+              Community
+            </Button>
+            <Badge className="ml-auto">{activeFilterCount} filters</Badge>
+          </div>
+        ) : null}
+
         <span className="text-xs font-semibold uppercase tracking-[0.08em] text-steel-500">Colors</span>
         {availableColors.map((color) => {
           const active = selectedColors.includes(color);
@@ -137,6 +183,7 @@ export default function DecksClient({ initialDecks, events }: DecksClientProps):
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
+          {!decksUxV2Enabled ? <Badge>{activeFilterCount} filters</Badge> : null}
           <Button size="sm" variant="secondary" onClick={clearFilters}>Reset</Button>
         </div>
       </div>

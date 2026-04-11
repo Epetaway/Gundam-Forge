@@ -1,6 +1,8 @@
-import { apiOk, toApiErrorResponse } from '@/lib/api/server';
+import { DecksApiResponseSchema, DecksQuerySchema } from '@gundam-forge/shared';
+import { apiOk, enforceContract, parseRequestContract, toApiErrorResponse } from '@/lib/api/server';
 import { getDecks } from '@/lib/data/decks';
 import { cards } from '@/lib/data/cards';
+import { compareDecksDeterministically } from '@/lib/decks/deterministicSort';
 import { validateDeck } from '@gundam-forge/shared';
 
 export const dynamic = 'force-static';
@@ -16,9 +18,20 @@ export async function GET(request: Request): Promise<Response> {
       process.env.NEXT_OUTPUT_MODE === 'export'
         ? new URLSearchParams()
         : new URL(request.url).searchParams;
-    const q = toLower(searchParams.get('q'));
-    const color = toLower(searchParams.get('color'));
-    const archetype = toLower(searchParams.get('archetype'));
+
+    const parsedQuery = parseRequestContract(
+      DecksQuerySchema,
+      {
+        q: searchParams.get('q') ?? undefined,
+        color: searchParams.get('color') ?? undefined,
+        archetype: searchParams.get('archetype') ?? undefined,
+      },
+      '/api/decks',
+    );
+
+    const q = toLower(parsedQuery.q ?? null);
+    const color = toLower(parsedQuery.color ?? null);
+    const archetype = toLower(parsedQuery.archetype ?? null);
 
     const decks = getDecks()
       .filter((deck) => {
@@ -37,9 +50,10 @@ export async function GET(request: Request): Promise<Response> {
 
         return matchesQuery && matchesColor && matchesArchetype;
       })
-      .sort((a, b) => b.likes + b.views - (a.likes + a.views));
+      .sort(compareDecksDeterministically);
 
-    return apiOk({ decks }, request);
+    const response = enforceContract(DecksApiResponseSchema, { decks }, '/api/decks');
+    return apiOk(response, request);
   } catch (error) {
     return toApiErrorResponse('/api/decks', error, request);
   }

@@ -1,6 +1,12 @@
-import { apiOk, apiError } from '@/lib/api/server';
+import { DeckAnalyticsSummaryResponseSchema } from '@gundam-forge/shared';
+import { apiError, apiOk, enforceContract, toApiErrorResponse } from '@/lib/api/server';
 import { supabase } from '@/lib/supabase/client';
 import { getDecks } from '@/lib/data/decks';
+
+// Normalize a score that may be stored as 0-1 decimal or 0-100 integer to 0-100.
+function normalizeScore(value: number): number {
+  return value <= 1 ? Math.round(value * 100) : Math.round(value);
+}
 
 export function generateStaticParams() {
   return getDecks().map((deck) => ({ id: deck.id }));
@@ -63,7 +69,13 @@ export async function GET(
     const row = (data as AnalyticsRow[] | null)?.[0] ?? null;
 
     if (!row) {
-      return apiOk({ analytics: null }, request, {
+      const response = enforceContract(
+        DeckAnalyticsSummaryResponseSchema,
+        { analytics: null },
+        '/api/deck-analytics/[id]/summary',
+      );
+
+      return apiOk(response, request, {
         headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
       });
     }
@@ -73,8 +85,8 @@ export async function GET(
       snapshotDate: row.snapshot_date,
       viewCountDelta: row.view_count_delta,
       likeCountDelta: row.like_count_delta,
-      metaProximityScore: Number(row.meta_proximity_score),
-      consistencyIndex: Number(row.consistency_index),
+      metaProximityScore: normalizeScore(Number(row.meta_proximity_score)),
+      consistencyIndex: normalizeScore(Number(row.consistency_index)),
       archetypePopularityRank: row.archetype_popularity_rank,
       colorComboRank: row.color_combo_rank,
       trendDirection: row.trend_direction as 'up' | 'flat' | 'down',
@@ -82,10 +94,16 @@ export async function GET(
       sparklineScores: (row.sparkline_scores ?? []).map(Number),
     };
 
-    return apiOk({ analytics }, request, {
+    const response = enforceContract(
+      DeckAnalyticsSummaryResponseSchema,
+      { analytics },
+      '/api/deck-analytics/[id]/summary',
+    );
+
+    return apiOk(response, request, {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
     });
   } catch (err) {
-    return apiError('Internal error', 500, request);
+    return toApiErrorResponse('/api/deck-analytics/[id]/summary', err, request);
   }
 }
