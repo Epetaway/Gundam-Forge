@@ -7,6 +7,7 @@ import type { CardColor, CardDefinition, CardType } from '@gundam-forge/shared';
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/Button';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
+import { CardsFilterApplyBar } from '@/components/cards/CardsFilterApplyBar';
 import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
@@ -14,12 +15,20 @@ import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage, getCardsFromSource } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
 import { filtersToSearchParams, parseDelimitedInput } from '@/lib/filters/cardFilters';
+import {
+  applyCardsMobilePreset,
+  areDraftFiltersEqual,
+  countDraftSelections,
+  KEYWORD_OPTIONS,
+  type CardsFilterDraft,
+  type CardsPresetId,
+  type KeywordOption,
+} from '@/lib/filters/cardsUxV2';
 import { cn } from '@/lib/utils/cn';
 import { getActiveDeckId, getStoredDeck, updateDeckEntries } from '@/lib/deck/storage';
 import { debounce } from '@/lib/utils/debounce';
+import { features } from '@/lib/features/feature-flags';
 
-const KEYWORD_OPTIONS = ['All', 'Rush', 'Breach', 'Burst', 'Suppression', 'Repair', 'Support', 'Link', 'Pair'] as const;
-type KeywordOption = typeof KEYWORD_OPTIONS[number];
 const CANONICAL_COLORS: CardColor[] = ['Blue', 'Green', 'Red', 'White', 'Purple', 'Colorless'];
 const CANONICAL_TYPES: CardType[] = ['Unit', 'Pilot', 'Command', 'Base', 'Resource'];
 
@@ -50,22 +59,6 @@ const LIST_PAGE_SIZE = 80;
 const selectClassName =
   'min-h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 py-2 pr-8 text-left text-sm leading-tight text-foreground outline-none transition-colors whitespace-normal focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
-interface FilterDraft {
-  query: string;
-  color: CardColor | 'All';
-  selectedColors: CardColor[];
-  type: CardType | 'All';
-  setCode: string;
-  keyword: KeywordOption;
-  zone: string;
-  deckRole: CardDeckRole | 'All';
-  matchMode: FilterMatchMode;
-  clans: string[];
-  traits: string[];
-  mechanics: string[];
-  triggers: string[];
-}
-
 interface ActiveChip {
   id: string;
   label: string;
@@ -95,6 +88,7 @@ function sortCards(cards: CardDefinition[], sortBy: SortKey): CardDefinition[] {
 export default function CardsClient({ initialCards }: CardsClientProps): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const cardsUxV2Enabled = features.cardsUxV2();
 
   const colorCounts = useMemo(() => {
     const counts = new Map<CardColor, number>();
@@ -162,7 +156,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
   const drawerRef = useRef<HTMLDivElement>(null);
   const debouncedSetQuery = useCallback(debounce((val: string) => setQuery(val), 150), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [addFeedback, setAddFeedback] = useState<string | null>(null);
-  const [draft, setDraft] = useState<FilterDraft>({
+  const [draft, setDraft] = useState<CardsFilterDraft>({
     query: '',
     color: 'All',
     selectedColors: [],
@@ -177,6 +171,61 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
     mechanics: [],
     triggers: [],
   });
+
+  const resetDraft = (): void => {
+    setDraft({
+      query: '',
+      color: 'All',
+      selectedColors: [],
+      type: 'All',
+      setCode: 'All',
+      keyword: 'All',
+      zone: 'All',
+      deckRole: 'All',
+      matchMode: 'strict',
+      clans: [],
+      traits: [],
+      mechanics: [],
+      triggers: [],
+    });
+  };
+
+  const draftSelectionCount = useMemo(() => countDraftSelections(draft), [draft]);
+
+  const appliedDraft = useMemo<CardsFilterDraft>(
+    () => ({
+      query,
+      color,
+      selectedColors,
+      type,
+      setCode,
+      keyword,
+      zone,
+      deckRole,
+      matchMode,
+      clans: selectedClans,
+      traits: selectedTraits,
+      mechanics: selectedMechanics,
+      triggers: selectedTriggers,
+    }),
+    [
+      color,
+      deckRole,
+      keyword,
+      matchMode,
+      query,
+      selectedClans,
+      selectedColors,
+      selectedMechanics,
+      selectedTraits,
+      selectedTriggers,
+      setCode,
+      type,
+      zone,
+    ],
+  );
+
+  const isDraftInSync = useMemo(() => areDraftFiltersEqual(draft, appliedDraft), [draft, appliedDraft]);
 
   useEffect(() => {
     if (color !== 'All' && !colorOptions.includes(color)) {
@@ -479,8 +528,12 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
       return {
         ...current,
         [group]: hasValue ? selected.filter((entry) => entry !== value) : [...selected, value],
-      } as FilterDraft;
+      } as CardsFilterDraft;
     });
+  };
+
+  const applyDraftPreset = (preset: CardsPresetId): void => {
+    setDraft((current) => applyCardsMobilePreset(current, preset));
   };
 
   const handleAddCard = (cardId: string): void => {
@@ -504,7 +557,6 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
         return;
       }
 
-      // Add to deck
       const newEntry = {
         cardId,
         qty: 1,
@@ -741,6 +793,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
           <div ref={drawerRef} className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-border bg-gradient-to-b from-surface to-surface-interactive/60 p-4 shadow-2xl md:inset-y-0 md:left-auto md:right-0 md:top-0 md:bottom-0 md:h-full md:max-h-none md:w-[360px] md:rounded-none md:rounded-l-2xl" role="dialog" aria-modal="true" aria-label="Filter cards">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">Filters</h3>
+              {cardsUxV2Enabled ? (
+                <span className="rounded-full border border-border bg-surface-interactive px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-steel-600">
+                  Draft {draftSelectionCount}
+                </span>
+              ) : null}
               <button
                 aria-label="Close"
                 className="rounded p-1 text-steel-600 hover:text-foreground"
@@ -750,6 +807,35 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                 <X className="h-4 w-4" />
               </button>
             </div>
+
+            {cardsUxV2Enabled ? (
+              <div className="mt-2 rounded-md border border-border bg-surface-interactive/80 p-2">
+                <p className="text-[11px] text-steel-600">Changes in this drawer apply only when you tap Apply.</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <button
+                    className="rounded-full border border-border bg-surface px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-steel-700 transition-colors hover:border-accent hover:text-foreground"
+                    onClick={() => applyDraftPreset('rush-main')}
+                    type="button"
+                  >
+                    Rush Main
+                  </button>
+                  <button
+                    className="rounded-full border border-border bg-surface px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-steel-700 transition-colors hover:border-accent hover:text-foreground"
+                    onClick={() => applyDraftPreset('resource-core')}
+                    type="button"
+                  >
+                    Resource Core
+                  </button>
+                  <button
+                    className="rounded-full border border-border bg-surface px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-steel-700 transition-colors hover:border-accent hover:text-foreground"
+                    onClick={() => applyDraftPreset('control-commands')}
+                    type="button"
+                  >
+                    Control Commands
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-2 space-y-2 pb-20">
               {/* Search — mobile only, desktop has it in toolbar */}
@@ -964,37 +1050,14 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </div>
             </div>
 
-            <div className="sticky bottom-0 -mx-4 mt-2 flex items-center gap-2 border-t border-border bg-surface/95 px-4 py-2 backdrop-blur-sm">
-              <Button
-                className="flex-1"
-                onClick={() =>
-                  setDraft({
-                    query: '',
-                    color: 'All',
-                    selectedColors: [],
-                    type: 'All',
-                    setCode: 'All',
-                    keyword: 'All',
-                    zone: 'All',
-                    deckRole: 'All',
-                    matchMode: 'strict',
-                    clans: [],
-                    traits: [],
-                    mechanics: [],
-                    triggers: [],
-                  })
-                }
-                variant="ghost"
-              >
-                Reset
-              </Button>
-              <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)} variant="secondary">
-                Cancel
-              </Button>
-              <Button className="flex-1" onClick={applyMobileFilters}>
-                Apply
-              </Button>
-            </div>
+            <CardsFilterApplyBar
+              cardsUxV2Enabled={cardsUxV2Enabled}
+              draftSelectionCount={draftSelectionCount}
+              isDraftInSync={isDraftInSync}
+              onApply={applyMobileFilters}
+              onCancel={() => setMobileFiltersOpen(false)}
+              onReset={resetDraft}
+            />
           </div>
         </>
       ) : null}

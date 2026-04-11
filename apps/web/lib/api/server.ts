@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
+import type { ZodType, ZodTypeDef } from 'zod';
+import type { ApiErrorCode, ApiErrorShape } from '@gundam-forge/shared';
 
-export interface ApiErrorShape {
-  ok: false;
-  error: string;
-  code?: string;
-  requestId?: string;
-  details?: unknown;
-}
+export type { ApiErrorShape };
 
 export interface ApiOkShape<T> {
   ok: true;
@@ -16,10 +12,10 @@ export interface ApiOkShape<T> {
 
 export class HttpError extends Error {
   readonly status: number;
-  readonly code?: string;
+  readonly code?: ApiErrorCode;
   readonly details?: unknown;
 
-  constructor(message: string, status: number, options?: { code?: string; details?: unknown }) {
+  constructor(message: string, status: number, options?: { code?: ApiErrorCode; details?: unknown }) {
     super(message);
     this.name = 'HttpError';
     this.status = status;
@@ -50,7 +46,7 @@ export function apiError(
   message: string,
   status = 500,
   request?: Request,
-  options?: { code?: string; details?: unknown },
+  options?: { code?: ApiErrorCode; details?: unknown },
 ): NextResponse<ApiErrorShape> {
   return NextResponse.json(
     {
@@ -93,4 +89,36 @@ export function toApiErrorResponse(route: string, error: unknown, request?: Requ
   }
 
   return apiError('Internal server error', 500, request, { code: 'INTERNAL_ERROR' });
+}
+
+export function enforceContract<TOutput>(
+  schema: ZodType<TOutput, ZodTypeDef, unknown>,
+  payload: unknown,
+  route: string,
+): TOutput {
+  const parsed = schema.safeParse(payload);
+  if (!parsed.success) {
+    throw new HttpError(`Response contract violation on ${route}`, 500, {
+      code: 'CONTRACT_VIOLATION',
+      details: parsed.error.issues,
+    });
+  }
+
+  return parsed.data;
+}
+
+export function parseRequestContract<T>(
+  schema: ZodType<T, ZodTypeDef, unknown>,
+  payload: unknown,
+  route: string,
+): T {
+  const parsed = schema.safeParse(payload);
+  if (!parsed.success) {
+    throw new HttpError(`Invalid request for ${route}`, 400, {
+      code: 'BAD_REQUEST',
+      details: parsed.error.issues,
+    });
+  }
+
+  return parsed.data;
 }

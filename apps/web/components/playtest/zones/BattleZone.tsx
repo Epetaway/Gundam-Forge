@@ -118,8 +118,19 @@ function UnitTile({
   onHoverCardChange,
   onCardDoubleClick,
 }: UnitTileProps) {
-  const ap = card?.ap ?? 0;
-  const hp = card?.hp ?? 0;
+  // Effective AP/HP must mirror game-engine.ts getUnitAttack / getUnitHealth —
+  // include pair, link and support counter bonuses so the display matches engine checks.
+  const baseAp = card?.ap ?? 0;
+  const baseHp = card?.hp ?? 0;
+  const hasPilot = !!unit.attachments?.pilot;
+  const linkedCount = unit.attachments?.linked?.length ?? 0;
+  const pairApBonus = unit.counters?.pairApBonus ?? (hasPilot ? 1 : 0);
+  const pairHpBonus = unit.counters?.pairHpBonus ?? (hasPilot ? 1 : 0);
+  const linkApBonus = unit.counters?.linkApBonus ?? linkedCount;
+  const linkHpBonus = unit.counters?.linkHpBonus ?? linkedCount;
+  const tempApBuff  = unit.counters?.tempApBuff ?? 0;
+  const ap = baseAp + tempApBuff + pairApBonus + linkApBonus;
+  const hp = baseHp + pairHpBonus + linkHpBonus;
   const dmg = unit.damageMarkers ?? 0;
   const remainingHp = Math.max(0, hp - dmg);
   const hpDamaged = dmg > 0;

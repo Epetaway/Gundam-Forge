@@ -36,5 +36,6 @@ export {
   type CardEffectRegistry,
 } from './playtest-engine';
 export * from './card-schema';
+export * from './api-contracts';
 export * from './card-sources';
 export * from './price-api';

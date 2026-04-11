@@ -21,20 +21,12 @@
  * @returns true if feature is enabled, false otherwise
  */
 export function isFeatureEnabled(featureName: string, defaultValue = false): boolean {
-  try {
-    // Client-side: Check for VITE_ prefixed environment variable
-    const envKey = `VITE_FEATURE_${featureName}`;
-    const envValue = (import.meta as any).env[envKey];
-
-    if (envValue !== undefined) {
-      return envValue === 'true' || envValue === true;
-    }
-
-    return defaultValue;
-  } catch (error) {
-    // Fallback if import.meta is not available (shouldn't happen in Vite/Next.js)
-    return defaultValue;
+  const envKey = `NEXT_PUBLIC_FEATURE_${featureName}`;
+  const envValue = process.env[envKey];
+  if (envValue !== undefined) {
+    return envValue === 'true';
   }
+  return defaultValue;
 }
 
 /**
@@ -47,6 +39,9 @@ export const FEATURE_FLAGS = {
   TRENDING: 'TRENDING',
   PLAYTEST_ACTIONS: 'PLAYTEST_ACTIONS',
   COMPARE_CARDS: 'COMPARE_CARDS',
+  CARDS_UX_V2: 'CARDS_UX_V2',
+  DECKS_UX_V2: 'DECKS_UX_V2',
+  PLAYTESTER_ASSIST_V2: 'PLAYTESTER_ASSIST_V2',
 } as const;
 
 /**
@@ -82,6 +77,21 @@ export const features = {
    * Allows comparing stats and mechanics with other cards
    */
   compareCards: () => isFeatureEnabled(FEATURE_FLAGS.COMPARE_CARDS),
+
+  /**
+   * Cards UX V2: Contract-gated cards browsing/filtering upgrades.
+   */
+  cardsUxV2: () => isFeatureEnabled(FEATURE_FLAGS.CARDS_UX_V2),
+
+  /**
+   * Decks UX V2: Contract-gated deck browser and detail upgrades.
+   */
+  decksUxV2: () => isFeatureEnabled(FEATURE_FLAGS.DECKS_UX_V2),
+
+  /**
+   * Playtester Assist V2: Contract-gated decision-assist and QoL upgrades.
+   */
+  playtesterAssistV2: () => isFeatureEnabled(FEATURE_FLAGS.PLAYTESTER_ASSIST_V2),
 } as const;
 
 /**
