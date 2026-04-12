@@ -1,14 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { X, Minus, Plus, ChevronLeft, ChevronRight, Copy, TrendingUp } from 'lucide-react';
+import { X, Minus, Plus } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogOverlay, DialogPortal } from '@/components/ui/Dialog';
 import { CardArtImage } from '@/components/ui/CardArtImage';
-import { Button } from '@/components/ui/Button';
-import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { useSwipeToClose } from '@/lib/hooks/useSwipeToClose';
-import { features } from '@/lib/features/feature-flags';
 
 export interface CardDetailModalCard {
   id: string;
@@ -43,21 +40,18 @@ interface CardDetailModalProps {
   card: CardDetailModalCard | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  // Context mode: 'deckbuilder' or 'cards'
   context?: 'deckbuilder' | 'cards';
-  // Deck builder specific - card count and actions
   qty?: number;
   onAdd?: () => void;
   onRemove?: () => void;
-  // Navigation (for catalog preview)
   allCards?: CardDetailModalCard[];
   onSelectCard?: (cardId: string) => void;
 }
 
 /**
- * Universal card detail modal component
- * Works in both deck builder (with add/remove) and cards page contexts
- * Supports keyboard navigation and responsive design
+ * Premium Editorial-Style Card Detail Modal
+ * Large hero image on left (60%), text-rich details on right (40%)
+ * Inspired by high-end TCG resources like TCGPlayer
  */
 export function CardDetailModal({
   card,
@@ -70,34 +64,12 @@ export function CardDetailModal({
   allCards = [],
   onSelectCard,
 }: CardDetailModalProps): JSX.Element {
-  const [copyFeedback, setCopyFeedback] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Enable swipe-to-close gesture on mobile
   useSwipeToClose(contentRef, {
     threshold: 50,
     onClose: () => onOpenChange(false),
   });
-
-  // Calculate navigation state
-  const currentIndex = React.useMemo(
-    () => (card && allCards.length > 0 ? allCards.findIndex((c) => c.id === card.id) : -1),
-    [card, allCards]
-  );
-  const canGoPrev = currentIndex > 0;
-  const canGoNext = currentIndex >= 0 && currentIndex < allCards.length - 1;
-
-  // Handle copy card ID to clipboard
-  const handleCopyCardId = async () => {
-    if (!card?.id) return;
-    try {
-      await navigator.clipboard.writeText(card.id);
-      setCopyFeedback(true);
-      setTimeout(() => setCopyFeedback(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy card ID:', error);
-    }
-  };
 
   // Keyboard navigation
   useEffect(() => {
@@ -107,19 +79,13 @@ export function CardDetailModal({
       if (e.key === 'Escape') {
         onOpenChange(false);
       }
-      if (e.key === 'ArrowLeft' && canGoPrev && onSelectCard && allCards[currentIndex - 1]) {
-        e.preventDefault();
-        onSelectCard(allCards[currentIndex - 1].id);
-      }
-      if (e.key === 'ArrowRight' && canGoNext && onSelectCard && allCards[currentIndex + 1]) {
-        e.preventDefault();
-        onSelectCard(allCards[currentIndex + 1].id);
-      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, currentIndex, canGoPrev, canGoNext, allCards, onSelectCard, onOpenChange]);
+  }, [open, onOpenChange]);
+
+  if (!card) return <></>;
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -127,344 +93,180 @@ export function CardDetailModal({
         <DialogOverlay />
         <DialogPrimitive.Content
           ref={contentRef}
-          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-elevated focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(860px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border sm:border-cobalt-400/35 sm:shadow-[0_24px_70px_rgba(2,6,23,0.65)] lg:w-[min(960px,88vw)]"
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(1200px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:border sm:border-steel-600/30 sm:shadow-2xl lg:w-[min(1200px,90vw)]"
         >
-        {card ? (
-          <>
-            {/* Header */}
-            <DialogHeader className="flex-shrink-0 border-b border-border bg-gradient-to-r from-cobalt-950/40 via-surface-muted to-surface px-4 py-3 md:px-6 md:py-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <DialogTitle className="font-display text-2xl font-semibold uppercase tracking-wide md:text-3xl">
-                    {card.name}
-                    {/* Trending Badge (feature-flagged) */}
-                    {features.trending() && (
-                      <span className="ml-3 inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-1 text-sm font-medium text-amber-300">
-                        <TrendingUp className="h-3 w-3" />
-                        Trending
-                      </span>
-                    )}
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 text-xs md:text-sm">
-                    {card.id} • {card.color} • {card.type} • Cost {card.cost}
-                  </DialogDescription>
-                  <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide">
-                    <span className="rounded border border-cobalt-400/40 bg-cobalt-500/15 px-2 py-0.5 text-cobalt-200">{card.type}</span>
-                    <span className="rounded border border-border bg-surface/70 px-2 py-0.5 text-steel-600">{card.color ?? 'Colorless'}</span>
-                    <span className="rounded border border-border bg-surface/70 px-2 py-0.5 text-steel-600">Set {card.set ?? 'Unknown'}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Copy Card ID Button (feature-flagged) */}
-                  {features.copyCopyCardId() && (
-                    <button
-                      onClick={handleCopyCardId}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-surface-elevated"
-                      aria-label="Copy card ID"
-                      title={copyFeedback ? 'Copied!' : 'Copy card ID'}
-                    >
-                      <Copy className={`h-5 w-5 ${copyFeedback ? 'text-green-400' : ''}`} />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => onOpenChange(false)}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-surface-elevated"
-                    aria-label="Close modal"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </DialogHeader>
+          {/* Close Button - Fixed Top Right with Jewel Tone */}
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute z-20 top-4 right-4 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded flex items-center gap-1.5 transition-all duration-200 hover:shadow-lg"
+            aria-label="Close modal"
+          >
+            <X className="h-4 w-4" />
+            Close
+          </button>
 
-            {/* Content - single scrollable column on mobile, two-column on desktop */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
-              {/* Image column - small centered image on mobile, fixed left panel on desktop */}
-              <div className="flex-shrink-0 bg-black p-4 md:w-80 md:border-r md:border-border">
-                <div className="relative mx-auto aspect-[5/7] w-full max-w-[160px] overflow-hidden rounded-md border border-border md:max-w-none">
+          {/* Main Content - 2 Column Editorial Layout */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left Column - Hero Image (60% on desktop) */}
+            <div className="hidden sm:flex w-3/5 bg-gradient-to-br from-slate-900 to-slate-950 p-6 items-center justify-center flex-shrink-0 overflow-hidden">
+              <div className="relative w-full max-w-sm aspect-[5/7] rounded-md border border-steel-600/40 overflow-hidden shadow-2xl hover:shadow-2xl transition-shadow">
+                <CardArtImage
+                  card={card}
+                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 1200px) 50vw, 600px"
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Right Column - Details (40% on desktop, full on mobile) */}
+            <div className="w-full sm:w-2/5 flex flex-col overflow-hidden">
+              {/* Card Image on Mobile */}
+              <div className="sm:hidden w-full bg-gradient-to-br from-slate-900 to-slate-950 p-4 flex-shrink-0">
+                <div className="relative w-full max-w-xs aspect-[5/7] mx-auto rounded-md border border-steel-600/40 overflow-hidden shadow-lg">
                   <CardArtImage
                     card={card}
                     className="h-full w-full object-cover"
                     fill
-                    sizes="(max-width: 768px) 160px, 320px"
+                    sizes="100vw"
                     priority
                   />
                 </div>
               </div>
 
-              {/* Details column - visible on all screens, scrollable on desktop */}
-              <div className="flex-1 space-y-4 bg-gradient-to-b from-surface-muted/50 to-surface p-4 md:overflow-y-auto md:p-6">
-                {/* Type & Stats */}
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Type</p>
-                  <p className="text-sm font-medium text-foreground">{card.type}</p>
-                </div>
-
-                {/* Price History (feature-flagged) */}
-                {features.priceHistory() && card.price && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Market Value</p>
-                    <div className="rounded border border-border bg-surface p-3 space-y-2">
-                      {card.price.market && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-steel-500">Market:</span>
-                          <span className="font-semibold text-foreground">${(card.price.market / 100).toFixed(2)}</span>
-                        </div>
-                      )}
-                      {card.price.low && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-steel-500">Low:</span>
-                          <span className="font-mono text-steel-400">${(card.price.low / 100).toFixed(2)}</span>
-                        </div>
-                      )}
-                      {card.price.mid && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-steel-500">Mid:</span>
-                          <span className="font-mono text-steel-400">${(card.price.mid / 100).toFixed(2)}</span>
-                        </div>
-                      )}
-                      {card.price.high && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-steel-500">High:</span>
-                          <span className="font-mono text-steel-400">${(card.price.high / 100).toFixed(2)}</span>
-                        </div>
-                      )}
-                      {card.price.foil && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-steel-500">Foil:</span>
-                          <span className="font-mono text-amber-400">${(card.price.foil / 100).toFixed(2)}</span>
-                        </div>
-                      )}
-                      {!card.price.market && !card.price.low && !card.price.mid && !card.price.high && !card.price.foil && (
-                        <p className="text-xs text-steel-600">No price data available</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Combat Stats */}
-                {(card.ap !== undefined || card.hp !== undefined || card.level !== undefined) && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Stats</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {card.level !== undefined && (
-                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-steel-600">Level</p>
-                          <p className="text-lg font-bold tabular-nums text-foreground">{card.level}</p>
-                        </div>
-                      )}
-                      {card.ap !== undefined && (
-                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-steel-600">AP</p>
-                          <p className="text-lg font-bold tabular-nums text-foreground">{card.ap}</p>
-                        </div>
-                      )}
-                      {card.hp !== undefined && (
-                        <div className="rounded border border-border bg-surface px-3 py-2 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-steel-600">HP</p>
-                          <p className="text-lg font-bold tabular-nums text-foreground">{card.hp}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Pilot Modifiers */}
-                {(card.apModifier !== undefined || card.hpModifier !== undefined) && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Modifiers</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {card.apModifier !== undefined && (
-                        <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-steel-600">AP Mod</p>
-                          <p className="text-lg font-bold tabular-nums text-cobalt-300">
-                            {card.apModifier > 0 ? '+' : ''}
-                            {card.apModifier}
-                          </p>
-                        </div>
-                      )}
-                      {card.hpModifier !== undefined && (
-                        <div className="rounded border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-2 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-steel-600">HP Mod</p>
-                          <p className="text-lg font-bold tabular-nums text-cobalt-300">
-                            {card.hpModifier > 0 ? '+' : ''}
-                            {card.hpModifier}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Traits */}
-                {card.traits && card.traits.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Traits</p>
-                    <p className="text-sm text-foreground">{card.traits.join(' • ')}</p>
-                  </div>
-                )}
-
-                {/* Link Condition */}
-                {card.linkCondition && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Link Condition</p>
-                    <p className="text-sm text-foreground">{card.linkCondition}</p>
-                  </div>
-                )}
-
-                {/* Keywords */}
-                {card.keywords && card.keywords.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Keywords</p>
-                    <div className="flex flex-wrap gap-1">
-                      {card.keywords.map((kw) => (
-                        <span key={kw} className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Triggers */}
-                {card.triggers && card.triggers.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Triggers</p>
-                    <div className="flex flex-wrap gap-1">
-                      {card.triggers.map((tr) => (
-                        <span key={tr} className="rounded bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-300">
-                          {tr}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Clans/Factions */}
-                {card.clans && card.clans.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Factions</p>
-                    <div className="flex flex-wrap gap-1">
-                      {card.clans.map((clan) => (
-                        <span key={clan} className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">
-                          {clan}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Rules Text */}
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Rules Text</p>
-                  <div className="rounded border border-border bg-surface p-3">
-                    <p className="whitespace-pre-wrap text-sm text-foreground">
-                      {card.text?.trim() ? card.text : 'No rules text available for this card.'}
+              {/* Scrollable Details Content */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-6 md:p-8 space-y-6">
+                  {/* Title Section */}
+                  <div className="space-y-1">
+                    <h2 className="font-display text-4xl font-bold text-foreground leading-tight">
+                      {card.name}
+                    </h2>
+                    <p className="text-base text-steel-600 font-medium">
+                      {card.type}
+                      {card.color && ` — ${card.color}`}
+                      {card.traits && card.traits.length > 0 && ` ${card.traits[0]}`}
                     </p>
                   </div>
-                </div>
 
-                {/* Playtest Actions (feature-flagged) */}
-                {features.playtestActions() && (
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Playtest Actions</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">Play</span>
-                      {card.type?.includes('Pilot') && (
-                        <span className="rounded bg-cobalt-500/20 px-2 py-1 text-xs font-medium text-cobalt-300">Link</span>
-                      )}
-                      {card.ap !== undefined && (
-                        <span className="rounded bg-orange-500/20 px-2 py-1 text-xs font-medium text-orange-300">Attack</span>
-                      )}
-                      <span className="rounded bg-steel-500/20 px-2 py-1 text-xs font-medium text-steel-300">Resource</span>
+                  {/* Ability/Rules Text */}
+                  {card.text && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Rules Text</p>
+                      <p className="text-base leading-relaxed text-steel-300 whitespace-pre-wrap font-medium">
+                        {card.text}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Stats Block */}
+                  {(card.ap !== undefined || card.hp !== undefined) && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Stats</p>
+                      <div className="flex items-end justify-end gap-6">
+                        {card.ap !== undefined && (
+                          <div className="text-right">
+                            <p className="text-xs text-steel-500 font-medium">Attack</p>
+                            <p className="text-3xl font-bold text-amber-400">{card.ap}</p>
+                          </div>
+                        )}
+                        {card.hp !== undefined && (
+                          <div className="text-right">
+                            <p className="text-xs text-steel-500 font-medium">Health</p>
+                            <p className="text-3xl font-bold text-red-400">{card.hp}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Traits */}
+                  {card.traits && card.traits.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Traits</p>
+                      <p className="text-sm text-steel-300">{card.traits.join(' • ')}</p>
+                    </div>
+                  )}
+
+                  {/* Source Information */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Source</p>
+                    <p className="text-sm text-steel-500">
+                      {card.set && `Set ${card.set} • `}
+                      {card.id}
+                    </p>
+                  </div>
+
+                  {/* Format Legalities Grid  */}
+                  <div className="space-y-3">
+                    <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Format Legalities</p>
+                    <div className="grid grid-cols-3 gap-3 gap-y-2 text-sm">
+                      {[
+                        'Standard',
+                        'Modern',
+                        'Pioneer',
+                        'Commander',
+                        'Legacy',
+                        'Historic',
+                      ].map((format) => (
+                        <div key={format} className="flex items-start gap-1.5">
+                          <span className="text-steel-400 flex-shrink-0">○</span>
+                          <span className="text-steel-500">{format}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                )}
+
+                  {/* Action Buttons */}
+                  <div className="space-y-2 pt-4 border-t border-steel-600/20">
+                    {context === 'deckbuilder' && (
+                      <>
+                        <div className="flex gap-2">
+                          <div className="flex items-center gap-1 border border-steel-600 rounded px-3 py-2 flex-shrink-0 bg-surface-muted/50">
+                            <button
+                              onClick={onRemove}
+                              disabled={qty === 0}
+                              className="inline-flex h-6 w-6 items-center justify-center text-foreground hover:text-indigo-400 disabled:opacity-40 transition-colors"
+                              aria-label={`Remove ${card.name}`}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="text-sm font-semibold text-foreground w-6 text-center">{qty}</span>
+                            <button
+                              onClick={onAdd}
+                              className="inline-flex h-6 w-6 items-center justify-center text-foreground hover:text-indigo-400 transition-colors"
+                              aria-label={`Add ${card.name}`}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <button
+                            onClick={onAdd}
+                            className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded transition-all duration-200 hover:shadow-lg"
+                          >
+                            Add to Deck
+                          </button>
+                        </div>
+                        <button className="w-full px-4 py-2 border border-steel-600 text-steel-300 hover:text-foreground hover:border-steel-500 rounded font-medium transition-colors duration-200">
+                          ♡ Add to Wish List
+                        </button>
+                      </>
+                    )}
+
+                    {context === 'cards' && (
+                      <button
+                        onClick={() => onOpenChange(false)}
+                        className="w-full px-4 py-2 border border-steel-600 text-steel-300 hover:text-foreground hover:border-steel-500 rounded font-medium transition-colors duration-200"
+                      >
+                        Close
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="flex flex-shrink-0 flex-col gap-3 border-t border-border bg-surface-muted px-4 py-3 md:px-6 md:py-4">
-              {/* Compare Cards Button (feature-flagged) */}
-              {features.compareCards() && (
-                <Button variant="secondary" className="w-full">
-                  Compare with Another Card
-                </Button>
-              )}
-
-              {/* Navigation buttons (if allCards provided) */}
-              {allCards.length > 1 && (
-                <div className="flex gap-2">
-                  <Button
-                    disabled={!canGoPrev}
-                    onClick={() => canGoPrev && onSelectCard && onSelectCard(allCards[currentIndex - 1].id)}
-                    size="sm"
-                    variant="secondary"
-                  >
-                    <ChevronLeft className="mr-1 h-4 w-4" />
-                    Previous
-                  </Button>
-                  <Button
-                    disabled={!canGoNext}
-                    onClick={() => canGoNext && onSelectCard && onSelectCard(allCards[currentIndex + 1].id)}
-                    size="sm"
-                    variant="secondary"
-                  >
-                    Next
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-
-              {/* Add/Remove controls (deck builder context only) */}
-              {context === 'deckbuilder' && (
-                <div className="flex gap-2">
-                  <div className="flex items-center gap-1 rounded border border-border bg-surface px-2">
-                    <button
-                      onClick={onRemove}
-                      disabled={qty === 0}
-                      className="inline-flex h-8 w-8 items-center justify-center text-foreground hover:bg-surface-elevated disabled:opacity-40"
-                      aria-label={`Remove ${card.name}`}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <input
-                      type="text"
-                      value={qty}
-                      readOnly
-                      className="w-8 bg-transparent text-center text-sm font-semibold text-foreground"
-                      aria-label={`Quantity of ${card.name}`}
-                    />
-                    <button
-                      onClick={onAdd}
-                      className="inline-flex h-8 w-8 items-center justify-center text-foreground hover:bg-surface-elevated"
-                      aria-label={`Add ${card.name}`}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  <Button onClick={onAdd} className="flex-1">
-                    Add to Deck
-                  </Button>
-
-                  <Button onClick={() => onOpenChange(false)} variant="secondary">
-                    Close
-                  </Button>
-                </div>
-              )}
-
-              {/* Cards page context */}
-              {context === 'cards' && (
-                <Button onClick={() => onOpenChange(false)} variant="secondary" className="w-full">
-                  Close
-                </Button>
-              )}
-            </div>
-          </>
-        ) : (
-          <div className="p-6 text-center text-sm text-steel-600">No card selected.</div>
-        )}
+          </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
