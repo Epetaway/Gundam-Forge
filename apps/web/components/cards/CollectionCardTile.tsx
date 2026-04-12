@@ -56,7 +56,7 @@ export function CollectionCardTile({
 
         {/* Qty badge — visible only in deck-building contexts */}
         {qty > 0 ? (
-          <span className="pointer-events-none absolute left-2 top-2 z-10 rounded-sm bg-black/65 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white backdrop-blur-sm">
+          <span className="pointer-events-none absolute right-2 top-2 z-10 rounded-sm bg-black/65 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white backdrop-blur-sm">
             {qty}
           </span>
         ) : null}
