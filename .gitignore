@@ -7,6 +7,7 @@ apps/web/out
 .DS_Store
 *.log
 *.tsbuildinfo
+*.swp
 
 # Environment variables
 .env.local

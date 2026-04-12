@@ -4,6 +4,11 @@ import { getReplay } from '@/lib/playtester/replay-repository';
 
 export const dynamic = process.env.NEXT_OUTPUT_MODE === 'export' ? 'force-static' : 'force-dynamic';
 
+export function generateStaticParams() {
+  // Export mode requires concrete params for dynamic route handlers.
+  return [{ gameId: 'static-export-replay' }];
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { gameId: string } },
