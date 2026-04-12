@@ -30,6 +30,13 @@ export interface CardDetailModalCard {
   triggers?: string[];
   clans?: string[];
   linkCondition?: string;
+  price?: {
+    market?: number;
+    low?: number;
+    mid?: number;
+    high?: number;
+    foil?: number;
+  };
 }
 
 interface CardDetailModalProps {
@@ -194,12 +201,43 @@ export function CardDetailModal({
                 </div>
 
                 {/* Price History (feature-flagged) */}
-                {features.priceHistory() && (
+                {features.priceHistory() && card.price && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Price History</p>
-                    <div className="rounded border border-border bg-surface p-3">
-                      <p className="text-xs text-steel-600">Market data unavailable</p>
-                      <p className="mt-2 text-xs text-foreground">Price tracking coming soon</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel-600">Market Value</p>
+                    <div className="rounded border border-border bg-surface p-3 space-y-2">
+                      {card.price.market && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-steel-500">Market:</span>
+                          <span className="font-semibold text-foreground">${(card.price.market / 100).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {card.price.low && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-steel-500">Low:</span>
+                          <span className="font-mono text-steel-400">${(card.price.low / 100).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {card.price.mid && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-steel-500">Mid:</span>
+                          <span className="font-mono text-steel-400">${(card.price.mid / 100).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {card.price.high && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-steel-500">High:</span>
+                          <span className="font-mono text-steel-400">${(card.price.high / 100).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {card.price.foil && (
+                        <div className="flex justify-between text-xs">
+                          <span className="text-steel-500">Foil:</span>
+                          <span className="font-mono text-amber-400">${(card.price.foil / 100).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {!card.price.market && !card.price.low && !card.price.mid && !card.price.high && !card.price.foil && (
+                        <p className="text-xs text-steel-600">No price data available</p>
+                      )}
                     </div>
                   </div>
                 )}
