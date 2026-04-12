@@ -95,14 +95,13 @@ export function CardDetailModal({
           ref={contentRef}
           className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface focus:outline-none data-[state=closed]:animate-zoom-out data-[state=open]:animate-zoom-in sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[88svh] sm:w-[min(1200px,92vw)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:border sm:border-steel-600/30 sm:shadow-2xl lg:w-[min(1200px,90vw)]"
         >
-          {/* Close Button - Fixed Top Right with Jewel Tone */}
+          {/* Close Button - Minimal X Icon Top Right */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute z-20 top-4 right-4 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded flex items-center gap-1.5 transition-all duration-200 hover:shadow-lg"
+            className="absolute z-20 top-4 right-4 p-1.5 text-steel-400 hover:text-foreground transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-4 w-4" />
-            Close
+            <X className="h-6 w-6" />
           </button>
 
           {/* Main Content - 2 Column Editorial Layout */}
@@ -138,43 +137,40 @@ export function CardDetailModal({
               {/* Scrollable Details Content */}
               <div className="flex-1 overflow-y-auto">
                 <div className="p-6 md:p-8 space-y-5">
-                  {/* Title Section with Cost */}
+                  {/* Title Section */}
                   <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h2 className="font-display text-4xl font-bold text-foreground leading-tight">
-                          {card.name}
-                        </h2>
-                        <p className="text-base text-steel-600 font-medium mt-1">
-                          {card.type}
-                          {card.color && ` — ${card.color}`}
-                          {card.traits && card.traits.length > 0 && ` (${card.traits.join(') (')})`}
-                        </p>
-                      </div>
-                      {/* Cost Badge */}
-                      {card.cost !== undefined && (
-                        <div className="flex flex-col items-center gap-1 px-3 py-2 bg-amber-500/20 border border-amber-500/40 rounded">
-                          <span className="text-xs text-amber-600 font-bold">COST</span>
-                          <span className="text-2xl font-bold text-amber-300">{card.cost}</span>
-                        </div>
-                      )}
+                    <div className="flex-1">
+                      <h2 className="font-display text-4xl font-bold text-steel-50 leading-tight">
+                        {card.name}
+                      </h2>
+                      <p className="text-base text-steel-400 font-medium mt-1">
+                        {card.type}
+                        {card.color && ` — ${card.color}`}
+                        {card.traits && card.traits.length > 0 && ` (${card.traits.join(') (')})`}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Level Display */}
-                  {card.level !== undefined && (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-steel-700/30 border border-steel-500/30 rounded w-fit">
-                      <span className="text-xs text-steel-500 font-bold">LEVEL</span>
-                      <span className="text-xl font-bold text-steel-300">{card.level}</span>
-                    </div>
-                  )}
-
-                  {/* Full Rules Text - Prominent */}
+                  {/* Level and Cost - Same Row */}
+                  <div className="flex gap-3">
+                    {card.level !== undefined && (
+                      <div className="flex flex-col items-center gap-1 px-3 py-2 bg-steel-700/30 border border-steel-500/30 rounded">
+                        <span className="text-xs text-steel-500 font-bold">LEVEL</span>
+                        <span className="text-xl font-bold text-steel-300">{card.level}</span>
+                      </div>
+                    )}
+                    {card.cost !== undefined && (
+                      <div className="flex flex-col items-center gap-1 px-3 py-2 bg-amber-500/20 border border-amber-500/40 rounded">
+                        <span className="text-xs text-amber-600 font-bold">COST</span>
+                        <span className="text-2xl font-bold text-amber-300">{card.cost}</span>
+                      </div>
+                    )}
+                  </div>
                   {card.text && (
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Rules Text</p>
                       <div className="bg-surface-muted/50 border border-steel-600/30 rounded p-4">
-                        <p className="text-sm leading-relaxed text-steel-200 whitespace-pre-wrap">
+                        <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap font-medium">
                           {card.text}
                         </p>
                       </div>
@@ -273,7 +269,7 @@ export function CardDetailModal({
                   {card.linkCondition && (
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Link Condition</p>
-                      <p className="text-sm text-steel-300">{card.linkCondition}</p>
+                      <p className="text-sm text-steel-100">{card.linkCondition}</p>
                     </div>
                   )}
 
