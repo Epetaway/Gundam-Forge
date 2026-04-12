@@ -110,7 +110,7 @@ export function QtyBadge({ qty, mode }: QtyBadgeProps): JSX.Element | null {
   if (qty <= 0) return null;
   if (mode === 'viewer' && qty === 1) return null;
   return (
-    <span className="pointer-events-none absolute left-2 top-2 z-10 rounded-sm bg-black/70 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white">
+    <span className="pointer-events-none absolute right-2 top-2 z-10 rounded-sm bg-black/70 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white">
       x{qty}
     </span>
   );
