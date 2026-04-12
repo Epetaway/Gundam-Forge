@@ -48,14 +48,15 @@ export function CardPoster({
     <div
       className={cn(
         'relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black',
-        'shadow-md transition-all duration-150 group-hover:shadow-lg',
+        'shadow-md transition-all duration-200 group-hover:shadow-lg',
+        'group-hover:border-cobalt-500/60 group-hover:ring-1 group-hover:ring-cobalt-500/30',
         className,
       )}
     >
-      {/* Card art */}
+      {/* Card art with hover scale */}
       <CardArtImage
         card={card}
-        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         fill
         sizes={sizes ?? '(max-width: 640px) 50vw, (max-width: 1280px) 25vw, 16vw'}
       />

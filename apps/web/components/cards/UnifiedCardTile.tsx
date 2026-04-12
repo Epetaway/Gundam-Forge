@@ -3,6 +3,7 @@
 import { ChevronRight, Minus, Plus } from 'lucide-react';
 import type { CardDefinition } from '@gundam-forge/shared';
 import { CardArtImage } from '@/components/ui/CardArtImage';
+import { CardQuickAdd } from '@/components/cards/CardQuickAdd';
 import { getCardImage } from '@/lib/data/cards';
 import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
@@ -43,7 +44,10 @@ export function UnifiedCardTile({
       <button
         type="button"
         className={cn(
-          'group relative aspect-[5/7] overflow-hidden rounded-md border border-border bg-black transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500',
+          'group relative aspect-[5/7] overflow-hidden rounded-md border border-border bg-black transition-all duration-200',
+          'hover:shadow-lg hover:border-cobalt-500/60 hover:ring-1 hover:ring-cobalt-500/30',
+          'active:scale-95 sm:active:scale-100',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500',
           className,
         )}
         onClick={() => onPreview?.(card.id)}
@@ -63,15 +67,23 @@ export function UnifiedCardTile({
         <img
           src={getCardImage(card)}
           alt={card.name}
-          className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
+          className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+        />
+
+        {/* Mobile quick-add overlay */}
+        <CardQuickAdd
+          cardName={card.name}
+          qty={qty ?? 0}
+          onAdd={() => onAdd?.()}
+          onOpenDetails={() => onPreview?.(card.id)}
         />
 
         {/* Synergy score intentionally hidden in grid tiles to reduce visual noise. */}
 
         {/* Overlay and label */}
         <div className="pointer-events-none absolute inset-0 hidden bg-black/40 opacity-0 transition-opacity duration-200 group-hover:block group-hover:opacity-100" />
-        <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 transform rounded bg-black/70 px-2 py-1 text-center text-[10px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 transform rounded bg-black/70 px-2 py-1 text-center text-[10px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:group-focus-visible:opacity-100">
           Click to Preview
         </div>
 
@@ -84,7 +96,7 @@ export function UnifiedCardTile({
             e.stopPropagation();
             onAdd?.();
           }}
-          className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-600 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-300 hover:bg-cobalt-500 sm:opacity-0"
+          className="absolute bottom-1 right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-cobalt-600 text-white opacity-100 transition-all duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-300 hover:bg-cobalt-500 sm:opacity-0 sm:group-hover:opacity-100"
         >
           <span className="text-sm font-bold">+</span>
         </button>
