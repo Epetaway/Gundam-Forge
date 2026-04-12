@@ -139,11 +139,11 @@ export function CardDetailModal({
                 <div className="p-6 md:p-8 space-y-5">
                   {/* Title Section */}
                   <div className="space-y-2">
-                    <div className="flex-1">
-                      <h2 className="font-display text-4xl font-bold text-steel-50 leading-tight">
+                    <div>
+                      <h2 className="font-display text-4xl font-bold text-foreground leading-tight uppercase tracking-wide">
                         {card.name}
                       </h2>
-                      <p className="text-base text-steel-400 font-medium mt-1">
+                      <p className="text-sm text-cobalt-300 font-medium mt-2">
                         {card.type}
                         {card.color && ` — ${card.color}`}
                         {card.traits && card.traits.length > 0 && ` (${card.traits.join(') (')})`}
@@ -319,14 +319,6 @@ export function CardDetailModal({
                       </>
                     )}
 
-                    {context === 'cards' && (
-                      <button
-                        onClick={() => onOpenChange(false)}
-                        className="w-full px-4 py-2 border border-steel-600 text-steel-300 hover:text-foreground hover:border-steel-500 rounded font-medium transition-colors duration-200"
-                      >
-                        Close
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
