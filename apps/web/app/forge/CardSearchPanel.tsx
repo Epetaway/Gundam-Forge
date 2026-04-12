@@ -8,6 +8,7 @@ import { sortCardsBySynergy, filterCardsByIntent, clearSynergyScoreCache } from 
 import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { UnifiedCardTile } from '@/components/cards/UnifiedCardTile';
+import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
 import { cn } from '@/lib/utils/cn';
 import { debounce } from '@/lib/utils/debounce';
 import { analyzeDeckIntent } from '@/lib/deck/analyzeDeckIntent';
@@ -420,7 +421,91 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
   const [deckColorOnly, setDeckColorOnly] = useState(() => deckColors.length > 0);
   const [includeEX, setIncludeEX] = useState(intentIncludeEX);
+  // ── Check if any filters are active ──────────────────────────────────────
   const hasActiveFilters = rawQuery || typeFilter !== 'All' || colorFilter !== 'All' || setFilter !== 'All' || keywordFilters.length > 0 || triggerFilters.length > 0 || effectKeywordFilters.length > 0 || deckColorOnly || includeEX;
+
+  // ── Build active filter chips ────────────────────────────────────────────
+  const activeFilterChips = useMemo(() => {
+    const chips: { id: string; label: string; value: string | string[] }[] = [];
+
+    if (rawQuery.trim()) {
+      chips.push({ id: 'query', label: 'Search', value: rawQuery.trim() });
+    }
+    if (typeFilter !== 'All') {
+      chips.push({ id: 'type', label: 'Type', value: typeFilter });
+    }
+    if (colorFilter !== 'All') {
+      chips.push({ id: 'color', label: 'Color', value: colorFilter });
+    }
+    if (setFilter !== 'All') {
+      chips.push({ id: 'set', label: 'Set', value: setFilter });
+    }
+    if (keywordFilters.length > 0) {
+      chips.push({ id: 'keywords', label: 'Keywords', value: keywordFilters });
+    }
+    if (triggerFilters.length > 0) {
+      chips.push({ id: 'triggers', label: 'Triggers', value: triggerFilters });
+    }
+    if (effectKeywordFilters.length > 0) {
+      chips.push({ id: 'effects', label: 'Effects', value: effectKeywordFilters });
+    }
+    if (deckColorOnly && deckColors.length > 0) {
+      chips.push({ id: 'deckColors', label: 'Deck Colors', value: 'Only' });
+    }
+    if (includeEX) {
+      chips.push({ id: 'includeEX', label: 'EX Cards', value: 'Include' });
+    }
+
+    return chips;
+  }, [rawQuery, typeFilter, colorFilter, setFilter, keywordFilters, triggerFilters, effectKeywordFilters, deckColorOnly, includeEX, deckColors.length]);
+
+  // ── Handle filter removal ────────────────────────────────────────────────
+  const handleRemoveChip = useCallback((chipId: string) => {
+    switch (chipId) {
+      case 'query':
+        setRawQuery('');
+        debouncedSetQuery('');
+        break;
+      case 'type':
+        setTypeFilter('All');
+        break;
+      case 'color':
+        setColorFilter('All');
+        break;
+      case 'set':
+        setSetFilter('All');
+        break;
+      case 'keywords':
+        setKeywordFilters([]);
+        break;
+      case 'triggers':
+        setTriggerFilters([]);
+        break;
+      case 'effects':
+        setEffectKeywordFilters([]);
+        break;
+      case 'deckColors':
+        setDeckColorOnly(false);
+        break;
+      case 'includeEX':
+        setIncludeEX(false);
+        break;
+    }
+  }, [debouncedSetQuery]);
+
+  // ── Handle clear all filters ─────────────────────────────────────────────
+  const handleClearAllFilters = useCallback(() => {
+    setRawQuery('');
+    debouncedSetQuery('');
+    setTypeFilter('All');
+    setColorFilter('All');
+    setSetFilter('All');
+    setKeywordFilters([]);
+    setTriggerFilters([]);
+    setEffectKeywordFilters([]);
+    setDeckColorOnly(false);
+    setIncludeEX(false);
+  }, [debouncedSetQuery]);
 
   // Group mode: auto-switch to 'clan' when deck has clans, user can override
   const [groupMode, setGroupMode] = useState<GroupMode>(() =>
@@ -932,6 +1017,19 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
           </div>
         </div>
       </div>
+
+      {/* ── Active filter display ── */}
+      {activeFilterChips.length > 0 && (
+        <div className="px-3 py-2">
+          <ActiveFilterChips
+            chips={activeFilterChips}
+            totalCards={filtered.length}
+            totalAvailable={allCards.filter((c) => !EXCLUDED_SETS.has(c.set)).length}
+            onRemoveChip={handleRemoveChip}
+            onClearAll={handleClearAllFilters}
+          />
+        </div>
+      )}
 
       {/* ── Card results ─────────────────────────────────────────────────── */}
       <div

@@ -61,7 +61,10 @@
       "Bash(npx eslint:*)",
       "Bash(ls apps/web/.eslint* apps/web/eslint*)",
       "Bash(find /Users/earlhickson/Development/Gundam-Forge -name *.eslintrc* -o -name eslint.config*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "WebFetch(domain:www.moxfield.com)",
+      "WebFetch(domain:moxfield.com)"
     ]
   }
 }

@@ -166,11 +166,24 @@ export const ExtendedCardDefinitionSchema = z.object({
     .default(true)
     .describe('Tournament legal flag'),
 
+  legalities: z
+    .record(z.enum(['legal', 'banned', 'restricted', 'suspended']))
+    .optional()
+    .describe('Format-specific legality (e.g., { standard: "legal", extended: "banned" })'),
+
   bannedDate: z
     .string()
     .date()
     .optional()
     .describe('If banned, the effective date (ISO 8601)'),
+
+  availability: z
+    .object({
+      print: z.number().int().positive().optional().describe('Print number/count in set'),
+      rarity: z.enum(['C', 'R', 'SR', 'P']).optional().describe('C=Common, R=Rare, SR=Special Rare, P=Promo'),
+    })
+    .optional()
+    .describe('Availability and rarity metadata'),
 
   // Rulings & clarifications
   ruling: z

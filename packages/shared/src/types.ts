@@ -56,6 +56,19 @@ export interface CardDefinition {
   isResource?: boolean;   // Can be included in resource zone (Resources, Commands, EX cards)
   isExCard?: boolean;     // Is an EX Base or EX Resource card
 
+  // Format legality
+  legalities?: Record<string, 'legal' | 'banned' | 'restricted' | 'suspended'>;
+  // Examples: { standard: 'legal', extended: 'banned', vintage: 'restricted' }
+  // 'restricted' = can only play 1 copy (vs max 4 normally)
+
+  // Availability metadata
+  availability?: {
+    /** Print count / print number in set (e.g., 1, 2 for reprints) */
+    print?: number;
+    /** Rarity: C (Common), R (Rare), SR (Special Rare), P (Promo) */
+    rarity?: 'C' | 'R' | 'SR' | 'P';
+  };
+
   // Legacy compatibility
   power?: number;        // Fallback for AP if ap not specified
 
@@ -76,6 +89,118 @@ export const getCardHP = (card: CardDefinition): number =>
 /** Helper to get a card's effective level (defaults to cost) */
 export const getCardLevel = (card: CardDefinition): number =>
   card.level ?? card.cost;
+
+/**
+ * Extract numeric value from a keyword string.
+ * Examples:
+ *   - getKeywordValue({ keywords: ['repair 1'] }, 'repair') → 1
+ *   - getKeywordValue({ keywords: ['support 3'] }, 'support') → 3
+ *   - getKeywordValue({ keywords: ['blocker'] }, 'blocker') → 1 (default)
+ *   - getKeywordValue({ keywords: [] }, 'unknown') → 0 (not found)
+ */
+export const getKeywordValue = (
+  card: CardDefinition,
+  keywordName: string,
+  defaultValue: number = 1
+): number => {
+  if (!card.keywords || card.keywords.length === 0) {
+    return 0;
+  }
+
+  const match = card.keywords.find((k) =>
+    k.toLowerCase().startsWith(keywordName.toLowerCase())
+  );
+
+  if (!match) {
+    return 0;
+  }
+
+  // If keyword is just the name (e.g., "blocker"), return default
+  if (match.toLowerCase() === keywordName.toLowerCase()) {
+    return defaultValue;
+  }
+
+  // Extract numeric suffix (e.g., "repair 2" → 2)
+  const numeric = match.match(/\d+$/);
+  return numeric ? parseInt(numeric[0], 10) : defaultValue;
+};
+
+/**
+ * Check if a card has a specific keyword (case-insensitive prefix match).
+ * Examples:
+ *   - hasKeyword({ keywords: ['repair 2'] }, 'repair') → true
+ *   - hasKeyword({ keywords: ['blocker'] }, 'blocker') → true
+ *   - hasKeyword({ keywords: [] }, 'any') → false
+ */
+export const hasKeyword = (card: CardDefinition, keywordName: string): boolean => {
+  if (!card.keywords || card.keywords.length === 0) {
+    return false;
+  }
+
+  return card.keywords.some((k) =>
+    k.toLowerCase().startsWith(keywordName.toLowerCase())
+  );
+};
+
+/**
+ * Check if a card is legal in a specific format.
+ * Examples:
+ *   - isLegalInFormat({ legalities: { standard: 'legal' } }, 'standard') → true
+ *   - isLegalInFormat({ legalities: { standard: 'banned' } }, 'standard') → false
+ *   - isLegalInFormat({}, 'any-format') → true (default: assume legal if not specified)
+ */
+export const isLegalInFormat = (
+  card: CardDefinition,
+  formatId: string,
+  assumeLegalIfNotSpecified: boolean = true
+): boolean => {
+  if (!card.legalities) {
+    return assumeLegalIfNotSpecified;
+  }
+
+  const status = card.legalities[formatId];
+  if (!status) {
+    return assumeLegalIfNotSpecified;
+  }
+
+  return status === 'legal' || status === 'restricted';
+};
+
+/**
+ * Get the copy limit for a card in a specific format.
+ * Examples:
+ *   - getCopyLimit({ legalities: { standard: 'legal' } }, 'standard') → 4 (default max)
+ *   - getCopyLimit({ legalities: { standard: 'restricted' } }, 'standard') → 1
+ *   - getCopyLimit({ legalities: { standard: 'banned' } }, 'standard') → 0
+ */
+export const getCopyLimit = (
+  card: CardDefinition,
+  formatId: string
+): number => {
+  if (!card.legalities) {
+    return 4; // Default max copies
+  }
+
+  const status = card.legalities[formatId.toLowerCase()] ||
+    card.legalities[formatId.toUpperCase()] ||
+    card.legalities[formatId];
+
+  if (!status) {
+    return 4; // Default max copies if format not specified
+  }
+
+  switch (status) {
+    case 'legal':
+      return 4;
+    case 'restricted':
+      return 1;
+    case 'suspended':
+    case 'banned':
+      return 0;
+    default:
+      return 4;
+  }
+};
 
 /**
  * DeckIntent: The strategic choices made during deck creation

@@ -11,6 +11,7 @@ import { CardsFilterApplyBar } from '@/components/cards/CardsFilterApplyBar';
 import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
 import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
+import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage, getCardsFromSource } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
