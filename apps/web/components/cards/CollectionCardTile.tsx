@@ -32,7 +32,7 @@ export function CollectionCardTile({
   return (
     <article
       className={cn(
-        'group flex flex-col overflow-hidden rounded-lg border border-border bg-surface-muted transition-all duration-150 hover:border-cobalt-400/50 hover:shadow-md',
+        'group flex flex-col overflow-hidden rounded-lg bg-surface-muted transition-all duration-150 hover:shadow-md',
         className,
       )}
     >

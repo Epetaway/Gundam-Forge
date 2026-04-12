@@ -13,7 +13,7 @@ interface CardPreviewTileProps {
 
 export function CardPreviewTile({ imageUrl, name, cost, type, qty, onClick, onAdd, onRemove }: CardPreviewTileProps) {
   return (
-    <div className="group relative rounded-md border border-border bg-black overflow-hidden focus:outline-none">
+    <div className="group relative rounded-md bg-black overflow-hidden focus:outline-none">
       <button
         className="block w-full"
         onClick={onClick}
@@ -24,17 +24,10 @@ export function CardPreviewTile({ imageUrl, name, cost, type, qty, onClick, onAd
           <img src={imageUrl} alt={name} className="aspect-[5/7] w-full object-cover" loading="lazy" />
         )}
         {qty > 1 && (
-          <span className="absolute left-2 top-2 z-10 rounded bg-black/80 px-2 py-0.5 font-mono text-xs font-bold text-white shadow">
+          <span className="absolute right-2 top-2 z-10 rounded bg-black/80 px-2 py-0.5 font-mono text-xs font-bold text-white shadow">
             x{qty}
           </span>
         )}
-        {/* Name + type bar always visible at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-1.5 pb-1 pt-4">
-          <p className="truncate text-[11px] font-semibold leading-tight text-white">{name}</p>
-          {type && (
-            <p className="truncate text-[9px] uppercase tracking-wide text-steel-400">{type}</p>
-          )}
-        </div>
       </button>
 
       {/* Builder controls: show on hover (desktop) */}

@@ -40,7 +40,7 @@ export function DeckEntryRow({
       )}
     >
       {/* Thumbnail */}
-      <div className="relative h-12 w-8 flex-none overflow-hidden rounded-[3px] border border-border bg-black">
+      <div className="relative h-12 w-8 flex-none overflow-hidden rounded-[3px] bg-black">
         <CardArtImage card={card} className="h-full w-full object-cover" fill sizes="32px" />
       </div>
 

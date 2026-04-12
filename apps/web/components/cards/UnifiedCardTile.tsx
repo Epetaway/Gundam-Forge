@@ -44,8 +44,8 @@ export function UnifiedCardTile({
       <button
         type="button"
         className={cn(
-          'group relative aspect-[5/7] overflow-hidden rounded-md border border-border bg-black transition-all duration-200',
-          'hover:shadow-lg hover:border-cobalt-500/60 hover:ring-1 hover:ring-cobalt-500/30',
+          'group relative aspect-[5/7] overflow-hidden rounded-md bg-black transition-all duration-200',
+          'hover:shadow-lg',
           'active:scale-95 sm:active:scale-100',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500',
           className,

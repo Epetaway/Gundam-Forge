@@ -47,9 +47,8 @@ export function CardPoster({
   return (
     <div
       className={cn(
-        'relative aspect-[5/7] w-full overflow-hidden rounded-md border border-border bg-black',
+        'relative aspect-[5/7] w-full overflow-hidden rounded-md bg-black',
         'shadow-md transition-all duration-200 group-hover:shadow-lg',
-        'group-hover:border-cobalt-500/60 group-hover:ring-1 group-hover:ring-cobalt-500/30',
         className,
       )}
     >
