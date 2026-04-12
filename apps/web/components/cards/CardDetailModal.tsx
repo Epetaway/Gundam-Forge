@@ -137,26 +137,47 @@ export function CardDetailModal({
 
               {/* Scrollable Details Content */}
               <div className="flex-1 overflow-y-auto">
-                <div className="p-6 md:p-8 space-y-6">
-                  {/* Title Section */}
-                  <div className="space-y-1">
-                    <h2 className="font-display text-4xl font-bold text-foreground leading-tight">
-                      {card.name}
-                    </h2>
-                    <p className="text-base text-steel-600 font-medium">
-                      {card.type}
-                      {card.color && ` — ${card.color}`}
-                      {card.traits && card.traits.length > 0 && ` ${card.traits[0]}`}
-                    </p>
+                <div className="p-6 md:p-8 space-y-5">
+                  {/* Title Section with Cost */}
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h2 className="font-display text-4xl font-bold text-foreground leading-tight">
+                          {card.name}
+                        </h2>
+                        <p className="text-base text-steel-600 font-medium mt-1">
+                          {card.type}
+                          {card.color && ` — ${card.color}`}
+                          {card.traits && card.traits.length > 0 && ` (${card.traits.join(') (')})`}
+                        </p>
+                      </div>
+                      {/* Cost Badge */}
+                      {card.cost !== undefined && (
+                        <div className="flex flex-col items-center gap-1 px-3 py-2 bg-amber-500/20 border border-amber-500/40 rounded">
+                          <span className="text-xs text-amber-600 font-bold">COST</span>
+                          <span className="text-2xl font-bold text-amber-300">{card.cost}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Ability/Rules Text */}
+                  {/* Level Display */}
+                  {card.level !== undefined && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-steel-700/30 border border-steel-500/30 rounded w-fit">
+                      <span className="text-xs text-steel-500 font-bold">LEVEL</span>
+                      <span className="text-xl font-bold text-steel-300">{card.level}</span>
+                    </div>
+                  )}
+
+                  {/* Full Rules Text - Prominent */}
                   {card.text && (
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Rules Text</p>
-                      <p className="text-base leading-relaxed text-steel-300 whitespace-pre-wrap font-medium">
-                        {card.text}
-                      </p>
+                      <div className="bg-surface-muted/50 border border-steel-600/30 rounded p-4">
+                        <p className="text-sm leading-relaxed text-steel-200 whitespace-pre-wrap">
+                          {card.text}
+                        </p>
+                      </div>
                     </div>
                   )}
 
@@ -164,7 +185,7 @@ export function CardDetailModal({
                   {(card.ap !== undefined || card.hp !== undefined) && (
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Stats</p>
-                      <div className="flex items-end justify-end gap-6">
+                      <div className="flex items-end justify-end gap-8">
                         {card.ap !== undefined && (
                           <div className="text-right">
                             <p className="text-xs text-steel-500 font-medium">Attack</p>
@@ -181,41 +202,89 @@ export function CardDetailModal({
                     </div>
                   )}
 
-                  {/* Traits */}
-                  {card.traits && card.traits.length > 0 && (
+                  {/* AP/HP Modifiers */}
+                  {(card.apModifier !== undefined || card.hpModifier !== undefined) && (
                     <div className="space-y-2">
-                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Traits</p>
-                      <p className="text-sm text-steel-300">{card.traits.join(' • ')}</p>
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Modifiers</p>
+                      <div className="flex gap-3">
+                        {card.apModifier !== undefined && (
+                          <div className="px-3 py-2 bg-cobalt-500/20 border border-cobalt-500/40 rounded">
+                            <p className="text-xs text-cobalt-600 font-bold">AP Mod</p>
+                            <p className="text-lg font-bold text-cobalt-300">
+                              {card.apModifier > 0 ? '+' : ''}{card.apModifier}
+                            </p>
+                          </div>
+                        )}
+                        {card.hpModifier !== undefined && (
+                          <div className="px-3 py-2 bg-red-500/20 border border-red-500/40 rounded">
+                            <p className="text-xs text-red-600 font-bold">HP Mod</p>
+                            <p className="text-lg font-bold text-red-300">
+                              {card.hpModifier > 0 ? '+' : ''}{card.hpModifier}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Keywords/Abilities */}
+                  {card.keywords && card.keywords.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Keywords</p>
+                      <div className="flex flex-wrap gap-2">
+                        {card.keywords.map((kw) => (
+                          <span key={kw} className="px-2.5 py-1 bg-cobalt-500/30 border border-cobalt-500/50 rounded text-xs font-semibold text-cobalt-200">
+                            {kw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Triggers */}
+                  {card.triggers && card.triggers.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Triggers</p>
+                      <div className="flex flex-wrap gap-2">
+                        {card.triggers.map((tr) => (
+                          <span key={tr} className="px-2.5 py-1 bg-amber-500/30 border border-amber-500/50 rounded text-xs font-semibold text-amber-200">
+                            {tr}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Clans/Factions */}
+                  {card.clans && card.clans.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Clans</p>
+                      <div className="flex flex-wrap gap-2">
+                        {card.clans.map((clan) => (
+                          <span key={clan} className="px-2.5 py-1 bg-emerald-500/30 border border-emerald-500/50 rounded text-xs font-semibold text-emerald-200">
+                            {clan}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Link Condition */}
+                  {card.linkCondition && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Link Condition</p>
+                      <p className="text-sm text-steel-300">{card.linkCondition}</p>
                     </div>
                   )}
 
                   {/* Source Information */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 pt-2 border-t border-steel-600/20">
                     <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Source</p>
                     <p className="text-sm text-steel-500">
-                      {card.set && `Set ${card.set} • `}
+                      {card.set && `Set ${card.set}`}
+                      {card.set && card.id && ' • '}
                       {card.id}
                     </p>
-                  </div>
-
-                  {/* Format Legalities Grid  */}
-                  <div className="space-y-3">
-                    <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Format Legalities</p>
-                    <div className="grid grid-cols-3 gap-3 gap-y-2 text-sm">
-                      {[
-                        'Standard',
-                        'Modern',
-                        'Pioneer',
-                        'Commander',
-                        'Legacy',
-                        'Historic',
-                      ].map((format) => (
-                        <div key={format} className="flex items-start gap-1.5">
-                          <span className="text-steel-400 flex-shrink-0">○</span>
-                          <span className="text-steel-500">{format}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
 
                   {/* Action Buttons */}
