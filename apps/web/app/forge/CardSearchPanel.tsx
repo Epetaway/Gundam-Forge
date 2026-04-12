@@ -9,6 +9,8 @@ import { cards as allCards, allSets, getCardImage } from '@/lib/data/cards';
 import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { UnifiedCardTile } from '@/components/cards/UnifiedCardTile';
 import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
+import { KeyboardShortcutsModal } from '@/components/modals/KeyboardShortcutsModal';
+import { useCardboardKeyboardShortcuts } from '@/lib/hooks/useCardboardKeyboardShortcuts';
 import { cn } from '@/lib/utils/cn';
 import { debounce } from '@/lib/utils/debounce';
 import { analyzeDeckIntent } from '@/lib/deck/analyzeDeckIntent';
@@ -412,6 +414,10 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [activeFilterSection, setActiveFilterSection] = useState<FilterSectionId>('intent');
 
+  // Keyboard shortcuts
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const deckColors = deckIntent?.colors ?? [];
   const deckClans = deckIntent?.clans ?? [];
   const mechanicsPackages = deckIntent?.packages ?? [];
@@ -506,6 +512,18 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
     setDeckColorOnly(false);
     setIncludeEX(false);
   }, [debouncedSetQuery]);
+
+  // ── Keyboard shortcuts (Moxfield-style) ──────────────────────────────────
+  useCardboardKeyboardShortcuts({
+    onSlashKey: () => {
+      // Focus the AdvancedSearchInput by finding the first input in the search section
+      const searchInput = document.querySelector('[aria-label="Search cards"] input') as HTMLInputElement;
+      if (searchInput) searchInput.focus();
+      else searchInputRef.current?.focus();
+    },
+    onQuestionKey: () => setShowKeyboardHelp(true),
+    enabled: true,
+  });
 
   // Group mode: auto-switch to 'clan' when deck has clans, user can override
   const [groupMode, setGroupMode] = useState<GroupMode>(() =>
@@ -1081,6 +1099,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             setPreviewCardId(null);
           }
         }}
+      />
+
+      {/* Keyboard Shortcuts Help Modal */}
+      <KeyboardShortcutsModal
+        open={showKeyboardHelp}
+        onOpenChange={setShowKeyboardHelp}
       />
     </aside>
   );

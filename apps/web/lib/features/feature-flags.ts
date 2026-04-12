@@ -80,8 +80,9 @@ export const features = {
 
   /**
    * Cards UX V2: Contract-gated cards browsing/filtering upgrades.
+   * Enables filter presets (Rush Main, Resource Core, Control Commands) in /cards page
    */
-  cardsUxV2: () => isFeatureEnabled(FEATURE_FLAGS.CARDS_UX_V2),
+  cardsUxV2: () => isFeatureEnabled(FEATURE_FLAGS.CARDS_UX_V2, true),
 
   /**
    * Decks UX V2: Contract-gated deck browser and detail upgrades.

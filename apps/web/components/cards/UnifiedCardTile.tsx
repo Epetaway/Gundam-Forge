@@ -8,7 +8,7 @@ import { getCardImage } from '@/lib/data/cards';
 import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
 
-type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'imageUrl' | 'placeholderArt'>;
+type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'imageUrl' | 'placeholderArt' | 'price'>;
 
 type ScoredCard = CardDefinition & { synergyScore?: number; synergyReasons?: any[] };
 
@@ -87,6 +87,13 @@ export function UnifiedCardTile({
           Click to Preview
         </div>
 
+        {/* Price label (if available) */}
+        {card.price?.market && (
+          <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/70 px-1 py-0.5 text-[9px] font-medium text-steel-500">
+            ${(card.price.market / 100).toFixed(2)}
+          </div>
+        )}
+
         {/* Add button */}
         <button
           type="button"
@@ -141,6 +148,13 @@ export function UnifiedCardTile({
       <span className="flex-none rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] font-bold text-text-secondary">
         {card.cost}
       </span>
+
+      {/* Price label (if available) */}
+      {card.price?.market && (
+        <span className="flex-none rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-medium text-steel-500">
+          ${(card.price.market / 100).toFixed(2)}
+        </span>
+      )}
 
       {/* Qty badge */}
       {qty > 0 ? (
