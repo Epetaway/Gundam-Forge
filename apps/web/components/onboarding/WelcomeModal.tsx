@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { ChevronRight, Zap, Wrench, Swords } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -114,7 +113,7 @@ export function WelcomeModal(): JSX.Element | null {
 
           {/* Content */}
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-3">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               {step.title}
             </h2>
             <p className="text-lg text-text-secondary mb-6">{step.description}</p>
@@ -131,7 +130,7 @@ export function WelcomeModal(): JSX.Element | null {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
+          <div className="flex flex-col-reverse gap-4 sm:flex-row sm:justify-center">
             <Button
               variant="secondary"
               onClick={handleClose}

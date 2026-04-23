@@ -149,7 +149,7 @@ export function AdvancedSearchInput({
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
           placeholder={placeholder}
-          className="w-full rounded-md border border-border bg-surface px-3 py-2.5 pl-10 pr-10 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
+          className="w-full rounded-md border border-border bg-surface px-4 py-2 pl-10 pr-10 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
           aria-label="Search cards"
           aria-autocomplete="list"
           aria-controls={isDropdownOpen ? 'search-suggestions' : undefined}
@@ -191,7 +191,7 @@ export function AdvancedSearchInput({
 
       {/* Search Syntax Help */}
       {showHelp && (
-        <div className="mt-2 space-y-1 rounded-md border border-border bg-surface-interactive/40 p-3 text-xs text-text-muted">
+        <div className="mt-2 space-y-1 rounded-md border border-border bg-surface-interactive/40 p-4 text-xs text-text-muted">
           <div><strong className="text-text-secondary">Search Tips:</strong></div>
           <div>• Multiple terms: <code className="text-cobalt-400">draw trash</code> (finds cards with BOTH)</div>
           <div>• OR logic: <code className="text-cobalt-400">draw | trash</code> (finds cards with EITHER)</div>
@@ -232,7 +232,7 @@ export function SimpleSearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-2.5 pl-10 bg-surface-800 border border-steel-700 rounded-lg text-steel-100 placeholder-steel-500 focus:outline-none focus:ring-2 focus:ring-cobalt-500 focus:border-transparent transition-all"
+        className="w-full px-4 py-2 pl-10 bg-surface-800 border border-steel-700 rounded-lg text-steel-100 placeholder-steel-500 focus:outline-none focus:ring-2 focus:ring-cobalt-500 focus:border-transparent transition-all"
         aria-label="Search"
       />
 

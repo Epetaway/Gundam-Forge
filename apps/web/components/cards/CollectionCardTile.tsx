@@ -32,7 +32,7 @@ export function CollectionCardTile({
   return (
     <article
       className={cn(
-        'group flex flex-col overflow-hidden rounded-lg bg-surface-muted transition-all duration-150 hover:shadow-md',
+        'group flex flex-col overflow-hidden rounded-lg border border-cobalt-900/55 bg-[linear-gradient(180deg,hsl(var(--surface-elevated)),hsl(var(--surface-muted)))] shadow-[var(--shadow-card)] transition-all duration-150 hover:border-cobalt-500/45 hover:shadow-[var(--shadow-hover)]',
         className,
       )}
     >
@@ -56,13 +56,13 @@ export function CollectionCardTile({
 
         {/* Qty badge — visible only in deck-building contexts */}
         {qty > 0 ? (
-          <span className="pointer-events-none absolute right-2 top-2 z-10 rounded-sm bg-black/65 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white backdrop-blur-sm">
+          <span className="pointer-events-none absolute right-2 top-2 z-10 rounded-sm bg-black/65 px-2 py-0.5 font-mono text-[11px] font-bold leading-none text-white backdrop-blur-sm">
             {qty}
           </span>
         ) : null}
 
         {/* ActionRail — right edge, hover/focus-revealed */}
-        <div className="absolute right-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-1.5 opacity-0 transition-opacity duration-150 focus-within:opacity-100 group-hover:opacity-100">
+        <div className="absolute right-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2 opacity-0 transition-opacity duration-150 focus-within:opacity-100 group-hover:opacity-100">
           {(onAdd ?? onRemove) ? (
             <div className="overflow-hidden rounded-[5px] border border-white/25 bg-black/55 backdrop-blur-[2px]">
               {onAdd ? (
@@ -102,19 +102,19 @@ export function CollectionCardTile({
       </div>
 
       {/* ── Meta row ──────────────────────────────────────────── */}
-      <div className="px-2 py-1.5">
+      <div className="px-2 py-2">
         <p className="truncate text-[12px] font-semibold leading-tight text-foreground">{card.name}</p>
         <p className="mt-0.5 truncate text-[10px] text-steel-600">{card.id} · {card.type}</p>
       </div>
 
       {/* ── Price / cost footer ───────────────────────────────── */}
-      <div className="flex items-center justify-between border-t border-border px-2 py-1">
+      <div className="flex items-center justify-between border-t border-cobalt-900/50 bg-surface/70 px-2 py-1">
         {marketPrice !== undefined ? (
           <span className="font-mono text-[10px] text-steel-600">${marketPrice.toFixed(2)}</span>
         ) : (
           <span className="text-[10px] text-steel-400">—</span>
         )}
-        <span className="rounded bg-surface px-1.5 py-0.5 font-mono text-[10px] font-bold text-steel-700">
+        <span className="rounded bg-surface px-2 py-0.5 font-mono text-[10px] font-bold text-steel-700">
           {card.cost}
         </span>
       </div>

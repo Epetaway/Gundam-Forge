@@ -109,7 +109,7 @@ export function DeckAnalyticsPanel({
       data-testid="deck-analytics-panel"
     >
       {/* Header */}
-      <div className="border-b border-cobalt-900/65 px-4 py-3">
+      <div className="border-b border-cobalt-900/65 px-4 py-4">
         <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cobalt-200">
           Deck Analytics
         </p>

@@ -45,7 +45,7 @@ export function GameLog({ entries }: GameLogProps) {
 
       {entries.length > 0 ? (
         entries.map((entry, i) => (
-          <div key={i} className="text-xs border-l border-slate-500/60 pl-2.5 py-1.5 bg-slate-900/25 rounded-r">
+          <div key={i} className="text-xs border-l border-slate-500/60 pl-2 py-2 bg-slate-900/25 rounded-r">
             <div className="flex gap-2">
               <span className="text-slate-300 min-w-fit font-mono text-[10px]">
                 T{entry.state?.turnNumber || '?'} {entry.phase}

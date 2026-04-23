@@ -19,7 +19,7 @@ export function StacksView({ items, selection, actions, ui }: DeckViewRendererPr
     <div className="space-y-6">
       {stacks.map((stack) => (
         <section key={stack.id}>
-          <header className="mb-3 flex items-center gap-2">
+          <header className="mb-4 flex items-center gap-2">
             <h3 className="text-sm font-bold uppercase tracking-wide text-foreground">
               {stack.label}
             </h3>

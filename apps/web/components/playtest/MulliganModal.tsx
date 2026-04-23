@@ -51,7 +51,7 @@ export function MulliganModal({
 
         {/* Hand Display */}
         <div className="mb-8">
-          <p className="text-sm text-white mb-3">Your opening hand ({hand.length} cards):</p>
+          <p className="text-sm text-white mb-4">Your opening hand ({hand.length} cards):</p>
           <div className="flex gap-2 overflow-x-auto pb-2 max-h-48">
             {hand.map((card) => {
               const cardDef = cardDatabase[card.cardId];
@@ -106,7 +106,7 @@ export function MulliganModal({
           <button
             onClick={() => setChoice('keep')}
             disabled={isLoading}
-            className={`flex-1 py-3 px-4 rounded font-semibold transition ${
+            className={`flex-1 py-4 px-4 rounded font-semibold transition ${
               choice === 'keep'
                 ? 'bg-green-600 text-white'
                 : 'bg-surface-elevated text-white hover:bg-surface border border-border'
@@ -118,7 +118,7 @@ export function MulliganModal({
           <button
             onClick={() => setChoice('mulligan')}
             disabled={isLoading}
-            className={`flex-1 py-3 px-4 rounded font-semibold transition ${
+            className={`flex-1 py-4 px-4 rounded font-semibold transition ${
               choice === 'mulligan'
                 ? 'bg-cobalt-600 text-white'
                 : 'bg-surface-elevated text-white hover:bg-surface border border-border'
@@ -133,7 +133,7 @@ export function MulliganModal({
           <button
             onClick={handleConfirm}
             disabled={isLoading || choice === null}
-            className="w-full py-3 px-4 rounded font-semibold transition bg-cobalt-600 text-white hover:bg-cobalt-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 px-4 rounded font-semibold transition bg-cobalt-600 text-white hover:bg-cobalt-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading
               ? 'Applying choice...'

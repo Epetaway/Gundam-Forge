@@ -52,7 +52,7 @@ export function MobileGameLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden">
       {/* Mobile Header - Minimal */}
-      <div className="border-b border-slate-700 bg-slate-800/50 px-4 py-3 flex-shrink-0">
+      <div className="border-b border-slate-700 bg-slate-800/50 px-4 py-4 flex-shrink-0">
         <h1 className="text-lg font-bold">Gundam Playtester</h1>
       </div>
 
@@ -68,7 +68,7 @@ export function MobileGameLayout({ children }: { children: React.ReactNode }) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 px-4 text-center transition text-sm font-semibold border-b-2 ${
+            className={`flex-1 py-4 px-4 text-center transition text-sm font-semibold border-b-2 ${
               activeTab === tab
                 ? 'border-purple-600 text-purple-300 bg-slate-800'
                 : 'border-slate-700 text-white hover:text-white'
@@ -92,7 +92,7 @@ export function TabletGameLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       {/* Tablet Header */}
-      <div className="border-b border-slate-700 bg-slate-800/50 px-4 py-3 flex justify-between items-center">
+      <div className="border-b border-slate-700 bg-slate-800/50 px-4 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold">Gundam TCG Playtester</h1>
         <div className="text-sm text-white">Tablet View</div>
       </div>

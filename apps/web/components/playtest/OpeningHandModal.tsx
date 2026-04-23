@@ -77,17 +77,17 @@ export default function OpeningHandModal({
                         {(cardDef?.cost || cardDef?.ap || cardDef?.hp) && (
                           <div className="flex gap-1 justify-center text-[9px] font-bold">
                             {cardDef?.cost && (
-                              <div className="bg-amber-700 text-white px-1.5 py-0.5 rounded">
+                              <div className="bg-amber-700 text-white px-2 py-0.5 rounded">
                                 {cardDef.cost}
                               </div>
                             )}
                             {cardDef?.ap && (
-                              <div className="bg-red-700 text-white px-1.5 py-0.5 rounded">
+                              <div className="bg-red-700 text-white px-2 py-0.5 rounded">
                                 ATK {cardDef.ap}
                               </div>
                             )}
                             {cardDef?.hp && (
-                              <div className="bg-blue-700 text-white px-1.5 py-0.5 rounded">
+                              <div className="bg-blue-700 text-white px-2 py-0.5 rounded">
                                 HP {cardDef.hp}
                               </div>
                             )}
@@ -110,18 +110,18 @@ export default function OpeningHandModal({
         <div className="border-t border-steel-600 bg-black/80 px-8 py-6 flex gap-4 justify-center">
           <Button
             onClick={onKeep}
-            className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded"
+            className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded"
           >
             Keep this
           </Button>
           <Button
             onClick={onMulligan}
             variant="secondary"
-            className="px-8 py-3 text-lg"
+            className="px-8 py-4 text-lg"
           >
             Mulligan ({hand.length})
           </Button>
-          <Button variant="secondary" className="px-8 py-3 text-lg">
+          <Button variant="secondary" className="px-8 py-4 text-lg">
             Options
           </Button>
         </div>

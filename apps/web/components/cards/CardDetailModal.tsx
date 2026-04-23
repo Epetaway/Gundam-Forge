@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Minus, Plus } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Dialog, DialogOverlay, DialogPortal } from '@/components/ui/Dialog';
@@ -61,8 +61,6 @@ export function CardDetailModal({
   qty = 0,
   onAdd,
   onRemove,
-  allCards = [],
-  onSelectCard,
 }: CardDetailModalProps): JSX.Element {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -98,7 +96,7 @@ export function CardDetailModal({
           {/* Close Button - Minimal X Icon Top Right */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute z-20 top-4 right-4 p-1.5 text-steel-400 hover:text-foreground transition-colors"
+            className="absolute z-20 top-4 right-4 p-2 text-steel-400 hover:text-foreground transition-colors"
             aria-label="Close modal"
           >
             <X className="h-6 w-6" />
@@ -136,7 +134,7 @@ export function CardDetailModal({
 
               {/* Scrollable Details Content */}
               <div className="flex-1 overflow-y-auto">
-                <div className="p-6 md:p-8 space-y-5">
+                <div className="p-6 md:p-8 space-y-6">
                   {/* Title Section */}
                   <div className="space-y-2">
                     <div>
@@ -152,15 +150,15 @@ export function CardDetailModal({
                   </div>
 
                   {/* Level and Cost - Same Row */}
-                  <div className="flex gap-3">
+                  <div className="flex gap-4">
                     {card.level !== undefined && (
-                      <div className="flex flex-col items-center gap-1 px-3 py-2 bg-steel-700/30 border border-steel-500/30 rounded">
+                      <div className="flex flex-col items-center gap-1 px-4 py-2 bg-steel-700/30 border border-steel-500/30 rounded">
                         <span className="text-xs text-steel-500 font-bold">LEVEL</span>
                         <span className="text-xl font-bold text-steel-300">{card.level}</span>
                       </div>
                     )}
                     {card.cost !== undefined && (
-                      <div className="flex flex-col items-center gap-1 px-3 py-2 bg-amber-500/20 border border-amber-500/40 rounded">
+                      <div className="flex flex-col items-center gap-1 px-4 py-2 bg-amber-500/20 border border-amber-500/40 rounded">
                         <span className="text-xs text-amber-600 font-bold">COST</span>
                         <span className="text-2xl font-bold text-amber-300">{card.cost}</span>
                       </div>
@@ -202,9 +200,9 @@ export function CardDetailModal({
                   {(card.apModifier !== undefined || card.hpModifier !== undefined) && (
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Modifiers</p>
-                      <div className="flex gap-3">
+                      <div className="flex gap-4">
                         {card.apModifier !== undefined && (
-                          <div className="px-3 py-2 bg-cobalt-500/20 border border-cobalt-500/40 rounded">
+                          <div className="px-4 py-2 bg-cobalt-500/20 border border-cobalt-500/40 rounded">
                             <p className="text-xs text-cobalt-600 font-bold">AP Mod</p>
                             <p className="text-lg font-bold text-cobalt-300">
                               {card.apModifier > 0 ? '+' : ''}{card.apModifier}
@@ -212,7 +210,7 @@ export function CardDetailModal({
                           </div>
                         )}
                         {card.hpModifier !== undefined && (
-                          <div className="px-3 py-2 bg-red-500/20 border border-red-500/40 rounded">
+                          <div className="px-4 py-2 bg-red-500/20 border border-red-500/40 rounded">
                             <p className="text-xs text-red-600 font-bold">HP Mod</p>
                             <p className="text-lg font-bold text-red-300">
                               {card.hpModifier > 0 ? '+' : ''}{card.hpModifier}
@@ -229,7 +227,7 @@ export function CardDetailModal({
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Keywords</p>
                       <div className="flex flex-wrap gap-2">
                         {card.keywords.map((kw) => (
-                          <span key={kw} className="px-2.5 py-1 bg-cobalt-500/30 border border-cobalt-500/50 rounded text-xs font-semibold text-cobalt-200">
+                          <span key={kw} className="px-2 py-1 bg-cobalt-500/30 border border-cobalt-500/50 rounded text-xs font-semibold text-cobalt-200">
                             {kw}
                           </span>
                         ))}
@@ -243,7 +241,7 @@ export function CardDetailModal({
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Triggers</p>
                       <div className="flex flex-wrap gap-2">
                         {card.triggers.map((tr) => (
-                          <span key={tr} className="px-2.5 py-1 bg-amber-500/30 border border-amber-500/50 rounded text-xs font-semibold text-amber-200">
+                          <span key={tr} className="px-2 py-1 bg-amber-500/30 border border-amber-500/50 rounded text-xs font-semibold text-amber-200">
                             {tr}
                           </span>
                         ))}
@@ -257,7 +255,7 @@ export function CardDetailModal({
                       <p className="text-sm font-bold text-steel-500 uppercase tracking-wider">Clans</p>
                       <div className="flex flex-wrap gap-2">
                         {card.clans.map((clan) => (
-                          <span key={clan} className="px-2.5 py-1 bg-emerald-500/30 border border-emerald-500/50 rounded text-xs font-semibold text-emerald-200">
+                          <span key={clan} className="px-2 py-1 bg-emerald-500/30 border border-emerald-500/50 rounded text-xs font-semibold text-emerald-200">
                             {clan}
                           </span>
                         ))}
@@ -288,7 +286,7 @@ export function CardDetailModal({
                     {context === 'deckbuilder' && (
                       <>
                         <div className="flex gap-2">
-                          <div className="flex items-center gap-1 border border-steel-600 rounded px-3 py-2 flex-shrink-0 bg-surface-muted/50">
+                          <div className="flex items-center gap-1 border border-steel-600 rounded px-4 py-2 flex-shrink-0 bg-surface-muted/50">
                             <button
                               onClick={onRemove}
                               disabled={qty === 0}

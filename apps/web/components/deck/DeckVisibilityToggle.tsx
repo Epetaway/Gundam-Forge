@@ -33,7 +33,7 @@ export function DeckVisibilityToggle({ deckId, initialIsPublic, onToggle }: Deck
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       <button
         onClick={handleToggle}
         disabled={isLoading}

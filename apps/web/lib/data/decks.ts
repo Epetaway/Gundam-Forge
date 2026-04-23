@@ -1,5 +1,4 @@
 import type { CardColor, CardDefinition } from '@gundam-forge/shared';
-import { isMainDeckCard } from '@gundam-forge/shared';
 import { cardsById } from '@/lib/data/cards';
 import liveDecksData from './decks-live.json';
 

@@ -22,8 +22,8 @@ export function TrendingDecksClient({ decks }: { decks: TrendingDeckData[] }) {
   if (decks.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border bg-surface-muted/50 py-12 text-center">
-        <Layers className="mx-auto mb-3 h-8 w-8 text-steel-600" aria-hidden="true" />
-        <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-3">No trending decks yet</p>
+        <Layers className="mx-auto mb-4 h-8 w-8 text-steel-600" aria-hidden="true" />
+        <p className="font-mono text-xs uppercase tracking-widest text-steel-500 mb-4">No trending decks yet</p>
         <p className="text-sm text-steel-600 mb-4">Be the first to build a deck and contribute to the meta.</p>
         <Link href="/forge">
           <Button size="sm" variant="primary">+ Create Deck</Button>

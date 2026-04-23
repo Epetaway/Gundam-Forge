@@ -60,17 +60,17 @@ export function KeyboardShortcutsLegend({ isOpen, onClose }: KeyboardShortcutsLe
           <div className="space-y-6">
             {shortcuts.map((category) => (
               <div key={category.category}>
-                <h3 className="text-lg font-semibold text-cobalt-400 mb-3">
+                <h3 className="text-lg font-semibold text-cobalt-400 mb-4">
                   {category.category}
                 </h3>
                 <div className="space-y-2">
                   {category.shortcuts.map((shortcut) => (
                     <div
                       key={shortcut.key}
-                      className="flex items-center justify-between p-3 bg-surface-muted/50 rounded border border-border hover:border-border transition"
+                      className="flex items-center justify-between p-4 bg-surface-muted/50 rounded border border-border hover:border-border transition"
                     >
                       <span className="text-white">{shortcut.action}</span>
-                      <code className="bg-surface text-cobalt-300 px-3 py-1 rounded font-mono text-sm border border-border">
+                      <code className="bg-surface text-cobalt-300 px-4 py-1 rounded font-mono text-sm border border-border">
                         {shortcut.key}
                       </code>
                     </div>

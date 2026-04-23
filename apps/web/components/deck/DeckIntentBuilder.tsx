@@ -142,8 +142,8 @@ export default function DeckIntentBuilder({
         </div>
       )}
 
-      <div className={cn('rounded-lg p-3', isInline ? 'p-2.5' : 'p-3')}>
-        <div className="mb-3 grid grid-cols-3 gap-2">
+      <div className={cn('rounded-lg p-4', isInline ? 'p-2' : 'p-4')}>
+        <div className="mb-4 grid grid-cols-3 gap-2">
           {steps.map((step, index) => {
             const isActive = index === stepIndex;
             const isReachable = index <= stepIndex || steps[Math.max(0, index - 1)].complete;
@@ -170,7 +170,7 @@ export default function DeckIntentBuilder({
           })}
         </div>
 
-        <div className="rounded-md px-3 py-3">
+        <div className="rounded-md px-4 py-4">
           {stepIndex === 0 && (
             <ClansStep
               clans={clans}
@@ -196,11 +196,11 @@ export default function DeckIntentBuilder({
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="mt-4 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => moveToStep(stepIndex - 1)}
-            className="rounded-md px-3 py-1.5 text-xs font-semibold text-steel-500 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md px-4 py-2 text-xs font-semibold text-steel-500 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             disabled={stepIndex === 0}
           >
             Back
@@ -210,7 +210,7 @@ export default function DeckIntentBuilder({
             type="button"
             onClick={handleNext}
             className={cn(
-              'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+              'rounded-md px-4 py-2 text-xs font-semibold transition-colors',
               activeStep.complete
                 ? 'bg-cobalt-600 text-white hover:bg-cobalt-500'
                 : 'cursor-not-allowed bg-steel-700/60 text-steel-400',
@@ -223,7 +223,7 @@ export default function DeckIntentBuilder({
       </div>
 
       {(showErrors || visitedColorStep) && !isColorsValid && (
-        <p className="rounded-md bg-red-500/10 px-3 py-2 text-xs text-red-400">
+        <p className="rounded-md bg-red-500/10 px-4 py-2 text-xs text-red-400">
           Please select 1-2 non-Colorless colors.
         </p>
       )}

@@ -66,7 +66,7 @@ export function BattleZone({
           {!isOpponent && isOver ? '⊕ Drop to play' : 'Empty'}
         </div>
       ) : (
-        <div className="flex flex-wrap gap-1.5 items-center py-1">
+        <div className="flex flex-wrap gap-2 items-center py-1">
           {units.map((unit) => {
             const card = cardDatabase[unit.cardId];
             const isAttacking = unit.instanceId === attackingUnitId;
@@ -200,7 +200,7 @@ function UnitTile({
       />
 
       {/* AP / HP stats */}
-      <div className="absolute bottom-[3px] left-[3px] right-[3px] flex justify-between items-end pointer-events-none">
+      <div className="absolute bottom-1 left-1 right-1 flex items-end justify-between pointer-events-none">
         <span
           className="text-[9px] font-bold leading-tight px-0.5 rounded"
           style={{
@@ -223,7 +223,7 @@ function UnitTile({
 
       {/* REST badge */}
       {isResting && (
-        <div className="absolute top-[3px] right-[3px] pointer-events-none">
+        <div className="pointer-events-none absolute right-1 top-1">
           <span
             className="text-[7px] font-bold leading-tight rounded px-[3px] py-[1px]"
             style={{
@@ -238,7 +238,7 @@ function UnitTile({
 
       {/* ATK badge */}
       {isAttacking && (
-        <div className="absolute top-[3px] left-[3px] pointer-events-none">
+        <div className="pointer-events-none absolute left-1 top-1">
           <span
             className="text-[7px] font-bold leading-tight rounded px-[3px] py-[1px]"
             style={{
@@ -276,7 +276,7 @@ function UnitTile({
           aria-label={`Attack with ${card?.name ?? unit.cardId}`}
         >
           <span
-            className="text-[10px] font-bold rounded px-1.5 py-0.5"
+            className="text-[10px] font-bold rounded px-2 py-0.5"
             style={{
               background: 'rgba(153,27,27,0.8)',
               color: '#fecaca',

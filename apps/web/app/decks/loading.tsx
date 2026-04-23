@@ -29,7 +29,7 @@ export default function DecksLoading(): JSX.Element {
             style={{ aspectRatio: '3/4', animationDelay: `${i * 50}ms` }}
           >
             <div className="w-full h-3/4 bg-surface-interactive" />
-            <div className="p-3 space-y-2">
+            <div className="p-4 space-y-2">
               <div className="h-3.5 rounded bg-surface-elevated w-4/5" />
               <div className="h-2.5 rounded bg-surface-elevated w-1/2" />
             </div>

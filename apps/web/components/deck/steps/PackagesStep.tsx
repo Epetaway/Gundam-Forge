@@ -46,25 +46,25 @@ export default function PackagesStep({
     switch (supportLevel) {
       case 'strong':
         return (
-          <span className="text-[10px] font-semibold text-green-400 bg-green-900/30 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-semibold text-green-400 bg-green-900/30 px-2 py-0.5 rounded">
             Strong
           </span>
         );
       case 'moderate':
         return (
-          <span className="text-[10px] font-semibold text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-semibold text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded">
             Good
           </span>
         );
       case 'limited':
         return (
-          <span className="text-[10px] font-semibold text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-semibold text-amber-400 bg-amber-900/30 px-2 py-0.5 rounded">
             Limited
           </span>
         );
       case 'none':
         return (
-          <span className="text-[10px] font-semibold text-steel-600 bg-steel-900/30 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-semibold text-steel-600 bg-steel-900/30 px-2 py-0.5 rounded">
             Unavailable
           </span>
         );
@@ -72,7 +72,7 @@ export default function PackagesStep({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="text-sm font-semibold text-foreground">Play Style Packages</p>
         <p className="text-xs text-steel-600">
@@ -102,7 +102,7 @@ export default function PackagesStep({
                 isUnavailable && 'opacity-50',
               )}
             >
-              <div className="flex items-start gap-2.5 px-3 py-2">
+              <div className="flex items-start gap-2 px-4 py-2">
                 <input
                   type="checkbox"
                   id={`pkg-${pkg.id}`}
@@ -140,7 +140,7 @@ export default function PackagesStep({
               </div>
 
               {pkgExpanded && (
-                <div className="space-y-2 px-3 py-2 text-xs">
+                <div className="space-y-2 px-4 py-2 text-xs">
                   <div>
                     <div className="text-[10px] font-medium uppercase tracking-wider text-steel-500">Keywords</div>
                     <div className="mt-1 flex flex-wrap gap-1">

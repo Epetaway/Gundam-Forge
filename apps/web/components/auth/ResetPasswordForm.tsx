@@ -123,13 +123,13 @@ export function ResetPasswordForm(): JSX.Element {
             />
 
             {error ? (
-              <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+              <p className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700" role="alert">
                 {error}
               </p>
             ) : null}
 
             {status ? (
-              <p aria-live="polite" className="rounded-md border border-cobalt-200 bg-cobalt-50 px-3 py-2 text-sm text-cobalt-700">
+              <p aria-live="polite" className="rounded-md border border-cobalt-200 bg-cobalt-50 px-4 py-2 text-sm text-cobalt-700">
                 {status}
               </p>
             ) : null}
@@ -165,13 +165,13 @@ export function ResetPasswordForm(): JSX.Element {
           />
 
           {error ? (
-            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+            <p className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700" role="alert">
               {error}
             </p>
           ) : null}
 
           {status ? (
-            <p aria-live="polite" className="rounded-md border border-cobalt-200 bg-cobalt-50 px-3 py-2 text-sm text-cobalt-700">
+            <p aria-live="polite" className="rounded-md border border-cobalt-200 bg-cobalt-50 px-4 py-2 text-sm text-cobalt-700">
               {status}
             </p>
           ) : null}

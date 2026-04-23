@@ -10,7 +10,7 @@ interface ShieldsRowProps {
 export default function ShieldsRow({ shields, player }: ShieldsRowProps) {
   return (
     <div className={`flex gap-2 ${player === 'opponent' ? 'justify-end' : ''}`}>
-      <div className="flex gap-2 bg-slate-800 rounded-lg p-3 border border-slate-700">
+      <div className="flex gap-2 bg-slate-800 rounded-lg p-4 border border-slate-700">
         <div className="text-xs font-semibold text-white self-center mr-2">
           {shields.length}/6 Shields
         </div>

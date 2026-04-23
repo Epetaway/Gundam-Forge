@@ -23,7 +23,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
           {/* Search */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-foreground">Search</h3>
-            <div className="space-y-1.5 text-xs">
+            <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <kbd className="inline-flex items-center justify-center rounded border border-border bg-surface px-2 py-1 font-mono font-semibold text-foreground">
                   /
@@ -36,7 +36,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
           {/* Navigation */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-foreground">Navigation</h3>
-            <div className="space-y-1.5 text-xs">
+            <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex gap-1">
                   <kbd className="inline-flex items-center justify-center rounded border border-border bg-surface px-2 py-1 font-mono font-semibold text-foreground">
@@ -60,7 +60,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
           {/* Deck Building */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-foreground">Deck Building</h3>
-            <div className="space-y-1.5 text-xs">
+            <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <kbd className="inline-flex items-center justify-center rounded border border-border bg-surface px-2 py-1 font-mono font-semibold text-foreground">
                   ↵
@@ -73,7 +73,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
           {/* Help */}
           <div>
             <h3 className="mb-2 text-sm font-semibold text-foreground">Help</h3>
-            <div className="space-y-1.5 text-xs">
+            <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <kbd className="inline-flex items-center justify-center rounded border border-border bg-surface px-2 py-1 font-mono font-semibold text-foreground">
                   ?
@@ -84,7 +84,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
           </div>
 
           {/* Tip */}
-          <div className="rounded-md border border-cobalt-400/30 bg-cobalt-500/10 p-3 text-xs text-steel-400">
+          <div className="rounded-md border border-cobalt-400/30 bg-cobalt-500/10 p-4 text-xs text-steel-400">
             <p>💡 <strong>Tip:</strong> Shortcuts don't work while typing in search or filter fields.</p>
           </div>
         </div>

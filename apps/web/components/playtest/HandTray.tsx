@@ -221,7 +221,7 @@ function DesktopArcFan({
               {canPlayCards && (isSelected || isHovered) && (
                 <button
                   onClick={() => onPlayCard(card)}
-                  className="absolute -bottom-6 left-0 right-0 mx-auto w-fit px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors z-[60] shadow-lg"
+                  className="absolute -bottom-6 left-0 right-0 mx-auto w-fit px-4 py-1 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors z-[60] shadow-lg"
                 >
                   Play
                 </button>
@@ -301,7 +301,7 @@ function MobileDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="p-3 overflow-y-auto"
+            className="p-4 overflow-y-auto"
             style={{ maxHeight: `calc(${drawerHeight}px - 50px)` }}
           >
             <div className="grid grid-cols-4 gap-2">

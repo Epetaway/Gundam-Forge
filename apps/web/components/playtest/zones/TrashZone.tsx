@@ -32,7 +32,7 @@ export function TrashZone({
   return (
     <div
       ref={isOpponent ? undefined : setNodeRef}
-      className={`border-2 rounded-lg bg-surface-elevated p-3 transition-colors ${
+      className={`border-2 rounded-lg bg-surface-elevated p-4 transition-colors ${
         !isOpponent && isOver ? 'border-red-500 bg-red-900/20' : 'border-border'
       }`}
     >
@@ -41,7 +41,7 @@ export function TrashZone({
       </div>
 
       {/* Trash Stack Visual - Using CardStack */}
-      <div className="mb-3 flex items-center justify-center">
+      <div className="mb-4 flex items-center justify-center">
         {trash.length > 0 ? (
           <CardStack
             cards={trash}
@@ -59,7 +59,7 @@ export function TrashZone({
       {trash.length > 0 && (
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="w-full px-2 py-1.5 bg-red-700/50 hover:bg-red-700 border border-red-600 rounded text-xs text-red-200 transition-colors"
+          className="w-full px-2 py-2 bg-red-700/50 hover:bg-red-700 border border-red-600 rounded text-xs text-red-200 transition-colors"
         >
           {showDetails ? 'Hide' : 'View'} {trash.length > 3 ? 'recent (3)' : 'all'}
         </button>
@@ -76,7 +76,7 @@ export function TrashZone({
               return (
                 <div
                   key={card.instanceId}
-                  className="text-[9px] text-white px-1.5 py-1 bg-surface/50 rounded border border-border"
+                  className="text-[9px] text-white px-2 py-1 bg-surface/50 rounded border border-border"
                 >
                   {cardDef?.name || card.cardId}
                 </div>

@@ -56,24 +56,6 @@ export interface CardSearchPanelProps {
   currentDeckCards?: CardDefinition[];
 }
 
-// ─── Synergy badge ───────────────────────────────────────────────────────────
-
-function SynergyBadge({ score }: { score: number }) {
-  if (score <= 0) return null;
-  const cls =
-    score >= 20 ? 'bg-green-500/90 text-white' :
-    score >= 8  ? 'bg-cobalt-500/90 text-white' :
-                  'bg-steel-700/80 text-white';
-  return (
-    <span
-      className={cn('absolute right-1 top-1 z-10 rounded px-1 py-0.5 text-[9px] font-bold leading-none', cls)}
-      aria-label={`Synergy score ${score}`}
-    >
-      ★{score}
-    </span>
-  );
-}
-
 // ─── Hover card tooltip (portal, appears to right of panel) ──────────────────
 
 function CardHoverTooltip({ card, anchor }: { card: ScoredCard; anchor: DOMRect }) {
@@ -129,10 +111,10 @@ function CardListTable({
         <table className="w-full text-left">
           <thead className="border-b border-border bg-surface-interactive text-[10px] uppercase tracking-wider text-foreground sticky top-0 z-10">
             <tr>
-              <th className="px-3 py-1.5">Card</th>
-              <th className="px-2 py-1.5 hidden sm:table-cell">Type</th>
-              {showSynergy && <th className="w-10 px-2 py-1.5 text-right">Syn</th>}
-              <th className="w-8 px-2 py-1.5" />
+              <th className="px-4 py-2">Card</th>
+              <th className="px-2 py-2 hidden sm:table-cell">Type</th>
+              {showSynergy && <th className="w-10 px-2 py-2 text-right">Syn</th>}
+              <th className="w-8 px-2 py-2" />
             </tr>
           </thead>
           <tbody>
@@ -146,7 +128,7 @@ function CardListTable({
                 }
                 onMouseLeave={() => setHovered(null)}
               >
-                <td className="px-3 py-1 font-medium text-foreground leading-tight">
+                <td className="px-4 py-1 font-medium leading-tight text-foreground">
                   {card.name}
                 </td>
                 <td className="px-2 py-1 hidden text-foreground sm:table-cell">{card.type}</td>
@@ -266,10 +248,10 @@ function CardGroup({
       {hovered && typeof document !== 'undefined' && (
         <CardHoverTooltip card={hovered.card} anchor={hovered.anchor} />
       )}
-      <div className="flex flex-wrap items-center gap-2 px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-2">
         <button
           type="button"
-          className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-surface-interactive/40"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-surface-interactive/40"
           onClick={() => setCollapsed((value) => !value)}
           aria-expanded={!collapsed}
         >
@@ -284,13 +266,13 @@ function CardGroup({
               {collapsed ? `${cards.length} cards` : `${startIndex}-${endIndex} of ${cards.length}`}
             </span>
           </span>
-          <span className="inline-flex min-w-10 items-center justify-center rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-semibold tabular-nums text-foreground shadow-sm">
+          <span className="inline-flex min-w-10 items-center justify-center rounded-full border border-border bg-surface px-2 py-1 text-[11px] font-semibold tabular-nums text-foreground shadow-sm">
             {cards.length}
           </span>
         </button>
 
         {!collapsed && pageCount > 1 && (
-          <div className="ml-auto flex items-center gap-1.5">
+          <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
               className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-steel-600 transition-colors hover:bg-surface-interactive hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
@@ -314,8 +296,8 @@ function CardGroup({
       </div>
 
       {!collapsed && (
-        <div className="border-t border-border/80 px-3 pb-3 pt-3" style={{ minWidth: 0 }}>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-muted">
+        <div className="border-t border-border/80 px-4 pb-4 pt-4" style={{ minWidth: 0 }}>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-muted">
             <span>
               {columns}-column layout · {rows} row{rows !== 1 ? 's' : ''} per page
             </span>
@@ -328,7 +310,7 @@ function CardGroup({
             )}
           </div>
 
-          <div className={cn('grid gap-3', gridClassName)}>
+          <div className={cn('grid gap-4', gridClassName)}>
             {pageCards.map((card) => (
               <UnifiedCardTile
                 key={card.id}
@@ -343,7 +325,7 @@ function CardGroup({
           </div>
 
           {pageCount > 1 && (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-1">
                 {pageNumbers.map((pageNumber) => (
                   <button
@@ -367,7 +349,7 @@ function CardGroup({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-3 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-4 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
                   onClick={() => setPage((value) => Math.max(0, value - 1))}
                   disabled={page === 0}
                 >
@@ -375,7 +357,7 @@ function CardGroup({
                 </button>
                 <button
                   type="button"
-                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-3 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-8 items-center justify-center rounded-md border border-border bg-surface px-4 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive disabled:cursor-not-allowed disabled:opacity-40"
                   onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}
                   disabled={page >= pageCount - 1}
                 >
@@ -634,7 +616,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
       const other = filtered.filter((c) => !usedIds.has(c.id));
       if (other.length > 0) {
-        sections.push({ label: 'Other Factions', cards: other, isOther: true });
+        sections.push({ label: 'Unclassified Factions', cards: other, isOther: true });
       }
       return sections;
     }
@@ -660,11 +642,11 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
       <div className="border-b border-border" style={{ maxWidth: '100%' }}>
 
         {/* ── Top bar: toggle + active pill count ── */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2">
+        <div className="flex items-center justify-between gap-2 px-4 py-2">
           <button
             type="button"
             onClick={() => setIsFilterMenuOpen((v) => !v)}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive active:scale-95"
+            className="inline-flex items-center gap-2 rounded-md px-2 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-surface-interactive active:scale-95"
             aria-expanded={isFilterMenuOpen}
             aria-label="Toggle filters menu"
           >
@@ -672,7 +654,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             <span>{isFilterMenuOpen ? 'Close Filters' : 'Filters'}</span>
           </button>
 
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto scrollbar-none">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto scrollbar-none">
             {hasActiveFilters ? (
               <>
                 {rawQuery && (
@@ -760,13 +742,13 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
             </nav>
 
             {/* Single content pane */}
-            <div className="p-3 pt-2.5">
+            <div className="p-4 pt-2">
 
               {/* INTENT tab */}
               {activeFilterSection === 'intent' && (
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {(deckColors.length > 0 || deckClans.length > 0) ? (
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Deck intent</span>
                         {onIntentChange && (
@@ -781,7 +763,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {[...deckClans, ...deckColors].map((v) => (
-                          <span key={v} className="rounded-full bg-cobalt-500/14 px-2.5 py-0.5 text-xs text-cobalt-200">{v}</span>
+                          <span key={v} className="rounded-full bg-cobalt-500/14 px-2 py-1 text-xs text-cobalt-200">{v}</span>
                         ))}
                       </div>
                     </div>
@@ -801,7 +783,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                             <button
                               type="button"
                               className={cn(
-                                'mt-1 w-full rounded-md px-2 py-1.5 text-xs font-semibold transition-colors',
+                                'mt-1 w-full rounded-md px-2 py-2 text-xs font-semibold transition-colors',
                                 deckAnalysis.confidence >= 70
                                   ? 'bg-green-600/20 text-green-300 hover:bg-green-600/30'
                                   : 'bg-amber-600/20 text-amber-300 hover:bg-amber-600/30',
@@ -821,12 +803,12 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     </div>
                   )}
 
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-2">
                     {deckColors.length > 0 && (
                       <button
                         type="button"
                         className={cn(
-                          'w-full rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+                          'w-full rounded-md px-4 py-2 text-xs font-semibold transition-colors',
                           deckColorOnly ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                         )}
                         onClick={() => setDeckColorOnly((v) => !v)}
@@ -838,7 +820,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     <button
                       type="button"
                       className={cn(
-                        'w-full rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+                        'w-full rounded-md px-4 py-2 text-xs font-semibold transition-colors',
                         includeEX ? 'bg-amber-600/20 text-amber-300' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                       )}
                       onClick={() => setIncludeEX((v) => !v)}
@@ -859,7 +841,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                       <button type="button" className="text-xs text-text-secondary hover:text-foreground" onClick={() => setKeywordFilters([])}>Clear</button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {['blocker', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
                       const active = keywordFilters.includes(kw);
                       return (
@@ -868,7 +850,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                           type="button"
                           onClick={() => setKeywordFilters((ks) => active ? ks.filter((k) => k !== kw) : [...ks, kw])}
                           className={cn(
-                            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                            'rounded-full px-4 py-1 text-xs font-medium transition-colors',
                             active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                           )}
                           aria-pressed={active}
@@ -890,7 +872,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                       <button type="button" className="text-xs text-text-secondary hover:text-foreground" onClick={() => setTriggerFilters([])}>Clear</button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {['burst', 'when-paired', 'during-pair', 'deploy', 'attack', 'when-linked', 'during-link'].map((tr) => {
                       const active = triggerFilters.includes(tr);
                       return (
@@ -899,7 +881,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                           type="button"
                           onClick={() => setTriggerFilters((ts) => active ? ts.filter((t) => t !== tr) : [...ts, tr])}
                           className={cn(
-                            'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                            'rounded-full px-4 py-1 text-xs font-medium transition-colors',
                             active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                           )}
                           aria-pressed={active}
@@ -914,16 +896,16 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
               {/* TYPE/COLOR tab */}
               {activeFilterSection === 'filters' && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Type</span>
-                    <div className="flex flex-wrap gap-1.5">
+                    <span className="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Type</span>
+                    <div className="flex flex-wrap gap-2">
                       {CARD_TYPES.map((t) => (
                         <button
                           key={t}
                           type="button"
                           className={cn(
-                            'rounded-full px-3 py-1 text-xs transition-colors',
+                            'rounded-full px-4 py-1 text-xs transition-colors',
                             typeFilter === t ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                           )}
                           onClick={() => setTypeFilter(t)}
@@ -935,14 +917,14 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     </div>
                   </div>
                   <div>
-                    <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Color</span>
-                    <div className="flex flex-wrap gap-1.5">
+                    <span className="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary">Color</span>
+                    <div className="flex flex-wrap gap-2">
                       {CARD_COLORS.map((c) => (
                         <button
                           key={c}
                           type="button"
                           className={cn(
-                            'rounded-full px-3 py-1 text-xs transition-colors',
+                            'rounded-full px-4 py-1 text-xs transition-colors',
                             colorFilter === c ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                           )}
                           onClick={() => setColorFilter(c)}
@@ -954,10 +936,10 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary" htmlFor="set-filter-select">Set</label>
+                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-text-secondary" htmlFor="set-filter-select">Set</label>
                     <select
                       id="set-filter-select"
-                      className="w-full rounded-md bg-surface-interactive px-2.5 py-1.5 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500/30"
+                      className="w-full rounded-md bg-surface-interactive px-2 py-2 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500/30"
                       value={setFilter}
                       onChange={(e) => setSetFilter(e.target.value)}
                     >
@@ -979,7 +961,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     showHelp={query.includes('|') || query.includes('-') || query.includes('"')}
                   />
                   {popularEffects.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       {popularEffects.slice(0, 6).map((effect) => {
                         const active = effectKeywordFilters.includes(effect.value);
                         return (
@@ -990,7 +972,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                               prev.includes(effect.value) ? prev.filter((e) => e !== effect.value) : [...prev, effect.value]
                             )}
                             className={cn(
-                              'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
+                              'inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium transition-colors',
                               active ? 'bg-cobalt-600 text-white' : 'bg-surface-interactive text-foreground hover:bg-surface-hover',
                             )}
                             aria-pressed={active}
@@ -1011,7 +993,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
         )}
 
         {/* ── Results bar ── */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2">
+        <div className="flex items-center justify-between gap-2 px-4 py-2">
           <p className="text-xs text-text-secondary" aria-live="polite">
             {filtered.length} card{filtered.length !== 1 ? 's' : ''}
           </p>
@@ -1038,7 +1020,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
 
       {/* ── Active filter display ── */}
       {activeFilterChips.length > 0 && (
-        <div className="px-3 py-2">
+        <div className="px-4 py-2">
           <ActiveFilterChips
             chips={activeFilterChips}
             totalCards={filtered.length}

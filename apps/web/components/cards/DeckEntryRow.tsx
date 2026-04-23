@@ -34,7 +34,7 @@ export function DeckEntryRow({
   return (
     <div
       className={cn(
-        'group flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5',
+        'group flex items-center gap-2 rounded-md border border-transparent px-2 py-2',
         'transition-colors hover:border-border hover:bg-surface-interactive',
         className,
       )}

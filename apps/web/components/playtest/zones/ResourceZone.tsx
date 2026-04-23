@@ -136,7 +136,7 @@ function ResourcePip({
       {/* Ready glow dot */}
       {!isResting && (
         <div
-          className="absolute -top-[2px] -right-[2px] w-[6px] h-[6px] rounded-full"
+          className="absolute -right-1 -top-1 h-2 w-2 rounded-full"
           style={{
             background: '#3b82f6',
             boxShadow: '0 0 4px rgba(59,130,246,0.6)',

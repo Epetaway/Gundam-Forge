@@ -31,7 +31,7 @@ export function DeckZone({
       : `${totalDeck}/${totalRequired} ✓`;
 
   return (
-    <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated p-4">
       <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         {isOpponent ? 'Opponent' : 'Your'} Deck
       </div>
@@ -39,7 +39,7 @@ export function DeckZone({
       {/* Main Deck Stack Visual */}
       <div
         className={`
-          relative h-24 mb-3 flex items-center justify-center cursor-pointer
+          relative h-24 mb-4 flex items-center justify-center cursor-pointer
           transition-transform duration-200 hover:scale-105
         `}
         onClick={onDrawCard}
@@ -65,7 +65,7 @@ export function DeckZone({
       </div>
 
       {/* Official GCG Deck Breakdown */}
-      <div className="space-y-2 mb-3">
+      <div className="space-y-2 mb-4">
         <div className="bg-blue-900/40 border border-blue-600 rounded-lg p-2">
           <div className="text-xs text-blue-300 mb-1">
             <strong>Main Deck:</strong> {deckSize} cards

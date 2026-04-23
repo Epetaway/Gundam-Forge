@@ -40,7 +40,7 @@ export function DeckSharingControls({ deckId }: DeckSharingControlsProps) {
     <div className="space-y-4 mb-6">
       {isOwner && (
         <div className="rounded-lg border border-border bg-surface-elevated p-4">
-          <h3 className="font-semibold text-foreground mb-3">Deck Settings</h3>
+          <h3 className="font-semibold text-foreground mb-4">Deck Settings</h3>
           <DeckVisibilityToggle
             deckId={deckId}
             initialIsPublic={deck.is_public}

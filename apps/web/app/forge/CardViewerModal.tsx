@@ -36,14 +36,14 @@ export function CardViewerModal({
         {card.text && <div className="whitespace-pre-wrap text-sm text-steel-700 mb-2">{card.text}</div>}
         <div className="flex justify-between mt-4">
           <button
-            className="px-3 py-1 rounded bg-surface-interactive border border-border text-xs"
+            className="rounded border border-border bg-surface-interactive px-4 py-1 text-xs"
             disabled={idx <= 0}
             onClick={() => idx > 0 && onNavigate(cards[idx - 1].id)}
           >
             Previous
           </button>
           <button
-            className="px-3 py-1 rounded bg-surface-interactive border border-border text-xs"
+            className="rounded border border-border bg-surface-interactive px-4 py-1 text-xs"
             disabled={idx >= cards.length - 1}
             onClick={() => idx < cards.length - 1 && onNavigate(cards[idx + 1].id)}
           >

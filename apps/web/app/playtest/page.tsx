@@ -66,7 +66,7 @@ export default function PlaytestPage() {
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-[#0a0e1a] px-6">
         <p className="text-lg font-bold text-red-400">Cannot Start Playtest</p>
         <p className="max-w-sm text-center text-sm text-white/70">{error}</p>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <Link
             href="/forge"
             className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
@@ -107,7 +107,7 @@ export default function PlaytestPage() {
             <li key={i}>• {err}</li>
           ))}
         </ul>
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-4 pt-2">
           <Link
             href="/forge"
             className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"

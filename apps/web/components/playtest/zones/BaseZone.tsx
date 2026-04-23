@@ -36,7 +36,7 @@ export function BaseZone({
     healthPercentage > 50 ? 'bg-emerald-600' : healthPercentage > 25 ? 'bg-amber-600' : 'bg-red-600';
 
   return (
-    <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated p-4">
       <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         Base Area
       </div>
@@ -44,7 +44,7 @@ export function BaseZone({
       {baseCard ? (
         <>
           {/* Base Card Display - Using CardStack */}
-          <div className="mb-3 flex justify-center">
+          <div className="mb-4 flex justify-center">
             <CardStack
               cards={baseCard}
               cardDatabase={cardDatabase}

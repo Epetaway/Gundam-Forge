@@ -2,18 +2,46 @@
 @config '../tailwind.config.ts';
 
 :root {
-  --font-sans: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-display: 'Rajdhani', 'Bahnschrift', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --bg-primary: #0f172a;
+  --bg-secondary: #111b2f;
+  --bg-surface: #16233a;
+  --text-primary-hex: #f8fafc;
+  --text-secondary-hex: #94a3b8;
+  --text-muted-hex: #64748b;
+  --accent-primary: #3b82f6;
+  --accent-hover: #2563eb;
+  --border-default: #374151;
+  --border-subtle: #1f2937;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  --brand-blue-500: #3b82f6;
+  --brand-blue-600: #2563eb;
+  --brand-purple-500: #8b5cf6;
+  --brand-pink-500: #ec4899;
+  --brand-red-500: #ef4444;
+  --color-blue: #3b82f6;
+  --color-red: #ef4444;
+  --color-green: #22c55e;
+  --color-white: #e5e7eb;
+  --color-purple: #8b5cf6;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-card: 0 8px 24px rgba(2, 6, 23, 0.32);
+  --shadow-hover: 0 16px 32px rgba(2, 6, 23, 0.48);
+  --shadow-modal: 0 28px 64px rgba(2, 6, 23, 0.62);
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  --background: 220 22% 7%;
-  --foreground: 215 46% 94%;
-  --surface: 218 24% 11%;
-  --surface-muted: 220 26% 15%;
-  --surface-elevated: 221 28% 19%;
-  --surface-interactive: 220 25% 18%;
+  --background: 221 62% 9%;
+  --foreground: 210 20% 98%;
+  --surface: 219 45% 14%;
+  --surface-muted: 220 48% 12%;
+  --surface-elevated: 219 40% 17%;
+  --surface-interactive: 219 35% 20%;
   --accent: 217 91% 60%;
   --accent-foreground: 0 0% 100%;
-  --border: 218 24% 22%;
+  --border: 218 30% 24%;
   --ring: 217 91% 60%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
@@ -77,9 +105,11 @@
     overflow-x: hidden;
     max-width: 100%;
     @apply bg-background text-foreground antialiased;
+    padding-top: max(0px, env(safe-area-inset-top));
     background-image:
-      radial-gradient(1200px 560px at 50% -10%, rgba(96, 165, 250, 0.16), transparent 72%),
-      linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(2, 6, 23, 0.95)),
+      radial-gradient(1200px 560px at 14% -14%, rgba(37, 99, 235, 0.24), transparent 72%),
+      radial-gradient(900px 420px at 86% -10%, rgba(139, 92, 246, 0.1), transparent 74%),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.96)),
       repeating-linear-gradient(0deg, rgba(125, 142, 168, 0.04) 0, rgba(125, 142, 168, 0.04) 1px, transparent 1px, transparent 12px);
   }
 
@@ -104,6 +134,19 @@
 
   a {
     @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  .safe-pad-x {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  .safe-pad-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+
+  .safe-pad-bottom {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 }
 
