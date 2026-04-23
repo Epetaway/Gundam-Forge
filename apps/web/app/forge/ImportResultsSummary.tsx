@@ -45,7 +45,7 @@ export function ImportResultsSummary({
 
   return (
     <div className="rounded-lg border border-border bg-surface-muted/80 backdrop-blur-sm mb-4">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+      <div className="flex items-center justify-between border-b border-border px-4 py-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">Import Results</span>
           {hasIssues ? (
@@ -71,7 +71,7 @@ export function ImportResultsSummary({
       <div className="divide-y divide-border">
         {/* Matched */}
         {results.matched.length > 0 && (
-          <section className="px-4 py-3">
+          <section className="px-4 py-4">
             <button
               className="flex w-full items-center justify-between text-left"
               onClick={() => setShowMatched((v) => !v)}
@@ -105,14 +105,14 @@ export function ImportResultsSummary({
 
         {/* Ambiguous */}
         {results.ambiguous.length > 0 && (
-          <section className="px-4 py-3">
-            <div className="flex items-center gap-2 mb-2">
+          <section className="px-4 py-4">
+            <div className="mb-2 flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-400" />
               <span className="text-sm font-medium text-foreground">
                 {results.ambiguous.length} ambiguous — pick the right card
               </span>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {results.ambiguous.map(({ entry, options }) => (
                 <li key={entry.originalLine}>
                   <p className="text-[11px] text-steel-600 mb-1">
@@ -147,14 +147,14 @@ export function ImportResultsSummary({
 
         {/* Unmatched */}
         {results.unmatched.length > 0 && (
-          <section className="px-4 py-3">
-            <div className="flex items-center gap-2 mb-2">
+          <section className="px-4 py-4">
+            <div className="mb-2 flex items-center gap-2">
               <XCircle className="h-4 w-4 text-red-400" />
               <span className="text-sm font-medium text-foreground">
                 {results.unmatched.length} not found — edit &amp; retry
               </span>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {results.unmatched.map((entry) => (
                 <li key={entry.originalLine}>
                   <p className="text-[11px] text-steel-600 mb-1">
@@ -176,7 +176,7 @@ export function ImportResultsSummary({
                     />
                     <button
                       className={cn(
-                        'h-8 rounded bg-cobalt-600 px-3 text-xs font-semibold text-white hover:bg-cobalt-500 transition-colors',
+                        'h-8 rounded bg-cobalt-600 px-4 text-xs font-semibold text-white transition-colors hover:bg-cobalt-500',
                         'disabled:opacity-50 disabled:cursor-not-allowed',
                       )}
                       disabled={!retryInputs[entry.originalLine]?.trim()}

@@ -5,7 +5,6 @@ import type { CardDefinition } from '@gundam-forge/shared';
 import { CardArtImage } from '@/components/ui/CardArtImage';
 import { CardQuickAdd } from '@/components/cards/CardQuickAdd';
 import { getCardImage } from '@/lib/data/cards';
-import { CARD_SIZE_TOKENS } from '@/lib/design-system/card-sizes';
 import { cn } from '@/lib/utils/cn';
 
 type CardRef = Pick<CardDefinition, 'id' | 'name' | 'type' | 'color' | 'cost' | 'imageUrl' | 'placeholderArt' | 'price'>;
@@ -39,7 +38,6 @@ export function UnifiedCardTile({
 }: UnifiedCardTileProps): JSX.Element {
   // Deckbuilder mode: Grid tile with image-first layout
   if (mode === 'deckbuilder') {
-    const scoredCard = card as ScoredCard;
     return (
       <button
         type="button"
@@ -52,7 +50,7 @@ export function UnifiedCardTile({
         )}
         onClick={() => onPreview?.(card.id)}
         onMouseEnter={(e) => {
-          if (onHoverChange && 'synergyScore' in card) {
+          if (onHoverChange && showSynergy && 'synergyScore' in card) {
             onHoverChange({ card: card as ScoredCard, anchor: e.currentTarget.getBoundingClientRect() });
           }
         }}
@@ -74,7 +72,6 @@ export function UnifiedCardTile({
         {/* Mobile quick-add overlay */}
         <CardQuickAdd
           cardName={card.name}
-          qty={qty ?? 0}
           onAdd={() => onAdd?.()}
           onOpenDetails={() => onPreview?.(card.id)}
         />
@@ -115,7 +112,7 @@ export function UnifiedCardTile({
   return (
     <article
       className={cn(
-        'group flex items-center gap-2 rounded-[6px] border border-border bg-surface-muted px-2 py-1.5 text-foreground',
+        'group flex items-center gap-2 rounded-[6px] border border-border bg-surface-muted px-2 py-2 text-foreground',
         'transition-all duration-150 hover:border-cobalt-400/60 hover:bg-surface-interactive',
         className,
       )}
@@ -145,13 +142,13 @@ export function UnifiedCardTile({
       </button>
 
       {/* Cost chip */}
-      <span className="flex-none rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] font-bold text-text-secondary">
+      <span className="flex-none rounded bg-surface px-2 py-0.5 font-mono text-[11px] font-bold text-text-secondary">
         {card.cost}
       </span>
 
       {/* Price label (if available) */}
       {card.price?.market && (
-        <span className="flex-none rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-medium text-steel-500">
+        <span className="flex-none rounded bg-surface-muted px-2 py-0.5 font-mono text-[9px] font-medium text-steel-500">
           ${(card.price.market / 100).toFixed(2)}
         </span>
       )}

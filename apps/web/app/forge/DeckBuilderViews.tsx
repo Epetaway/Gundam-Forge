@@ -129,9 +129,8 @@ export function GridView({ cards, density, onOpenCard }: DeckViewProps) {
 
 // StacksView
 import { groupDeckItemsByType } from '@/lib/deck/grouping';
-import { CardArtImage } from '@/components/ui/CardArtImage';
 
-export function StacksView({ cards, density, onOpenCard, groupBy }: DeckViewProps & { groupBy: string }) {
+export function StacksView({ cards, density, onOpenCard }: DeckViewProps & { groupBy: string }) {
   // Adapt DeckCard[] to DeckViewItem[] for grouping
   const items = cards.map(card => ({
     id: card.id,
@@ -148,7 +147,7 @@ export function StacksView({ cards, density, onOpenCard, groupBy }: DeckViewProp
   const stacks = groupDeckItemsByType(items);
 
   if (stacks.length === 0) {
-    return <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">No cards match your filters.</p>;
+    return <p className="rounded-md border border-dashed border-border p-12 text-center text-sm text-steel-600">No cards match your filters.</p>;
   }
 
   // Horizontal scrollable flex row of columns
@@ -159,7 +158,7 @@ export function StacksView({ cards, density, onOpenCard, groupBy }: DeckViewProp
           className="min-w-[220px] max-w-[260px] flex-shrink-0 rounded-md border border-border bg-surface-muted/70 shadow-sm"
           key={stack.id}
         >
-          <header className="sticky top-0 z-10 flex flex-col gap-0.5 border-b border-border bg-surface-muted/90 px-3 py-2 backdrop-blur">
+          <header className="sticky top-0 z-10 flex flex-col gap-0.5 border-b border-border bg-surface-muted/90 px-4 py-2 backdrop-blur">
             <h3 className="text-base font-bold text-foreground truncate" title={stack.label}>{stack.label}</h3>
             <span className="text-xs text-steel-600">{stack.totalQty} cards</span>
           </header>
@@ -201,7 +200,7 @@ export function TextView({ cards, density, onOpenCard }: DeckViewProps) {
 }
 
 // TableView
-export function TableView({ cards, density, onOpenCard, sortKey, sortDir, onSort }: DeckViewProps & { sortKey: string, sortDir: string, onSort: (key: string) => void }) {
+export function TableView({ cards, onOpenCard, sortKey, sortDir, onSort }: DeckViewProps & { sortKey: string, sortDir: string, onSort: (key: string) => void }) {
   const columns = [
     { key: 'qty', label: 'Qty' },
     { key: 'name', label: 'Name' },

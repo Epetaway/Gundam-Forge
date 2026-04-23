@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { StatCard } from '@/components/ui/StatCard';
 import type { Profile } from '@/lib/api/profiles';
 
 interface ProfileStatsProps {
@@ -20,27 +21,17 @@ export function ProfileStats({ profile }: ProfileStatsProps): JSX.Element {
 
   return (
     <div className="space-y-4">
-      {/* Basic Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-sm text-steel-600">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard key={stat.label} label={stat.label} value={stat.value} />
         ))}
       </div>
 
-      {/* Extended Stats */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Deck Building Insights</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Favorite Archetype */}
           {profile.favorite_archetype && (
             <div>
               <p className="text-sm font-medium text-steel-600">Favorite Archetype</p>
@@ -50,7 +41,6 @@ export function ProfileStats({ profile }: ProfileStatsProps): JSX.Element {
             </div>
           )}
 
-          {/* Most Used Colors */}
           {profile.most_used_colors.length > 0 && (
             <div>
               <p className="text-sm font-medium text-steel-600">Most Used Colors</p>
@@ -64,13 +54,11 @@ export function ProfileStats({ profile }: ProfileStatsProps): JSX.Element {
             </div>
           )}
 
-          {/* Join Date */}
           <div>
             <p className="text-sm font-medium text-steel-600">Member Since</p>
             <p className="mt-1 text-sm text-foreground">{joinDate}</p>
           </div>
 
-          {/* Role Badge */}
           {profile.role !== 'user' && (
             <div>
               <p className="text-sm font-medium text-steel-600">Role</p>
@@ -82,7 +70,6 @@ export function ProfileStats({ profile }: ProfileStatsProps): JSX.Element {
         </CardContent>
       </Card>
 
-      {/* Social Stats (placeholder for future) */}
       {(profile.follower_count > 0 || profile.following_count > 0) && (
         <Card>
           <CardHeader>

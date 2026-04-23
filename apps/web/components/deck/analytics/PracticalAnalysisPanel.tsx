@@ -28,16 +28,16 @@ export function PracticalAnalysisPanel({
   const maxCurve = Math.max(1, ...analysis.curve.map((bucket) => bucket.count));
 
   return (
-    <div className={cn('space-y-5', className)} data-testid="practical-analysis-panel">
+    <div className={cn('space-y-6', className)} data-testid="practical-analysis-panel">
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid h-auto w-full grid-cols-3 gap-1 border border-cobalt-900/65 bg-surface-interactive p-1">
-          <TabsTrigger value="overview" className="min-w-0 rounded-md border border-transparent px-2 py-1.5 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
+          <TabsTrigger value="overview" className="min-w-0 rounded-md border border-transparent px-2 py-2 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
             <span className="truncate">Overview</span>
           </TabsTrigger>
-          <TabsTrigger value="curve" className="min-w-0 rounded-md border border-transparent px-2 py-1.5 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
+          <TabsTrigger value="curve" className="min-w-0 rounded-md border border-transparent px-2 py-2 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
             <span className="truncate">Curve</span>
           </TabsTrigger>
-          <TabsTrigger value="roles" className="min-w-0 rounded-md border border-transparent px-2 py-1.5 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
+          <TabsTrigger value="roles" className="min-w-0 rounded-md border border-transparent px-2 py-2 text-[11px] font-semibold text-foreground/85 data-[state=active]:border-cobalt-400/50 data-[state=active]:bg-cobalt-500/20 data-[state=active]:text-foreground sm:text-xs">
             <span className="truncate">Roles</span>
           </TabsTrigger>
         </TabsList>
@@ -54,7 +54,7 @@ export function PracticalAnalysisPanel({
         <TabsContent value="curve" className="space-y-4">
           <section className="space-y-2">
             <SectionTitle title="Curve Pressure" subtitle="Copies per cost bucket" />
-            <div className="space-y-1.5 rounded border border-cobalt-900/55 bg-surface/40 p-2.5">
+            <div className="space-y-2 rounded border border-cobalt-900/55 bg-surface/40 p-2">
               {analysis.curve.map((bucket) => {
                 const width = (bucket.count / maxCurve) * 100;
                 return (
@@ -92,19 +92,19 @@ export function PracticalAnalysisPanel({
               <table className="w-full text-left">
                 <thead className="border-b border-cobalt-900/55">
                   <tr className="font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Color</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Qty</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Share</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Avg Cost</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Color</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Qty</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Share</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Avg Cost</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysis.colors.map((row) => (
                     <tr key={row.color} className="border-b border-cobalt-950/45 text-xs last:border-b-0">
-                      <td className="px-2.5 py-1.5 text-foreground whitespace-nowrap">{row.color}</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{row.count}</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{Math.round(row.share)}%</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{row.avgCost.toFixed(1)}</td>
+                      <td className="px-2 py-2 text-foreground whitespace-nowrap">{row.color}</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{row.count}</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{Math.round(row.share)}%</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{row.avgCost.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -136,19 +136,19 @@ export function PracticalAnalysisPanel({
               <table className="w-full text-left">
                 <thead className="border-b border-cobalt-900/55">
                   <tr className="font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Role</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">Qty</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">By T3</th>
-                    <th className="px-2.5 py-1.5 whitespace-nowrap">By T5</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Role</th>
+                    <th className="px-2 py-2 whitespace-nowrap">Qty</th>
+                    <th className="px-2 py-2 whitespace-nowrap">By T3</th>
+                    <th className="px-2 py-2 whitespace-nowrap">By T5</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysis.roles.map((row) => (
                     <tr key={row.role} className="border-b border-cobalt-950/45 text-xs last:border-b-0">
-                      <td className="px-2.5 py-1.5 text-foreground whitespace-nowrap">{row.role}</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{row.qty}</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{Math.round(row.oddsByTurn3)}%</td>
-                      <td className="px-2.5 py-1.5 font-mono text-foreground whitespace-nowrap">{Math.round(row.oddsByTurn5)}%</td>
+                      <td className="px-2 py-2 text-foreground whitespace-nowrap">{row.role}</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{row.qty}</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{Math.round(row.oddsByTurn3)}%</td>
+                      <td className="px-2 py-2 font-mono text-foreground whitespace-nowrap">{Math.round(row.oddsByTurn5)}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -173,7 +173,7 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) 
 
 function StatCard({ label, value, tone }: { label: string; value: string; tone: 'good' | 'warn' }) {
   return (
-    <div className="min-w-0 rounded border border-cobalt-900/70 bg-surface-interactive px-2.5 py-2">
+    <div className="min-w-0 rounded border border-cobalt-900/70 bg-surface-interactive px-2 py-2">
       <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-text-muted whitespace-nowrap">{label}</p>
       <p className={cn('mt-0.5 font-mono text-sm font-semibold whitespace-nowrap', tone === 'good' ? 'text-emerald-400' : 'text-amber-300')}>
         {value}

@@ -26,9 +26,9 @@ interface DeckSetupFormProps {
 }
 
 const FIELD_CLASS =
-  'w-full rounded-md border border-cobalt-900/70 bg-background/40 px-3 text-sm text-foreground outline-none placeholder:text-steel-500 focus-visible:border-cobalt-400/70 focus-visible:ring-2 focus-visible:ring-cobalt-500/25';
+  'w-full rounded-md border border-cobalt-900/70 bg-background/40 px-4 text-sm text-foreground outline-none placeholder:text-steel-500 focus-visible:border-cobalt-400/70 focus-visible:ring-2 focus-visible:ring-cobalt-500/25';
 
-const SECTION_CLASS = 'space-y-3 rounded-lg bg-surface/30 p-3';
+const SECTION_CLASS = 'space-y-4 rounded-lg bg-surface/30 p-4';
 
 const FORM_SECTIONS = [
   { id: 'setup-basics',  label: 'Basics',  desc: 'Name & format',           icon: Target,       optional: false },
@@ -156,7 +156,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <nav aria-label="Create deck sections" className="grid grid-cols-4 gap-1.5 rounded-lg bg-surface/30 p-1.5">
+      <nav aria-label="Create deck sections" className="grid grid-cols-4 gap-2 rounded-lg bg-surface/30 p-2">
         {FORM_SECTIONS.map((section, idx) => {
           const Icon = section.icon;
           const active = activeSection === section.id;
@@ -194,7 +194,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
         {activeSection === 'setup-basics' && (
           <>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-foreground">
                 Deck Name <span className="text-red-400">*</span>
               </label>
@@ -209,13 +209,13 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-foreground">Visibility</label>
               <div className="inline-flex rounded-md border border-cobalt-900/70 p-1">
                 {VISIBILITIES.map((v) => (
                   <button
                     className={cn(
-                      'flex-1 rounded px-3 py-1.5 text-xs font-semibold transition-colors',
+                      'flex-1 rounded px-4 py-2 text-xs font-semibold transition-colors',
                       ctx.visibility === v.value
                         ? 'border border-cobalt-400/40 bg-cobalt-500/15 text-cobalt-200 shadow-sm'
                         : 'text-steel-600 hover:text-foreground',
@@ -265,13 +265,13 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
 
         {activeSection === 'setup-starter' && (
           <>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-foreground" htmlFor="deck-set-select">
                 Set / Format <span className="font-normal text-steel-600">(filters catalog and official starters)</span>
               </label>
               <select
                 id="deck-set-select"
-                className={cn(FIELD_CLASS, 'h-9 px-2.5')}
+                className={cn(FIELD_CLASS, 'h-9 px-2')}
                 onChange={(e) => {
                   ctx.setSetId(e.target.value);
                   setSelectedTemplateSlug(null);
@@ -308,7 +308,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
       </section>
 
       {ctx.setId && templates.length === 0 && (
-        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
+        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
           No official starter decks matched {ctx.setId}. Choose another set or start from scratch.
         </p>
       )}
@@ -324,7 +324,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
         </button>
 
         {activeSection === 'setup-import' && (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-foreground">
               Paste Deck List <span className="font-normal text-steel-600">(optional)</span>
             </label>
@@ -332,7 +332,7 @@ export default function DeckSetupForm({ cards }: DeckSetupFormProps) {
               <summary className="cursor-pointer select-none font-medium text-cobalt-400 hover:text-cobalt-300">
                 Accepted formats — click to expand
               </summary>
-              <pre className="mt-1.5 whitespace-pre-wrap rounded border border-cobalt-900/70 bg-background/40 px-3 py-2 font-mono text-[11px] leading-relaxed text-steel-500">{`One card per line, quantity first:
+              <pre className="mt-2 whitespace-pre-wrap rounded border border-cobalt-900/70 bg-background/40 px-4 py-2 font-mono text-[11px] leading-relaxed text-steel-500">{`One card per line, quantity first:
   3 Amuro Ray
   Amuro Ray x3
   ST01-001 Amuro Ray x3
@@ -357,21 +357,21 @@ Unrecognized cards are listed as warnings after import.`}</pre>
         <p
           role="status"
           aria-live="polite"
-          className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400"
+          className="rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm text-amber-400"
         >
           Imported {importedCount} cards — a valid main deck requires exactly 50.
         </p>
       )}
 
       {error && (
-        <p className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+        <p className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-400">
           {error}
         </p>
       )}
 
       <button
         className={cn(
-          'mt-1 rounded-md bg-cobalt-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-cobalt-500 active:scale-[0.98]',
+          'mt-1 rounded-md bg-cobalt-600 py-2 text-sm font-bold text-white transition-all hover:bg-cobalt-500 active:scale-[0.98]',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
         disabled={submitting || !ctx.name.trim()}

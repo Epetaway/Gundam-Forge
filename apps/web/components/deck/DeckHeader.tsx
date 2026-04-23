@@ -41,23 +41,23 @@ export function DeckHeader({
       <Button asChild size="sm" variant="secondary">
         <Link href="/decks">
           View Decks
-          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+          <ExternalLink className="ml-2 h-3.5 w-3.5" />
         </Link>
       </Button>
     ) : (
       <Button asChild size="sm" variant="primary">
         <Link href="/forge">
           Open in Forge
-          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+          <ExternalLink className="ml-2 h-3.5 w-3.5" />
         </Link>
       </Button>
     );
 
   return (
     <header className="sticky top-16 z-20 border-b border-cobalt-900/60 bg-surface/95 backdrop-blur-md">
-      <div className="p-4 md:p-5">
+      <div className="p-4 md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cobalt-300">
             {eyebrow}
             </p>
@@ -83,16 +83,16 @@ export function DeckHeader({
             {children}
             <Button asChild size="sm" variant="primary">
               <Link href={`/decks/${deckId}/playtest`}>
-                <Swords className="mr-1.5 h-3.5 w-3.5" />
+                <Swords className="mr-2 h-3.5 w-3.5" />
                 Playtest
               </Link>
             </Button>
             <Button onClick={onShare} size="sm" variant="secondary">
-              <Share2 className="mr-1.5 h-3.5 w-3.5" />
+              <Share2 className="mr-2 h-3.5 w-3.5" />
               Share
             </Button>
             <Button onClick={onExport} size="sm" variant="secondary">
-              <Download className="mr-1.5 h-3.5 w-3.5" />
+              <Download className="mr-2 h-3.5 w-3.5" />
               Export
             </Button>
             {actionLink}

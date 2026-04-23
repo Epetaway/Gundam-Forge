@@ -111,10 +111,10 @@ export default function AdminMetaPage() {
           value={token}
           onChange={(e) => setToken(e.target.value)}
           placeholder="x-meta-admin-token"
-          className="w-full rounded-md border border-steel-700 bg-surface-950 px-3 py-2 text-sm text-surface-foreground"
+          className="w-full rounded-md border border-steel-700 bg-surface-950 px-4 py-2 text-sm text-surface-foreground"
         />
 
-        <div className="mt-4 flex flex-wrap gap-3">
+        <div className="mt-4 flex flex-wrap gap-4">
           <button
             type="button"
             onClick={runAutoDetectDryRun}
@@ -139,14 +139,14 @@ export default function AdminMetaPage() {
         <textarea
           value={payloadText}
           onChange={(e) => setPayloadText(e.target.value)}
-          className="mt-3 h-72 w-full rounded-md border border-steel-700 bg-surface-950 p-3 font-mono text-xs text-surface-foreground"
+          className="mt-4 h-72 w-full rounded-md border border-steel-700 bg-surface-950 p-4 font-mono text-xs text-surface-foreground"
           spellCheck={false}
         />
       </section>
 
       <section className="mt-6 rounded-lg border border-steel-700 bg-surface-900/70 p-4">
         <h2 className="text-lg font-medium text-surface-foreground">Latest Response</h2>
-        <pre className="mt-3 max-h-[28rem] overflow-auto rounded-md bg-surface-950 p-3 text-xs text-surface-foreground">
+        <pre className="mt-4 max-h-[28rem] overflow-auto rounded-md bg-surface-950 p-4 text-xs text-surface-foreground">
           {JSON.stringify(response ?? { ok: true, note: 'No requests yet.' }, null, 2)}
         </pre>
       </section>

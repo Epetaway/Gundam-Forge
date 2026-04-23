@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LayoutGrid, SlidersHorizontal, Table2, FileJson } from 'lucide-react';
+import { LayoutGrid, SlidersHorizontal, Table2, FileJson, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/layout/Container';
 import { DeckHeader } from '@/components/deck/DeckHeader';
@@ -23,6 +23,7 @@ import { useLocalStorageState } from '@/lib/useLocalStorageState';
 import { DeckStats } from '@/components/deck/DeckStats';
 import { DeckAnalyticsPanel } from '@/components/deck/analytics/DeckAnalyticsPanel';
 import { useDeckAnalyticsQuery } from '@/lib/query/useDeckAnalyticsQuery';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface DeckViewPageProps {
   deck: {
@@ -133,7 +134,7 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
   const ActiveRenderer = activeView.Component;
 
   return (
-    <Container className="space-y-5 py-6" wide>
+    <Container className="space-y-6 py-6" wide>
       <DeckHeader
         archetype={deck.archetype}
         colors={deck.colors}
@@ -147,7 +148,7 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
         deckId={deck.id}
       >
         <Button onClick={handleExportJson} size="sm" variant="secondary" title="Download deck as JSON file">
-          <FileJson className="mr-1.5 h-3.5 w-3.5" />
+          <FileJson className="mr-2 h-3.5 w-3.5" />
           JSON
         </Button>
       </DeckHeader>
@@ -166,10 +167,10 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
         views={viewRegistry}
         actions={
           <>
-            <span className="inline-flex h-10 items-center rounded-md border border-cobalt-900/70 px-3 text-xs font-semibold text-foreground">
+            <span className="inline-flex h-10 items-center rounded-md border border-cobalt-900/70 px-4 text-xs font-semibold text-foreground">
               {visibleCards.length} cards shown
             </span>
-            <span className="inline-flex h-10 items-center rounded-md border border-cobalt-400/40 bg-cobalt-500/10 px-3 text-xs font-semibold text-cobalt-300">
+            <span className="inline-flex h-10 items-center rounded-md border border-cobalt-400/40 bg-cobalt-500/10 px-4 text-xs font-semibold text-cobalt-300">
               {activeView.label} mode
             </span>
           </>
@@ -177,16 +178,24 @@ export function DeckViewPage({ deck, initialItems }: DeckViewPageProps): JSX.Ele
       />
 
       <section className="grid items-start gap-4 pb-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <section aria-live="polite" className="min-w-0 space-y-3">
-          <ActiveRenderer
-            actions={{ onOpenCard: setActiveCardId }}
-            items={visibleCards}
-            selection={{ activeCardId }}
-            ui={{ density, features, mode: 'viewer' }}
-          />
+        <section aria-live="polite" className="min-w-0 space-y-4">
+          {visibleCards.length === 0 ? (
+            <EmptyState
+              icon={<Layers className="h-5 w-5 text-text-muted" />}
+              title="No cards found"
+              description="Try clearing the search query to view all cards in this deck."
+            />
+          ) : (
+            <ActiveRenderer
+              actions={{ onOpenCard: setActiveCardId }}
+              items={visibleCards}
+              selection={{ activeCardId }}
+              ui={{ density, features, mode: 'viewer' }}
+            />
+          )}
         </section>
 
-        <aside className="space-y-4 xl:sticky xl:top-[18.75rem]">
+        <aside className="space-y-4 xl:sticky xl:top-72">
           <DeckStats items={initialItems} />
           <DeckAnalyticsPanel
             items={initialItems}

@@ -80,7 +80,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
   return (
     <div className="space-y-4 rounded-lg border border-cobalt-900/65 bg-gradient-to-br from-surface-elevated via-surface to-surface p-4 shadow-[0_8px_24px_rgba(2,6,23,0.35)]">
       {/* Summary chips */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-4">
         <Chip label="Cards" value={`${totalCards}`} />
         <Chip label="Avg Cost" value={avgCost.toFixed(1)} />
         {typeEntries.slice(0, 4).map(([type, count]) => (
@@ -119,7 +119,7 @@ export function DeckStats({ items }: DeckStatsProps): JSX.Element {
             })}
           </div>
           {/* Phase legend */}
-          <div className="flex gap-3 mt-2 text-[9px]">
+          <div className="flex gap-4 mt-2 text-[9px]">
             {PHASE_CONFIG.map((phase) => (
               <div key={phase.label} className="flex items-center gap-1">
                 <div className={`h-2 w-2 rounded-full bg-gradient-to-br ${phase.color}`} />
@@ -171,7 +171,7 @@ function Chip({
   color?: string;
 }): JSX.Element {
   return (
-    <div className="flex items-center gap-1.5 rounded border border-cobalt-900/70 bg-surface-interactive px-2 py-1">
+    <div className="flex items-center gap-2 rounded border border-cobalt-900/70 bg-surface-interactive px-2 py-1">
       {color && (
         <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
       )}

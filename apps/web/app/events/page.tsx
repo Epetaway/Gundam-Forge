@@ -6,6 +6,8 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 import { getDecks } from '@/lib/data/decks';
 import { getEvents } from '@/lib/data/events';
 import { canLinkPlacementDeck, formatPlacementDeckLabel } from '@/lib/events/linking';
@@ -14,11 +16,38 @@ import { rankArchetypes } from '@/lib/meta/engine';
 export default function EventsPage(): JSX.Element {
   const events = getEvents();
   const knownDeckIds = new Set(getDecks().map((deck) => deck.id));
-  const archetypeMeta = rankArchetypes(events).slice(0, 5);
+  const archetypeMeta = rankArchetypes(events)
+    .map((record) => ({
+      ...record,
+      archetype: record.archetype.replace(/Rogue\s*\/\s*Other|Other/gi, 'Unclassified'),
+    }))
+    .slice(0, 5);
   const latestEventDate = events[0]?.date ?? null;
 
+  if (events.length === 0) {
+    return (
+      <Container className="space-y-8 py-8">
+        <PageHeader
+          description="Tournament command board with placements, archetype pressure, and win-rate heat."
+          eyebrow="Events"
+          title="Tournament Results"
+        />
+        <EmptyState
+          icon={<Trophy className="h-5 w-5 text-text-muted" />}
+          title="No events found"
+          description="No tournament results are available yet."
+          cta={
+            <Button asChild variant="secondary">
+              <Link href="/decks">Browse Decks</Link>
+            </Button>
+          }
+        />
+      </Container>
+    );
+  }
+
   return (
-    <Container className="space-y-6 py-8">
+    <Container className="space-y-8 py-8">
       <PageHeader
         description={latestEventDate ? `Tournament command board · Last event: ${latestEventDate}` : "Tournament command board with placements, archetype pressure, and win-rate heat."}
         eyebrow="Events"
@@ -26,7 +55,7 @@ export default function EventsPage(): JSX.Element {
       />
 
       <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <div className="space-y-3">
+        <div className="space-y-4">
           {events.map((event) => (
             <Card className="overflow-hidden border-steel-400 bg-surface-elevated" key={event.id}>
               <div className="flex items-center justify-between border-b border-border bg-[linear-gradient(120deg,hsl(var(--accent)/0.2),transparent_65%)] px-4 py-2 text-xs text-steel-600">
@@ -42,11 +71,11 @@ export default function EventsPage(): JSX.Element {
                   <Badge>{event.date}</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {event.placements.map((placement) => (
                     <li
-                      className={`rounded-md border px-3 py-2 ${getPlacementTone(placement.placement)}`}
+                      className={`rounded-md border px-4 py-2 ${getPlacementTone(placement.placement)}`}
                       key={`${event.id}:${placement.placement}`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -89,9 +118,9 @@ export default function EventsPage(): JSX.Element {
               Archetype Meta Snapshot
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-4">
             {archetypeMeta.map((record) => (
-              <div className="rounded-md border border-border bg-surface-interactive px-3 py-2" key={record.archetype}>
+              <div className="rounded-md border border-border bg-surface-interactive px-4 py-4" key={record.archetype}>
                 <div className="flex items-center justify-between text-sm">
                   <p className="font-semibold">{record.archetype}</p>
                   <Badge variant="accent">{record.topThree} top 3</Badge>
@@ -100,9 +129,12 @@ export default function EventsPage(): JSX.Element {
                   {getMetaWinRateIcon(record.winRate)}
                   {record.placements} tracked placements • {(record.winRate * 100).toFixed(1)}% win rate
                 </p>
+                <div className="mt-2">
+                  <ProgressBar label="Meta Share" value={record.metaShare * 100} colorClassName="bg-accent" />
+                </div>
               </div>
             ))}
-            <div className="rounded-md border border-border bg-surface-interactive px-3 py-2 text-xs text-steel-600">
+            <div className="rounded-md border border-border bg-surface-interactive px-4 py-2 text-xs text-steel-600">
               <p className="inline-flex items-center gap-1 font-semibold text-amber-300">
                 <ShieldAlert className="h-4 w-4" />
                 Meta pressure updates after each event sync.

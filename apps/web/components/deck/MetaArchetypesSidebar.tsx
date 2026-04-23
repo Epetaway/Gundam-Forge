@@ -72,7 +72,7 @@ export function MetaArchetypesSidebar(): JSX.Element {
 
   return (
     <aside
-      className="w-72 rounded-lg border border-steel-700 bg-surface-950/90 p-3 shadow-xl backdrop-blur"
+      className="w-72 rounded-lg border border-steel-700 bg-surface-950/90 p-4 shadow-xl backdrop-blur"
       aria-label="Current meta archetype trends"
     >
       <header className="mb-2">
@@ -84,14 +84,14 @@ export function MetaArchetypesSidebar(): JSX.Element {
 
       {error && <p className="rounded bg-red-500/10 px-2 py-1 text-xs text-red-300">{error}</p>}
 
-      <ul className="space-y-1.5" role="list" aria-label="Top archetypes">
+      <ul className="space-y-2" role="list" aria-label="Top archetypes">
         {(data?.topArchetypes ?? []).slice(0, 6).map((entry) => {
           const badge = trendBadge(entry.trendDirection);
           return (
             <li key={`${entry.archetypeId}-${entry.rank}`} className="rounded border border-steel-800 bg-surface-900/60 p-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-surface-foreground">#{entry.rank}</span>
-                <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${badge.className}`}>{badge.label}</span>
+                <span className={`rounded px-2 py-0.5 text-[10px] font-medium ${badge.className}`}>{badge.label}</span>
               </div>
               <p className="mt-1 text-xs text-surface-foreground/90">{entry.archetypeId}</p>
               <p className="mt-1 text-[11px] text-steel-400">

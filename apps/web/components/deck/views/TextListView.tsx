@@ -31,7 +31,7 @@ function CardHoverPreview({ item, anchor }: { item: DeckViewItem; anchor: DOMRec
           draggable={false}
         />
       ) : (
-        <div className="flex h-56 flex-col items-center justify-center gap-1 bg-surface-interactive p-3 text-center">
+        <div className="flex h-56 flex-col items-center justify-center gap-1 bg-surface-interactive p-4 text-center">
           <p className="text-xs font-semibold leading-tight text-foreground">{item.name}</p>
           {item.typeLine && <p className="text-[10px] text-text-muted">{item.typeLine}</p>}
           {item.ap !== undefined && (
@@ -67,12 +67,12 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
         <table className="w-full text-left">
           <thead className="border-b border-cobalt-900/65 bg-surface-interactive text-[11px] uppercase tracking-[0.12em] text-text-muted">
             <tr>
-              <th className="w-10 px-3 py-2">Qty</th>
-              <th className="px-3 py-2">Card</th>
-              <th className="hidden px-3 py-2 sm:table-cell">Type</th>
-              <th className="hidden w-14 px-3 py-2 sm:table-cell">Cost</th>
+              <th className="w-10 px-4 py-2">Qty</th>
+              <th className="px-4 py-2">Card</th>
+              <th className="hidden px-4 py-2 sm:table-cell">Type</th>
+              <th className="hidden w-14 px-4 py-2 sm:table-cell">Cost</th>
               {ui.features.deckEdit && (
-                <th className="w-16 px-3 py-2" />
+                <th className="w-16 px-4 py-2" />
               )}
             </tr>
           </thead>
@@ -93,14 +93,14 @@ export function TextListView({ items, selection, actions, ui }: DeckViewRenderer
                   }
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <td className="px-3 py-1.5 font-mono text-xs font-bold text-text-muted">
+                  <td className="px-4 py-2 font-mono text-xs font-bold text-text-muted">
                     ×{item.qty}
                   </td>
-                  <td className="px-3 py-1.5 font-medium text-foreground">{item.name}</td>
-                  <td className="hidden px-3 py-1.5 text-xs text-text-muted sm:table-cell">
+                  <td className="px-4 py-2 font-medium text-foreground">{item.name}</td>
+                  <td className="hidden px-4 py-2 text-xs text-text-muted sm:table-cell">
                     {item.typeLine}
                   </td>
-                  <td className="hidden px-3 py-1.5 font-mono text-xs text-steel-600 sm:table-cell">
+                  <td className="hidden px-4 py-2 font-mono text-xs text-steel-600 sm:table-cell">
                     {item.cost ?? '—'}
                   </td>
                   {ui.features.deckEdit && (

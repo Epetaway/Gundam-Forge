@@ -325,14 +325,14 @@ export function Battlefield({
           className="absolute right-3 top-14 z-30 hidden xl:flex w-52 flex-col rounded-xl border bg-slate-950/85 backdrop-blur-sm overflow-hidden"
           style={{ borderColor: 'rgba(56,189,248,0.35)', boxShadow: '0 10px 28px rgba(2,132,199,0.2)' }}
         >
-          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-cyan-300/20 bg-slate-900/80">
+          <div className="flex items-center justify-between px-2 py-2 border-b border-cyan-300/20 bg-slate-900/80">
             <span className="text-[10px] uppercase tracking-wider text-cyan-200/90">
               {pinnedCardId ? 'Pinned Card' : 'Hover Preview'}
             </span>
             <button
               type="button"
               onClick={togglePreviewPin}
-              className="text-[10px] px-1.5 py-0.5 rounded border border-cyan-300/40 text-cyan-200 hover:bg-cyan-900/40 transition"
+              className="text-[10px] px-2 py-0.5 rounded border border-cyan-300/40 text-cyan-200 hover:bg-cyan-900/40 transition"
               title={pinnedCardId ? 'Unpin preview' : 'Pin this preview'}
             >
               {pinnedCardId ? 'Unpin' : 'Pin'}
@@ -349,15 +349,15 @@ export function Battlefield({
               {previewCard.name ?? previewCardId}
             </div>
           </div>
-          <div className="px-2.5 py-2 text-[11px] text-slate-300 space-y-1.5">
+          <div className="px-2 py-2 text-[11px] text-slate-300 space-y-2">
             <div className="flex items-center justify-between text-[10px] uppercase tracking-wide text-slate-400">
               <span>{previewCard.type ?? 'Card'}</span>
               <span>{previewCard.color ?? 'Colorless'}</span>
             </div>
             <div className="flex items-center gap-2 text-slate-200">
-              <span className="rounded bg-cyan-900/60 px-1.5 py-0.5">Cost {previewCard.cost ?? 0}</span>
-              <span className="rounded bg-rose-900/40 px-1.5 py-0.5">AP {previewCard.ap ?? 0}</span>
-              <span className="rounded bg-sky-900/40 px-1.5 py-0.5">HP {previewCard.hp ?? 0}</span>
+              <span className="rounded bg-cyan-900/60 px-2 py-0.5">Cost {previewCard.cost ?? 0}</span>
+              <span className="rounded bg-rose-900/40 px-2 py-0.5">AP {previewCard.ap ?? 0}</span>
+              <span className="rounded bg-sky-900/40 px-2 py-0.5">HP {previewCard.hp ?? 0}</span>
             </div>
             {previewCard.text ? (
               <p className="line-clamp-4 leading-relaxed text-slate-300/90">{previewCard.text}</p>
@@ -376,7 +376,7 @@ export function Battlefield({
           className="absolute right-2 top-14 z-30 xl:hidden w-44 rounded-lg border bg-slate-950/90 backdrop-blur-sm overflow-hidden"
           style={{ borderColor: 'rgba(56,189,248,0.3)', boxShadow: '0 8px 22px rgba(2,132,199,0.16)' }}
         >
-          <div className="px-2 py-1.5 border-b border-cyan-300/20 flex items-center justify-between">
+          <div className="px-2 py-2 border-b border-cyan-300/20 flex items-center justify-between">
             <span className="text-[9px] uppercase tracking-wide text-cyan-100/90">Card</span>
             <button
               type="button"
@@ -386,7 +386,7 @@ export function Battlefield({
               {pinnedCardId ? 'Unpin' : 'Pin'}
             </button>
           </div>
-          <div className="p-2 space-y-1.5">
+          <div className="p-2 space-y-2">
             <div className="text-[10px] text-slate-100 font-semibold truncate">{previewCard.name ?? previewCardId}</div>
             <div className="text-[9px] text-slate-400 uppercase tracking-wide">{previewCard.type ?? 'Card'} · {previewCard.color ?? 'Colorless'}</div>
             <div className="grid grid-cols-3 gap-1 text-[9px] text-slate-200">
@@ -404,7 +404,7 @@ export function Battlefield({
       {/* ── TARGETING BANNER ─────────────────────────────────────── */}
       {isTargeting && (
         <div
-          className="flex-shrink-0 flex items-center gap-3 px-4 py-1.5 z-20"
+          className="flex-shrink-0 flex items-center gap-4 px-4 py-2 z-20"
           style={{
             background: 'rgba(120,53,15,0.6)',
             borderBottom: '1px solid rgba(217,119,6,0.4)',
@@ -428,7 +428,7 @@ export function Battlefield({
           <div className="ml-auto flex items-center gap-2 flex-shrink-0">
             <button
               type="button"
-              className="rounded px-2.5 py-1 text-xs font-semibold transition-colors"
+              className="rounded px-2 py-1 text-xs font-semibold transition-colors"
               style={{
                 border: '1px solid rgba(217,119,6,0.5)',
                 background: 'rgba(146,64,14,0.4)',
@@ -466,7 +466,7 @@ export function Battlefield({
 
         {/* ═══ OPPONENT HALF ═════════════════════════════════════ */}
         <div
-          className="flex-1 min-h-0 flex flex-col gap-1 rounded-t-xl px-3 py-1.5"
+          className="flex-1 min-h-0 flex flex-col gap-1 rounded-t-xl px-4 py-2"
           style={{
             background: 'rgba(127,29,29,0.04)',
             border: '1px solid rgba(127,29,29,0.12)',
@@ -487,7 +487,7 @@ export function Battlefield({
             <span className="text-[9px]" style={{ color: 'rgba(71,85,105,0.5)' }}>
               · Hand: {opponentState.hand.length}
             </span>
-            <div className="ml-auto flex items-center gap-1.5">
+            <div className="ml-auto flex items-center gap-2">
               <ZonePile label="Deck" count={opponentState.deck.length} />
               <ZonePile label="Trash" count={opponentState.discardPile.length} />
             </div>
@@ -548,7 +548,7 @@ export function Battlefield({
 
         {/* ═══ CENTER DIVIDER ════════════════════════════════════ */}
         <div
-          className="flex-shrink-0 flex items-center gap-3 py-1"
+          className="flex-shrink-0 flex items-center gap-4 py-1"
           style={{ minHeight: '28px' }}
         >
           <div
@@ -559,7 +559,7 @@ export function Battlefield({
             }}
           />
           <div
-            className="px-3 py-[3px] rounded-full text-[10px] font-semibold whitespace-nowrap flex-shrink-0"
+            className="px-4 py-[3px] rounded-full text-[10px] font-semibold whitespace-nowrap flex-shrink-0"
             style={{
               border: '1px solid rgba(59,130,246,0.2)',
               background: 'rgba(15,25,60,0.65)',
@@ -596,7 +596,7 @@ export function Battlefield({
 
         {/* ═══ PLAYER HALF ═══════════════════════════════════════ */}
         <div
-          className="flex-1 min-h-0 flex flex-col gap-1 rounded-b-xl px-3 py-1.5"
+          className="flex-1 min-h-0 flex flex-col gap-1 rounded-b-xl px-4 py-2"
           style={{
             background: 'rgba(29,78,216,0.04)',
             border: '1px solid rgba(29,78,216,0.12)',
@@ -660,7 +660,7 @@ export function Battlefield({
           </div>
 
           {/* Utility row */}
-          <div className="flex-shrink-0 flex items-center gap-1.5 pb-0.5">
+          <div className="flex-shrink-0 flex items-center gap-2 pb-0.5">
             <ZonePile
               label="Deck"
               count={playerState.deck.length}
@@ -688,7 +688,7 @@ export function Battlefield({
 
       {/* ── HAND TRAY ────────────────────────────────────────────── */}
       <div
-        className="flex-shrink-0 px-2 pt-1.5 pb-2"
+        className="flex-shrink-0 px-2 pt-2 pb-2"
         style={{ borderTop: '1px solid rgba(59,130,246,0.15)' }}
       >
         <div

@@ -146,7 +146,7 @@ export function AccessibleCard({
       onClick={onClick}
       aria-pressed={isSelected}
       aria-label={getCardAriaLabel(card)}
-      className={`p-3 rounded border-2 transition focus:ring-2 focus:ring-purple-500 ${
+      className={`p-4 rounded border-2 transition focus:ring-2 focus:ring-purple-500 ${
         isSelected ? 'ring-2 ring-yellow-400' : ''
       }`}
     >

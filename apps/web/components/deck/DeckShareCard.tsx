@@ -40,11 +40,11 @@ export function DeckShareCard({ deckId, deckName, isPublic }: DeckShareCardProps
 
   return (
     <div className="rounded-lg border border-border bg-surface-elevated p-4">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-4">
         <div className="text-lg">🔗</div>
         <h3 className="font-semibold text-foreground">Share Deck</h3>
       </div>
-      <p className="text-sm text-muted-foreground mb-3">
+      <p className="text-sm text-muted-foreground mb-4">
         Anyone with this link can view and clone "{deckName}".
       </p>
       <div className="flex gap-2">
@@ -52,7 +52,7 @@ export function DeckShareCard({ deckId, deckName, isPublic }: DeckShareCardProps
           type="text"
           value={shareUrl}
           readOnly
-          className="flex-1 px-3 py-2 text-sm bg-surface border border-border rounded text-foreground font-mono"
+          className="flex-1 px-4 py-2 text-sm bg-surface border border-border rounded text-foreground font-mono"
           onClick={(e) => e.currentTarget.select()}
         />
         <Button onClick={handleCopy} variant="secondary" size="sm">

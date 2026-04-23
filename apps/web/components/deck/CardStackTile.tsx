@@ -115,7 +115,7 @@ export function CardStackTile({
         {/* Quantity badge — top-right corner */}
         {(mode === 'builder' || item.qty > 1) && (
           <span
-            className="pointer-events-none absolute right-1.5 top-1.5 z-10 rounded-sm bg-black/70 px-1.5 py-0.5 font-mono text-[11px] font-bold leading-none text-white"
+            className="pointer-events-none absolute right-1.5 top-1.5 z-10 rounded-sm bg-black/70 px-2 py-0.5 font-mono text-[11px] font-bold leading-none text-white"
             aria-label={`Quantity: ${item.qty}`}
           >
             ×{item.qty}

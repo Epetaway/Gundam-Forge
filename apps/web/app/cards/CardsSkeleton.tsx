@@ -21,7 +21,7 @@ export function CardsSkeleton(): JSX.Element {
       </div>
 
       {/* Card grid skeleton — 12 cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {Array.from({ length: 12 }).map((_, i) => (
           <div
             key={i}
@@ -31,7 +31,7 @@ export function CardsSkeleton(): JSX.Element {
             {/* Image placeholder */}
             <div className="w-full h-3/4 bg-surface-interactive" />
             {/* Text placeholders */}
-            <div className="p-2 space-y-1.5">
+            <div className="p-2 space-y-2">
               <div className="h-3 rounded bg-surface-elevated w-4/5" />
               <div className="h-2.5 rounded bg-surface-elevated w-1/2" />
             </div>

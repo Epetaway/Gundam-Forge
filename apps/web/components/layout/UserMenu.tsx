@@ -51,7 +51,7 @@ export function UserMenu(): JSX.Element {
 
           {/* Menu */}
           <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-border bg-surface shadow-lg">
-            <div className="border-b border-border px-4 py-3">
+            <div className="border-b border-border px-4 py-4">
               <p className="text-sm font-medium text-foreground truncate">
                 {user.email}
               </p>

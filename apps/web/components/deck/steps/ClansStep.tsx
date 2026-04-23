@@ -66,13 +66,13 @@ export default function ClansStep({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="text-sm font-semibold text-foreground">Factions / Clans</p>
         <p className="text-xs text-steel-600">Pick up to 3 factions or leave this open for flexible suggestions.</p>
       </div>
 
-      <div className="flex items-center gap-2 rounded-md px-3 py-2">
+      <div className="flex items-center gap-2 rounded-md px-4 py-2">
         <input
           type="checkbox"
           id="any-clans"
@@ -96,7 +96,7 @@ export default function ClansStep({
                 onClick={() => handleToggleClan(clan)}
                 disabled={atMax}
                 className={cn(
-                  'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                  'rounded-full px-4 py-2 text-xs font-medium transition-all',
                   active
                     ? 'bg-cobalt-600 text-white ring-2 ring-cobalt-400/40'
                     : 'text-steel-600 hover:text-foreground',

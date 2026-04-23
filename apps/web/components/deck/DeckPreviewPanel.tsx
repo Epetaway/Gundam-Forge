@@ -45,12 +45,12 @@ export default function DeckPreviewPanel() {
 
       {/* Colors */}
       {colors.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {colors.map((c) => {
             const style = COLOR_STYLES[c];
             return (
               <span
-                className={cn('rounded-full px-2.5 py-0.5 text-[11px] font-semibold', style.bg, style.text)}
+                className={cn('rounded-full px-2 py-0.5 text-[11px] font-semibold', style.bg, style.text)}
                 key={c}
               >
                 {style.label}
@@ -63,7 +63,7 @@ export default function DeckPreviewPanel() {
       )}
 
       {/* Meta row */}
-      <div className="flex flex-wrap gap-3 text-xs text-steel-600">
+      <div className="flex flex-wrap gap-4 text-xs text-steel-600">
         {packageLabel && (
           <span className="rounded border border-cobalt-400/30 bg-cobalt-400/10 px-2 py-0.5 font-medium text-cobalt-300">
             {packageLabel}
@@ -72,10 +72,10 @@ export default function DeckPreviewPanel() {
         <span className="capitalize">{visibility}</span>
       </div>
 
-      <div className="rounded-md border border-cobalt-900/65 bg-cobalt-900/10 px-3 py-2.5">
+      <div className="rounded-md border border-cobalt-900/65 bg-cobalt-900/10 px-4 py-2">
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-cobalt-300">Intent Summary</p>
 
-        <div className="grid grid-cols-1 gap-1.5 text-xs text-steel-600">
+        <div className="grid grid-cols-1 gap-2 text-xs text-steel-600">
           <p>
             <span className="font-semibold text-foreground">Factions:</span>{' '}
             {clans.length > 0 ? clans.join(', ') : 'Any'}
@@ -91,7 +91,7 @@ export default function DeckPreviewPanel() {
         </div>
 
         {selectedPackages.length > 0 && (
-          <div className="mt-2.5 border-t border-cobalt-900/60 pt-2">
+          <div className="mt-2 border-t border-cobalt-900/60 pt-2">
             <p className="mb-1 text-[11px] font-semibold text-steel-500">Selected Mechanics</p>
             <div className="flex flex-wrap gap-1">
               {selectedPackages.map((pkg) => (
@@ -109,7 +109,7 @@ export default function DeckPreviewPanel() {
 
       {/* Import preview */}
       {lineCount > 0 && (
-        <div className="rounded-md border border-cobalt-900/65 bg-surface px-3 py-2 text-xs text-steel-600">
+        <div className="rounded-md border border-cobalt-900/65 bg-surface px-4 py-2 text-xs text-steel-600">
           <span className="font-semibold text-cobalt-300">{lineCount}</span>{' '}
           {lineCount === 1 ? 'line' : 'lines'} ready to import
         </div>
@@ -134,7 +134,7 @@ export default function DeckPreviewPanel() {
             value={browseQuery}
             onChange={(e) => setBrowseQuery(e.target.value)}
             className={cn(
-              'min-w-0 flex-1 rounded border border-cobalt-900/65 bg-surface px-2.5 py-1.5 text-xs text-foreground',
+              'min-w-0 flex-1 rounded border border-cobalt-900/65 bg-surface px-2 py-2 text-xs text-foreground',
               'placeholder:text-steel-600 focus:border-cobalt-500 focus:outline-none focus:ring-1 focus:ring-cobalt-500/40',
             )}
             aria-label="Search public decks"
@@ -142,7 +142,7 @@ export default function DeckPreviewPanel() {
           <Link
             href={`/decks${browseQuery.trim() ? `?q=${encodeURIComponent(browseQuery.trim())}` : ''}`}
             className={cn(
-              'flex-shrink-0 rounded border border-cobalt-600 bg-cobalt-600/10 px-3 py-1.5',
+              'flex-shrink-0 rounded border border-cobalt-600 bg-cobalt-600/10 px-4 py-2',
               'text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20',
             )}
           >

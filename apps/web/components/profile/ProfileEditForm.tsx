@@ -227,7 +227,7 @@ export function ProfileEditForm({ profile, onSave, onCancel }: ProfileEditFormPr
               Bio
             </label>
             <textarea
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-steel-500 focus:border-cobalt-500 focus:outline-none focus:ring-1 focus:ring-cobalt-500"
+              className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm text-foreground placeholder-steel-500 focus:border-cobalt-500 focus:outline-none focus:ring-1 focus:ring-cobalt-500"
               id="bio"
               maxLength={500}
               onChange={(e) => setBio(e.target.value)}
@@ -242,19 +242,19 @@ export function ProfileEditForm({ profile, onSave, onCancel }: ProfileEditFormPr
 
           {/* Error/Success Messages */}
           {error && (
-            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+            <p className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700" role="alert">
               {error}
             </p>
           )}
 
           {success && (
-            <p className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+            <p className="rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">
               {success}
             </p>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button
               className="flex-1"
               disabled={pending || !!usernameError}

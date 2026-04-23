@@ -18,13 +18,13 @@ export function ResourceDeckZone({
   isOpponent,
 }: ResourceDeckAreaProps) {
   return (
-    <div className="border-2 border-border rounded-lg bg-surface-elevated p-3">
+    <div className="border-2 border-border rounded-lg bg-surface-elevated p-4">
       <div className="text-xs font-bold text-white uppercase mb-2 tracking-wider">
         Resource Deck
       </div>
 
       {/* Deck Stack Visual */}
-      <div className="relative h-20 mb-3 flex items-center justify-center">
+      <div className="relative h-20 mb-4 flex items-center justify-center">
         {resourceDeck.length > 0 ? (
           <div className="relative w-12">
             {[0, 1, 2].map(

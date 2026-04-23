@@ -640,7 +640,7 @@ export function PlaytestGameEnhanced({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-hidden">
       {/* HEADER: Phase Indicator + Controls */}
-      <header className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-gradient-to-r from-surface-elevated to-surface px-3 py-2">
+      <header className="flex-shrink-0 border-b-2 border-cobalt-500/30 bg-gradient-to-r from-surface-elevated to-surface px-4 py-2">
         <div className="flex items-center gap-2 min-w-0">
           {/* Title */}
           <h1 className="text-base font-bold text-foreground whitespace-nowrap mr-2">Gundam TCG</h1>
@@ -664,7 +664,7 @@ export function PlaytestGameEnhanced({
           <div className="flex-1" />
 
           {/* Action buttons — always in one row, never wrap */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Undo/Redo */}
             {!isSetupPhase && !isMobileAutoMode && (
               <>
@@ -691,7 +691,7 @@ export function PlaytestGameEnhanced({
             {!isSetupPhase && !isMobileAutoMode && needsToDraw && (
               <button
                 onClick={handleDraw}
-                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition animate-pulse"
+                className="px-4 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-semibold text-xs transition animate-pulse"
               >
                 Draw Card
               </button>
@@ -703,7 +703,7 @@ export function PlaytestGameEnhanced({
                 onClick={() =>
                   handleAction({ type: 'PLACE_RESOURCE', playerId: 'player1', timestamp: Date.now() })
                 }
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-semibold text-xs transition animate-pulse"
+                className="px-4 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-semibold text-xs transition animate-pulse"
               >
                 Place Resource
               </button>
@@ -714,7 +714,7 @@ export function PlaytestGameEnhanced({
               <button
                 onClick={handleAdvancePhase}
                 disabled={!isPlayerTurn || needsToDraw || needsToPlaceResource}
-                className="px-3 py-1 bg-cobalt-600 hover:bg-cobalt-700 disabled:bg-surface-muted disabled:text-white disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
+                className="px-4 py-1 bg-cobalt-600 hover:bg-cobalt-700 disabled:bg-surface-muted disabled:text-white disabled:cursor-not-allowed text-foreground rounded font-semibold text-xs transition"
                 title={needsToDraw ? 'Draw first' : needsToPlaceResource ? 'Place resource first' : 'Next phase (Enter)'}
               >
                 {needsToDraw ? 'Draw First' : needsToPlaceResource ? 'Place Resource First' : 'Next Phase →'}
@@ -731,7 +731,7 @@ export function PlaytestGameEnhanced({
                     timestamp: Date.now(),
                   })
                 }
-                className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded font-semibold text-xs transition"
+                className="px-4 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded font-semibold text-xs transition"
                 title="Resolve all pending triggers"
               >
                 Resolve Triggers ({gameState.stack.length})
@@ -969,11 +969,11 @@ export function PlaytestGameEnhanced({
         };
         return (
           <div
-            className={`fixed bottom-4 right-4 flex flex-col gap-1.5 text-white px-4 py-3 rounded-xl shadow-2xl max-w-sm z-50 border backdrop-blur-sm ${misplayError.accent}`}
+            className={`fixed bottom-4 right-4 flex flex-col gap-2 text-white px-4 py-4 rounded-xl shadow-2xl max-w-sm z-50 border backdrop-blur-sm ${misplayError.accent}`}
             role="alert"
             aria-live="assertive"
           >
-            <div className="flex items-start gap-2.5">
+            <div className="flex items-start gap-2">
               <span aria-hidden="true" className="text-white/80">
                 {iconMap[misplayError.category]}
               </span>
@@ -1000,7 +1000,7 @@ export function PlaytestGameEnhanced({
       {/* Generic Error Toast (init/system errors) */}
       {error && !misplayError && (
         <div
-          className="fixed bottom-4 right-4 flex items-start gap-2.5 bg-destructive/90 text-white px-4 py-3 rounded-xl shadow-lg max-w-xs z-50 border border-destructive/60 backdrop-blur-sm"
+          className="fixed bottom-4 right-4 flex items-start gap-2 bg-destructive/90 text-white px-4 py-4 rounded-xl shadow-lg max-w-xs z-50 border border-destructive/60 backdrop-blur-sm"
           role="alert"
           aria-live="assertive"
         >
@@ -1019,7 +1019,7 @@ export function PlaytestGameEnhanced({
       {/* One-time Controls Toast */}
       {!isSetupPhase && showControlsToast && !isMobileAutoMode && (
         <div
-          className="fixed top-20 right-4 max-w-sm rounded-lg border border-cyan-400/35 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl z-50"
+          className="fixed top-20 right-4 max-w-sm rounded-lg border border-cyan-400/35 bg-slate-950/95 px-4 py-4 text-slate-100 shadow-xl z-50"
           role="status"
           aria-live="polite"
         >
@@ -1051,7 +1051,7 @@ export function PlaytestGameEnhanced({
 
       {/* Mobile Game Log Panel */}
       {showMobileLog && !isSetupPhase && engine && (
-        <div className="fixed md:hidden bottom-16 inset-x-0 z-50 max-h-64 overflow-y-auto bg-surface border-t border-border p-3 max-h-[40vh]">
+        <div className="fixed md:hidden bottom-16 inset-x-0 z-50 max-h-64 overflow-y-auto bg-surface border-t border-border p-4 max-h-[40vh]">
           <div className="space-y-2">
             {engine.getLog().slice(-20).reverse().map((entry, i) => (
               <div key={i} className="text-xs border-b border-border/30 pb-2 last:border-b-0">

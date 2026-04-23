@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils/cn';
 
 interface CardQuickAddProps {
   cardName: string;
-  qty: number;
   onAdd: () => void;
   onOpenDetails?: () => void;
   className?: string;
@@ -18,7 +17,6 @@ interface CardQuickAddProps {
  */
 export function CardQuickAdd({
   cardName,
-  qty,
   onAdd,
   onOpenDetails,
   className,
@@ -56,7 +54,7 @@ export function CardQuickAdd({
 
         {/* Detail access hint */}
         {onOpenDetails && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/50 backdrop-blur-sm border border-white/10">
+          <div className="flex items-center gap-2 px-2 py-1 rounded bg-black/50 backdrop-blur-sm border border-white/10">
             <span className="text-xs text-white font-medium">Details</span>
             <button
               type="button"

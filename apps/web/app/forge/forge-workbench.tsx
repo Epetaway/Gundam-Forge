@@ -333,7 +333,7 @@ function PlaystyleHintBar({ packageIds }: PlaystyleHintBarProps) {
   const primary = hints[0];
 
   return (
-    <div className="border-b border-border bg-cobalt-900/20 px-3 py-2 text-xs text-cobalt-200">
+    <div className="border-b border-border bg-cobalt-900/20 px-4 py-2 text-xs text-cobalt-200">
       <span className="font-semibold">Playstyle Hint:</span>{' '}
       {primary.label} is {primary.trendText}
       {primary.tier ? ` (Tier ${primary.tier})` : ''}.{' '}
@@ -358,12 +358,12 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
        * Errors are NOT shown inline; they open a bottom sheet to save vertical space.
        */}
       <div
-        className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-surface/80 px-3 py-1.5 text-xs"
+        className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-surface/80 px-4 py-2 text-xs"
         role="status"
         aria-label="Deck validation status"
       >
         {/* Main deck progress */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
             <div
               className={cn('h-full rounded-full transition-all', metrics.mainDeckCards === 50 ? 'bg-green-500' : 'bg-cobalt-500')}
@@ -378,7 +378,7 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
         <span className="text-steel-700" aria-hidden="true">·</span>
 
         {/* Resource deck progress */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-interactive" aria-hidden="true">
             <div
               className={cn('h-full rounded-full transition-all', metrics.resourceDeckCards === 10 ? 'bg-green-500' : 'bg-cobalt-500')}
@@ -395,14 +395,14 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
           {issueCount > 0 ? (
             <button
               type="button"
-              className="rounded bg-red-500/10 px-2 py-0.5 text-red-400 transition-colors hover:bg-red-500/20"
+              className="rounded bg-red-500/10 px-2 py-1 text-red-400 transition-colors hover:bg-red-500/20"
               onClick={() => setIssuesOpen(true)}
               aria-label={`${issueCount} deck issue${issueCount !== 1 ? 's' : ''}. Tap to view.`}
             >
               Issues ({issueCount})
             </button>
           ) : isValid ? (
-            <span className="rounded bg-green-500/10 px-2 py-0.5 font-semibold text-green-400">✓ Valid</span>
+            <span className="rounded bg-green-500/10 px-2 py-1 font-semibold text-green-400">✓ Valid</span>
           ) : null}
         </div>
       </div>
@@ -417,7 +417,7 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
         >
           <div className="absolute inset-0 bg-black/50" onClick={() => setIssuesOpen(false)} aria-hidden="true" />
           <div className="absolute inset-x-0 bottom-0 rounded-t-xl bg-surface px-4 pb-[env(safe-area-inset-bottom,16px)] pt-4 shadow-2xl">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <h2 id="issues-sheet-title" className="text-sm font-semibold">Deck Issues</h2>
               <button
                 type="button"
@@ -430,10 +430,10 @@ function ValidationBar({ entries, allCards }: ValidationBarProps) {
             </div>
             <ul className="space-y-1 pb-2" role="list">
               {errors.map((e) => (
-                <li key={e} className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-400">{e}</li>
+                <li key={e} className="rounded bg-red-500/10 px-4 py-2 text-sm text-red-400">{e}</li>
               ))}
               {warnings.map((w) => (
-                <li key={w} className="rounded bg-amber-500/10 px-3 py-2 text-sm text-amber-700">{w}</li>
+                <li key={w} className="rounded bg-amber-500/10 px-4 py-2 text-sm text-amber-700">{w}</li>
               ))}
             </ul>
           </div>
@@ -482,11 +482,11 @@ function MobileToolbar({
   return (
     <>
       {/* ── Compact single row ── */}
-      <div className="flex md:hidden flex-shrink-0 items-center gap-1.5 border-b border-border bg-surface px-2 py-1.5">
+      <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-2 py-2">
         {/* Open catalog drawer */}
         <button
           type="button"
-          className="rounded bg-cobalt-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-cobalt-500"
+          className="rounded bg-cobalt-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-cobalt-500"
           onClick={onCardsOpen}
           aria-label="Open card catalog"
         >
@@ -502,7 +502,7 @@ function MobileToolbar({
                 key={view.id}
                 type="button"
                 className={cn(
-                  'flex items-center rounded p-1.5 transition-colors',
+                  'flex items-center rounded p-2 transition-colors',
                   viewMode === view.id ? 'bg-surface text-foreground shadow-sm' : 'text-steel-600 hover:text-foreground',
                 )}
                 onClick={() => onViewModeChange(view.id)}
@@ -520,7 +520,7 @@ function MobileToolbar({
         <button
           type="button"
           className={cn(
-            'rounded p-1.5 transition-colors',
+            'rounded p-2 transition-colors',
             searchOpen || query ? 'bg-cobalt-600/20 text-cobalt-400' : 'text-steel-600 hover:text-foreground',
           )}
           onClick={() => setSearchOpen((v) => !v)}
@@ -533,7 +533,7 @@ function MobileToolbar({
         {/* View options overflow — opens bottom sheet */}
         <button
           type="button"
-          className="ml-auto rounded border border-border bg-surface-interactive p-1.5 text-steel-600 transition-colors hover:text-foreground"
+          className="ml-auto rounded border border-border bg-surface-interactive p-2 text-steel-600 transition-colors hover:text-foreground"
           onClick={() => setOptionsOpen(true)}
           aria-label="View options"
           title="Sort, import"
@@ -544,7 +544,7 @@ function MobileToolbar({
 
       {/* ── Inline search expand ── */}
       {searchOpen && (
-        <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-2 py-1.5">
+        <div className="flex md:hidden flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-2 py-2">
           <label className="relative flex-1">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-steel-500" aria-hidden="true" />
             <input
@@ -596,7 +596,7 @@ function MobileToolbar({
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground">Sort by</span>
                 <select
-                  className="rounded border border-border bg-surface-interactive px-2 py-1.5 text-sm outline-none focus-visible:border-ring"
+                  className="rounded border border-border bg-surface-interactive px-2 py-2 text-sm outline-none focus-visible:border-ring"
                   value={sortBy}
                   onChange={(e) => onSortByChange(e.target.value as DeckSortKey)}
                   aria-label="Sort cards"
@@ -610,7 +610,7 @@ function MobileToolbar({
               {/* Import */}
               <button
                 type="button"
-                className="w-full rounded border border-border bg-surface-interactive py-2.5 text-sm text-steel-600 transition-colors hover:text-foreground"
+                className="w-full rounded border border-border bg-surface-interactive py-2 text-sm text-steel-600 transition-colors hover:text-foreground"
                 onClick={() => { setOptionsOpen(false); onImportOpen(); }}
               >
                 Import Deck
@@ -721,10 +721,10 @@ function DeckSettingsBar({
   return (
     <div className="flex-shrink-0 border-b border-border bg-surface">
       {/* Collapsed bar */}
-      <div className="flex items-center gap-3 px-4 py-1.5">
+      <div className="flex items-center gap-4 px-4 py-2">
         <button
           type="button"
-          className="flex items-center gap-1.5 text-xs text-steel-500 transition-colors hover:text-foreground"
+          className="flex items-center gap-2 text-xs text-steel-500 transition-colors hover:text-foreground"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="deck-settings-panel"
@@ -817,7 +817,7 @@ function DeckSettingsBar({
       {open && (
         <div
           id="deck-settings-panel"
-          className="border-t border-border bg-surface-elevated px-4 pb-3 pt-2"
+          className="border-t border-border bg-surface-elevated px-4 pb-4 pt-2"
         >
           <div className="flex flex-wrap items-start gap-4">
             {/* Name */}
@@ -942,7 +942,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
       aria-labelledby="import-modal-title"
     >
       <div className="relative w-full max-w-md rounded-lg bg-surface shadow-xl">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between border-b border-border px-4 py-4">
           <h2 id="import-modal-title" className="text-base font-semibold">Import Deck</h2>
           <button
             type="button"
@@ -954,7 +954,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
           </button>
         </div>
 
-        <div className="space-y-3 px-4 py-3">
+        <div className="space-y-4 px-4 py-4">
           {/* Format help */}
           <details className="text-xs text-steel-600">
             <summary className="cursor-pointer font-medium text-cobalt-400 hover:text-cobalt-300">
@@ -969,7 +969,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
             <label htmlFor="deck-import-textarea" className="sr-only">Paste deck list</label>
             <textarea
               id="deck-import-textarea"
-              className="h-36 w-full rounded border border-border bg-surface-interactive px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+              className="h-36 w-full rounded border border-border bg-surface-interactive px-4 py-2 font-mono text-xs text-foreground outline-none placeholder:text-steel-500 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
               placeholder={`4 Gundam\n3 Amuro Ray\n2 Mega Particle Cannon\n...`}
               value={text}
               onChange={(e) => { setText(e.target.value); setResult(null); }}
@@ -979,7 +979,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
           {/* Import result feedback */}
           {result && (
-            <div className={cn('rounded px-3 py-2 text-xs', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-700' : 'bg-green-500/10 text-green-700')}>
+            <div className={cn('rounded px-4 py-2 text-xs', result.notFound.length > 0 ? 'bg-amber-500/10 text-amber-700' : 'bg-green-500/10 text-green-700')}>
               <p className="font-semibold">
                 {result.imported} card type{result.imported !== 1 ? 's' : ''} imported.
               </p>
@@ -1007,7 +1007,7 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
             {result && result.notFound.length > 0 && (
               <button
                 type="button"
-                className="rounded border border-border px-3 py-2 text-sm text-steel-600 transition-colors hover:text-foreground"
+                className="rounded border border-border px-4 py-2 text-sm text-steel-600 transition-colors hover:text-foreground"
                 onClick={onClose}
               >
                 Continue anyway
@@ -1024,25 +1024,9 @@ function ImportModal({ onClose, onImport }: ImportModalProps) {
 
 export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<ForgeWorkbenchProps, 'cards'>): JSX.Element | null {
   const [importOpen, setImportOpen] = React.useState(false);
-  const [warningDismissed, setWarningDismissed] = React.useState(false);
 
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => { setMounted(true); }, []);
-
-  React.useEffect(() => {
-    try {
-      if (localStorage.getItem('gundam-forge.forge.localWarningDismissed') === 'true') {
-        setWarningDismissed(true);
-      }
-    } catch {
-      setWarningDismissed(false);
-    }
-  }, []);
-
-  const dismissWarning = React.useCallback(() => {
-    setWarningDismissed(true);
-    try { localStorage.setItem('gundam-forge.forge.localWarningDismissed', 'true'); } catch { /* ignore */ }
-  }, []);
 
   const [deckMeta, setDeckMeta] = React.useState({
     name: 'Untitled Deck',
@@ -1385,7 +1369,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           <p className="mb-6 max-w-sm text-steel-500">
             Create a new deck or open an existing one to begin using the Forge.
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <a href="/forge">
               <button className="inline-flex items-center gap-2 rounded-sm border border-cobalt-400/70 bg-cobalt-500/25 px-4 py-2 font-semibold text-cobalt-300 transition-all hover:bg-cobalt-500/35">
                 + Create Deck
@@ -1502,7 +1486,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       {toast && (
         <div
           className={cn(
-            'fixed bottom-4 left-1/2 z-50 -translate-x-1/2 flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium shadow-lg',
+            'fixed bottom-4 left-1/2 z-50 -translate-x-1/2 flex items-center gap-4 rounded-lg px-4 py-2 text-sm font-medium shadow-lg',
             toast.kind === 'warn' ? 'bg-amber-700 text-white' : 'bg-green-700 text-white',
           )}
           role="status"
@@ -1525,7 +1509,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
       {/* Main deck area */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Breadcrumb navigation */}
-        <div className="flex-shrink-0 border-b border-border bg-surface/50 px-4 py-2.5 hidden md:block">
+        <div className="hidden flex-shrink-0 border-b border-border bg-surface/50 px-4 py-2 md:block">
           <Breadcrumb
             items={[
               { label: 'Home', href: '/' },
@@ -1536,24 +1520,14 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
           />
         </div>
 
-        {!warningDismissed && (
-          <div className="mx-3 mt-3 flex items-start gap-2.5 rounded-lg border border-amber-500/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-200 md:mx-4">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
-            <p className="flex-1 leading-relaxed">
-              <span className="font-semibold">Decks are saved locally.</span>{' '}
-              Clearing browser data or switching devices will erase your decks. Use{' '}
-              <span className="font-semibold">Export</span> to back up.
-            </p>
-            <button
-              type="button"
-              onClick={dismissWarning}
-              className="ml-1 shrink-0 rounded p-0.5 text-amber-400/70 transition-colors hover:text-amber-300"
-              aria-label="Dismiss warning"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
+        <div className="mx-4 mt-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-900/30 px-4 py-2 text-xs text-amber-200 md:mx-4">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+          <p className="leading-relaxed">
+            <span className="font-semibold">Decks are saved locally.</span>{' '}
+            Clearing browser data or switching devices will erase your decks. Use{' '}
+            <span className="font-semibold">Export</span> to back up.
+          </p>
+        </div>
 
         {/* Deck settings bar with live validation */}
         {deckSettingsBar}
@@ -1618,7 +1592,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
                   {!desktopPanelOpen && (
                     <button
                       type="button"
-                      className="inline-flex h-9 items-center rounded border border-cobalt-600 bg-cobalt-600/10 px-3 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20"
+                      className="inline-flex h-9 items-center rounded border border-cobalt-600 bg-cobalt-600/10 px-4 text-xs font-semibold text-cobalt-400 transition-colors hover:bg-cobalt-600/20"
                       onClick={() => setSidebarOpen(true)}
                       aria-label="Open card catalog"
                     >
@@ -1627,7 +1601,7 @@ export function DeckBuilderPage({ deckId, initialDeck, initialSetId }: Omit<Forg
                   )}
                   <button
                     type="button"
-                    className="inline-flex h-9 items-center rounded border border-border bg-surface-interactive px-3 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
+                    className="inline-flex h-9 items-center rounded border border-border bg-surface-interactive px-4 text-xs font-medium text-steel-600 transition-colors hover:bg-surface hover:text-foreground"
                     onClick={() => setImportOpen(true)}
                     aria-label="Import deck list"
                   >

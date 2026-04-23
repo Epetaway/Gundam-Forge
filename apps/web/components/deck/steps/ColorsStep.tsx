@@ -38,7 +38,7 @@ export default function ColorsStep({
   const isValid = colors.length >= 1 && colors.length <= 2 && nonColorlessColors.length >= 1;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="text-sm font-semibold text-foreground">Colors</p>
         <p className="text-xs text-steel-600">Select 1-2 non-Colorless colors. Colorless can be added as support.</p>
@@ -54,7 +54,7 @@ export default function ColorsStep({
               onClick={() => handleColorToggle(c.value)}
               disabled={nonColorlessAtMax}
               className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-semibold transition-all',
+                'rounded-full px-4 py-2 text-xs font-semibold transition-all',
                 active
                   ? `${c.bg} ${c.text} ring-2 ring-cobalt-400/60`
                   : 'text-steel-600 hover:text-foreground',
@@ -73,7 +73,7 @@ export default function ColorsStep({
       )}
 
       {showError && !isValid && (
-        <p className="rounded-md bg-red-500/10 px-2.5 py-1.5 text-xs text-red-400">
+        <p className="rounded-md bg-red-500/10 px-2 py-2 text-xs text-red-400">
           Please select 1-2 non-Colorless colors.
         </p>
       )}

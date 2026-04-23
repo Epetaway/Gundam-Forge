@@ -25,7 +25,7 @@ export default function StarterDeckPicker({
   const secondaryRecommendations = recommendations.slice(1);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <label className="text-sm font-semibold text-foreground">
         Start From Official Starter Deck <span className="font-normal text-steel-600">(optional)</span>
       </label>
@@ -34,7 +34,7 @@ export default function StarterDeckPicker({
         type="button"
         onClick={() => onSelect(null)}
         className={cn(
-          'rounded-lg px-3 py-2.5 text-left transition-colors',
+          'rounded-lg px-4 py-2 text-left transition-colors',
           selectedSlug === null
             ? 'bg-cobalt-500/20 text-foreground ring-1 ring-cobalt-300/60'
             : 'bg-background/30 text-steel-500 hover:bg-cobalt-500/10 hover:text-foreground',
@@ -82,7 +82,7 @@ export default function StarterDeckPicker({
             </div>
           </div>
 
-          <div className="space-y-2 bg-surface/70 px-3 py-3">
+          <div className="space-y-2 bg-surface/70 px-4 py-4">
             <div className="flex items-center justify-between gap-2">
               <p className="line-clamp-1 text-sm font-semibold text-foreground">{featuredRecommendation.template.name}</p>
               <Badge variant="accent" className="text-[10px]">Top pick</Badge>
@@ -94,7 +94,7 @@ export default function StarterDeckPicker({
               {featuredRecommendation.reasons.map((reason) => (
                 <span
                   key={`${featuredRecommendation.template.slug}-${reason}`}
-                  className="rounded bg-cobalt-900/35 px-1.5 py-0.5 text-[10px] text-cobalt-200"
+                  className="rounded bg-cobalt-900/35 px-2 py-0.5 text-[10px] text-cobalt-200"
                 >
                   {reason}
                 </span>
@@ -116,7 +116,7 @@ export default function StarterDeckPicker({
                   type="button"
                   onClick={() => onSelect(item.template)}
                   className={cn(
-                    'rounded-md px-2.5 py-2 text-left transition-colors',
+                    'rounded-md px-2 py-2 text-left transition-colors',
                     selected
                       ? 'bg-cobalt-500/15 ring-1 ring-cobalt-300/60'
                       : 'bg-background/30 hover:bg-cobalt-500/10',
@@ -130,7 +130,7 @@ export default function StarterDeckPicker({
                     {item.reasons.map((reason) => (
                       <span
                         key={`${item.template.slug}-${reason}`}
-                        className="rounded bg-surface px-1.5 py-0.5 text-[10px] text-steel-500"
+                        className="rounded bg-surface px-2 py-0.5 text-[10px] text-steel-500"
                       >
                         {reason}
                       </span>
@@ -172,10 +172,10 @@ export default function StarterDeckPicker({
                   loading="lazy"
                   decoding="async"
                 />
-                <CardContent className="space-y-2 px-3 py-2.5">
+                <CardContent className="space-y-2 px-4 py-2">
                   <p className="text-sm font-semibold text-foreground line-clamp-1">{template.name}</p>
                   <p className="text-xs text-steel-600 line-clamp-2">{template.description}</p>
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="accent" className="text-[10px]">{template.archetype}</Badge>
                     {template.colors.slice(0, 2).map((color) => (
                       <Badge key={`${template.slug}-${color}`} className="text-[10px]">{color}</Badge>

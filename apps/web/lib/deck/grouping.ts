@@ -11,7 +11,7 @@ export function groupDeckItemsByType(items: DeckViewItem[]): DeckTypeStack[] {
   const buckets = new Map<string, DeckTypeStack>();
 
   for (const item of items) {
-    const label = item.typeLine || 'Other';
+    const label = item.typeLine || 'Unclassified';
     const existing = buckets.get(label);
     if (existing) {
       existing.cards.push(item);

@@ -88,7 +88,7 @@ export function ShieldZone({
       </div>
 
       {/* HP bar */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <div
           className="flex-1 h-1 rounded-full overflow-hidden"
           style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(51,65,85,0.3)' }}

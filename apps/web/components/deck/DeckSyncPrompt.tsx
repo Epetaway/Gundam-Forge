@@ -45,7 +45,7 @@ export function DeckSyncPrompt({ deckCount, onComplete, onDismiss }: DeckSyncPro
               You have {deckCount} local {deckCount === 1 ? 'deck' : 'decks'} saved on this device. 
               Would you like to sync {deckCount === 1 ? 'it' : 'them'} to your account?
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <Button onClick={handleSync} className="flex-1">
                 Sync Now
               </Button>
@@ -100,7 +100,7 @@ export function DeckSyncPrompt({ deckCount, onComplete, onDismiss }: DeckSyncPro
                   </p>
                 </div>
                 {result.errors.length > 0 && (
-                  <div className="bg-destructive/10 border border-destructive/20 rounded p-3 max-h-32 overflow-y-auto">
+                  <div className="bg-destructive/10 border border-destructive/20 rounded p-4 max-h-32 overflow-y-auto">
                     <p className="text-sm font-medium text-destructive mb-2">Errors:</p>
                     <ul className="text-xs text-destructive/90 space-y-1">
                       {result.errors.map((error, i) => (
@@ -109,7 +109,7 @@ export function DeckSyncPrompt({ deckCount, onComplete, onDismiss }: DeckSyncPro
                     </ul>
                   </div>
                 )}
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   {result.failedCount > 0 && result.syncedCount < deckCount && (
                     <Button onClick={handleSync} className="flex-1">
                       Retry Failed

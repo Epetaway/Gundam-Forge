@@ -32,7 +32,7 @@ export function ActiveFilterChips({
   const percentage = Math.round((totalCards / totalAvailable) * 100);
 
   return (
-    <div className="space-y-2 rounded-lg border border-cobalt-900/40 bg-surface-elevated/50 p-3 backdrop-blur-sm">
+    <div className="space-y-2 rounded-lg border border-cobalt-900/40 bg-surface-elevated/50 p-4 backdrop-blur-sm">
       {/* Filter count and progress */}
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export function ActiveFilterChips({
               type="button"
               onClick={() => onRemoveChip(chip.id)}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border border-cobalt-500/60 bg-cobalt-600/20 px-2.5 py-1',
+                'inline-flex items-center gap-2 rounded-full border border-cobalt-500/60 bg-cobalt-600/20 px-2 py-1',
                 'text-xs font-medium text-cobalt-300 transition-all',
                 'hover:bg-cobalt-600/30 hover:border-cobalt-400',
                 'active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-400',

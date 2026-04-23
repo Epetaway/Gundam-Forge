@@ -120,7 +120,7 @@ export function ConsistencyScale({ score, className }: ConsistencyScaleProps) {
       {zone.warning && (
         <motion.p
           key={zone.label}
-          className="rounded border border-amber-500/20 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-400"
+          className="rounded border border-amber-500/20 bg-amber-500/10 px-2 py-2 text-[11px] text-amber-400"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}

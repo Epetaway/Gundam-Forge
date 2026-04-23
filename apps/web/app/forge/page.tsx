@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { cn } from '@/lib/utils/cn';
 import { cards } from '@/lib/data/cards';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export default function ForgePage(): JSX.Element {
   const [deckId, setDeckId] = React.useState<string | null>(null);
@@ -44,22 +44,9 @@ export default function ForgePage(): JSX.Element {
 function CreateDeckWorkspace(): JSX.Element {
   const [showPreview, setShowPreview] = React.useState(false);
 
-  const [warningDismissed, setWarningDismissed] = React.useState(() => {
-    try {
-      return typeof window !== 'undefined' && localStorage.getItem('gundam-forge.forge.localWarningDismissed') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  function dismissWarning() {
-    setWarningDismissed(true);
-    try { localStorage.setItem('gundam-forge.forge.localWarningDismissed', 'true'); } catch { /* ignore */ }
-  }
-
   return (
     <div className="grid min-h-[calc(100vh-4rem)] grid-cols-1 bg-background xl:grid-cols-[420px_minmax(0,1fr)]">
-      <aside className="border-r border-cobalt-900/60 bg-gradient-to-b from-surface via-surface to-surface-muted px-4 py-5 md:px-5 xl:sticky xl:top-16 xl:h-[calc(100vh-4rem)] xl:overflow-y-auto xl:scrollbar-modern">
+      <aside className="border-r border-cobalt-900/60 bg-gradient-to-b from-surface via-surface to-surface-muted px-4 py-6 md:px-6 xl:sticky xl:top-16 xl:h-[calc(100vh-4rem)] xl:overflow-y-auto xl:scrollbar-modern">
         <div className="space-y-4">
           <div>
             <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-cobalt-300">Forge</p>
@@ -67,28 +54,18 @@ function CreateDeckWorkspace(): JSX.Element {
             <p className="mt-1 text-xs text-steel-600">Use icon tabs and drawers to move fast without long scrolling.</p>
           </div>
 
-          {!warningDismissed && (
-            <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/40 bg-amber-900/30 px-3 py-2.5 text-xs text-amber-200">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
-              <p className="flex-1 leading-relaxed">
-                <span className="font-semibold">Decks are saved locally.</span>{' '}
-                Clearing browser data or switching devices will erase your decks. Use{' '}
-                <span className="font-semibold">Export</span> inside the Forge to back up.
-              </p>
-              <button
-                type="button"
-                onClick={dismissWarning}
-                className="ml-1 shrink-0 rounded p-0.5 text-amber-400/70 transition-colors hover:text-amber-300"
-                aria-label="Dismiss warning"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
+          <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-900/30 px-4 py-2 text-xs text-amber-200">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+            <p className="leading-relaxed">
+              <span className="font-semibold">Decks are saved locally.</span>{' '}
+              Clearing browser data or switching devices will erase your decks. Use{' '}
+              <span className="font-semibold">Export</span> inside the Forge to back up.
+            </p>
+          </div>
 
           <DeckSetupForm cards={cards} />
 
-          <div className="flex flex-col gap-2 border-t border-cobalt-900/55 pt-3.5">
+          <div className="flex flex-col gap-2 border-t border-cobalt-900/55 pt-4">
             <Button
               onClick={() => setShowPreview((open) => !open)}
               size="sm"
@@ -115,7 +92,7 @@ function CreateDeckWorkspace(): JSX.Element {
 
       <section
         className={cn(
-          'hidden bg-background px-6 py-6 md:flex md:items-center md:justify-center lg:px-10 lg:py-8',
+          'hidden bg-background px-6 py-6 md:flex md:items-center md:justify-center lg:px-12 lg:py-8',
           showPreview && 'block',
         )}
       >

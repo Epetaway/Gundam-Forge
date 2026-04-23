@@ -40,7 +40,7 @@ export function EffectKeywordPills({
     : [{ category: null, effects }];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {groupedEffects.map((group, groupIndex) => (
         <div key={`category-${groupIndex}`}>
           {group.category && (
@@ -59,7 +59,7 @@ export function EffectKeywordPills({
                   type="button"
                   onClick={() => onEffectClick(effect.value)}
                   className={`
-                    flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium
+                    flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium
                     transition-all duration-150
                     ${
                       isActive
@@ -73,7 +73,7 @@ export function EffectKeywordPills({
                   {effect.count !== undefined && (
                     <span
                       className={`
-                        text-xs px-1.5 py-0.5 rounded
+                        text-xs px-2 py-0.5 rounded
                         ${isActive ? 'bg-cobalt-700' : 'bg-surface text-text-muted'}
                       `}
                     >
@@ -87,7 +87,7 @@ export function EffectKeywordPills({
             {group.effects.length > maxVisible && (
               <button
                 type="button"
-                className="rounded-full bg-surface-interactive px-3 py-1.5 text-sm font-medium text-text-muted hover:bg-surface-muted"
+                className="rounded-full bg-surface-interactive px-4 py-2 text-sm font-medium text-text-muted hover:bg-surface-muted"
                 aria-label={`${group.effects.length - maxVisible} more effects`}
               >
                 +{group.effects.length - maxVisible} more
@@ -130,7 +130,7 @@ export function EffectKeywordBadges({ effects }: { effects: string[] }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-2">
       {effects.map((effect) => (
         <span
           key={effect}

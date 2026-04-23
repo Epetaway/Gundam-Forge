@@ -51,7 +51,7 @@ export function MainNav(): JSX.Element {
           return (
             <Link
               className={cn(
-                'inline-flex min-h-[44px] items-center gap-2 rounded-sm border px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'inline-flex min-h-[44px] items-center gap-2 rounded-sm border px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 isActive
                   ? 'border-cobalt-400/70 bg-cobalt-500/25 text-cobalt-300 shadow-[0_0_14px_hsl(var(--accent)/0.28)]'
                   : 'border-transparent text-steel-600 hover:border-cobalt-500/30 hover:bg-steel-200 hover:text-foreground',

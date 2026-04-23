@@ -62,11 +62,6 @@ export function SearchSuggestionDropdown({
 
   if (!isOpen) return null;
 
-  // Flatten suggestions for keyboard navigation
-  const flatSuggestions = suggestions.flatMap(group =>
-    group.suggestions.map(s => ({ ...s, groupLabel: group.label }))
-  );
-
   if (isLoading) {
     return (
       <div

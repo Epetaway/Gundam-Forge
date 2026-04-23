@@ -214,7 +214,7 @@ function CoinFlipModal({
               className="space-y-4"
             >
               {/* Who won */}
-              <div className="p-3 rounded-lg bg-surface-interactive/50 border border-steel-600">
+              <div className="p-4 rounded-lg bg-surface-interactive/50 border border-steel-600">
                 <p className="text-white font-semibold">
                   {playerWon ? 'You won the flip!' : `${opponentId} won the flip!`}
                 </p>
@@ -224,7 +224,7 @@ function CoinFlipModal({
               {playerWon && (
                 <>
                   <p className="text-white text-sm">Choose your turn order:</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <Button
                       onClick={() => onResult(true, true)}
                       variant="primary"
@@ -272,11 +272,11 @@ function CoinFlipModal({
         {/* Players */}
         {!result && (
           <div className="grid grid-cols-2 gap-4 text-sm mt-8">
-            <div className="p-3 bg-surface-interactive/50 rounded border border-steel-600">
+            <div className="p-4 bg-surface-interactive/50 rounded border border-steel-600">
               <p className="text-white text-xs uppercase mb-1">You</p>
               <p className="text-white font-semibold">{playerId}</p>
             </div>
-            <div className="p-3 bg-surface-interactive/50 rounded border border-steel-600">
+            <div className="p-4 bg-surface-interactive/50 rounded border border-steel-600">
               <p className="text-white text-xs uppercase mb-1">Opponent</p>
               <p className="text-white font-semibold">{opponentId}</p>
             </div>

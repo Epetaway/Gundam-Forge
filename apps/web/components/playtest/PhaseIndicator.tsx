@@ -35,7 +35,7 @@ export function PhaseIndicator({ currentPhase, turnNumber, activePlayer }: Phase
         Turn {turnNumber} &bull; {turnText}
       </span>
       <span
-        className="px-2.5 py-1 text-xs rounded-full font-semibold whitespace-nowrap border"
+        className="px-2 py-1 text-xs rounded-full font-semibold whitespace-nowrap border"
         style={{
           background: isPlayerTurn ? 'rgba(14,116,144,0.25)' : 'rgba(153,27,27,0.25)',
           borderColor: isPlayerTurn ? 'rgba(34,211,238,0.45)' : 'rgba(252,165,165,0.45)',

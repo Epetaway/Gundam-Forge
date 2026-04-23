@@ -10,8 +10,6 @@ import { CardDetailModal } from '@/components/cards/CardDetailModal';
 import { CardsFilterApplyBar } from '@/components/cards/CardsFilterApplyBar';
 import { CardPreviewTile } from '@/components/deck/CardPreviewTile';
 import { ReferenceCardTile } from '@/components/cards/ReferenceCardTile';
-import { DeckPreviewCard } from '@/components/deck/DeckPreviewCard';
-import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
 import { useCardsQuery } from '@/lib/query/useCardsQuery';
 import { getCardImage, getCardsFromSource } from '@/lib/data/cards';
 import type { CardDeckRole, CatalogFilters, FilterMatchMode } from '@/lib/filters/cardFilters';
@@ -58,7 +56,7 @@ const GRID_PAGE_SIZE = 60;
 const LIST_PAGE_SIZE = 80;
 
 const selectClassName =
-  'min-h-9 w-full rounded-md border border-border bg-surface-interactive px-2.5 py-2 pr-8 text-left text-sm leading-tight text-foreground outline-none transition-colors whitespace-normal focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
+  'min-h-9 w-full rounded-md border border-border bg-surface-interactive px-2 py-2 pr-8 text-left text-sm leading-tight text-foreground outline-none transition-colors whitespace-normal focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20';
 
 interface ActiveChip {
   id: string;
@@ -618,8 +616,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
               {/* Sort */}
               <select
-                className={selectClassName}
-                style={{ width: 'auto', minWidth: '9rem', maxWidth: '13rem' }}
+                className={`${selectClassName} w-auto min-w-[9rem] max-w-[13rem]`}
                 onChange={(event) => setSortBy(event.target.value as SortKey)}
                 value={sortBy}
               >
@@ -657,10 +654,10 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
               {/* Filters button — opens filter drawer */}
               <Button onClick={openMobileFilters} size="sm" variant="secondary">
-                <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+                <SlidersHorizontal className="mr-2 h-3.5 w-3.5" />
                 Filters
                 {activeChips.length > 0 ? (
-                  <span className="ml-1.5 rounded-full bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold text-accent">
+                  <span className="ml-2 rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
                     {activeChips.length}
                   </span>
                 ) : null}
@@ -670,7 +667,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
           {/* Active filter chips */}
           {activeChips.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-1.5 pb-2">
+            <div className="flex flex-wrap items-center gap-2 pb-2">
               {activeChips.map((chip) => (
                 <button
                   className="inline-flex min-h-[32px] items-center gap-1 rounded-sm border border-border bg-surface-interactive px-2 py-1 text-[11px] font-medium text-steel-700 transition-colors hover:border-accent hover:text-accent"
@@ -698,7 +695,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
       {/* ── Active Deck Bar ──────────────────────────────── */}
       {activeDeckId && activeDeckName ? (
-        <div className="sticky top-[68px] z-30 border-b border-border bg-gradient-to-r from-cobalt-600/10 to-cobalt-500/5 backdrop-blur-sm">
+        <div className="sticky top-16 z-30 border-b border-border bg-gradient-to-r from-cobalt-600/10 to-cobalt-500/5 backdrop-blur-sm">
           <Container wide>
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-2">
@@ -726,18 +723,29 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
       <Container className="py-4" wide>
         {(timedOut || isError) && sorted.length === 0 ? (
-          <div className="mb-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-300">
-            <p>Cards failed to load. Retry?</p>
-            <Button className="mt-2" onClick={() => { setTimedOut(false); void refetch(); }} size="sm" variant="secondary">
+          <div className="mb-4 rounded-md border border-red-500/40 bg-red-500/10 px-4 py-4 text-sm text-red-200" role="status" aria-live="polite">
+            <p className="font-semibold">Cards failed to load</p>
+            <p className="mt-1 text-xs text-red-200/90">Try reloading this card list.</p>
+            <Button className="mt-4" onClick={() => { setTimedOut(false); void refetch(); }} size="sm" variant="secondary">
               Retry
             </Button>
           </div>
         ) : null}
 
-        {sorted.length === 0 ? (
-          <p className="rounded-md border border-dashed border-border p-10 text-center text-sm text-steel-600">
-            No cards match the active filters.
-          </p>
+        {isFetching && sorted.length === 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" role="status" aria-live="polite">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={`cards-loading-${i}`} className="aspect-[3/4] animate-pulse rounded-lg border border-border bg-surface-muted" />
+            ))}
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="rounded-md border border-dashed border-border p-12 text-center" role="status" aria-live="polite">
+            <p className="text-base font-semibold text-foreground">No cards found</p>
+            <p className="mt-2 text-sm text-text-muted">No cards match the active filters.</p>
+            <Button className="mt-4" onClick={clearAll} size="sm" variant="secondary">
+              Clear Filters
+            </Button>
+          </div>
         ) : (
           <>
             {view === 'grid' ? (
@@ -761,7 +769,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             ) : (
               <ul className="divide-y divide-border" role="list">
                 {visibleCards.map((card) => (
-                  <li className="px-1.5 py-1" key={card.id}>
+                  <li className="px-2 py-1" key={card.id}>
                     <ReferenceCardTile
                       card={card}
                       onOpen={() => setInspectCardId(card.id)}
@@ -771,7 +779,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               </ul>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
               <p className="text-sm text-steel-600">Showing {visibleCards.length} of {sorted.length} cards</p>
               {displayCount < sorted.length ? (
                 <Button onClick={() => setDisplayCount((count) => count + pageSize)} variant="secondary">
@@ -812,7 +820,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
             {cardsUxV2Enabled ? (
               <div className="mt-2 rounded-md border border-border bg-surface-interactive/80 p-2">
                 <p className="text-[11px] text-steel-600">Changes in this drawer apply only when you tap Apply.</p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <button
                     className="rounded-full border border-border bg-surface px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-steel-700 transition-colors hover:border-accent hover:text-foreground"
                     onClick={() => applyDraftPreset('rush-main')}
@@ -843,7 +851,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600 sm:hidden">
                 Search
                 <input
-                  className="mt-1 h-9 rounded-md border border-border bg-surface-interactive px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                  className="mt-1 h-9 rounded-md border border-border bg-surface-interactive px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                   onChange={(event) => setDraft((c) => ({ ...c, query: event.target.value }))}
                   placeholder="Card name, ID, text"
                   value={draft.query}
@@ -852,7 +860,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
 
               <label className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Color</span>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {colorOptions.filter((option) => option !== 'All').map((option) => {
                     const c = option as CardColor;
                     const active = draft.selectedColors.includes(c);
@@ -861,7 +869,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                         key={c}
                         type="button"
                         className={cn(
-                          'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
+                          'rounded-full px-4 py-1 text-xs font-semibold border transition-colors',
                           active
                             ? COLOR_PILL_ACTIVE_CLASSES[c]
                             : 'bg-surface-interactive text-steel-600 border-border hover:border-accent hover:text-foreground',
@@ -876,7 +884,7 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
                           }));
                         }}
                       >
-                        <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-2">
                           <span className={cn('h-2 w-2 rounded-full ring-1 ring-black/25', COLOR_DOT_CLASSES[c])} aria-hidden="true" />
                           {c} ({colorCounts.get(c) ?? 0})
                         </span>
@@ -961,11 +969,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Clans</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {clanOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
+                          'rounded-full border px-2 py-0.5 text-[10px] font-medium normal-case',
                           draft.clans.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -984,11 +992,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Traits</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {traitOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
+                          'rounded-full border px-2 py-0.5 text-[10px] font-medium normal-case',
                           draft.traits.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -1007,11 +1015,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Mechanics</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {mechanicOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
+                          'rounded-full border px-2 py-0.5 text-[10px] font-medium normal-case',
                           draft.mechanics.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',
@@ -1030,11 +1038,11 @@ export default function CardsClient({ initialCards }: CardsClientProps): JSX.Ele
               <div className="grid text-[10px] font-semibold uppercase tracking-wide text-steel-600">
                 <span className="mb-1">Triggers</span>
                 <div className="max-h-28 overflow-y-auto rounded-md border border-border bg-surface/50 p-2">
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {triggerOptions.map((option) => (
                       <button
                         className={cn(
-                          'rounded-full border px-1.5 py-0.5 text-[10px] font-medium normal-case',
+                          'rounded-full border px-2 py-0.5 text-[10px] font-medium normal-case',
                           draft.triggers.includes(option)
                             ? 'border-accent bg-accent/15 text-accent'
                             : 'border-border bg-surface-interactive text-steel-700 hover:border-accent/40',

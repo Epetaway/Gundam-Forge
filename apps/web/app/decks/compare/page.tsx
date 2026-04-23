@@ -51,14 +51,14 @@ export default function DeckComparePage({ searchParams }: ComparePageProps): JSX
       <section className="rounded-lg border border-steel-700 bg-surface-900/70 p-4">
         <h2 className="text-sm font-semibold text-surface-foreground">Quick Select</h2>
         <p className="mt-1 text-xs text-steel-400">Use these links to compare popular decks.</p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {topDeckOptions.slice(0, 6).map((deck, index, arr) => {
             const against = arr[(index + 1) % arr.length];
             return (
               <a
                 key={`${deck.id}-${against.id}`}
                 href={`/decks/compare?ids=${deck.id},${against.id}`}
-                className="min-h-11 rounded border border-steel-700 bg-surface-950 px-3 py-2 text-sm text-surface-foreground transition-colors hover:border-cobalt-500/60"
+                className="min-h-11 rounded border border-steel-700 bg-surface-950 px-4 py-2 text-sm text-surface-foreground transition-colors hover:border-cobalt-500/60"
               >
                 {deck.name} vs {against.name}
               </a>
@@ -77,7 +77,7 @@ export default function DeckComparePage({ searchParams }: ComparePageProps): JSX
             <article key={deck.id} className="rounded-lg border border-steel-700 bg-surface-900/70 p-4">
               <h2 className="text-base font-semibold text-surface-foreground">{deck.name}</h2>
               <p className="mt-1 text-xs text-steel-400">{deck.archetype}</p>
-              <p className="mt-3 text-sm text-surface-foreground/90">{deck.description}</p>
+              <p className="mt-4 text-sm text-surface-foreground/90">{deck.description}</p>
 
               <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <div>
