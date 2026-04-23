@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { GameEngine } from '@/lib/game';
 import { AdvancedAutoplayer, type StrategyBias } from '@/lib/game/advanced-autoplayer';
 import { Battlefield } from './Battlefield';
+import { GoldfishBattlefield, type GoldfishStats } from './GoldfishBattlefield';
 import { GameStartFlow } from './GameStartFlow';
 import type { GameStartPhase } from './GameStartFlow';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
@@ -50,6 +51,7 @@ interface PlaytestGameEnhancedProps {
   opponentDeckId: string;
   cardDatabase: Record<string, any>;
   onGameEnd?: (winner: string, reason: string) => void;
+  mode?: 'versus' | 'goldfish';
 }
 
 interface OpponentDeckOption {
@@ -139,6 +141,7 @@ export function PlaytestGameEnhanced({
   opponentDeckId,
   cardDatabase,
   onGameEnd,
+  mode = 'versus',
 }: PlaytestGameEnhancedProps) {
   const playtesterAssistV2Enabled = features.playtesterAssistV2();
   const CONTROLS_TOAST_KEY = 'gf.playtest.controlsToastDismissed.v1';
@@ -348,6 +351,24 @@ export function PlaytestGameEnhanced({
     }
   }, [playerDeck, cardDatabase, opponentDeckOptions, selectedOpponentDeckId]);
 
+  // Goldfish mode: auto-setup opening hand and skip GameStartFlow entirely
+  useEffect(() => {
+    if (mode !== 'goldfish') return;
+    if (!engine || gameReady) return;
+
+    engine.setupDraw('player1', 5);
+    engine.setupDraw('player2', 3);
+    engine.setFirstPlayer('player1');
+    engine.executeAction({
+      type: 'ADVANCE_PHASE',
+      playerId: 'player1',
+      timestamp: Date.now(),
+    });
+    setGameState(engine.getState());
+    setGameReady(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine, gameReady, mode]);
+
   useEffect(() => {
     if (!isMobileAutoMode || !engine || gameReady) return;
 
@@ -453,9 +474,9 @@ export function PlaytestGameEnhanced({
 
       setGameState(engine.getState());
 
-      // Check for game end
+      // Check for game end (skipped in goldfish mode — no win condition)
       const finalState = engine.getState();
-      if (finalState.isGameOver && finalState.winner) {
+      if (mode !== 'goldfish' && finalState.isGameOver && finalState.winner) {
         if (finalState.winner === 'player1') {
           playVictory();
           onGameEnd?.(finalState.winner, 'You win!');
@@ -489,22 +510,26 @@ export function PlaytestGameEnhanced({
   }, [gameState?.phase, gameReady]);
 
   // Opponent turn: fire autoplayer when it's player2's turn (desktop/tablet mode)
+  // In goldfish mode, skip AI and advance immediately.
   useEffect(() => {
     if (isMobileAutoMode) return;
     if (!engine || !gameState) return;
     if (gameState.activePlayerId !== 'player2') return;
     if (gameState.phase === 'start' || gameState.phase === 'gameOver') return;
 
+    const delay = mode === 'goldfish' ? 50 : 800;
     const timeout = setTimeout(() => {
       const currentState = engine.getState();
       if (currentState.activePlayerId !== 'player2') return;
 
-      const decision = autoplayerRef.current.decideActions(currentState, cardDatabase);
-      for (const action of decision.actions) {
-        engine.executeAction(action);
+      if (mode !== 'goldfish') {
+        const decision = autoplayerRef.current.decideActions(currentState, cardDatabase);
+        for (const action of decision.actions) {
+          engine.executeAction(action);
+        }
       }
 
-      // If phase hasn't fully cycled back to player1 after autoplayer, advance it
+      // Advance phase back to player1
       const afterState = engine.getState();
       if (afterState.activePlayerId === 'player2' && afterState.phase !== 'gameOver') {
         engine.executeAction({
@@ -516,11 +541,11 @@ export function PlaytestGameEnhanced({
       }
 
       setGameState(engine.getState());
-    }, 800);
+    }, delay);
 
     return () => clearTimeout(timeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState?.activePlayerId, gameState?.phase, isMobileAutoMode]);
+  }, [gameState?.activePlayerId, gameState?.phase, isMobileAutoMode, mode]);
 
   // Dismiss error
   const dismissError = () => {
@@ -594,6 +619,28 @@ export function PlaytestGameEnhanced({
     (playerState?.resourceDeck.length ?? 0) > 0;
   const hasPendingTriggers = (gameState?.stack.length ?? 0) > 0;
 
+  const goldfishStats = React.useMemo<GoldfishStats>(() => {
+    if (mode !== 'goldfish' || !engine || !gameState) {
+      return { cardsPlayed: 0, resourcesPlaced: 0, firstUnitTurn: null };
+    }
+    const log = engine.getLog();
+    const cardsPlayed = log.filter(
+      (e) => e.actionType === 'PLAY_CARD' && e.activePlayer === 'player1',
+    ).length;
+    const resourcesPlaced = log.filter(
+      (e) => e.actionType === 'PLACE_RESOURCE' && e.activePlayer === 'player1',
+    ).length;
+    let firstUnitTurn: number | null = null;
+    for (const entry of log) {
+      if ((entry.state?.players?.['player1']?.battleArea?.length ?? 0) > 0) {
+        firstUnitTurn = entry.state.turnNumber ?? null;
+        break;
+      }
+    }
+    return { cardsPlayed, resourcesPlaced, firstUnitTurn };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine, gameState, mode]);
+
   const assistHint = React.useMemo(
     () =>
       getPlaytesterAssistHint({
@@ -652,6 +699,12 @@ export function PlaytestGameEnhanced({
               turnNumber={gameState.turnNumber}
               activePlayer={isPlayerTurn ? 'You' : 'Opponent'}
             />
+          )}
+
+          {mode === 'goldfish' && !isSetupPhase && (
+            <span className="px-2 py-1 text-[10px] rounded-full border border-blue-400/40 bg-blue-950/50 text-blue-200 whitespace-nowrap">
+              🐟 Goldfish Mode
+            </span>
           )}
 
           {isMobileAutoMode && !isSetupPhase && (
@@ -755,18 +808,20 @@ export function PlaytestGameEnhanced({
               {disableSetupAnimations ? 'Fast Setup' : 'Animated Setup'}
             </button>
 
-            <select
-              value={selectedOpponentDeckId}
-              onChange={(event) => setSelectedOpponentDeckId(event.target.value)}
-              className="px-2 py-1 bg-surface-elevated border border-border rounded text-xs text-foreground max-w-[200px]"
-              title="Select opponent deck"
-            >
-              {opponentDeckOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+            {mode !== 'goldfish' && (
+              <select
+                value={selectedOpponentDeckId}
+                onChange={(event) => setSelectedOpponentDeckId(event.target.value)}
+                className="px-2 py-1 bg-surface-elevated border border-border rounded text-xs text-foreground max-w-[200px]"
+                title="Select opponent deck"
+              >
+                {opponentDeckOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <button
               onClick={() => {
@@ -823,8 +878,8 @@ export function PlaytestGameEnhanced({
         )}
       </header>
 
-      {/* SETUP PHASE — GameStartFlow */}
-      {isSetupPhase && !isMobileAutoMode && (
+      {/* SETUP PHASE — GameStartFlow (skipped in goldfish mode) */}
+      {isSetupPhase && !isMobileAutoMode && mode !== 'goldfish' && (
         <GameStartFlow
           phase={startPhase}
           playerId="player1"
@@ -889,7 +944,7 @@ export function PlaytestGameEnhanced({
         </div>
       )}
 
-      {/* MAIN GAME AREA: Battlefield */}
+      {/* MAIN GAME AREA */}
       {!isSetupPhase && (
         <DragDropProvider
           cardDatabase={cardDatabase}
@@ -904,45 +959,57 @@ export function PlaytestGameEnhanced({
           onDropError={(msg) => showMisplay(msg)}
         >
           <main className="flex-1 overflow-hidden" id="main-content">
-            <Battlefield
-              playerState={resolvedPlayerState}
-              opponentState={resolvedOpponentState}
-              isPlayerTurn={isPlayerTurn}
-              gamePhase={gameState.phase}
-              cardDatabase={cardDatabase}
-              selectedCard={selectedCard}
-              turnNumber={gameState.turnNumber}
-              gameLog={engine.getLog().slice(-20)}
-              onUnitSelected={(unit, isOpponent) => {
-                if (!isOpponent) {
-                  setSelectedCard(unit);
-                }
-              }}
-              onSelectCard={(card) => {
-                setSelectedCard(card);
-              }}
-              onCardPlayRequested={(card) => {
-                handleAction({
-                  type: 'PLAY_CARD',
-                  playerId: 'player1',
-                  timestamp: Date.now(),
-                  payload: { cardInstanceId: card.instanceId },
-                });
-              }}
-              onShieldDamaged={(remaining) => {
-                if (remaining === 0) {
-                  playShieldBreak();
-                }
-              }}
-              onAttackDeclared={(attackerInstanceId, targetInstanceId) => {
-                handleAction({
-                  type: 'DECLARE_ATTACK',
-                  playerId: 'player1',
-                  timestamp: Date.now(),
-                  payload: { attackerInstanceId, ...(targetInstanceId ? { targetInstanceId } : {}) },
-                });
-              }}
-            />
+            {mode === 'goldfish' ? (
+              <GoldfishBattlefield
+                gameState={gameState}
+                engine={engine}
+                cardDatabase={cardDatabase}
+                selectedCard={selectedCard}
+                onAction={handleAction}
+                onSelectCard={(card) => setSelectedCard(card)}
+                goldfishStats={goldfishStats}
+              />
+            ) : (
+              <Battlefield
+                playerState={resolvedPlayerState}
+                opponentState={resolvedOpponentState}
+                isPlayerTurn={isPlayerTurn}
+                gamePhase={gameState.phase}
+                cardDatabase={cardDatabase}
+                selectedCard={selectedCard}
+                turnNumber={gameState.turnNumber}
+                gameLog={engine.getLog().slice(-20)}
+                onUnitSelected={(unit, isOpponent) => {
+                  if (!isOpponent) {
+                    setSelectedCard(unit);
+                  }
+                }}
+                onSelectCard={(card) => {
+                  setSelectedCard(card);
+                }}
+                onCardPlayRequested={(card) => {
+                  handleAction({
+                    type: 'PLAY_CARD',
+                    playerId: 'player1',
+                    timestamp: Date.now(),
+                    payload: { cardInstanceId: card.instanceId },
+                  });
+                }}
+                onShieldDamaged={(remaining) => {
+                  if (remaining === 0) {
+                    playShieldBreak();
+                  }
+                }}
+                onAttackDeclared={(attackerInstanceId, targetInstanceId) => {
+                  handleAction({
+                    type: 'DECLARE_ATTACK',
+                    playerId: 'player1',
+                    timestamp: Date.now(),
+                    payload: { attackerInstanceId, ...(targetInstanceId ? { targetInstanceId } : {}) },
+                  });
+                }}
+              />
+            )}
           </main>
         </DragDropProvider>
       )}

@@ -34,6 +34,16 @@ const TYPE_ORDER = ['Unit', 'Pilot', 'Command', 'Base'];
 
 const EXCLUDED_SETS = new Set(['Token']);
 
+const SYNERGY_TIERS = [
+  { tier: 'SS', label: '95+', min: 95 },
+  { tier: 'S',  label: '85+', min: 85 },
+  { tier: 'A',  label: '70+', min: 70 },
+  { tier: 'B',  label: '50+', min: 50 },
+  { tier: 'C',  label: '<50', min: 0  },
+] as const;
+
+type SynergyTier = (typeof SYNERGY_TIERS)[number]['tier'];
+
 type GroupMode = 'none' | 'clan' | 'type';
 
 const FILTER_SECTIONS = [
@@ -392,7 +402,8 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
   const [previewCardId, setPreviewCardId] = useState<string | null>(null);
   const previewCard = previewCardId ? (allCards.find((c) => c.id === previewCardId) ?? null) : null;
 
-  const [intentEditorOpen, setIntentEditorOpen] = useState(false);
+  const [intentEditorOpen, setIntentEditorOpen] = useState(() => !!onIntentChange);
+  const [synergyTierFilter, setSynergyTierFilter] = useState<SynergyTier | null>(null);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [activeFilterSection, setActiveFilterSection] = useState<FilterSectionId>('intent');
 
@@ -585,12 +596,26 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
       eligible = scored.map(s => s.card);
     }
 
+    let result: ScoredCard[] = eligible;
     if (mechanicsPackages.length > 0) {
-      return sortCardsBySynergy(eligible, mechanicsPackages, deckClans, deckColors, includeEX);
+      result = sortCardsBySynergy(eligible, mechanicsPackages, deckClans, deckColors, includeEX);
     }
 
-    return eligible;
-  }, [query, typeFilter, colorFilter, setFilter, keywordFilters, triggerFilters, effectKeywordFilters, deckColorOnly, deckColors, includeEX, deckClans, mechanicsPackages]);
+    if (synergyTierFilter && mechanicsPackages.length > 0) {
+      result = result.filter((c) => {
+        const score = c.synergyScore ?? 0;
+        switch (synergyTierFilter) {
+          case 'SS': return score >= 95;
+          case 'S':  return score >= 85 && score < 95;
+          case 'A':  return score >= 70 && score < 85;
+          case 'B':  return score >= 50 && score < 70;
+          case 'C':  return score < 50;
+        }
+      });
+    }
+
+    return result;
+  }, [query, typeFilter, colorFilter, setFilter, keywordFilters, triggerFilters, effectKeywordFilters, deckColorOnly, deckColors, includeEX, deckClans, mechanicsPackages, synergyTierFilter]);
 
   const showSynergy = mechanicsPackages.length > 0;
 
@@ -842,7 +867,7 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {['blocker', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
+                    {['attack', 'blocker', 'when-played', 'on-attack', 'main', 'high-maneuver', 'first-strike', 'breach', 'support', 'repair', 'suppression'].map((kw) => {
                       const active = keywordFilters.includes(kw);
                       return (
                         <button
@@ -987,6 +1012,46 @@ export function CardSearchPanel({ onSelect, deckIntent, initialSetId, onIntentCh
                     </div>
                   )}
                 </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Synergy tier filter chips (visible only when synergy scoring is active) ── */}
+        {showSynergy && (
+          <div className="border-t border-border px-4 py-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="shrink-0 font-mono text-[10px] uppercase tracking-widest text-text-muted">Synergy</span>
+              {SYNERGY_TIERS.map(({ tier, label }) => {
+                const active = synergyTierFilter === tier;
+                const colorClass = {
+                  SS: active ? 'bg-violet-600 text-white' : 'border border-violet-500/40 text-violet-300 hover:bg-violet-600/20',
+                  S:  active ? 'bg-blue-600 text-white'   : 'border border-blue-500/40 text-blue-300 hover:bg-blue-600/20',
+                  A:  active ? 'bg-green-600 text-white'  : 'border border-green-500/40 text-green-300 hover:bg-green-600/20',
+                  B:  active ? 'bg-amber-600 text-white'  : 'border border-amber-500/40 text-amber-300 hover:bg-amber-600/20',
+                  C:  active ? 'bg-slate-600 text-white'  : 'border border-slate-500/40 text-slate-400 hover:bg-slate-600/20',
+                }[tier];
+                return (
+                  <button
+                    key={tier}
+                    type="button"
+                    onClick={() => setSynergyTierFilter(active ? null : tier)}
+                    className={cn('rounded-full px-2.5 py-0.5 text-[11px] font-bold transition-colors', colorClass)}
+                    aria-pressed={active}
+                    title={`Filter to ${tier}-tier synergy cards (${label})`}
+                  >
+                    {tier} <span className="font-normal opacity-70">{label}</span>
+                  </button>
+                );
+              })}
+              {synergyTierFilter && (
+                <button
+                  type="button"
+                  onClick={() => setSynergyTierFilter(null)}
+                  className="text-[11px] text-text-secondary transition-colors hover:text-foreground"
+                >
+                  ✕ Clear
+                </button>
               )}
             </div>
           </div>
