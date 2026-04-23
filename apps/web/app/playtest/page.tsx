@@ -9,19 +9,85 @@ import { getDeckById } from '@/lib/data/decks';
 import { cards, cardsRecord } from '@/lib/data/cards';
 import type { DeckRecord } from '@/lib/data/decks';
 
-/**
- * /playtest?deckId=<id>
- *
- * Resolves the deck from:
- *   1. localStorage — user's Forge-built StoredDeck
- *   2. Catalog — DeckRecord from the deck catalog
- *
- * StoredDeck and DeckRecord both have `entries: Array<{cardId, qty}>` so
- * conversion is straightforward.
- */
+type PlaytestMode = 'versus' | 'goldfish';
+
+function ModeSelector({
+  deckName,
+  onSelect,
+}: {
+  deckName: string;
+  onSelect: (mode: PlaytestMode) => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-[#0a0e1a] px-6">
+      <div className="text-center space-y-2">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-blue-400">Playtest Mode</p>
+        <h1 className="text-2xl font-bold text-white">{deckName}</h1>
+        <p className="text-sm text-white/50">Choose how you want to test this deck</p>
+      </div>
+
+      <div className="grid w-full max-w-xl gap-4 sm:grid-cols-2">
+        {/* Goldfish */}
+        <button
+          onClick={() => onSelect('goldfish')}
+          className="group flex flex-col gap-3 rounded-xl border border-blue-500/30 bg-blue-950/30 p-6 text-left transition hover:border-blue-400/60 hover:bg-blue-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🐟</span>
+            <span className="text-base font-bold text-white">Goldfish</span>
+            <span className="ml-auto rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-blue-300">
+              Recommended
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-white/60">
+            Play solitaire-style with no opponent. Test your deck&apos;s speed, consistency, and combo lines turn-by-turn.
+          </p>
+          <ul className="space-y-1 text-xs text-white/40">
+            <li>✓ No opponent board</li>
+            <li>✓ Stats: turns to first unit, cards played</li>
+            <li>✓ Unlimited turns — end when you&apos;re done</li>
+          </ul>
+        </button>
+
+        {/* VS Bot */}
+        <button
+          onClick={() => onSelect('versus')}
+          className="group flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-6 text-left transition hover:border-white/20 hover:bg-white/[0.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🤖</span>
+            <span className="text-base font-bold text-white">VS Bot</span>
+          </div>
+          <p className="text-sm leading-relaxed text-white/60">
+            Play a full match against an AI opponent. Test your deck in a competitive setting with full rules enforcement.
+          </p>
+          <ul className="space-y-1 text-xs text-white/40">
+            <li>✓ Full two-player game</li>
+            <li>✓ AI opponent with strategy</li>
+            <li>✓ Win/loss conditions</li>
+          </ul>
+        </button>
+      </div>
+
+      <Link
+        href="/decks"
+        className="text-xs text-white/30 transition hover:text-white/60"
+      >
+        ← Back to Decks
+      </Link>
+    </div>
+  );
+}
+
 export default function PlaytestPage() {
   const [deck, setDeck] = React.useState<DeckRecord | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [mode, setMode] = React.useState<PlaytestMode | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const m = new URLSearchParams(window.location.search).get('mode');
+    if (m === 'versus' || m === 'goldfish') return m as PlaytestMode;
+    return null;
+  });
 
   React.useEffect(() => {
     const deckId = new URLSearchParams(window.location.search).get('deckId');
@@ -31,7 +97,6 @@ export default function PlaytestPage() {
       return;
     }
 
-    // Try localStorage first (Forge-built deck)
     const stored = getStoredDeck(deckId);
     if (stored) {
       const asRecord: DeckRecord = {
@@ -49,7 +114,6 @@ export default function PlaytestPage() {
       return;
     }
 
-    // Fall back to catalog deck
     const catalogDeck = getDeckById(deckId);
     if (catalogDeck) {
       setDeck(catalogDeck);
@@ -59,6 +123,15 @@ export default function PlaytestPage() {
     setError(
       `Deck "${deckId}" was not found in your saved decks or the catalog. It may have been deleted.`,
     );
+  }, []);
+
+  const handleModeSelect = React.useCallback((selected: PlaytestMode) => {
+    setMode(selected);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('mode', selected);
+      window.history.replaceState({}, '', url.toString());
+    }
   }, []);
 
   if (error) {
@@ -93,7 +166,6 @@ export default function PlaytestPage() {
     );
   }
 
-  // Validate deck before playtesting
   const validation = validateDeck(deck.entries, cards);
   if (!validation.isValid) {
     return (
@@ -125,11 +197,16 @@ export default function PlaytestPage() {
     );
   }
 
+  if (!mode) {
+    return <ModeSelector deckName={deck.name} onSelect={handleModeSelect} />;
+  }
+
   return (
     <PlaytestGameEnhanced
       playerDeck={deck}
       opponentDeckId="token-colorless-bot"
       cardDatabase={cardsRecord}
+      mode={mode}
       onGameEnd={(winner, reason) => {
         console.log(`Game ended — winner: ${winner}, reason: ${reason}`);
       }}
