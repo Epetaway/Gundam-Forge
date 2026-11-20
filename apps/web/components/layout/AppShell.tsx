@@ -42,7 +42,13 @@ export function AppShell({ children }: AppShellProps): JSX.Element {
 
       <footer className="safe-pad-x safe-pad-bottom border-t border-border bg-surface/90">
         <Container className="flex flex-col gap-4 py-6 text-xs text-steel-600 sm:flex-row sm:items-center sm:justify-between">
-          <p>Built for high-velocity Gundam GCG deck iteration.</p>
+          <div className="flex flex-col gap-1">
+            <p>Built for high-velocity Gundam GCG deck iteration.</p>
+            <p>
+              Unofficial fan project. Not affiliated with or endorsed by Bandai or Sunrise. Card names, text and art
+              belong to their respective owners.
+            </p>
+          </div>
           <p className="font-mono uppercase tracking-[0.16em]">Fast · Free · Community-powered</p>
         </Container>
       </footer>

@@ -4,6 +4,10 @@ dist
 .next
 apps/web/.next
 apps/web/out
+
+# Card art is downloaded by `npm run fetch-assets` (locally and in CI) and never committed:
+# the images belong to their rights holders.
+apps/web/public/card_art/
 .DS_Store
 *.log
 *.tsbuildinfo
