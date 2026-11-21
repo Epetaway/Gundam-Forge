@@ -2,6 +2,8 @@
 
 Gundam Forge is a beta deck builder + playtest simulator for Bandai Gundam TCG workflows.
 
+> **Evaluating this project?** Start with the [project wiki](./docs/wiki/README.md): problem, design, architecture, key decisions, quality, and lessons learned.
+
 > **Fan project.** Gundam Forge is an independent, unofficial, non-commercial fan tool. It is not affiliated with, endorsed by, or sponsored by Bandai, Sunrise, or any other rights holder. Gundam and all card names, text and artwork are trademarks and copyrights of their respective owners.
 >
 > **Card images are not stored in this repository.** `npm run fetch-assets` downloads them into `apps/web/public/card_art/` (gitignored) for local development, and the deploy workflow does the same at build time. Without them the app shows generated placeholders.
